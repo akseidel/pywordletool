@@ -1,41 +1,41 @@
-import os
-from grepper import setupGrepFiltering
-from helpers import clearScrn, shellCMDLst, makeLtrRankDictionary, showThisWordList, makeRankedFilteredResultDictionary
-from helpers import getWordListPathName, getRawWordCount, getResultsWordList
 
-clearScrn()
+import grepper
+import helpers
+from helpers import get_word_list_path_name, get_raw_word_count, get_results_word_list
+
+helpers.clear_scrn()
 
 # variables
 ranked_wrds_dict ={} # dictionary of ranked words resulting from grep filtering
 
-wrdListFileName = getWordListPathName('worddata/wo_nyt_wordlist.txt')
-# wrdListFileName = getWordListPathName('worddata/nyt_wordlist.txt')
+wrdListFileName = get_word_list_path_name('worddata/wo_nyt_wordlist.txt')
+# wrdListFileName = get_word_list_path_name('worddata/nyt_wordlist.txt')
 
 rankFile = 'worddata/letter_ranks.txt' # rankFile is the letter ranking textfile
-ltr_rank_dict = makeLtrRankDictionary(rankFile)  # ltr_rank_dict is the rank dictionary
+ltr_rank_dict = helpers.make_ltr_rank_dictionary(rankFile)  # ltr_rank_dict is the rank dictionary
 
-# Initialize and setup the shellCMDLst class instance that is used to hold the
+# Initialize and setup the ShellCmdList class instance that is used to hold the
 # grep filtering command stack. Guessing because it is a class instance is why it
 # can be passed around as a global variable where it gets modified along the way.
-thisShCMDLst = shellCMDLst(wrdListFileName)
-setupGrepFiltering(thisShCMDLst) # fills the stack with grep assignments
+this_sh_cmd_lst = helpers.ShellCmdList(wrdListFileName)
+grepper.setup_grep_filtering(this_sh_cmd_lst)  # fills the stack with grep assignments
 
 # Get word count
-raw_cnt = getRawWordCount(thisShCMDLst)
+raw_cnt = get_raw_word_count(this_sh_cmd_lst)
 
 # Get results words list
-wrds = getResultsWordList(thisShCMDLst)
+wrds = get_results_word_list(this_sh_cmd_lst)
 
 # Ranking and filtering the words into a dictionary
-# Set noDups to prevent letters from occurring more than once
-# noDups = False
-noDups = True 
-ranked_wrds_dict = makeRankedFilteredResultDictionary(wrds,ltr_rank_dict,noDups)
+# Set no_dups to prevent letters from occurring more than once
+# no_dups = False
+no_dups = True
+ranked_wrds_dict = helpers.make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups)
 
-showThisWordList(ranked_wrds_dict)
+helpers.show_this_word_list(ranked_wrds_dict)
 print()
 print('Showing word list of ' + str(len(ranked_wrds_dict)) + " from raw list of " + raw_cnt + " having duplicates.")
 print()
 
-print(thisShCMDLst.fullCMD())
+print(this_sh_cmd_lst.full_cmd())
 print()
