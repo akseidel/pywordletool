@@ -89,10 +89,32 @@ def wrd_has_duplicates(wrd):
 
 # List out the ranked word list
 def show_this_word_list(the_word_list):
-    print("Word  : Rank")
+    n_col = 6
+    n_items = len(the_word_list)
+    h_txt = " Word : Rank "
+    left_pad = ""
+    mid_pad = "   "
+    h_line = left_pad + h_txt
+    for i in range(1, n_col):
+        h_line = h_line + mid_pad + h_txt
+    print(h_line)
+    c = 0
+    i = 0
+    l_msg = ""
     for key, value in the_word_list.items():
         msg = key + " : " + str(value)
-        print(msg)
+        i = i + 1
+        if c == 0:
+            l_msg = left_pad + msg
+        else:
+            l_msg = l_msg + mid_pad + msg
+        c = c + 1
+        if c == n_col:
+            print(l_msg)
+            c = 0
+            l_msg = ""
+        if i == n_items:
+            print(l_msg)
 
 
 # Ranking and filtering the words into a dictionary
