@@ -7,8 +7,8 @@ helpers.clear_scrn()
 # variables
 ranked_wrds_dict ={} # dictionary of ranked words resulting from grep filtering
 
-wrdListFileName = helpers.get_word_list_path_name('worddata/wo_nyt_wordlist.txt')
-# wrdListFileName = helpers.get_word_list_path_name('worddata/nyt_wordlist.txt')
+# wrdListFileName = helpers.get_word_list_path_name('worddata/wo_nyt_wordlist.txt')
+wrdListFileName = helpers.get_word_list_path_name('worddata/nyt_wordlist.txt')
 
 rankFile = 'worddata/letter_ranks.txt' # rankFile is the letter ranking textfile
 ltr_rank_dict = helpers.make_ltr_rank_dictionary(rankFile)  # ltr_rank_dict is the rank dictionary
@@ -27,8 +27,9 @@ wrds = helpers.get_results_word_list(this_sh_cmd_lst)
 
 # Ranking and filtering the words into a dictionary
 # Set no_dups to prevent letters from occurring more than once
-# no_dups = False
-no_dups = True
+# First pick should not use duplicates, later picks should consider them.
+no_dups = False
+# no_dups = True
 ranked_wrds_dict = helpers.make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups)
 
 helpers.show_this_word_list(ranked_wrds_dict)
