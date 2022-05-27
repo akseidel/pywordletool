@@ -7,8 +7,8 @@ helpers.clear_scrn()
 # variables
 ranked_wrds_dict ={} # dictionary of ranked words resulting from grep filtering
 
-# wrdListFileName = helpers.get_word_list_path_name('worddata/wo_nyt_wordlist.txt')
-wrdListFileName = helpers.get_word_list_path_name('worddata/nyt_wordlist.txt')
+wrdListFileName = helpers.get_word_list_path_name('worddata/wo_nyt_wordlist.txt')
+# wrdListFileName = helpers.get_word_list_path_name('worddata/nyt_wordlist.txt')
 
 rankFile = 'worddata/letter_ranks.txt' # rankFile is the letter ranking textfile
 ltr_rank_dict = helpers.make_ltr_rank_dictionary(rankFile)  # ltr_rank_dict is the rank dictionary

@@ -8,7 +8,7 @@ from helpers import ShellCmdList
 def setup_grep_filtering(this_sh_cmd_lst):
     # post first pick always exclusions
     # format is => this_sh_cmd_lst.add_excl_any_cmd('l|s')
-    this_sh_cmd_lst.add_excl_any_cmd('l|h|c|o|r|n')
+    this_sh_cmd_lst.add_excl_any_cmd('l|e')
 
     # post first pick temporary exclusions
     # format is => this_sh_cmd_lst.add_excl_any_cmd('l|s')
@@ -34,19 +34,18 @@ def setup_grep_filtering(this_sh_cmd_lst):
 
     # # post first pick required non positions
     # # format is => this_sh_cmd_lst.add_excl_pos_cmd('l',p)
-    this_sh_cmd_lst.add_excl_pos_cmd('s',1)
-    this_sh_cmd_lst.add_excl_pos_cmd('a',2)
-    this_sh_cmd_lst.add_excl_pos_cmd('t',3)
-    this_sh_cmd_lst.add_excl_pos_cmd('e',5)
+    this_sh_cmd_lst.add_excl_pos_cmd('t',5)
+    this_sh_cmd_lst.add_excl_pos_cmd('a',1)
+    # this_sh_cmd_lst.add_excl_pos_cmd('t',3)
+    # this_sh_cmd_lst.add_excl_pos_cmd('e',5)
 
     # # post first pick required positions
     # # format is => this_sh_cmd_lst.add_incl_pos_cmd('l',p)
+    # this_sh_cmd_lst.add_incl_pos_cmd('t',1)
+    # this_sh_cmd_lst.add_incl_pos_cmd('u',2)
+    # this_sh_cmd_lst.add_incl_pos_cmd('a',3)
+    this_sh_cmd_lst.add_incl_pos_cmd('r',4)
     # this_sh_cmd_lst.add_incl_pos_cmd('t',5)
-    # this_sh_cmd_lst.add_incl_pos_cmd('u',3)
-    # this_sh_cmd_lst.add_incl_pos_cmd('c',4)
-    # this_sh_cmd_lst.add_incl_pos_cmd('h',5)
-    # this_sh_cmd_lst.add_incl_pos_cmd('r',1)
-    # this_sh_cmd_lst.add_incl_pos_cmd('s',5)
 
     # # post first pick Low rank inclusions
     # this_sh_cmd_lst.add_cmd('grep -E \'b|f|k|w\'')
