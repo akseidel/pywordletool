@@ -3,27 +3,24 @@
 # from tkinter import *
 
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
-# import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
-import customtkinter
+import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
+import customtkinter as ctk
 
-customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
-customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
+ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
+ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 
 # customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 
-def tk_q(self):
-    pass
 
 
-# self.quit()
 
 def do_grep():
     print("do grep")
     # this_app.bt_grep(text = "What")
 
 
-class pywordletool(customtkinter.CTk):
+class pywordletool(ctk.CTk):
     # global do_grep
     global switch_var
 
@@ -31,12 +28,12 @@ class pywordletool(customtkinter.CTk):
         super().__init__()
         self.title("This Wordle Tool")
         w_width = 600
-        w_height = 400
+        w_height = 800
         pos_x = int( self.winfo_screenwidth()/2 - w_width/2 )
         pos_y = int( self.winfo_screenheight()/2 - w_height/2 )
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
 
-        self.frame = customtkinter.CTkFrame(master=self,
+        self.frame = ctk.CTkFrame(master=self,
                                             width=580,
                                             height=200,
                                             corner_radius=10,
@@ -57,7 +54,7 @@ class pywordletool(customtkinter.CTk):
 
         t.insert( 1.0, text_var.get())
 
-        gr_output = customtkinter.CTkLabel(master=self.frame,
+        gr_output = ctk.CTkLabel(master=self.frame,
                                            textvariable=text_var,
                                            width=578,
                                            height=200,
@@ -72,15 +69,15 @@ class pywordletool(customtkinter.CTk):
         #
         # self.label2 = customtkinter.CTkLabel(self, text ="Helps you do a wordle.").grid(row=2, column=0, padx=10, pady=6)
         #
-        self.bt_grep = customtkinter.CTkButton(master=self,
+        self.bt_grep = ctk.CTkButton(master=self,
                                                text="Do Grep",
                                                # command=(lambda: self.bt_grep.set_text("Changed This To Be Long"))
-                                               command=do_grep()
+                                               command=do_grep
                                                )
         self.bt_grep.grid(row=1, column=1)
-        # self.bt_Q = customtkinter.CTkButton(self, text = "Quit",  command=tk_q(self))
-        #
-        # self.bt_Q.pack(row=3,column=2,padx= 6,pady=6)
+        self.bt_Q = ctk.CTkButton(self, text = "Quit",  command=self.destroy)
+
+        self.bt_Q.grid(row=2,column=1,padx= 6,pady=6)
 
         switch_var = tk.StringVar(value="off")   # starting value
 
@@ -88,14 +85,22 @@ class pywordletool(customtkinter.CTk):
             pass
             # print("switch toggled, current value:", switch_1.get())
 
-        switch_1 = customtkinter.CTkSwitch(master=self,
-                                           text="Allow Duplicate Letters",
-                                           command=switch_event,
-                                           variable= switch_var,
-                                           onvalue="on",
-                                           offvalue="off"
-                                           )
+        switch_1 = ctk.CTkSwitch(master=self,
+                               text="Allow Duplicate Letters",
+                               command=switch_event,
+                               variable= switch_var,
+                               onvalue="on",
+                               offvalue="off"
+                               )
         switch_1.grid(row=2, column=0, padx= 6, pady=6, sticky="W")
+
+
+        combo = ttk.Combobox(master=self,
+                             values= ("Small Vocabulary", "Large Vocabulary")
+                             )
+        # combo['values']= ("Small Vocabulary", "Large Vocabulary")
+        combo.grid(row=3, column=0, padx= 6, pady=6, sticky="W")
+        combo.current(0)
 
 
 this_app = pywordletool()
