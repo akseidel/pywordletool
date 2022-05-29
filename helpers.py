@@ -4,7 +4,7 @@
 import sys
 import os
 import random
-
+import grepper
 
 # Returns the wordle word list full pathname
 # Exits program if not found
@@ -88,8 +88,7 @@ def wrd_has_duplicates(wrd):
 
 
 # List out the ranked word list
-def show_this_word_list(the_word_list):
-    n_col = 6
+def show_this_word_list(the_word_list, n_col):
     n_items = len(the_word_list)
     h_txt = " Word : Rank "
     left_pad = ""
@@ -115,6 +114,11 @@ def show_this_word_list(the_word_list):
             l_msg = ""
         if i == n_items:
             print(l_msg)
+
+#
+# def show_list_in_textbox(the_word_list, n_col, tbox_result):
+#     tbox_result.delete(1.0, END)
+
 
 
 # Ranking and filtering the words into a dictionary
@@ -207,6 +211,7 @@ class ShellCmdList:
         elif p == 5:
             self.shCMDlist.append("grep -E '...." + l + "'")
 
+    # returns the list assembled into one command line
     def full_cmd(self):
         pc = " | "
         this_cmd = ""
@@ -214,3 +219,60 @@ class ShellCmdList:
             this_cmd = this_cmd + w + pc
         this_cmd = this_cmd + self.shCMDlist[-1]
         return this_cmd
+
+# ToolResults(vocabulary file, letter_ranks file, no_dups)
+class ToolResults:
+    # constructor
+    def __init__(self, data_path, vocabulary, letter_ranks, no_dups):
+        self.data_path = data_path
+        self.vocab = vocabulary  # vocabulary is the words list textfile
+        self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
+        self.no_dups = no_dups  # no_dups is the allow duplicate letters flag
+        #self.g_cmd_lst = grep_cmd_lst  # grep_cmd_lst is the list of grep commands
+
+        # we have all the setting so do the grep
+        wrdListFileName = get_word_list_path_name(self.data_path + self.vocab)
+        rankFile = self.data_path + self.ltr_ranks
+        self.ltr_rank_dict = make_ltr_rank_dictionary(rankFile)  # ltr_rank_dict is the rank dictionary
+        # Initialize and setup the ShellCmdList class instance that holds the
+        # grep filtering command stack. Guessing because it is a class instance is why it
+        # can be passed around as a global variable where it gets modified along the way.
+        self.this_sh_cmd_lst = ShellCmdList(wrdListFileName) # init with cat wordlistfile
+        grepper.setup_grep_filtering(self.this_sh_cmd_lst)  # fills the cmd stack with grep assignments
+        # At this point the grep stack is ready for executing
+        self.ranked_wrds_dict ={} # dictionary of ranked words resulting from grep filtering
+        self.raw_cnt = 0
+        self.ranked_cnt = 0
+
+    # returns results words list
+    def get_results_wrd_lst(self):
+        return os.popen(self.this_sh_cmd_lst.full_cmd()).read().split("\n")
+
+
+    # returns ranked results words list
+    def get_ranked_results_wrd_lst(self):
+        # Ranking and filtering the words into a dictionary
+        # Set no_dups to prevent letters from occurring more than once
+        # First pick should not use duplicates, later picks should consider them.
+        wrds = self.get_results_wrd_lst()
+        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.no_dups)
+        self.ranked_cnt = len(self.ranked_wrds_dict)
+        return  self.ranked_wrds_dict
+
+
+    # Get the grepped word count
+    def get_results_raw_cnt(self):
+        sh_cmd_for_cnt = self.this_sh_cmd_lst.full_cmd() + " | wc -l"
+        self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
+        return self.raw_cnt
+
+    # returns ranked word list formatted into columns
+    def show_col_format_ranked_list(self, n_col):
+        return show_this_word_list(self.get_ranked_results_wrd_lst(),n_col)
+
+    def show_status(self):
+        status = '=> Showing word list of ' + str(self.ranked_cnt) + " from raw list of " + str(self.get_results_raw_cnt()) + " having duplicates."
+        return status
+
+    def show_full_cmd(self):
+        return '=> ' + self.this_sh_cmd_lst.full_cmd()
