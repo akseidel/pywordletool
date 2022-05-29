@@ -158,9 +158,9 @@ def clear_scrn():
 # It has functions that build greps related to filtering wordle
 # letter conditions.
 class ShellCmdList:
-    shCMDlist = list()
-
+    # command list is by instance
     def __init__(self, list_file_name):
+        self. shCMDlist = list()
         self.shCMDlist.append("cat " + list_file_name)
 
     def add_cmd(self, s):
@@ -275,4 +275,10 @@ class ToolResults:
         return status
 
     def show_full_cmd(self):
-        return '=> ' + self.this_sh_cmd_lst.full_cmd()
+        return self.this_sh_cmd_lst.full_cmd()
+
+    def show_cmd(self):
+        full_cmd = self.this_sh_cmd_lst.full_cmd()
+        full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)
+        part_cmd = full_cmd.replace(full_path_name,'',1)
+        return '=> ' + part_cmd

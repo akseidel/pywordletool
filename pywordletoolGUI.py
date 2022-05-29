@@ -1,29 +1,18 @@
 # get customtkinter  -> pip3 install customtkinter
 # if already, may need to upgrade it -> pip3 install customtkinter --upgrade
 # from tkinter import *
-import time
+import textwrap
 
 import helpers
 
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
-from tkinter.constants import END
-
 import customtkinter as ctk
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
-ctk.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-
-# customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 n_col = 7
-
-
-
-
-def sw_no_dup_event():
-    pass
-    # print("switch toggled, current value:", sw_no_dups.get())
 
 def str_wrd_list_hrd():
     h_txt = " Word : Rank "
@@ -34,7 +23,7 @@ def str_wrd_list_hrd():
         h_line = h_line + mid_pad + h_txt
     return h_line
 
-class pywordletool(ctk.CTk):
+class pywordletoolWND(ctk.CTk):
     # global do_grep
     global n_col
     global switch_var
@@ -47,24 +36,50 @@ class pywordletool(ctk.CTk):
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
+        # self.resizable(width=False,height=False)
         Font_tuple = ("PT Mono", 14, "normal")
 
         self.no_dups = tk.BooleanVar()
+        self.no_dupe_state = tk.StringVar()
+        self.no_dupe_state.set("on")
         self.vocabulary = tk.StringVar()
+        self.status = tk.StringVar()
+        self.allgreps = tk.StringVar()
+
+        # return a reformatted string with wordwrapping
+        #@staticmethod
+        def wrap_this(string, max_chars):
+            """A helper that will return the string with word-break wrapping.
+            :param str string: The text to be wrapped.
+            :param int max_chars: The maximum number of characters on a line before wrapping.
+            """
+            string = string.replace('\n', '').replace('\r', '') # strip confusing newlines
+            words = string.split(' ')
+            the_lines = []
+            the_line = ""
+            for w in words:
+                if len(the_line+' '+w) <= max_chars:
+                    the_line += ' '+w
+                else:
+                    the_lines.append(the_line)
+                    the_line = w
+            if the_line:
+                the_lines.append(the_line)
+            the_lines[0] = the_lines[0][1:]
+            the_newline = ""
+            for w in the_lines:
+                the_newline += '\n'+w
+            return the_newline
+
 
         self.result_frame = ctk.CTkFrame(self,
                                   width=900,
                                   height=200,
                                   corner_radius=10,
-                                  relief='sunken',
+                                  # relief='sunken',
                                   borderwidth=0,
                                          )
-        self.result_frame.pack(padx=10,pady=10) # fill=tk.X,
-
-        # self.result_frame.rowconfigure(0, weight = 1)
-        # self.result_frame.rowconfigure(1, weight = 10)
-
-        # text_var = tk.StringVar(value="The grep output goes here. And it goes. And goes. And Goes.")
+        self.result_frame.pack(padx=20,pady=20)
 
         # tx_result_hd = tk.Text(self.result_frame, relief='sunken', wrap='word',background='#e3e4e5',borderwidth=0,highlightthickness=0)
         # # tx_result_hd.pack(  fill=tk.X)
@@ -77,39 +92,39 @@ class pywordletool(ctk.CTk):
         lb_result_hd.grid(row=0, column=0,  columnspan=4, sticky='ew', padx=6, pady=2)
         lb_result_hd.configure(font = Font_tuple)
 
-
         tx_result = tk.Text(self.result_frame, wrap='word',background='#e3e4e5',borderwidth=0,highlightthickness=0)
         # tx_result.pack(  expand= True, fill=tk.X)
         tx_result.grid(row=1, column=0,  columnspan=4,  sticky='ew', padx=6, pady=4)
         tx_result.configure(font = Font_tuple)
 
-
-        # tx_result.insert(1.0, text_var.get())
-
         tx_results_scroll_bar = ttk.Scrollbar(self.result_frame, orient='vertical', command=tx_result.yview)
         tx_results_scroll_bar.grid(row=0, rowspan=3, column=5, sticky='ns')
         # tx_results_scroll_bar.pack()
 
-        tx_status = tk.Text(self.result_frame,  wrap='word',background='#e3e4e5',borderwidth=0,highlightthickness=0)
+
+        lb_status = tk.Label(self.result_frame,
+                             textvariable=self.status,
+                             background='#e3e4e5',
+                             borderwidth=0,
+                             highlightthickness=0)
         # tx_result.pack(  expand= True, fill=tk.X)
-        tx_status.grid(row=3, column=0,  columnspan=5,  sticky='ew', padx=6, pady=4)
-        tx_status.configure(font = Font_tuple)
-        tx_status.insert(1.0,'No status yet.')
+        lb_status.grid(row=4, column=0,  columnspan=4,  sticky='ew', padx=6, pady=4)
+        lb_status.configure(font = Font_tuple)
+        self.status.set('=> No status yet.')
+        print(self.status.get())
 
-
-
-
-        self.setting_frame = ctk.CTkFrame(self,
-                                  width=780,
-                                  height=100,
-                                  corner_radius=10,
-                                  relief='sunken',
-                                  borderwidth=2)
+        self.settings_frame = ctk.CTkFrame(self,
+                                           width=900,
+                                           height=100,
+                                           corner_radius=10,
+                                           # relief='sunken',
+                                           borderwidth=0)
         # self.frame.grid(row=0, column=0, rowspan=1, columnspan=3, padx=6, pady=6)
-        self.setting_frame.pack( side= tk.TOP, fill = tk.X, padx=6, pady=6)
+        self.settings_frame.pack(side= tk.BOTTOM, fill=tk.X,  padx=20, pady=10)
 
 
-        # gr_output = ctk.CTkLabel(self.setting_frame,
+
+        # gr_output = ctk.CTkLabel(self.settings_frame,
         #                          # textvariable=text_var,
         #                          width=778,
         #                          height=100,
@@ -126,38 +141,35 @@ class pywordletool(ctk.CTk):
         # self.label2 = customtkinter.CTkLabel(self, text ="Helps you do a wordle.").grid(row=2, column=0, padx=10, pady=6)
         #
 
-        combo_vocab = ttk.Combobox(self.setting_frame,
-                                values= ("Small Vocabulary", "Large Vocabulary"),
-                                state= 'readonly'
-                                )
-        combo_vocab.grid(row=3, column=0, padx= 6, pady=6, sticky="W")
-        combo_vocab.current(0)
+        lb_allgreps = tk.Label(self.settings_frame,
+                             textvariable=self.allgreps,
+                             background='#e3e4e5',
+                             borderwidth=0,
+                             highlightthickness=0)
+        # tx_result.pack(  expand= True, fill=tk.X)
+        lb_allgreps.grid(row=3, column=0,  columnspan=6,  sticky='w', padx=6, pady=4)
+        lb_allgreps.configure(font = Font_tuple)
+        self.allgreps.set('=> AllGreps')
+        # print(self.allgreps.get())
 
-        sw_no_dups_var = tk.StringVar(value="off")   # starting value
 
-        sw_no_dups = ctk.CTkSwitch(self.setting_frame,
-                             text="Allow Duplicate Letters",
-                             variable=sw_no_dups_var,
-                             onvalue="on",
-                             offvalue="off"
-                             )
-        sw_no_dups.grid(row=3, column=2, padx=6, pady=6, sticky="W")
 
         def do_grep():
+            """Runs a wordletool helper grep instance
+            """
             data_path = 'worddata/' # path from here to data folder
             if sw_no_dups.get() == "on":
                 no_dups = False
             else:
                 no_dups = True
-            # initialize the wordletool
 
-            if combo_vocab.get() == "Small Vocabulary":
+            if self.vocabulary.get() == "Small Vocabulary":
                 vocab_filename = 'wo_nyt_wordlist.txt'
             else:
                 vocab_filename = 'nyt_wordlist.txt'
+
             wordletool = helpers.ToolResults(data_path, vocab_filename, 'letter_ranks.txt', no_dups)
-            tx_result.delete( 1.0 , END)
-            tx_status.delete(1.0, END)
+            tx_result.delete( 1.0 , tk.END)
 
             the_word_list = wordletool.get_ranked_results_wrd_lst()
 
@@ -176,22 +188,49 @@ class pywordletool(ctk.CTk):
                     l_msg = l_msg + mid_pad + msg
                 c = c + 1
                 if c == n_col:
-                    tx_result.insert(END, l_msg + '\n')
+                    tx_result.insert(tk.END, l_msg + '\n')
                     c = 0
                     l_msg = ""
                 if i == n_items:
-                    tx_result.insert(END, l_msg + '\n')
+                    tx_result.insert(tk.END, l_msg + '\n')
             tx_result.see('end')
             print(wordletool.show_status())
-            tx_status.insert(END,wordletool.show_status())
+            self.status.set(wordletool.show_status())
+            self.allgreps.set(wrap_this(wordletool.show_cmd(),90))
 
-        self.bt_grep = ctk.CTkButton(self.setting_frame, text="Do Grep",
-                                     # command=(lambda: self.bt_grep.set_text("Changed This To Be Long"))
+
+        def callbackFuncVocab(event):
+            vocab = event.widget.get()
+            print(vocab)
+            do_grep()
+
+        combo_vocab = ttk.Combobox(self.settings_frame,
+                                   values= ("Small Vocabulary", "Large Vocabulary"),
+                                   state= 'readonly',
+                                   textvariable = self.vocabulary
+                                   )
+        combo_vocab.grid(row=0, column=1, padx= 6, pady=6, sticky="W")
+        combo_vocab.current(0)
+        combo_vocab.configure(font = Font_tuple)
+        combo_vocab.bind("<<ComboboxSelected>>", callbackFuncVocab)
+
+        sw_no_dups = ctk.CTkSwitch(self.settings_frame,
+                                   text="Allow Duplicate Letters",
+                                   onvalue="on",
+                                   offvalue="off",
+                                   command=do_grep
+                                   )
+        sw_no_dups.grid(row=0, column=2, padx=20, pady=6, sticky="W")
+
+
+        self.bt_grep = ctk.CTkButton(self.settings_frame,
+                                     text="Do Grep",
                                      command=do_grep
                                      )
-        self.bt_grep.grid(row=1, column=0)
-        self.bt_Q = ctk.CTkButton(self.setting_frame, text="Quit", command=self.destroy)
-        self.bt_Q.grid(row=3, column=3, padx=6, pady=6, sticky='e')
+        self.bt_grep.grid(row=0, column=0, padx=10, pady=10)
+
+        self.bt_Q = ctk.CTkButton(self.settings_frame, text="Quit", command=self.destroy)
+        self.bt_Q.grid(row=3, column=7, columnspan= 1, padx=6, pady=6, sticky='e')
 
 
 
@@ -202,5 +241,5 @@ class pywordletool(ctk.CTk):
 
 # end pywordletool class
 
-this_app = pywordletool()
+this_app = pywordletoolWND()
 this_app.mainloop()
