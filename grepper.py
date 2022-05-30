@@ -17,8 +17,8 @@ def setup_grep_filtering(this_sh_cmd_lst):
 
     # Low rank exclusions
     # add back in at some point
-    # this_sh_cmd_lst.add_cmd('grep -vE \'b|f|k|w\'')
-    # this_sh_cmd_lst.add_cmd('grep -vE \'v|x|z|q|j\'')
+    this_sh_cmd_lst.add_cmd('grep -vE \'b|f|k|w\'')
+    this_sh_cmd_lst.add_cmd('grep -vE \'v|x|z|q|j\'')
 
     # Midrank inclusions
     # this_sh_cmd_lst.add_cmd('grep -E \'u|c|y|h|d|p|g|m\'')
