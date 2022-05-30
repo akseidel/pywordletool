@@ -1,0 +1,13 @@
+The wordle tool helper show five-letter words from which you can select for playing the wordle game.
+
+The five-letter words are assigned a rank according to how common the letters are in the English wordle words. The wordle tool presents ranked words from lowest rank to highest rank. Scroll the list upwards to see the lower ranking words.
+
+The Allow Duplicate Letters option includes words having duplicate letters. After your first or second wordle choice you should start to consider duplicate letters. Depending on your known letters status, duplicate letters ought to be shown before making the third selection.
+
+Excluding a letter results in words presented as not containing that letter. Use the Require letter option only to require that letter. By default all letters will be shown. Requiring more than five letters will result in no words shown since there are simply no five-letter words containing more than five different letters.
+
+Excluding a letter from a letter position is done by entering the letter and the position. For example 'a,2' excludes the letter 'a' from the second letter position.
+
+Requiring a letter at a letter position is done by entering the letter and the position. For example 'a,2' requires the letter 'a' from the second letter position.
+
+Multiple position exclusions or requiring for a letter is accomplished with multiple entries.

@@ -2,7 +2,8 @@
 # if already, may need to upgrade it -> pip3 install customtkinter --upgrade
 # from tkinter import *
 import textwrap
-
+import sys
+import os
 import helpers
 
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
@@ -27,6 +28,33 @@ def str_wrd_list_hrd():
         h_line = h_line + mid_pad + h_txt
     return h_line
 
+
+# return a reformatted string with wordwrapping
+#@staticmethod
+def wrap_this(string, max_chars):
+            """A helper that will return the string with word-break wrapping.
+            :param str string: The text to be wrapped.
+            :param int max_chars: The maximum number of characters on a line before wrapping.
+            """
+            string = string.replace('\n', '').replace('\r', '') # strip confusing newlines
+            words = string.split(' ')
+            the_lines = []
+            the_line = ""
+            for w in words:
+                if len(the_line+' '+w) <= max_chars:
+                    the_line += ' '+w
+                else:
+                    the_lines.append(the_line)
+                    the_line = w
+            if the_line:
+                the_lines.append(the_line)
+            the_lines[0] = the_lines[0][1:]
+            the_newline = ""
+            for w in the_lines:
+                the_newline += '\n'+w
+            return the_newline
+
+
 class pywordleMainWindow(ctk.CTk):
     """The pywordletool application GUI window
     """
@@ -48,6 +76,7 @@ class pywordleMainWindow(ctk.CTk):
             print("Help already exists")
             self.wnd_help.deiconify()
             self.wnd_help.focus_set()
+
 
     def __init__(self):
         super().__init__()
@@ -71,30 +100,6 @@ class pywordleMainWindow(ctk.CTk):
         # self.style = ttk.Style(self)
         # self.style.configure('TSeparator', )
 
-        # return a reformatted string with wordwrapping
-        #@staticmethod
-        def wrap_this(string, max_chars):
-            """A helper that will return the string with word-break wrapping.
-            :param str string: The text to be wrapped.
-            :param int max_chars: The maximum number of characters on a line before wrapping.
-            """
-            string = string.replace('\n', '').replace('\r', '') # strip confusing newlines
-            words = string.split(' ')
-            the_lines = []
-            the_line = ""
-            for w in words:
-                if len(the_line+' '+w) <= max_chars:
-                    the_line += ' '+w
-                else:
-                    the_lines.append(the_line)
-                    the_line = w
-            if the_line:
-                the_lines.append(the_line)
-            the_lines[0] = the_lines[0][1:]
-            the_newline = ""
-            for w in the_lines:
-                the_newline += '\n'+w
-            return the_newline
 
         def build_exclude_grep(ex_btn_var_list):
             """Builds the grep line for excluding letters
@@ -114,7 +119,6 @@ class pywordleMainWindow(ctk.CTk):
                 grep_exclude= "grep -vE \'" + args +"\'"
             return grep_exclude
 
-        
 
         self.result_frame = ctk.CTkFrame(self,
                                       width=900,
@@ -425,7 +429,6 @@ class pywordleMainWindow(ctk.CTk):
         self.allgreps.set('=> AllGreps')
 
 
-
         def do_grep():
             """Runs a wordletool helper grep instance
             """
@@ -518,14 +521,21 @@ class pywordleMainWindow(ctk.CTk):
     def create_wnd_help(self):
         self.wnd_help = ctk.CTkToplevel(self)
         self.wnd_help.wm_title('Some Information For You')
-        w_width = 400
-        w_height = 300
+        w_width = 800
+        w_height = 440
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.wnd_help.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
+        self.wnd_help.resizable(width=False,height=False)
 
-        msg1 = ctk.CTkLabel(self.wnd_help, text='This is all the help you get')
-        msg1.pack(side="top", fill="both", expand=True, padx=40, pady=40)
+        data_path = 'worddata/' # path from here to data folder
+        full_path_name = os.path.join(os.path.dirname(__file__), data_path , 'helpinfo.txt')
+        if os.path.exists(full_path_name):
+            f = open(full_path_name, "r", encoding="UTF8").read()
+        else:
+            f = 'This is all the help you get because file helpinfo.txt has gone missing.'
+        msg1 = tk.Label(self.wnd_help, text= f, justify=tk.LEFT, wraplength= 740)
+        msg1.pack(side="top",  expand=True, padx=6, pady=4)
         buttonQ = ctk.CTkButton(self.wnd_help, text="Close",
                                 command=self.close_help)
         buttonQ.pack(side="right",padx=6, pady=6)
