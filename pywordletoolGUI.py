@@ -14,6 +14,7 @@ ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 n_col = 8
+help_showing = False
 
 def str_wrd_list_hrd():
     """Creates the word list header line.
@@ -26,11 +27,27 @@ def str_wrd_list_hrd():
         h_line = h_line + mid_pad + h_txt
     return h_line
 
-class pywordletoolWND(ctk.CTk):
+class pywordleMainWindow(ctk.CTk):
     """The pywordletool application GUI window
     """
     global n_col
     global switch_var
+
+    def close_help(self):
+        global help_showing
+        self.wnd_help.destroy()
+        help_showing = False
+
+    def show_help(self):
+        global help_showing
+
+        if  help_showing is False:
+            self.create_wnd_help()
+            help_showing = True
+        else:
+            print("Help already exists")
+            self.wnd_help.deiconify()
+            self.wnd_help.focus_set()
 
     def __init__(self):
         super().__init__()
@@ -481,17 +498,43 @@ class pywordletoolWND(ctk.CTk):
 
 
         self.bt_grep = ctk.CTkButton(self.settings_frame,
-                                     text="Do Grep",
+                                     text="Do Grep", width=100,
                                      command=do_grep)
         self.bt_grep.grid(row=0, column=0, padx=10, pady=10, sticky='ew')
 
-        self.bt_Q = ctk.CTkButton(self.settings_frame, text="Quit", command=self.destroy)
-        self.bt_Q.grid(row=3, column=7, columnspan= 1, padx=6, pady=6, sticky='e')
+        self.sep_d1 = ttk.Separator(self.settings_frame, orient='vertical')
+        self.sep_d1.grid(row=0, column=4, columnspan= 1, padx=132, pady=6)
+        # self.sep_d2 = ttk.Separator(self.settings_frame, orient='vertical')
+        # self.sep_d2.grid(row=0, column=5, columnspan= 1, padx=20, pady=6)
+
+        self.bt_help = ctk.CTkButton(self.settings_frame, text="?", width=40, command=self.show_help)
+        self.bt_help.grid(row=0, column=6, columnspan= 1, padx=6, pady=6, sticky='e')
+
+        self.bt_Q = ctk.CTkButton(self.settings_frame, text="Quit", width=100, command=self.destroy)
+        self.bt_Q.grid(row=0, column=7, columnspan= 1, padx=6, pady=6, sticky='e')
 
         do_grep()
 
+    def create_wnd_help(self):
+        self.wnd_help = ctk.CTkToplevel(self)
+        self.wnd_help.wm_title('Some Information For You')
+        w_width = 400
+        w_height = 300
+        pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
+        pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
+        self.wnd_help.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
 
-# end pywordletool class
+        msg1 = ctk.CTkLabel(self.wnd_help, text='This is all the help you get')
+        msg1.pack(side="top", fill="both", expand=True, padx=40, pady=40)
+        buttonQ = ctk.CTkButton(self.wnd_help, text="Close",
+                                command=self.close_help)
+        buttonQ.pack(side="right",padx=6, pady=6)
+        buttonF = ctk.CTkButton(self.wnd_help, text="Return Focus",
+                                command=this_app.focus_set)
+        buttonF.pack(side="left",padx=6, pady=6)
+        self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
 
-this_app = pywordletoolWND()
+# end pywordleMainWindow class
+
+this_app = pywordleMainWindow()
 this_app.mainloop()

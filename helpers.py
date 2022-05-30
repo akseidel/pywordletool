@@ -271,7 +271,7 @@ class ToolResults:
         return show_this_word_list(self.get_ranked_results_wrd_lst(),n_col)
 
     def show_status(self):
-        status = '=> Showing word list of ' + str(self.ranked_cnt) + " from raw list of " + str(self.get_results_raw_cnt()) + " having duplicates."
+        status = '=> Showing ' +  str(self.ranked_cnt) + ' words from the raw list of ' + str(self.get_results_raw_cnt()) + " duplicate letter words."
         return status
 
     def show_full_cmd(self):
