@@ -281,4 +281,4 @@ class ToolResults:
         full_cmd = self.this_sh_cmd_lst.full_cmd()
         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)
         part_cmd = full_cmd.replace(full_path_name,'',1)
-        return '=> ' + part_cmd
+        return  part_cmd

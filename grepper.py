@@ -8,7 +8,7 @@ def setup_grep_filtering(this_sh_cmd_lst):
 
     # post first pick always exclusions
     # format is => this_sh_cmd_lst.add_excl_any_cmd('l|s')
-    this_sh_cmd_lst.add_excl_any_cmd('a|s|b|i|e')
+    # this_sh_cmd_lst.add_excl_any_cmd('a|s|b|i|e')
 
     # post first pick temporary exclusions
     # format is => this_sh_cmd_lst.add_excl_any_cmd('l|s')
@@ -17,8 +17,8 @@ def setup_grep_filtering(this_sh_cmd_lst):
 
     # Low rank exclusions
     # add back in at some point
-    this_sh_cmd_lst.add_cmd('grep -vE \'b|f|k|w\'')
-    this_sh_cmd_lst.add_cmd('grep -vE \'v|x|z|q|j\'')
+    # this_sh_cmd_lst.add_cmd('grep -vE \'b|f|k|w\'')
+    # this_sh_cmd_lst.add_cmd('grep -vE \'v|x|z|q|j\'')
 
     # Midrank inclusions
     # this_sh_cmd_lst.add_cmd('grep -E \'u|c|y|h|d|p|g|m\'')
@@ -34,12 +34,12 @@ def setup_grep_filtering(this_sh_cmd_lst):
 
     # # post first pick required non positions
     # # format is => this_sh_cmd_lst.add_excl_pos_cmd('l',p)
-    this_sh_cmd_lst.add_excl_pos_cmd('r',4)
-    this_sh_cmd_lst.add_excl_pos_cmd('e',2)
-    this_sh_cmd_lst.add_excl_pos_cmd('t',1)
-    this_sh_cmd_lst.add_excl_pos_cmd('c',4)
-    this_sh_cmd_lst.add_excl_pos_cmd('e',4)
-    this_sh_cmd_lst.add_excl_pos_cmd('p',5)
+    # this_sh_cmd_lst.add_excl_pos_cmd('r',4)
+    # this_sh_cmd_lst.add_excl_pos_cmd('e',2)
+    # this_sh_cmd_lst.add_excl_pos_cmd('t',1)
+    # this_sh_cmd_lst.add_excl_pos_cmd('c',4)
+    # this_sh_cmd_lst.add_excl_pos_cmd('e',4)
+    # this_sh_cmd_lst.add_excl_pos_cmd('p',5)
 
     # # post first pick required positions
     # # format is => this_sh_cmd_lst.add_incl_pos_cmd('l',p)
