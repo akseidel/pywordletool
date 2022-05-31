@@ -244,18 +244,134 @@ class pywordleMainWindow(ctk.CTk):
                                         height=100,
                                         text= 'Require A Position',
                                         )
-        self.criteria_frame_pr.pack(side= tk.RIGHT, fill=tk.X,  padx=6, pady=6)
+        self.criteria_frame_pr.pack(side= tk.LEFT, fill=tk.X,  padx=6, pady=6)
 
-        combo_px = ttk.Combobox(self.criteria_frame_px,
-                                   values= ("a,4", "t,1"),
-                                    justify=tk.CENTER,
-                                   # state= 'readonly',
-                                   # textvariable = self.vocabulary
+         # letter position frame require- uses pack
+        self.actions_frame = ttk.LabelFrame(self.criteria_frame_p,
+                                        width=450,
+                                        height=100,
+                                        text= 'Actions',
+                                        )
+        self.actions_frame.pack(side= tk.RIGHT, fill=tk.BOTH,  padx=6, pady=6, expand=True)
+
+
+        # =======  START ============ exclude from position controls
+        self.pos_px_l = tk.StringVar()
+        self.combo_px_l = ttk.Combobox(self.criteria_frame_px,
+                                   values= ('','a','b','c','d','e','f','g','h','i','j','k',
+                                            'l','m','n','o','p','q','r','s','t','u','v','w',
+                                            'x','y','z'),
+                                   width=4,
+                                   justify=tk.CENTER,
+                                   textvariable = self.pos_px_l
                                    )
-        combo_px.grid(row=0, column=1, padx= 6, pady=6, sticky="W")
-        combo_px.current(0)
-        combo_px.configure(font = Font_tuple)
+        self.combo_px_l.grid(row=0, column=0, padx= 4, pady=6, sticky='w')
+        self.combo_px_l.current(0)
+        # self.combo_px_l.configure(font = Font_tuple)
+
+        self.pos_px_p = tk.StringVar()
+        self.combo_px_p = ttk.Combobox(self.criteria_frame_px,
+                                   values= ('1','2','3','4','5'),
+                                   width=4,
+                                   justify=tk.CENTER,
+                                   state='readonly',
+                                   textvariable = self.pos_px_p
+                                   )
+        self.combo_px_p.grid(row=0, column=1, padx= 4, pady=6, sticky='w')
+        self.combo_px_p.current(0)
+
+        self.bt_px_add = ctk.CTkButton(self.criteria_frame_px,
+                                     text="+", width=20,
+                                     # command=
+                                       )
+        self.bt_px_add.grid(row=0, column=2, padx=2, pady=6, sticky='ew')
+
+        self.bt_px_rem = ctk.CTkButton(self.criteria_frame_px,
+                                     text="-", width=20,
+                                     # command=
+                                       )
+        self.bt_px_rem.grid(row=0, column=3, padx=2, pady=6, sticky='ew')
+
+        self.treeview_px = ttk.Treeview(self.criteria_frame_px,
+                                    columns=('1', '2'),
+                                    show='headings',
+                                    height=5,
+                                   )
+        self.treeview_px.grid(row=1, column=0, columnspan=4,padx= 6, pady=6, sticky='ew')
+        ttk.Style().configure('Treeview', relief='raised')
+        self.treeview_px.heading(1, text='Letter')
+        self.treeview_px.heading(2, text='Position')
+        for column in self.treeview_px["columns"]:
+            self.treeview_px.column(column, anchor=tk.CENTER) # This will center text in rows
+            self.treeview_px.column(column, width=80)
+        self.treeview_px.insert(parent='', index=0, id=0, values=('a', 3))
+        self.treeview_px.insert(parent='', index=1, id=1, values=('i', 2))
+        self.treeview_px.insert(parent='', index=2, id=2, values=('s', 5))
+
+        # treeview_px.configure(font = Font_tuple)
         # combo_px.bind("<<ComboboxSelected>>", callbackFuncVocab)
+
+        # =======  END ============ exclude from position controls
+
+
+         # =======  START ============ require from position controls
+        self.pos_pr_l = tk.StringVar()
+        self.combo_pr_l = ttk.Combobox(self.criteria_frame_pr,
+                                   values= ('','a','b','c','d','e','f','g','h','i','j','k',
+                                            'l','m','n','o','p','q','r','s','t','u','v','w',
+                                            'x','y','z'),
+                                   width=4,
+                                   justify=tk.CENTER,
+                                   textvariable = self.pos_pr_l
+                                   )
+        self.combo_pr_l.grid(row=0, column=0, padx= 4, pady=6, sticky='w')
+        self.combo_pr_l.current(0)
+        # self.combo_pr_l.configure(font = Font_tuple)
+
+        self.pos_pr_p = tk.StringVar()
+        self.combo_pr_p = ttk.Combobox(self.criteria_frame_pr,
+                                   values= ('1','2','3','4','5'),
+                                   width=4,
+                                   justify=tk.CENTER,
+                                   state='readonly',
+                                   textvariable = self.pos_pr_p
+                                   )
+        self.combo_pr_p.grid(row=0, column=1, padx= 4, pady=6, sticky='w')
+        self.combo_pr_p.current(0)
+
+        self.bt_pr_add = ctk.CTkButton(self.criteria_frame_pr,
+                                     text="+", width=20,
+                                     # command=
+                                       )
+        self.bt_pr_add.grid(row=0, column=2, padx=2, pady=6, sticky='ew')
+
+        self.bt_pr_rem = ctk.CTkButton(self.criteria_frame_pr,
+                                     text="-", width=20,
+                                     # command=
+                                       )
+        self.bt_pr_rem.grid(row=0, column=3, padx=2, pady=6, sticky='ew')
+
+        self.treeview_pr = ttk.Treeview(self.criteria_frame_pr,
+                                    columns=('1', '2'),
+                                    show='headings',
+                                    height=5,
+                                   )
+        self.treeview_pr.grid(row=1, column=0, columnspan=4,padx= 6, pady=6, sticky='ew')
+        ttk.Style().configure('Treeview', relief='raised')
+        self.treeview_pr.heading(1, text='Letter')
+        self.treeview_pr.heading(2, text='Position')
+        for column in self.treeview_pr["columns"]:
+            self.treeview_pr.column(column, anchor=tk.CENTER) # This will center text in rows
+            self.treeview_pr.column(column, width=80)
+        self.treeview_pr.insert(parent='', index=0, id=0, values=('q', 1))
+        self.treeview_pr.insert(parent='', index=1, id=1, values=('w', 4))
+        self.treeview_pr.insert(parent='', index=2, id=2, values=('a', 5))
+
+        # treeview_px.configure(font = Font_tuple)
+        # combo_px.bind("<<ComboboxSelected>>", callbackFuncVocab)
+
+        # =======  END ============ require from position controls
+
 
         # =============== Exclude Letters =============
         self.v_xE = tk.StringVar()
@@ -556,40 +672,6 @@ class pywordleMainWindow(ctk.CTk):
                                            borderwidth=0)
         self.settings_frame.pack(side= tk.BOTTOM, fill=tk.X,  padx=20, pady=6)
 
-        combo_vocab = ttk.Combobox(self.settings_frame,
-                                   values= ("Small Vocabulary", "Large Vocabulary"),
-                                   state= 'readonly',
-                                   textvariable = self.vocabulary
-                                   )
-        combo_vocab.grid(row=0, column=1, padx= 6, pady=6, sticky="W")
-        combo_vocab.current(0)
-        combo_vocab.configure(font = Font_tuple)
-        combo_vocab.bind("<<ComboboxSelected>>", callbackFuncVocab)
-
-        sw_no_dups = ctk.CTkSwitch(self.settings_frame,
-                                   text="Allow Duplicate Letters",
-                                   onvalue="on",
-                                   offvalue="off",
-                                   command=do_grep)
-        sw_no_dups.grid(row=0, column=2, padx=20, pady=6, sticky="W")
-
-
-        self.bt_grep = ctk.CTkButton(self.settings_frame,
-                                     text="Do Grep", width=100,
-                                     command=do_grep)
-        self.bt_grep.grid(row=0, column=0, padx=10, pady=10, sticky='ew')
-
-        self.sep_d1 = ttk.Separator(self.settings_frame, orient='vertical')
-        self.sep_d1.grid(row=0, column=4, columnspan= 1, padx=132, pady=6)
-        # self.sep_d2 = ttk.Separator(self.settings_frame, orient='vertical')
-        # self.sep_d2.grid(row=0, column=5, columnspan= 1, padx=20, pady=6)
-
-        self.bt_help = ctk.CTkButton(self.settings_frame, text="?", width=40, command=self.show_help)
-        self.bt_help.grid(row=0, column=6, columnspan= 1, padx=6, pady=6, sticky='e')
-
-        self.bt_Q = ctk.CTkButton(self.settings_frame, text="Quit", width=100, command=self.destroy)
-        self.bt_Q.grid(row=0, column=7, columnspan= 1, padx=6, pady=6, sticky='e')
-
         lb_allgreps = tk.Label(self.settings_frame,
                                 textvariable=self.allgreps,
                                 justify=tk.LEFT,
@@ -597,9 +679,42 @@ class pywordleMainWindow(ctk.CTk):
                                 background='#dedede',
                                 borderwidth=0,
                                 highlightthickness=0)
-        lb_allgreps.grid(row=1, column=0,  columnspan=8,  sticky='wns', padx=6, pady=10)
+        lb_allgreps.grid(row=0, column=0,  columnspan=8,  sticky='ewns', padx=6, pady=10)
         lb_allgreps.configure(font = Font_tuple)
         self.allgreps.set('=> AllGreps')
+
+        self.bt_grep = ctk.CTkButton(self.actions_frame,
+                                     text="Do Grep", width=100,
+                                     command=do_grep)
+        self.bt_grep.grid(row=0, column=0, padx=6, pady=6, sticky='ew')
+
+        combo_vocab = ttk.Combobox(self.actions_frame,
+                                   values= ("Small Vocabulary", "Large Vocabulary"),
+                                   state= 'readonly',
+                                   textvariable = self.vocabulary
+                                   )
+        combo_vocab.grid(row=2, column=0, padx= 6, pady=6, sticky='w')
+        combo_vocab.current(0)
+        combo_vocab.configure(font = Font_tuple)
+        combo_vocab.bind("<<ComboboxSelected>>", callbackFuncVocab)
+
+        sw_no_dups = ctk.CTkSwitch(self.actions_frame,
+                                   text="Allow Duplicate Letters",
+                                   onvalue="on",
+                                   offvalue="off",
+                                   command=do_grep)
+        sw_no_dups.grid(row=1, column=0, padx=6, pady=6, sticky='w')
+
+        # self.sep_d1 = ttk.Separator(self.actions_frame, orient='vertical')
+        # self.sep_d1.grid(row=0, column=1, columnspan= 1, padx=132, pady=6)
+        # self.sep_d2 = ttk.Separator(self.settings_frame, orient='vertical')
+        # self.sep_d2.grid(row=0, column=5, columnspan= 1, padx=20, pady=6)
+
+        self.bt_help = ctk.CTkButton(self.actions_frame, text="?", width=40, command=self.show_help)
+        self.bt_help.grid(row=0, column=1, columnspan= 1, padx=6, pady=6, sticky='e')
+
+        self.bt_Q = ctk.CTkButton(self.actions_frame, text="Quit", width=100, command=self.destroy)
+        self.bt_Q.grid(row=0, column=2, columnspan= 1, padx=6, pady=6, sticky='e')
 
         do_grep()
 
