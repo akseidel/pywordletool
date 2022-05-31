@@ -119,6 +119,41 @@ class pywordleMainWindow(ctk.CTk):
                 grep_exclude= "grep -vE \'" + args +"\'"
             return grep_exclude
 
+        def build_require_grep(re_btn_var_list):
+            """Builds the grep line for requiring letters
+            :param list Stringvars: Stringvars bound to letter checkboxes
+            """
+            # example 'grep -E \'b|f|k|w\''
+            grep_require = ""
+            args = ""
+            pipe = "|"
+            lts = []
+            for b in re_btn_var_list:
+                l = b.get()
+                if l != '-':
+                    lts.append(l)
+            args = pipe.join(lts)
+            if len(lts) > 0:
+                grep_require= "grep -E \'" + args +"\'"
+            return grep_require
+
+        def build_requireall_grep(re_btn_var_list):
+            """Builds the grep line for requiring letters
+            :param list Stringvars: Stringvars bound to letter checkboxes
+            """
+            # example 'grep -E \'b|f|k|w\''
+            grep_requireall = ""
+            args = ""
+            pipe = "|"
+            itms = []
+            for b in re_btn_var_list:
+                l = b.get()
+                if l != '-':
+                    itms.append("grep -E \'" +l+"\'")
+            args = pipe.join(itms)
+            if len(itms) > 0:
+                grep_requireall = args
+            return grep_requireall
 
         self.result_frame = ctk.CTkFrame(self,
                                       width=900,
@@ -168,7 +203,7 @@ class pywordleMainWindow(ctk.CTk):
         self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
                                         width=900,
                                         height=100,
-                                        text= 'Letters To Be Required  (Require is not the same as Allow)',
+                                        text= 'Letters To Be Required  - (But not necessarily all present the word)',
                                         )
         self.criteria_frame_r.pack(side= tk.BOTTOM, fill=tk.X,  padx=6, pady=6)
 
@@ -297,118 +332,120 @@ class pywordleMainWindow(ctk.CTk):
 
 
         # =============== Require Letters =============
-        self.v_rE = tk.IntVar()
-        self.v_rE.set(0)
-        bt_r_E = ttk.Checkbutton(self.criteria_frame_r, text = "E", variable=self.v_rE, onvalue=1, offvalue=0)
+        self.v_rE = tk.StringVar()
+        self.v_rE.set('-')
+        bt_r_E = ttk.Checkbutton(self.criteria_frame_r, text = "E", variable=self.v_rE, onvalue='e', offvalue='-')
         bt_r_E.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rA = tk.IntVar()
-        self.v_rA.set(0)
-        bt_r_A= ttk.Checkbutton(self.criteria_frame_r, text = "A", variable=self.v_rA, onvalue=1, offvalue=0)
+        self.v_rA = tk.StringVar()
+        self.v_rA.set('-')
+        bt_r_A= ttk.Checkbutton(self.criteria_frame_r, text = "A", variable=self.v_rA, onvalue='a', offvalue='-')
         bt_r_A.pack(side=tk.LEFT,padx = 2, pady = 2)
         sep_1 = ttk.Separator(self.criteria_frame_r, orient='vertical').pack(side=tk.LEFT, fill='y',padx=8)
-        self.v_rR = tk.IntVar()
-        self.v_rR.set(0)
-        bt_r_R = ttk.Checkbutton(self.criteria_frame_r, text = "R", variable=self.v_rR, onvalue=1, offvalue=0)
+        self.v_rR = tk.StringVar()
+        self.v_rR.set('-')
+        bt_r_R = ttk.Checkbutton(self.criteria_frame_r, text = "R", variable=self.v_rR, onvalue='r', offvalue='-')
         bt_r_R.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rO = tk.IntVar()
-        self.v_rO.set(0)
-        bt_r_O = ttk.Checkbutton(self.criteria_frame_r, text = "O", variable=self.v_rO, onvalue=1, offvalue=0)
+        self.v_rO = tk.StringVar()
+        self.v_rO.set('-')
+        bt_r_O = ttk.Checkbutton(self.criteria_frame_r, text = "O", variable=self.v_rO, onvalue='o', offvalue='-')
         bt_r_O.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rT = tk.IntVar()
-        self.v_rT.set(0)
-        bt_r_T = ttk.Checkbutton(self.criteria_frame_r, text = "T", variable=self.v_rT, onvalue=1, offvalue=0)
+        self.v_rT = tk.StringVar()
+        self.v_rT.set('-')
+        bt_r_T = ttk.Checkbutton(self.criteria_frame_r, text = "T", variable=self.v_rT, onvalue='t', offvalue='-')
         bt_r_T.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rI = tk.IntVar()
-        self.v_rI.set(0)
-        bt_r_I = ttk.Checkbutton(self.criteria_frame_r, text = "I", variable=self.v_rI, onvalue=1, offvalue=0)
+        self.v_rI = tk.StringVar()
+        self.v_rI.set('-')
+        bt_r_I = ttk.Checkbutton(self.criteria_frame_r, text = "I", variable=self.v_rI, onvalue='i', offvalue='-')
         bt_r_I.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rL = tk.IntVar()
-        self.v_rL.set(0)
-        bt_r_L = ttk.Checkbutton(self.criteria_frame_r, text = "L", variable=self.v_rL, onvalue=1, offvalue=0)
+        self.v_rL = tk.StringVar()
+        self.v_rL.set('-')
+        bt_r_L = ttk.Checkbutton(self.criteria_frame_r, text = "L", variable=self.v_rL, onvalue='l', offvalue='-')
         bt_r_L.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rS = tk.IntVar()
-        self.v_rS.set(0)
-        bt_r_S = ttk.Checkbutton(self.criteria_frame_r, text = "S", variable=self.v_rS, onvalue=1, offvalue=0)
+        self.v_rS = tk.StringVar()
+        self.v_rS.set('-')
+        bt_r_S = ttk.Checkbutton(self.criteria_frame_r, text = "S", variable=self.v_rS, onvalue='s', offvalue='-')
         bt_r_S.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rN = tk.IntVar()
-        self.v_rN.set(0)
-        bt_r_N = ttk.Checkbutton(self.criteria_frame_r, text = "N", variable=self.v_rN, onvalue=1, offvalue=0)
+        self.v_rN = tk.StringVar()
+        self.v_rN.set('-')
+        bt_r_N = ttk.Checkbutton(self.criteria_frame_r, text = "N", variable=self.v_rN, onvalue='n', offvalue='-')
         bt_r_N.pack(side=tk.LEFT,padx = 2, pady = 2)
         sep_2 = ttk.Separator(self.criteria_frame_r, orient='vertical').pack(side=tk.LEFT, fill='y',padx=8)
-        self.v_rU = tk.IntVar()
-        self.v_rU.set(0)
-        bt_r_U = ttk.Checkbutton(self.criteria_frame_r, text = "U", variable=self.v_rU, onvalue=1, offvalue=0)
+        self.v_rU = tk.StringVar()
+        self.v_rU.set('-')
+        bt_r_U = ttk.Checkbutton(self.criteria_frame_r, text = "U", variable=self.v_rU, onvalue='u', offvalue='-')
         bt_r_U.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rC = tk.IntVar()
-        self.v_rC.set(0)
-        bt_r_C = ttk.Checkbutton(self.criteria_frame_r, text = "C", variable=self.v_rC, onvalue=1, offvalue=0)
+        self.v_rC = tk.StringVar()
+        self.v_rC.set('-')
+        bt_r_C = ttk.Checkbutton(self.criteria_frame_r, text = "C", variable=self.v_rC, onvalue='c', offvalue='-')
         bt_r_C.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rY = tk.IntVar()
-        self.v_rY.set(0)
-        bt_r_Y = ttk.Checkbutton(self.criteria_frame_r, text = "Y", variable=self.v_rY, onvalue=1, offvalue=0)
+        self.v_rY = tk.StringVar()
+        self.v_rY.set('-')
+        bt_r_Y = ttk.Checkbutton(self.criteria_frame_r, text = "Y", variable=self.v_rY, onvalue='y', offvalue='-')
         bt_r_Y.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rH = tk.IntVar()
-        self.v_rH.set(0)
-        bt_r_H = ttk.Checkbutton(self.criteria_frame_r, text = "H", variable=self.v_rH, onvalue=1, offvalue=0)
+        self.v_rH = tk.StringVar()
+        self.v_rH.set('-')
+        bt_r_H = ttk.Checkbutton(self.criteria_frame_r, text = "H", variable=self.v_rH, onvalue='h', offvalue='-')
         bt_r_H.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rD = tk.IntVar()
-        self.v_rD.set(0)
-        bt_r_D = ttk.Checkbutton(self.criteria_frame_r, text = "D", variable=self.v_rD, onvalue=1, offvalue=0)
+        self.v_rD = tk.StringVar()
+        self.v_rD.set('-')
+        bt_r_D = ttk.Checkbutton(self.criteria_frame_r, text = "D", variable=self.v_rD, onvalue='d', offvalue='-')
         bt_r_D.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rP = tk.IntVar()
-        self.v_rP.set(0)
-        bt_r_P = ttk.Checkbutton(self.criteria_frame_r, text = "P", variable=self.v_rP, onvalue=1, offvalue=0)
+        self.v_rP = tk.StringVar()
+        self.v_rP.set('-')
+        bt_r_P = ttk.Checkbutton(self.criteria_frame_r, text = "P", variable=self.v_rP, onvalue='p', offvalue='-')
         bt_r_P.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rG = tk.IntVar()
-        self.v_rG.set(0)
-        bt_r_G = ttk.Checkbutton(self.criteria_frame_r, text = "G", variable=self.v_rG, onvalue=1, offvalue=0)
+        self.v_rG = tk.StringVar()
+        self.v_rG.set('-')
+        bt_r_G = ttk.Checkbutton(self.criteria_frame_r, text = "G", variable=self.v_rG, onvalue='g', offvalue='-')
         bt_r_G.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rM = tk.IntVar()
-        self.v_rM.set(0)
-        bt_r_M = ttk.Checkbutton(self.criteria_frame_r, text = "M", variable=self.v_rM, onvalue=1, offvalue=0)
+        self.v_rM = tk.StringVar()
+        self.v_rM.set('-')
+        bt_r_M = ttk.Checkbutton(self.criteria_frame_r, text = "M", variable=self.v_rM, onvalue='m', offvalue='-')
         bt_r_M.pack(side=tk.LEFT,padx = 2, pady = 2)
         sep_3 = ttk.Separator(self.criteria_frame_r, orient='vertical').pack(side=tk.LEFT, fill='y',padx=8)
-        self.v_rB = tk.IntVar()
-        self.v_rB.set(0)
-        bt_r_B = ttk.Checkbutton(self.criteria_frame_r, text = "B", variable=self.v_rB, onvalue=1, offvalue=0)
+        self.v_rB = tk.StringVar()
+        self.v_rB.set('-')
+        bt_r_B = ttk.Checkbutton(self.criteria_frame_r, text = "B", variable=self.v_rB, onvalue='b', offvalue='-')
         bt_r_B.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rF = tk.IntVar()
-        self.v_rF.set(0)
-        bt_r_F = ttk.Checkbutton(self.criteria_frame_r, text = "F", variable=self.v_rF, onvalue=1, offvalue=0)
+        self.v_rF = tk.StringVar()
+        self.v_rF.set('-')
+        bt_r_F = ttk.Checkbutton(self.criteria_frame_r, text = "F", variable=self.v_rF, onvalue='f', offvalue='-')
         bt_r_F.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rK = tk.IntVar()
-        self.v_rK.set(0)
-        bt_r_K = ttk.Checkbutton(self.criteria_frame_r, text = "K", variable=self.v_rK, onvalue=1, offvalue=0)
+        self.v_rK = tk.StringVar()
+        self.v_rK.set('-')
+        bt_r_K = ttk.Checkbutton(self.criteria_frame_r, text = "K", variable=self.v_rK, onvalue='k', offvalue='-')
         bt_r_K.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rW = tk.IntVar()
-        self.v_rW.set(0)
-        bt_r_W = ttk.Checkbutton(self.criteria_frame_r, text = "W", variable=self.v_rW, onvalue=1, offvalue=0)
+        self.v_rW = tk.StringVar()
+        self.v_rW.set('-')
+        bt_r_W = ttk.Checkbutton(self.criteria_frame_r, text = "W", variable=self.v_rW, onvalue='w', offvalue='-')
         bt_r_W.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rV = tk.IntVar()
-        self.v_rV.set(0)
-        bt_r_V = ttk.Checkbutton(self.criteria_frame_r, text = "V", variable=self.v_rV, onvalue=1, offvalue=0)
+        self.v_rV = tk.StringVar()
+        self.v_rV.set('-')
+        bt_r_V = ttk.Checkbutton(self.criteria_frame_r, text = "V", variable=self.v_rV, onvalue='v', offvalue='-')
         bt_r_V.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rX = tk.IntVar()
-        self.v_rX.set(0)
+        self.v_rX = tk.StringVar()
+        self.v_rX.set('-')
         sep_4 = ttk.Separator(self.criteria_frame_r, orient='vertical').pack(side=tk.LEFT, fill='y',padx=8)
-        bt_r_X = ttk.Checkbutton(self.criteria_frame_r, text = "X", variable=self.v_rX, onvalue=1, offvalue=0)
+        bt_r_X = ttk.Checkbutton(self.criteria_frame_r, text = "X", variable=self.v_rX, onvalue='x', offvalue='-')
         bt_r_X.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rZ = tk.IntVar()
-        self.v_rZ.set(0)
-        bt_r_Z = ttk.Checkbutton(self.criteria_frame_r, text = "Z", variable=self.v_rZ, onvalue=1, offvalue=0)
+        self.v_rZ = tk.StringVar()
+        self.v_rZ.set('-')
+        bt_r_Z = ttk.Checkbutton(self.criteria_frame_r, text = "Z", variable=self.v_rZ, onvalue='z', offvalue='-')
         bt_r_Z.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rQ = tk.IntVar()
-        self.v_rQ.set(0)
-        bt_r_Q = ttk.Checkbutton(self.criteria_frame_r, text = "Q", variable=self.v_rQ, onvalue=1, offvalue=0)
+        self.v_rQ = tk.StringVar()
+        self.v_rQ.set('-')
+        bt_r_Q = ttk.Checkbutton(self.criteria_frame_r, text = "Q", variable=self.v_rQ, onvalue='q', offvalue='-')
         bt_r_Q.pack(side=tk.LEFT,padx = 2, pady = 2)
-        self.v_rJ = tk.IntVar()
-        self.v_rJ.set(0)
-        bt_r_J = ttk.Checkbutton(self.criteria_frame_r, text = "J", variable=self.v_rJ, onvalue=1, offvalue=0)
+        self.v_rJ = tk.StringVar()
+        self.v_rJ.set('-')
+        bt_r_J = ttk.Checkbutton(self.criteria_frame_r, text = "J", variable=self.v_rJ, onvalue='j', offvalue='-')
         bt_r_J.pack(side=tk.LEFT,padx = 2, pady = 2)
         # ===END========= Require Letters =============
-
-
-
+        self.re_btn_vars =[self.v_rA,self.v_rB,self.v_rC,self.v_rD,self.v_rE,self.v_rF,
+                       self.v_rG,self.v_rH,self.v_rI,self.v_rJ,self.v_rK,self.v_rL,
+                       self.v_rM,self.v_rN,self.v_rO,self.v_rP,self.v_rQ,self.v_rR,
+                       self.v_rS,self.v_rT,self.v_rU,self.v_rV,self.v_rW,self.v_rX,
+                        self.v_rY,self.v_rZ]
 
         self.settings_frame = ctk.CTkFrame(self,
                                            width=900,
@@ -443,9 +480,15 @@ class pywordleMainWindow(ctk.CTk):
             else:
                 vocab_filename = 'nyt_wordlist.txt'
 
-            print(build_exclude_grep(self.ex_btn_vars))
+
 
             wordletool = helpers.ToolResults(data_path, vocab_filename, 'letter_ranks.txt', no_dups)
+
+            print(build_exclude_grep(self.ex_btn_vars))
+            print(build_requireall_grep(self.re_btn_vars))
+            wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
+            wordletool.tool_command_list.add_cmd(build_requireall_grep(self.re_btn_vars))
+
             tx_result.delete( 1.0 , tk.END)
 
             the_word_list = wordletool.get_ranked_results_wrd_lst()

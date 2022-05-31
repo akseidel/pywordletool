@@ -23,7 +23,6 @@ def get_word_list_path_name(local_path_file_name):
         print()
         sys.exit()
 
-
 # Make and return the letter ranking dictionary
 def make_ltr_rank_dictionary(local_path_rank_file):
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_rank_file)
@@ -70,7 +69,6 @@ def make_ltr_rank_dictionary(local_path_rank_file):
         }
     return ltr_rank_dict
 
-
 # Returns a word's letter frequency ranking
 def wrd_rank(wrd, ltr_rank_dict):
     r = 0
@@ -78,14 +76,12 @@ def wrd_rank(wrd, ltr_rank_dict):
         r = r + ltr_rank_dict[x]
     return r
 
-
 # Returns true if word has duplicate letters
 def wrd_has_duplicates(wrd):
     ltr_d = {}
     for l in wrd:
         ltr_d[l] = l
     return len(ltr_d) < len(wrd)
-
 
 # List out the ranked word list
 def show_this_word_list(the_word_list, n_col):
@@ -115,12 +111,6 @@ def show_this_word_list(the_word_list, n_col):
         if i == n_items:
             print(l_msg)
 
-#
-# def show_list_in_textbox(the_word_list, n_col, tbox_result):
-#     tbox_result.delete(1.0, END)
-
-
-
 # Ranking and filtering the words into a dictionary
 def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups):
     wrds_dict = {}
@@ -136,23 +126,19 @@ def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups):
     # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
     return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
 
-
 # Returns the number of matching words
 def get_raw_word_count(this_sh_cmd_lst):
     sh_cmd_cnt = this_sh_cmd_lst.full_cmd() + " | wc -l"
     return os.popen(sh_cmd_cnt).read().strip()
-
 
 # Returns the results words list
 def get_results_word_list(this_sh_cmd_lst):
     result = os.popen(this_sh_cmd_lst.full_cmd()).read()
     return result.split("\n")
 
-
 # Clears the console
 def clear_scrn():
     os.system("cls" if os.name == "nt" else "clear")
-
 
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
@@ -164,7 +150,8 @@ class ShellCmdList:
         self.shCMDlist.append("cat " + list_file_name)
 
     def add_cmd(self, s):
-        self.shCMDlist.append(s)
+        if len(s) > 0:
+            self.shCMDlist.append(s)
 
     # word includes random letter from list lst
     # returns the random pick letter
@@ -175,41 +162,45 @@ class ShellCmdList:
 
     # word requires this letter l
     def add_require_cmd(self, l):
-        self.shCMDlist.append("grep -E '" + l + "'")
+         if len(l) > 0:
+            self.shCMDlist.append("grep -E '" + l + "'")
 
     # word excludes this letter l
     def add_excl_any_cmd(self, l):
-        self.shCMDlist.append("grep -vE '" + l + "'")
+         if len(l) > 0:
+            self.shCMDlist.append("grep -vE '" + l + "'")
 
     # word excludes letter from position number
     def add_excl_pos_cmd(self, l, p):
-        # can have letter
-        self.shCMDlist.append("grep -E '" + l + "'")
-        # but not in this position
-        if p == 1:
-            self.shCMDlist.append("grep -vE '" + l + "....'")
-        elif p == 2:
-            self.shCMDlist.append("grep -vE '." + l + "...'")
-        elif p == 3:
-            self.shCMDlist.append("grep -vE '.." + l + "..'")
-        elif p == 4:
-            self.shCMDlist.append("grep -vE '..." + l + ".'")
-        elif p == 5:
-            self.shCMDlist.append("grep -vE '...." + l + "'")
+        if len(l) > 0:
+            # can have letter
+            self.shCMDlist.append("grep -E '" + l + "'")
+            # but not in this position
+            if p == 1:
+                self.shCMDlist.append("grep -vE '" + l + "....'")
+            elif p == 2:
+                self.shCMDlist.append("grep -vE '." + l + "...'")
+            elif p == 3:
+                self.shCMDlist.append("grep -vE '.." + l + "..'")
+            elif p == 4:
+                self.shCMDlist.append("grep -vE '..." + l + ".'")
+            elif p == 5:
+                self.shCMDlist.append("grep -vE '...." + l + "'")
 
     # word includes letter in position number
     def add_incl_pos_cmd(self, l, p):
-        # Have letter in this position
-        if p == 1:
-            self.shCMDlist.append("grep -E '" + l + "....'")
-        elif p == 2:
-            self.shCMDlist.append("grep -E '." + l + "...'")
-        elif p == 3:
-            self.shCMDlist.append("grep -E '.." + l + "..'")
-        elif p == 4:
-            self.shCMDlist.append("grep -E '..." + l + ".'")
-        elif p == 5:
-            self.shCMDlist.append("grep -E '...." + l + "'")
+        if len(l) > 0:
+            # Have letter in this position
+            if p == 1:
+                self.shCMDlist.append("grep -E '" + l + "....'")
+            elif p == 2:
+                self.shCMDlist.append("grep -E '." + l + "...'")
+            elif p == 3:
+                self.shCMDlist.append("grep -E '.." + l + "..'")
+            elif p == 4:
+                self.shCMDlist.append("grep -E '..." + l + ".'")
+            elif p == 5:
+                self.shCMDlist.append("grep -E '...." + l + "'")
 
     # returns the list assembled into one command line
     def full_cmd(self):
@@ -237,8 +228,8 @@ class ToolResults:
         # Initialize and setup the ShellCmdList class instance that holds the
         # grep filtering command stack. Guessing because it is a class instance is why it
         # can be passed around as a global variable where it gets modified along the way.
-        self.this_sh_cmd_lst = ShellCmdList(wrdListFileName) # init with cat wordlistfile
-        grepper.setup_grep_filtering(self.this_sh_cmd_lst)  # fills the cmd stack with grep assignments
+        self.tool_command_list = ShellCmdList(wrdListFileName) # init with cat wordlistfile
+        grepper.setup_grep_filtering(self.tool_command_list)  # fills the cmd stack with grep assignments
         # At this point the grep stack is ready for executing
         self.ranked_wrds_dict ={} # dictionary of ranked words resulting from grep filtering
         self.raw_cnt = 0
@@ -246,8 +237,7 @@ class ToolResults:
 
     # returns results words list
     def get_results_wrd_lst(self):
-        return os.popen(self.this_sh_cmd_lst.full_cmd()).read().split("\n")
-
+        return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
 
     # returns ranked results words list
     def get_ranked_results_wrd_lst(self):
@@ -259,10 +249,9 @@ class ToolResults:
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return  self.ranked_wrds_dict
 
-
     # Get the grepped word count
     def get_results_raw_cnt(self):
-        sh_cmd_for_cnt = self.this_sh_cmd_lst.full_cmd() + " | wc -l"
+        sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
         self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
         return self.raw_cnt
 
@@ -275,10 +264,10 @@ class ToolResults:
         return status
 
     def show_full_cmd(self):
-        return self.this_sh_cmd_lst.full_cmd()
+        return self.tool_command_list.full_cmd()
 
     def show_cmd(self):
-        full_cmd = self.this_sh_cmd_lst.full_cmd()
+        full_cmd = self.tool_command_list.full_cmd()
         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)
         part_cmd = full_cmd.replace(full_path_name,'',1)
         return  part_cmd
