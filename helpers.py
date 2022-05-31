@@ -204,7 +204,7 @@ class ShellCmdList:
 
     # returns the list assembled into one command line
     def full_cmd(self):
-        pc = " | "
+        pc = "|"
         this_cmd = ""
         for w in self.shCMDlist[:-1]:
             this_cmd = this_cmd + w + pc

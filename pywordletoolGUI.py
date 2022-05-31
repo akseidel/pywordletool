@@ -14,8 +14,9 @@ ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 # ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-n_col = 8
-help_showing = False
+data_path = 'worddata/' # path from here to data folder
+n_col = 8               # number of list columns
+help_showing = False    # flag indicating help window is open
 
 def str_wrd_list_hrd():
     """Creates the word list header line.
@@ -82,7 +83,7 @@ class pywordleMainWindow(ctk.CTk):
         super().__init__()
         self.title("This Wordle Tool")
         w_width = 1020
-        w_height = 700
+        w_height = 900
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
@@ -192,7 +193,10 @@ class pywordleMainWindow(ctk.CTk):
         lb_status.configure(font = Font_tuple)
         self.status.set('=> No status yet.')
 
-        # grep criteria outer frame
+        # grep criteria outer frame holding:
+        # letter require frame
+        # letter exclusion frame
+        # letter position frame
         self.criteria_frame = ctk.CTkFrame(self,
                                            width=900,
                                            height=100,
@@ -200,19 +204,58 @@ class pywordleMainWindow(ctk.CTk):
                                            borderwidth=0)
         self.criteria_frame.pack(side= tk.BOTTOM, fill=tk.X,  padx=20, pady=8)
 
-        self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
-                                        width=900,
-                                        height=100,
-                                        text= 'Letters To Be Required  - (But not necessarily all present the word)',
-                                        )
-        self.criteria_frame_r.pack(side= tk.BOTTOM, fill=tk.X,  padx=6, pady=6)
-
+         # letter exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
                                         width=900,
                                         height=100,
                                         text= 'Letters To Be Excluded',
                                         )
-        self.criteria_frame_x.pack(side= tk.BOTTOM, fill=tk.X,  padx=6, pady=6)
+        self.criteria_frame_x.pack(side= tk.TOP, fill=tk.X,  padx=6, pady=6)
+
+        # letter require frame - uses pack
+        self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
+                                        width=900,
+                                        height=100,
+                                        text= 'Letters To Be Required',
+                                        )
+        self.criteria_frame_r.pack(side= tk.TOP, fill=tk.X,  padx=6, pady=6)
+
+
+
+        # letter position frame overall - uses pack
+        self.criteria_frame_p = ttk.LabelFrame(self.criteria_frame,
+                                        width=900,
+                                        height=100,
+                                        text= 'Letters Positioning',
+                                        )
+        self.criteria_frame_p.pack(side= tk.BOTTOM, fill=tk.X,  padx=6, pady=6)
+
+        # letter position frame exclude - uses pack
+        self.criteria_frame_px = ttk.LabelFrame(self.criteria_frame_p,
+                                        width=450,
+                                        height=100,
+                                        text= 'Exclude From Position',
+                                        )
+        self.criteria_frame_px.pack(side= tk.LEFT, fill=tk.X,  padx=6, pady=6)
+
+         # letter position frame require- uses pack
+        self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
+                                        width=450,
+                                        height=100,
+                                        text= 'Require A Position',
+                                        )
+        self.criteria_frame_pr.pack(side= tk.RIGHT, fill=tk.X,  padx=6, pady=6)
+
+        combo_px = ttk.Combobox(self.criteria_frame_px,
+                                   values= ("a,4", "t,1"),
+                                    justify=tk.CENTER,
+                                   # state= 'readonly',
+                                   # textvariable = self.vocabulary
+                                   )
+        combo_px.grid(row=0, column=1, padx= 6, pady=6, sticky="W")
+        combo_px.current(0)
+        combo_px.configure(font = Font_tuple)
+        # combo_px.bind("<<ComboboxSelected>>", callbackFuncVocab)
 
         # =============== Exclude Letters =============
         self.v_xE = tk.StringVar()
@@ -447,29 +490,13 @@ class pywordleMainWindow(ctk.CTk):
                        self.v_rS,self.v_rT,self.v_rU,self.v_rV,self.v_rW,self.v_rX,
                         self.v_rY,self.v_rZ]
 
-        self.settings_frame = ctk.CTkFrame(self,
-                                           width=900,
-                                           height=100,
-                                           corner_radius=10,
-                                           borderwidth=0)
-        self.settings_frame.pack(side= tk.BOTTOM, fill=tk.X,  padx=20, pady=6)
-
-
-        lb_allgreps = tk.Label(self.settings_frame,
-                                textvariable=self.allgreps,
-                                justify=tk.LEFT,
-                                background='#dedede',
-                                borderwidth=0,
-                                highlightthickness=0)
-        lb_allgreps.grid(row=3, column=0,  columnspan=6,  sticky='w', padx=6, pady=10)
-        lb_allgreps.configure(font = Font_tuple)
-        self.allgreps.set('=> AllGreps')
 
 
         def do_grep():
             """Runs a wordletool helper grep instance
             """
-            data_path = 'worddata/' # path from here to data folder
+            global data_path
+
             if sw_no_dups.get() == "on":
                 no_dups = False
             else:
@@ -479,8 +506,6 @@ class pywordleMainWindow(ctk.CTk):
                 vocab_filename = 'wo_nyt_wordlist.txt'
             else:
                 vocab_filename = 'nyt_wordlist.txt'
-
-
 
             wordletool = helpers.ToolResults(data_path, vocab_filename, 'letter_ranks.txt', no_dups)
 
@@ -517,13 +542,19 @@ class pywordleMainWindow(ctk.CTk):
             print(wordletool.show_status())
             self.status.set(wordletool.show_status())
             self.allgreps.set("")
-            self.allgreps.set(wrap_this(wordletool.show_cmd(),90))
-
+            self.allgreps.set(wrap_this(wordletool.show_cmd(),120))
 
         def callbackFuncVocab(event):
             vocab = event.widget.get()
             print(vocab)
             do_grep()
+
+        self.settings_frame = ctk.CTkFrame(self,
+                                           width=900,
+                                           # height=100,
+                                           corner_radius=10,
+                                           borderwidth=0)
+        self.settings_frame.pack(side= tk.BOTTOM, fill=tk.X,  padx=20, pady=6)
 
         combo_vocab = ttk.Combobox(self.settings_frame,
                                    values= ("Small Vocabulary", "Large Vocabulary"),
@@ -559,19 +590,30 @@ class pywordleMainWindow(ctk.CTk):
         self.bt_Q = ctk.CTkButton(self.settings_frame, text="Quit", width=100, command=self.destroy)
         self.bt_Q.grid(row=0, column=7, columnspan= 1, padx=6, pady=6, sticky='e')
 
+        lb_allgreps = tk.Label(self.settings_frame,
+                                textvariable=self.allgreps,
+                                justify=tk.LEFT,
+                                anchor='ne',
+                                background='#dedede',
+                                borderwidth=0,
+                                highlightthickness=0)
+        lb_allgreps.grid(row=1, column=0,  columnspan=8,  sticky='wns', padx=6, pady=10)
+        lb_allgreps.configure(font = Font_tuple)
+        self.allgreps.set('=> AllGreps')
+
         do_grep()
 
     def create_wnd_help(self):
+        global data_path
         self.wnd_help = ctk.CTkToplevel(self)
         self.wnd_help.wm_title('Some Information For You')
         w_width = 800
-        w_height = 440
+        w_height = 460
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.wnd_help.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
         self.wnd_help.resizable(width=False,height=False)
 
-        data_path = 'worddata/' # path from here to data folder
         full_path_name = os.path.join(os.path.dirname(__file__), data_path , 'helpinfo.txt')
         if os.path.exists(full_path_name):
             f = open(full_path_name, "r", encoding="UTF8").read()
