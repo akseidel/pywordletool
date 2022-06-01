@@ -4,14 +4,15 @@
 import sys
 import os
 import random
-import grepper
+from NotPartOfGUI import grepper
+
 
 # Returns the wordle word list full pathname
 # Exits program if not found
 def get_word_list_path_name(local_path_file_name):
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_file_name)
     if os.path.exists(full_path_name):
-        print("Using " + local_path_file_name)
+        # print("Using " + local_path_file_name)
         return full_path_name
     else:
         print(
@@ -28,7 +29,7 @@ def make_ltr_rank_dictionary(local_path_rank_file):
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_rank_file)
     ltr_rank_dict = {}  # ltr_rank_dict will be the rank dictionary
     if os.path.exists(full_path_name):
-        print("Using " + local_path_rank_file)
+        # print("Using " + local_path_rank_file)
         with open(full_path_name) as f:
             for l in f:
                 l = l.split(":")

@@ -79,7 +79,7 @@ class pywordleMainWindow(ctk.CTk):
             self.create_wnd_help()
             help_showing = True
         else:
-            print("Help already exists")
+            # print("Help already exists")
             self.wnd_help.deiconify()
             self.wnd_help.focus_set()
 
@@ -726,8 +726,8 @@ class pywordleMainWindow(ctk.CTk):
 
             wordletool = helpers.ToolResults(data_path, vocab_filename, 'letter_ranks.txt', no_dups)
 
-            print(build_exclude_grep(self.ex_btn_vars))
-            print(build_requireall_grep(self.re_btn_vars))
+            # print(build_exclude_grep(self.ex_btn_vars))
+            # print(build_requireall_grep(self.re_btn_vars))
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_requireall_grep(self.re_btn_vars))
             # == to do === build position and add command
@@ -759,14 +759,14 @@ class pywordleMainWindow(ctk.CTk):
                 if i == n_items:
                     tx_result.insert(tk.END, l_msg + '\n')
             tx_result.see('end')
-            print(wordletool.show_status())
+            # print(wordletool.show_status())
             self.status.set(wordletool.show_status())
             self.allgreps.set("")
             self.allgreps.set(wrap_this(wordletool.show_cmd(), 120))
 
         def callbackFuncVocab(event):
-            vocab = event.widget.get()
-            print(vocab)
+            # vocab = event.widget.get()
+            # print(vocab)
             do_grep()
 
         self.settings_frame = ctk.CTkFrame(self,

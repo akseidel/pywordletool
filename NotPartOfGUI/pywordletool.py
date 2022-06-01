@@ -4,7 +4,7 @@
 import helpers
 
 
-data_path = 'worddata/' # path from here to data folder
+data_path = '../worddata/'  # path from here to data folder
 
 # Set no_dups to prevent letters from occurring more than once
 # First pick should not use duplicates, later picks should consider them.
