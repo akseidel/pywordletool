@@ -1,8 +1,5 @@
 # get customtkinter  -> pip3 install customtkinter
 # if already, may need to upgrade it -> pip3 install customtkinter --upgrade
-# from tkinter import *
-import textwrap
-import sys
 import os
 import helpers
 
@@ -39,7 +36,7 @@ def wrap_this(string, max_chars):
     """A helper that will return the string with word-break wrapping.
             :param str string: The text to be wrapped.
             :param int max_chars: The maximum number of characters on a line before wrapping.
-            """
+    """
     string = string.replace('\n', '').replace('\r', '')  # strip confusing newlines
     words = string.split(' ')
     the_lines = []
@@ -59,11 +56,10 @@ def wrap_this(string, max_chars):
     return the_newline
 
 
-class pywordleMainWindow(ctk.CTk):
+class Pywordlemainwindow(ctk.CTk):
     """The pywordletool application GUI window
     """
     global n_col
-    global switch_var
     global x_pos_dict
     global r_pos_dict
 
@@ -84,16 +80,17 @@ class pywordleMainWindow(ctk.CTk):
             self.wnd_help.focus_set()
 
     # ======== set exclude combos to treeview selection
-    def X_PosTreeViewClick(self, event):
-        curItem = self.treeview_px.focus()
-        val_tup = self.treeview_px.item(curItem).get('values')
+    def x_pos_tree_view_click(self, event):
+        cur_item = self.treeview_px.focus()
+        val_tup = self.treeview_px.item(cur_item).get('values')
         if val_tup != ():
             self.pos_px_l.set(val_tup[0])
             self.pos_px_p.set(val_tup[1])
+
     # ======== set require combos to treeview selection
-    def R_PosTreeViewClick(self, event):
-        curItem = self.treeview_pr.focus()
-        val_tup = self.treeview_pr.item(curItem).get('values')
+    def r_pos_tree_view_click(self, event):
+        cur_item = self.treeview_pr.focus()
+        val_tup = self.treeview_pr.item(cur_item).get('values')
         if val_tup != ():
             self.pos_pr_l.set(val_tup[0])
             self.pos_pr_p.set(val_tup[1])
@@ -107,7 +104,7 @@ class pywordleMainWindow(ctk.CTk):
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
         # self.resizable(width=False,height=False)
-        Font_tuple = ("PT Mono", 14, "normal")
+        font_tuple = ("PT Mono", 14, "normal")
 
         self.no_dups = tk.BooleanVar()
         self.no_dupe_state = tk.StringVar()
@@ -122,7 +119,8 @@ class pywordleMainWindow(ctk.CTk):
         style.configure("position.ttk.Treeview", highlightthickness=0, bd=0,
                         font=('', 14))  # body font
         style.configure("position.ttk.Treeview.Heading", font=('', 14))  # heading font
-        #style.configure("position.ttk.TCombobox", font=('', 20)) # not working
+
+        # style.configure("position.ttk.TCombobox", font=('', 20)) # not working
 
         def add_x_pos():
             x_ltr = self.pos_px_l.get().upper()
@@ -189,23 +187,22 @@ class pywordleMainWindow(ctk.CTk):
 
         def build_exclude_grep(ex_btn_var_list):
             """Builds the grep line for excluding letters
-            :param list Stringvars: Stringvars bound to letter checkboxes
+
             """
             # example 'grep -vE \'b|f|k|w\''
             grep_exclude = ""
-            args = ""
             pipe = "|"
             lts = []
             for b in ex_btn_var_list:
-                l = b.get()
-                if l != '-':
-                    lts.append(l)
+                ltr = b.get()
+                if ltr != '-':
+                    lts.append(ltr)
             args = pipe.join(lts)
             if len(lts) > 0:
                 grep_exclude = "grep -vE \'" + args + "\'"
             return grep_exclude
 
-        def build_x_pos_grep(self,this_pos_dict):
+        def build_x_pos_grep(self, this_pos_dict):
             """Builds the grep line for excluding positions
 
             """
@@ -215,11 +212,11 @@ class pywordleMainWindow(ctk.CTk):
                 sort_by_key_dict[j] = this_pos_dict[j]
             for x in sort_by_key_dict:
                 parts = this_pos_dict[x].split(',')
-                l = parts[0].lower()
+                ltr = parts[0].lower()
                 p = int(parts[1])
-                self.tool_command_list.add_excl_pos_cmd(l,p)
+                self.tool_command_list.add_excl_pos_cmd(ltr, p)
 
-        def build_r_pos_grep(self,this_pos_dict):
+        def build_r_pos_grep(self, this_pos_dict):
             """Builds the grep line for including positions
 
             """
@@ -229,24 +226,21 @@ class pywordleMainWindow(ctk.CTk):
                 sort_by_key_dict[j] = this_pos_dict[j]
             for x in sort_by_key_dict:
                 parts = this_pos_dict[x].split(',')
-                l = parts[0].lower()
+                ltr = parts[0].lower()
                 p = int(parts[1])
-                self.tool_command_list.add_incl_pos_cmd(l,p)
-
+                self.tool_command_list.add_incl_pos_cmd(ltr, p)
 
         def build_requireall_grep(re_btn_var_list):
             """Builds the grep line for requiring letters
-            :param list Stringvars: Stringvars bound to letter checkboxes
             """
             # example 'grep -E \'b|f|k|w\''
             grep_requireall = ""
-            args = ""
             pipe = "|"
             itms = []
             for b in re_btn_var_list:
-                l = b.get()
-                if l != '-':
-                    itms.append("grep -E \'" + l + "\'")
+                ltr = b.get()
+                if ltr != '-':
+                    itms.append("grep -E \'" + ltr + "\'")
             args = pipe.join(itms)
             if len(itms) > 0:
                 grep_requireall = args
@@ -266,7 +260,7 @@ class pywordleMainWindow(ctk.CTk):
                                 borderwidth=0,
                                 highlightthickness=0)
         lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='ew', padx=6, pady=2)
-        lb_result_hd.configure(font=Font_tuple)
+        lb_result_hd.configure(font=font_tuple)
 
         tx_result = tk.Text(self.result_frame,
                             wrap='word',
@@ -274,7 +268,7 @@ class pywordleMainWindow(ctk.CTk):
                             borderwidth=0,
                             highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
-        tx_result.configure(font=Font_tuple)
+        tx_result.configure(font=font_tuple)
 
         tx_results_scroll_bar = ttk.Scrollbar(self.result_frame, orient='vertical', command=tx_result.yview)
         tx_results_scroll_bar.grid(row=0, rowspan=3, column=5, sticky='ns')
@@ -285,7 +279,7 @@ class pywordleMainWindow(ctk.CTk):
                              borderwidth=0,
                              highlightthickness=0)
         lb_status.grid(row=2, rowspan=3, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
-        lb_status.configure(font=Font_tuple)
+        lb_status.configure(font=font_tuple)
         self.status.set('=> No status yet.')
 
         # grep criteria outer frame holding:
@@ -359,7 +353,7 @@ class pywordleMainWindow(ctk.CTk):
                                        )
         self.combo_px_l.grid(row=0, column=0, padx=4, pady=6, sticky='w')
         self.combo_px_l.current(0)
-        # self.combo_px_l.configure(font = Font_tuple)
+        # self.combo_px_l.configure(font = font_tuple)
 
         self.pos_px_p = tk.StringVar()
         self.combo_px_p = ttk.Combobox(self.criteria_frame_px,
@@ -384,10 +378,8 @@ class pywordleMainWindow(ctk.CTk):
                                        )
         self.bt_px_rem.grid(row=0, column=3, padx=2, pady=6, sticky='ew')
 
-
-
         # ======  exclude position treeview
-        self.treeview_px = ttk.Treeview(self.criteria_frame_px,style='position.ttk.Treeview')
+        self.treeview_px = ttk.Treeview(self.criteria_frame_px, style='position.ttk.Treeview')
         self.treeview_px.configure(columns=('1', '2'),
                                    show='headings',
                                    height=5)
@@ -400,14 +392,12 @@ class pywordleMainWindow(ctk.CTk):
             self.treeview_px.column(column, anchor=tk.CENTER)  # This will center text in rows
             self.treeview_px.column(column, width=80)
         # selection callback
-        self.treeview_px.bind('<ButtonRelease-1>', self.X_PosTreeViewClick)
+        self.treeview_px.bind('<ButtonRelease-1>', self.x_pos_tree_view_click)
         # scrollbar for treeview
         sb = ttk.Scrollbar(self.criteria_frame_px, orient=tk.VERTICAL)
         sb.grid(row=1, column=4, pady=6, sticky='ens')
         self.treeview_px.config(yscrollcommand=sb.set)
         sb.config(command=self.treeview_px.yview)
-
-
 
         # =======  END ============ exclude from position controls
 
@@ -423,7 +413,7 @@ class pywordleMainWindow(ctk.CTk):
                                        )
         self.combo_pr_l.grid(row=0, column=0, padx=4, pady=6, sticky='w')
         self.combo_pr_l.current(0)
-        # self.combo_pr_l.configure(font = Font_tuple)
+        # self.combo_pr_l.configure(font = font_tuple)
 
         self.pos_pr_p = tk.StringVar()
         self.combo_pr_p = ttk.Combobox(self.criteria_frame_pr,
@@ -448,8 +438,8 @@ class pywordleMainWindow(ctk.CTk):
                                        )
         self.bt_pr_rem.grid(row=0, column=3, padx=2, pady=6, sticky='ew')
 
-        #style='position.ttk.Treeview')
-        self.treeview_pr = ttk.Treeview(self.criteria_frame_pr,style='position.ttk.Treeview')
+        # style='position.ttk.Treeview')
+        self.treeview_pr = ttk.Treeview(self.criteria_frame_pr, style='position.ttk.Treeview')
         self.treeview_pr.configure(columns=('1', '2'),
                                    show='headings',
                                    height=5
@@ -462,27 +452,24 @@ class pywordleMainWindow(ctk.CTk):
             self.treeview_pr.column(column, anchor=tk.CENTER)  # This will center text in rows
             self.treeview_pr.column(column, width=80)
         # selection callback
-        self.treeview_pr.bind('<ButtonRelease-1>', self.R_PosTreeViewClick)
+        self.treeview_pr.bind('<ButtonRelease-1>', self.r_pos_tree_view_click)
         # scrollbar for treeview
         sb = ttk.Scrollbar(self.criteria_frame_pr, orient=tk.VERTICAL)
         sb.grid(row=1, column=4, pady=6, sticky='ens')
         self.treeview_pr.config(yscrollcommand=sb.set)
         sb.config(command=self.treeview_pr.yview)
 
-
-        # combo_px.bind("<<ComboboxSelected>>", callbackFuncVocab)
-
         # =======  END ============ require from position controls
 
         # =============== Exclude Letters =============
         self.v_xE = tk.StringVar()
         self.v_xE.set('-')
-        bt_xE = ttk.Checkbutton(self.criteria_frame_x, text="E", variable=self.v_xE, onvalue='e', offvalue='-')
-        bt_xE.pack(side=tk.LEFT, padx=2, pady=2)
+        bt_x_e = ttk.Checkbutton(self.criteria_frame_x, text="E", variable=self.v_xE, onvalue='e', offvalue='-')
+        bt_x_e.pack(side=tk.LEFT, padx=2, pady=2)
         self.v_xA = tk.StringVar()
         self.v_xA.set('-')
-        bt_xA = ttk.Checkbutton(self.criteria_frame_x, text="A", variable=self.v_xA, onvalue='a', offvalue='-')
-        bt_xA.pack(side=tk.LEFT, padx=2, pady=2)
+        bt_x_a = ttk.Checkbutton(self.criteria_frame_x, text="A", variable=self.v_xA, onvalue='a', offvalue='-')
+        bt_x_a.pack(side=tk.LEFT, padx=2, pady=2)
         sep_1 = ttk.Separator(self.criteria_frame_x, orient='vertical').pack(side=tk.LEFT, fill='y', padx=8)
         self.v_xR = tk.StringVar()
         self.v_xR.set('-')
@@ -731,8 +718,8 @@ class pywordleMainWindow(ctk.CTk):
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_requireall_grep(self.re_btn_vars))
             # == to do === build position and add command
-            build_x_pos_grep(wordletool,x_pos_dict)
-            build_r_pos_grep(wordletool,r_pos_dict)
+            build_x_pos_grep(wordletool, x_pos_dict)
+            build_r_pos_grep(wordletool, r_pos_dict)
 
             tx_result.delete(1.0, tk.END)
 
@@ -764,9 +751,7 @@ class pywordleMainWindow(ctk.CTk):
             self.allgreps.set("")
             self.allgreps.set(wrap_this(wordletool.show_cmd(), 120))
 
-        def callbackFuncVocab(event):
-            # vocab = event.widget.get()
-            # print(vocab)
+        def callback_func_vocab(self):
             do_grep()
 
         self.settings_frame = ctk.CTkFrame(self,
@@ -784,7 +769,7 @@ class pywordleMainWindow(ctk.CTk):
                                borderwidth=0,
                                highlightthickness=0)
         lb_allgreps.grid(row=0, column=0, columnspan=8, sticky='ewns', padx=6, pady=10)
-        lb_allgreps.configure(font=Font_tuple)
+        lb_allgreps.configure(font=font_tuple)
         self.allgreps.set('=> AllGreps')
 
         self.bt_grep = ctk.CTkButton(self.actions_frame,
@@ -799,8 +784,8 @@ class pywordleMainWindow(ctk.CTk):
                                    )
         combo_vocab.pack(side=tk.BOTTOM, padx=6, pady=6, anchor='nw', fill=tk.X)
         combo_vocab.current(0)
-        combo_vocab.configure(font=Font_tuple)
-        combo_vocab.bind("<<ComboboxSelected>>", callbackFuncVocab)
+        combo_vocab.configure(font=font_tuple)
+        combo_vocab.bind("<<ComboboxSelected>>", callback_func_vocab)
 
         sw_no_dups = ctk.CTkSwitch(self.actions_frame,
                                    text="Allow Duplicate Letters",
@@ -843,16 +828,16 @@ class pywordleMainWindow(ctk.CTk):
             f = 'This is all the help you get because file helpinfo.txt has gone missing.'
         msg1 = tk.Label(self.wnd_help, text=f, justify=tk.LEFT, wraplength=740)
         msg1.pack(side="top", expand=True, padx=6, pady=4)
-        buttonQ = ctk.CTkButton(self.wnd_help, text="Close",
-                                command=self.close_help)
-        buttonQ.pack(side="right", padx=6, pady=6)
-        buttonF = ctk.CTkButton(self.wnd_help, text="Return Focus",
-                                command=this_app.focus_set)
-        buttonF.pack(side="left", padx=6, pady=6)
+        button_q = ctk.CTkButton(self.wnd_help, text="Close",
+                                 command=self.close_help)
+        button_q.pack(side="right", padx=6, pady=6)
+        button_f = ctk.CTkButton(self.wnd_help, text="Return Focus",
+                                 command=this_app.focus_set)
+        button_f.pack(side="left", padx=6, pady=6)
         self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
 
 
-# end pywordleMainWindow class
+# end Pywordlemainwindow class
 
-this_app = pywordleMainWindow()
+this_app = Pywordlemainwindow()
 this_app.mainloop()
