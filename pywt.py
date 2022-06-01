@@ -773,7 +773,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.allgreps.set('=> AllGreps')
 
         self.bt_grep = ctk.CTkButton(self.actions_frame,
-                                     text="Do Grep", width=100,
+                                     text="Apply Your Thinking", width=100,
                                      command=do_grep)
         self.bt_grep.pack(side=tk.TOP, padx=6, pady=6, anchor='w', fill=tk.X)
 
