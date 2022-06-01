@@ -220,8 +220,6 @@ class pywordleMainWindow(ctk.CTk):
                                         )
         self.criteria_frame_r.pack(side= tk.TOP, fill=tk.X,  padx=6, pady=6)
 
-
-
         # letter position frame overall - uses pack
         self.criteria_frame_p = ttk.LabelFrame(self.criteria_frame,
                                         width=900,
@@ -246,13 +244,13 @@ class pywordleMainWindow(ctk.CTk):
                                         )
         self.criteria_frame_pr.pack(side= tk.LEFT, fill=tk.X,  padx=6, pady=6)
 
-         # letter position frame require- uses pack
+        # actions frame require- uses pack
         self.actions_frame = ttk.LabelFrame(self.criteria_frame_p,
                                         width=450,
                                         height=100,
                                         text= 'Actions',
                                         )
-        self.actions_frame.pack(side= tk.RIGHT, fill=tk.BOTH,  padx=6, pady=6, expand=True)
+        self.actions_frame.pack(side= tk.LEFT, fill=tk.BOTH,  padx=6, pady=6, expand=True)
 
 
         # =======  START ============ exclude from position controls
@@ -482,13 +480,13 @@ class pywordleMainWindow(ctk.CTk):
         self.v_xJ.set('-')
         bt_xJ = ttk.Checkbutton(self.criteria_frame_x, text = "J", variable=self.v_xJ, onvalue='j', offvalue='-')
         bt_xJ.pack(side=tk.LEFT,padx = 2, pady = 2)
-        # ==END========== Exclude Letters =============
+
         self.ex_btn_vars =[self.v_xA,self.v_xB,self.v_xC,self.v_xD,self.v_xE,self.v_xF,
                        self.v_xG,self.v_xH,self.v_xI,self.v_xJ,self.v_xK,self.v_xL,
                        self.v_xM,self.v_xN,self.v_xO,self.v_xP,self.v_xQ,self.v_xR,
                        self.v_xS,self.v_xT,self.v_xU,self.v_xV,self.v_xW,self.v_xX,
                         self.v_xY,self.v_xZ]
-
+        # ==END========== Exclude Letters =============
 
         # =============== Require Letters =============
         self.v_rE = tk.StringVar()
@@ -599,13 +597,13 @@ class pywordleMainWindow(ctk.CTk):
         self.v_rJ.set('-')
         bt_r_J = ttk.Checkbutton(self.criteria_frame_r, text = "J", variable=self.v_rJ, onvalue='j', offvalue='-')
         bt_r_J.pack(side=tk.LEFT,padx = 2, pady = 2)
-        # ===END========= Require Letters =============
+
         self.re_btn_vars =[self.v_rA,self.v_rB,self.v_rC,self.v_rD,self.v_rE,self.v_rF,
                        self.v_rG,self.v_rH,self.v_rI,self.v_rJ,self.v_rK,self.v_rL,
                        self.v_rM,self.v_rN,self.v_rO,self.v_rP,self.v_rQ,self.v_rR,
                        self.v_rS,self.v_rT,self.v_rU,self.v_rV,self.v_rW,self.v_rX,
                         self.v_rY,self.v_rZ]
-
+        # ===END========= Require Letters =============
 
 
         def do_grep():
@@ -686,14 +684,14 @@ class pywordleMainWindow(ctk.CTk):
         self.bt_grep = ctk.CTkButton(self.actions_frame,
                                      text="Do Grep", width=100,
                                      command=do_grep)
-        self.bt_grep.grid(row=0, column=0, padx=6, pady=6, sticky='ew')
+        self.bt_grep.pack(side=tk.TOP, padx=6, pady=6, anchor='w', fill=tk.X)
 
         combo_vocab = ttk.Combobox(self.actions_frame,
                                    values= ("Small Vocabulary", "Large Vocabulary"),
                                    state= 'readonly',
                                    textvariable = self.vocabulary
                                    )
-        combo_vocab.grid(row=2, column=0, padx= 6, pady=6, sticky='w')
+        combo_vocab.pack(side=tk.BOTTOM, padx=6, pady=6, anchor='nw', fill=tk.X)
         combo_vocab.current(0)
         combo_vocab.configure(font = Font_tuple)
         combo_vocab.bind("<<ComboboxSelected>>", callbackFuncVocab)
@@ -703,18 +701,21 @@ class pywordleMainWindow(ctk.CTk):
                                    onvalue="on",
                                    offvalue="off",
                                    command=do_grep)
-        sw_no_dups.grid(row=1, column=0, padx=6, pady=6, sticky='w')
+        sw_no_dups.pack(side=tk.TOP, padx=6, pady=6, anchor='w', fill=tk.X)
 
-        # self.sep_d1 = ttk.Separator(self.actions_frame, orient='vertical')
-        # self.sep_d1.grid(row=0, column=1, columnspan= 1, padx=132, pady=6)
-        # self.sep_d2 = ttk.Separator(self.settings_frame, orient='vertical')
-        # self.sep_d2.grid(row=0, column=5, columnspan= 1, padx=20, pady=6)
+        # admin frame require- uses pack
+        self.admin_frame = ttk.LabelFrame(self.criteria_frame_p,
+                                        width=250,
+                                        height=100,
+                                        text= 'Application',
+                                        )
+        self.admin_frame.pack(side= tk.LEFT, fill=tk.BOTH, padx=6, pady=6, expand=True)
 
-        self.bt_help = ctk.CTkButton(self.actions_frame, text="?", width=40, command=self.show_help)
-        self.bt_help.grid(row=0, column=1, columnspan= 1, padx=6, pady=6, sticky='e')
+        self.bt_Q = ctk.CTkButton(self.admin_frame, text="Quit", width=100, command=self.destroy)
+        self.bt_Q.pack(side=tk.BOTTOM, padx=6, pady=6, anchor='e')
 
-        self.bt_Q = ctk.CTkButton(self.actions_frame, text="Quit", width=100, command=self.destroy)
-        self.bt_Q.grid(row=0, column=2, columnspan= 1, padx=6, pady=6, sticky='e')
+        self.bt_help = ctk.CTkButton(self.admin_frame, text="?", width=40, command=self.show_help)
+        self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=6, anchor='e')
 
         do_grep()
 
