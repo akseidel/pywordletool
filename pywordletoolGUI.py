@@ -17,6 +17,8 @@ ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dar
 data_path = 'worddata/' # path from here to data folder
 n_col = 8               # number of list columns
 help_showing = False    # flag indicating help window is open
+x_pos_dict={}           # exclude position dictionary
+r_pos_dict={}           # require position dictionary
 
 def str_wrd_list_hrd():
     """Creates the word list header line.
@@ -78,7 +80,6 @@ class pywordleMainWindow(ctk.CTk):
             self.wnd_help.deiconify()
             self.wnd_help.focus_set()
 
-
     def __init__(self):
         super().__init__()
         self.title("This Wordle Tool")
@@ -100,6 +101,68 @@ class pywordleMainWindow(ctk.CTk):
         # configure style
         # self.style = ttk.Style(self)
         # self.style.configure('TSeparator', )
+
+        def add_x_pos():
+            x_ltr = self.pos_px_l.get().upper()
+            x_pos = self.pos_px_p.get()
+            if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
+                self.pos_px_l.set('')
+                return
+            self.pos_px_l.set(x_ltr)
+            key = x_ltr + ',' + x_pos
+            value = key
+            x_pos_dict[key] = value
+            fill_treeview_per_dictionary(self.treeview_px,x_pos_dict)
+
+        def add_r_pos():
+            x_ltr = self.pos_pr_l.get().upper()
+            x_pos = self.pos_pr_p.get()
+            if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
+                self.pos_pr_l.set('')
+                return
+            self.pos_pr_l.set(x_ltr)
+            key = x_ltr + ',' + x_pos
+            value = key
+            r_pos_dict[key] = value
+            fill_treeview_per_dictionary(self.treeview_pr,r_pos_dict)
+
+        def remove_x_pos():
+            x_ltr = self.pos_px_l.get().upper()
+            x_pos = self.pos_px_p.get()
+            if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
+                self.pos_px_l.set('')
+                return
+            self.pos_px_l.set(x_ltr)
+            key = x_ltr + ',' + x_pos
+            if key in x_pos_dict:
+                del x_pos_dict[key]
+                fill_treeview_per_dictionary(self.treeview_px,x_pos_dict)
+
+        def remove_r_pos():
+            x_ltr = self.pos_pr_l.get().upper()
+            x_pos = self.pos_pr_p.get()
+            if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
+                self.pos_pr_l.set('')
+                return
+            self.pos_pr_l.set(x_ltr)
+            key = x_ltr + ',' + x_pos
+            if key in r_pos_dict:
+                del r_pos_dict[key]
+                fill_treeview_per_dictionary(self.treeview_pr,r_pos_dict)
+
+        # Clears and fills a treeview with dictionary contents
+        # Results are sorted by the dictionary keys
+        def fill_treeview_per_dictionary(this_treeview,this_pos_dict):
+            for i in this_treeview.get_children():
+                this_treeview.delete(i)
+            i = 0
+            sort_by_key_dict={}
+            for j in sorted(this_pos_dict):
+                sort_by_key_dict[j]=this_pos_dict[j]
+            for x in sort_by_key_dict:
+                parts = this_pos_dict[x].split(',')
+                this_treeview.insert(parent='', index=i, id=i, values=parts)
+                i += 1
 
 
         def build_exclude_grep(ex_btn_var_list):
@@ -256,9 +319,9 @@ class pywordleMainWindow(ctk.CTk):
         # =======  START ============ exclude from position controls
         self.pos_px_l = tk.StringVar()
         self.combo_px_l = ttk.Combobox(self.criteria_frame_px,
-                                   values= ('','a','b','c','d','e','f','g','h','i','j','k',
-                                            'l','m','n','o','p','q','r','s','t','u','v','w',
-                                            'x','y','z'),
+                                   values= ('','A','B','C','D','E','F','G','H','I','J','K',
+                                            'L','M','N','O','P','Q','R','S','T','U','V','W',
+                                            'X','Y','Z'),
                                    width=4,
                                    justify=tk.CENTER,
                                    textvariable = self.pos_px_l
@@ -278,23 +341,28 @@ class pywordleMainWindow(ctk.CTk):
         self.combo_px_p.grid(row=0, column=1, padx= 4, pady=6, sticky='w')
         self.combo_px_p.current(0)
 
+
         self.bt_px_add = ctk.CTkButton(self.criteria_frame_px,
-                                     text="+", width=20,
-                                     # command=
+                                       text="+", width=20,
+                                       command = add_x_pos
                                        )
         self.bt_px_add.grid(row=0, column=2, padx=2, pady=6, sticky='ew')
 
         self.bt_px_rem = ctk.CTkButton(self.criteria_frame_px,
                                      text="-", width=20,
-                                     # command=
+                                     command= remove_x_pos
                                        )
         self.bt_px_rem.grid(row=0, column=3, padx=2, pady=6, sticky='ew')
 
-        self.treeview_px = ttk.Treeview(self.criteria_frame_px,
-                                    columns=('1', '2'),
+        # ===========
+        def OnTreeViewClick(self):
+            print('here')
+        # ======  exclude position treeview
+        self.treeview_px = ttk.Treeview(self.criteria_frame_px)
+        self.treeview_px.configure( columns=('1', '2'),
                                     show='headings',
-                                    height=5,
-                                   )
+                                    height=5)
+
         self.treeview_px.grid(row=1, column=0, columnspan=4,padx= 6, pady=6, sticky='ew')
         ttk.Style().configure('Treeview', relief='raised')
         self.treeview_px.heading(1, text='Letter')
@@ -302,9 +370,12 @@ class pywordleMainWindow(ctk.CTk):
         for column in self.treeview_px["columns"]:
             self.treeview_px.column(column, anchor=tk.CENTER) # This will center text in rows
             self.treeview_px.column(column, width=80)
-        self.treeview_px.insert(parent='', index=0, id=0, values=('a', 3))
-        self.treeview_px.insert(parent='', index=1, id=1, values=('i', 2))
-        self.treeview_px.insert(parent='', index=2, id=2, values=('s', 5))
+        self.treeview_px.bind('<<TreeviewSelect>>', OnTreeViewClick)
+        # scrollbar for treeview
+        sb = ttk.Scrollbar(self.criteria_frame_px, orient=tk.VERTICAL)
+        sb.grid(row=1, column=4, pady=6, sticky='ens')
+        self.treeview_px.config(yscrollcommand=sb.set)
+        sb.config(command=self.treeview_px.yview)
 
         # treeview_px.configure(font = Font_tuple)
         # combo_px.bind("<<ComboboxSelected>>", callbackFuncVocab)
@@ -315,9 +386,9 @@ class pywordleMainWindow(ctk.CTk):
          # =======  START ============ require from position controls
         self.pos_pr_l = tk.StringVar()
         self.combo_pr_l = ttk.Combobox(self.criteria_frame_pr,
-                                   values= ('','a','b','c','d','e','f','g','h','i','j','k',
-                                            'l','m','n','o','p','q','r','s','t','u','v','w',
-                                            'x','y','z'),
+                                   values= ('','A','B','C','D','E','F','G','H','I','J','K',
+                                            'L','M','N','O','P','Q','R','S','T','U','V','W',
+                                            'X','Y','Z'),
                                    width=4,
                                    justify=tk.CENTER,
                                    textvariable = self.pos_pr_l
@@ -338,14 +409,14 @@ class pywordleMainWindow(ctk.CTk):
         self.combo_pr_p.current(0)
 
         self.bt_pr_add = ctk.CTkButton(self.criteria_frame_pr,
-                                     text="+", width=20,
-                                     # command=
+                                       text="+", width=20,
+                                       command= add_r_pos
                                        )
         self.bt_pr_add.grid(row=0, column=2, padx=2, pady=6, sticky='ew')
 
         self.bt_pr_rem = ctk.CTkButton(self.criteria_frame_pr,
-                                     text="-", width=20,
-                                     # command=
+                                       text="-", width=20,
+                                       command=remove_r_pos
                                        )
         self.bt_pr_rem.grid(row=0, column=3, padx=2, pady=6, sticky='ew')
 
@@ -361,11 +432,13 @@ class pywordleMainWindow(ctk.CTk):
         for column in self.treeview_pr["columns"]:
             self.treeview_pr.column(column, anchor=tk.CENTER) # This will center text in rows
             self.treeview_pr.column(column, width=80)
-        self.treeview_pr.insert(parent='', index=0, id=0, values=('q', 1))
-        self.treeview_pr.insert(parent='', index=1, id=1, values=('w', 4))
-        self.treeview_pr.insert(parent='', index=2, id=2, values=('a', 5))
+        # scrollbar for treeview
+        sb = ttk.Scrollbar(self.criteria_frame_pr, orient=tk.VERTICAL)
+        sb.grid(row=1, column=4, pady=6, sticky='ens')
+        self.treeview_pr.config(yscrollcommand=sb.set)
+        sb.config(command=self.treeview_pr.yview)
+        self.treeview_pr.configure(font = Font_tuple)
 
-        # treeview_px.configure(font = Font_tuple)
         # combo_px.bind("<<ComboboxSelected>>", callbackFuncVocab)
 
         # =======  END ============ require from position controls
