@@ -10,8 +10,8 @@ Excluding letters results in words presented not containing those letters.
 
 Requiring letters results in words presented containing those letters. No words show when six or more letters are required.
 
-Excluding a letter from a letter position is done by entering the letter and the position. For example 'a,2' excludes the letter 'a' from the second letter position.
+Excluding a letter from a letter position is done by entering the letter and the position. For example 'a,2' excludes the letter 'a' from the second letter position. In the puzzle context the letter is known to be present in the word, so it will also be required. The letter will not appear checked for Require.
 
-Requiring a letter at a letter position is done by entering the letter and the position. For example 'a,2' requires the letter 'a' from the second letter position.
+Requiring a letter at a letter position is done by entering the letter and the position. For example 'a,2' requires the letter 'a' from the second letter position. In the puzzle context the letter is known to be present in the word, so it will also be required. The letter will not appear checked for Require.
 
 Multiple position exclusions or requiring for a letter is accomplished with multiple entries.
