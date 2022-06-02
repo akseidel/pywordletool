@@ -1,17 +1,15 @@
-The wordle tool helper shows five-letter words from which you can select for playing the wordle game.
+The wordle helper shows five-letter words from which you can select for playing the wordle game.
 
-The five-letter words are assigned a rank according to how common the letters are in the English wordle words. The wordle tool presents ranked words from lowest rank to highest rank. Scroll the list upwards to see the lower ranking words.
+The five-letter words are assigned a rank according to how common the letters are in the English wordle words. This helper presents ranked words from lowest rank to highest rank. Scroll the list upwards to see the lower ranking words.
 
 Word rank represents relative probability. Any word matching the filter could be the wordle word regardless of its rank.
 
-The Allow Duplicate Letters option includes words having duplicate letters. After your first or second wordle choice you should start to consider duplicate letters. Depending on your known letters status, duplicate letters ought to be shown before making the third selection.
+The 'Allow Duplicate Letters' option includes words having duplicate letters. After your first or second wordle choice you should start to consider words with duplicate letters. Depending on your known letters status, duplicate letters ought to be shown before making the third selection.
 
-Excluding letters results in words presented not containing those letters. Apply Your Thinking needs to be pressed after making any letter exclusion.
+'Letters To Be Excluded' checkboxes result in words not containing those letters. The 'Apply Your Thinking' button needs to be pressed after making any letter exclusion.
 
-Requiring letters results in words presented containing those letters. No words show when six or more letters are required. Apply Your Thinking needs to be pressed after making any letter requiring.
+'Letters To Be Required' checkboxes  result in words containing those letters. The 'Apply Your Thinking' button needs to be pressed after making any letter requiring. No words will show when six or more letters are required.
 
-Excluding a letter from a letter position is done by entering the letter and the position. For example 'a,2' excludes the letter 'a' from the second letter position. In the puzzle context the letter is known to be present in the word, so it will also be required. The letter will not appear checked for Require.
+'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In the puzzle context the letter is known to be present in the word, so it will also be required. The letter's checkbox will not appear checked in 'Letters To Be Required'.
 
-Requiring a letter at a letter position is done by entering the letter and the position. For example 'a,2' requires the letter 'a' from the second letter position. In the puzzle context the letter is known to be present in the word, so it will also be required. The letter will not appear checked for Require.
-
-Multiple position exclusions or requiring for a letter is accomplished with multiple entries.
+One might not use 'Letter Positioning' settings until after letter elimination strategy picks have been made to avoid its interference with letter exclusion settings.

@@ -7,11 +7,11 @@
 def setup_grep_filtering(this_sh_cmd_lst):
 
     # post first pick always exclusions
-    # format is => tool_command_list.add_excl_any_cmd('l|s')
+    # format is => tool_command_list.add_excl_any_cmd('ltr|s')
     # tool_command_list.add_excl_any_cmd('a|s|b|i|e')
 
     # post first pick temporary exclusions
-    # format is => tool_command_list.add_excl_any_cmd('l|s')
+    # format is => tool_command_list.add_excl_any_cmd('ltr|s')
     # make sure to remove any position rules for these 
     # tool_command_list.add_excl_any_cmd('e|t|r')
 
@@ -33,7 +33,7 @@ def setup_grep_filtering(this_sh_cmd_lst):
     # randMidrank = tool_command_list.add_rand_incl_frm_cmd('ucyhdpgm')
 
     # # post first pick required non positions
-    # # format is => tool_command_list.add_excl_pos_cmd('l',p)
+    # # format is => tool_command_list.add_excl_pos_cmd('ltr',p)
     # tool_command_list.add_excl_pos_cmd('r',4)
     # tool_command_list.add_excl_pos_cmd('e',2)
     # tool_command_list.add_excl_pos_cmd('t',1)
@@ -42,7 +42,7 @@ def setup_grep_filtering(this_sh_cmd_lst):
     # tool_command_list.add_excl_pos_cmd('p',5)
 
     # # post first pick required positions
-    # # format is => tool_command_list.add_incl_pos_cmd('l',p)
+    # # format is => tool_command_list.add_incl_pos_cmd('ltr',p)
     # tool_command_list.add_incl_pos_cmd('c',1)
     # tool_command_list.add_incl_pos_cmd('r',2)
     # tool_command_list.add_incl_pos_cmd('c',3)
