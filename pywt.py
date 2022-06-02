@@ -93,7 +93,7 @@ class Pywordlemainwindow(ctk.CTk):
 
     def __init__(self):
         super().__init__()
-        self.title("This Wordle Tool")
+        self.title("This Wordle Helper")
         w_width = 1020
         w_height = 900
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
