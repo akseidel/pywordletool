@@ -1,3 +1,6 @@
+# ----------------------------------------------------------------
+# pywt.py  akseidel 5/2022
+# ----------------------------------------------------------------
 # get customtkinter  -> pip3 install customtkinter
 # if already, may need to upgrade it -> pip3 install customtkinter --upgrade
 import os
