@@ -4,23 +4,25 @@
 import sys
 import os
 import random
-
+from tkinter import messagebox
 
 # Returns the wordle word list full pathname
 # Exits program if not found
+
+
 def get_word_list_path_name(local_path_file_name):
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_file_name)
     if os.path.exists(full_path_name):
         # print("Using " + local_path_file_name)
         return full_path_name
     else:
-        print(
-            "Stopping here, wordle word list file "
-            + local_path_file_name
-            + " was not found."
-        )
-        print("Expected here: " + full_path_name)
+        msg = 'The wordle word list file '\
+            + local_path_file_name\
+            + ' was not found.'\
+            + ' Expected here:' + full_path_name
+        print(msg)
         print()
+        messagebox.showerror(title='Stopping Here', message=msg)
         sys.exit()
 
 
@@ -35,11 +37,11 @@ def make_ltr_rank_dictionary(local_path_rank_file):
                 ltr = ltr.split(":")
                 ltr_rank_dict[ltr[0]] = float(ltr[1])
     else:
-        print(
-            "Letter ranking file "
-            + local_path_rank_file
+        msg = "Letter ranking file "\
+            + local_path_rank_file\
             + " not found. Switching to built in letter ranking."
-        )
+        print(msg)
+        messagebox.showwarning('Warning', message=msg)
         ltr_rank_dict = {
             "e": 39.0,
             "a": 33.6,
@@ -47,7 +49,7 @@ def make_ltr_rank_dictionary(local_path_rank_file):
             "o": 24.9,
             "t": 24.7,
             "i": 23.9,
-            "ltr": 23.9,
+            "l": 23.9,
             "s": 22.9,
             "n": 20.3,
             "u": 16.9,
