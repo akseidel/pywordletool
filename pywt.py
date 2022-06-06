@@ -14,17 +14,18 @@ ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 data_path = 'worddata/'  # path from here to data folder
-#n_col = 8  # number of list columns
+# n_col = 8  # number of list columns
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 
+
 def set_n_col(self):
-    print(self.winfo_screenwidth())
     if self.winfo_screenwidth() > 1280:  # to do
         return 8
     else:
         return 6
+
 
 def str_wrd_list_hrd(n_col):
     """Creates the word list header line.
@@ -105,6 +106,8 @@ class Pywordlemainwindow(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+        self.info_frame = None
+        self.wnd_help = None
         self.title("This Wordle Helper")
         # print(self.winfo_screenheight())
         # print(self.winfo_screenwidth())
@@ -129,6 +132,7 @@ class Pywordlemainwindow(ctk.CTk):
         style = ttk.Style()
         style.configure("position.ttk.Treeview", highlightthickness=0, bd=0,
                         font=('', 12))  # body font
+
         # style.configure("position.ttk.Treeview.Heading", font=('', 12))  # heading font
 
         def callback_do_grep(self):
@@ -413,7 +417,6 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.bt_px_clr.grid(row=0, column=4, padx=1, pady=2, sticky='ew')
 
-
         # ======  exclude position treeview
         self.treeview_px = ttk.Treeview(self.criteria_frame_px, style='position.ttk.Treeview')
         self.treeview_px.configure(columns=('1', '2'),
@@ -611,12 +614,24 @@ class Pywordlemainwindow(ctk.CTk):
         self.v_xJ.set('-')
         bt_xJ = ttk.Checkbutton(self.criteria_frame_x, text="J", variable=self.v_xJ, onvalue='j', offvalue='-')
         bt_xJ.pack(side=tk.LEFT, padx=2, pady=2)
-
+        sep_5 = ttk.Separator(self.criteria_frame_x, orient='vertical')
+        sep_5.pack(side=tk.LEFT, fill='y', padx=8)
         self.ex_btn_vars = [self.v_xA, self.v_xB, self.v_xC, self.v_xD, self.v_xE, self.v_xF,
                             self.v_xG, self.v_xH, self.v_xI, self.v_xJ, self.v_xK, self.v_xL,
                             self.v_xM, self.v_xN, self.v_xO, self.v_xP, self.v_xQ, self.v_xR,
                             self.v_xS, self.v_xT, self.v_xU, self.v_xV, self.v_xW, self.v_xX,
                             self.v_xY, self.v_xZ]
+
+        def clear_excl_ckbs():
+            for x_var in self.ex_btn_vars:
+                x_var.set('-')
+            do_grep()
+
+        self.bt_x_clr = ctk.CTkButton(self.criteria_frame_x,
+                                      text="z", width=20,
+                                      command=clear_excl_ckbs
+                                      )
+        self.bt_x_clr.pack(side=tk.LEFT, padx=2, pady=2)
         # ==END========== Exclude Letters =============
 
         # =============== Require Letters =============
@@ -732,12 +747,25 @@ class Pywordlemainwindow(ctk.CTk):
         self.v_rJ.set('-')
         bt_r_J = ttk.Checkbutton(self.criteria_frame_r, text="J", variable=self.v_rJ, onvalue='j', offvalue='-')
         bt_r_J.pack(side=tk.LEFT, padx=2, pady=2)
+        sep_5 = ttk.Separator(self.criteria_frame_r, orient='vertical')
+        sep_5.pack(side=tk.LEFT, fill='y', padx=8)
 
         self.re_btn_vars = [self.v_rA, self.v_rB, self.v_rC, self.v_rD, self.v_rE, self.v_rF,
                             self.v_rG, self.v_rH, self.v_rI, self.v_rJ, self.v_rK, self.v_rL,
                             self.v_rM, self.v_rN, self.v_rO, self.v_rP, self.v_rQ, self.v_rR,
                             self.v_rS, self.v_rT, self.v_rU, self.v_rV, self.v_rW, self.v_rX,
                             self.v_rY, self.v_rZ]
+
+        def clear_reqr_ckbs():
+            for r_var in self.re_btn_vars:
+                r_var.set('-')
+            do_grep()
+
+        self.bt_r_clr = ctk.CTkButton(self.criteria_frame_r,
+                                      text="z", width=20,
+                                      command=clear_reqr_ckbs
+                                      )
+        self.bt_r_clr.pack(side=tk.LEFT, padx=2, pady=2)
 
         # ===END========= Require Letters =============
 
@@ -851,20 +879,35 @@ class Pywordlemainwindow(ctk.CTk):
         global data_path
         self.wnd_help = ctk.CTkToplevel(self)
         self.wnd_help.wm_title('Some Information For You')
-        w_width = 800
+        w_width = 680
         w_height = 560
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.wnd_help.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
-        self.wnd_help.resizable(width=False, height=False)
+        # self.wnd_help.resizable(width=False, height=False)
 
         full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
         if os.path.exists(full_path_name):
             f = open(full_path_name, "r", encoding="UTF8").read()
         else:
             f = 'This is all the help you get because file helpinfo.txt has gone missing.'
-        msg1 = tk.Label(self.wnd_help, text=f, justify=tk.LEFT, wraplength=740)
-        msg1.pack(side="top", expand=True, padx=6, pady=4)
+       
+        self.info_frame = ttk.LabelFrame(self.wnd_help,
+                                         borderwidth=0,
+                                         )
+        self.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2,  expand=True)
+
+        msg1 = tk.Text(self.info_frame,
+                       wrap='word'
+                       )
+        msg1.grid(row=0, column=0, padx=6, pady=2)
+        # scrollbar for help
+        help_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
+        help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
+        msg1.config(yscrollcommand=help_sb.set)
+        help_sb.config(command=msg1.yview)
+        msg1.insert(tk.END, f)
+
         button_q = ctk.CTkButton(self.wnd_help, text="Close",
                                  command=self.close_help)
         button_q.pack(side="right", padx=20, pady=20)
