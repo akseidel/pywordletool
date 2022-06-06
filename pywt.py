@@ -13,8 +13,8 @@ import customtkinter as ctk
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
+# globals
 data_path = 'worddata/'  # path from here to data folder
-# n_col = 8  # number of list columns
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
@@ -22,19 +22,19 @@ r_pos_dict = {}  # require position dictionary
 
 def set_n_col(self):
     if self.winfo_screenwidth() > 1280:  # to do
-        return 8
+        return 9
     else:
         return 6
 
 
-def str_wrd_list_hrd(n_col):
+def str_wrd_list_hrd(ln_col):
     """Creates the word list header line.
     """
     h_txt = " Word : Rank "
     left_pad = ""
     mid_pad = "  "
     h_line = left_pad + h_txt
-    for i in range(1, n_col):
+    for i in range(1, ln_col):
         h_line = h_line + mid_pad + h_txt
     return h_line
 
@@ -68,7 +68,6 @@ def wrap_this(string, max_chars):
 class Pywordlemainwindow(ctk.CTk):
     """The pywordletool application GUI window
     """
-    global n_col
     global x_pos_dict
     global r_pos_dict
 
@@ -111,29 +110,27 @@ class Pywordlemainwindow(ctk.CTk):
         self.title("This Wordle Helper")
         # print(self.winfo_screenheight())
         # print(self.winfo_screenwidth())
-        w_width = 1040
-        w_height = 700  # to do, set according to screen height
+        w_width = 1036
+        w_height = 656  # to do, set according to screen height
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
         # self.resizable(width=False,height=False)
         font_tuple = ("Courier", 12, "normal")
-        n_col = set_n_col(self)
-
+        ln_col = set_n_col(self)
+        # set the Vars
         self.no_dups = tk.BooleanVar()
         self.no_dupe_state = tk.StringVar()
         self.no_dupe_state.set("on")
         self.vocabulary = tk.StringVar()
         self.status = tk.StringVar()
-        self.allgreps = tk.StringVar()
 
         # configure style
-        # self.style = ttk.Style(self)
         style = ttk.Style()
         style.configure("position.ttk.Treeview", highlightthickness=0, bd=0,
                         font=('', 12))  # body font
-
-        # style.configure("position.ttk.Treeview.Heading", font=('', 12))  # heading font
+        # style.configure("Vertical.TScrollbar", arrowsize= 64, background="green", bordercolor="red", arrowcolor="white")
+        # Some style settings do not work in osx?
 
         def callback_do_grep(self):
             do_grep()
@@ -183,6 +180,8 @@ class Pywordlemainwindow(ctk.CTk):
         def clearall_x_pos():
             x_pos_dict.clear()
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict)
+            self.combo_px_l.current(0)
+            self.combo_px_p.current(0)
 
         def remove_r_pos():
             x_ltr = self.pos_pr_l.get().upper()
@@ -199,6 +198,16 @@ class Pywordlemainwindow(ctk.CTk):
         def clearall_r_pos():
             r_pos_dict.clear()
             fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict)
+            self.combo_pr_l.current(0)
+            self.combo_pr_p.current(0)
+
+        # clears all settings
+        def clear_all():
+            clearall_r_pos()
+            clearall_x_pos()
+            clear_excl_ckbs()
+            clear_reqr_ckbs()
+
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys
@@ -232,7 +241,7 @@ class Pywordlemainwindow(ctk.CTk):
                 grep_exclude = "grep -vE \'" + args + "\'"
             return grep_exclude
 
-        def build_x_pos_grep(self, this_pos_dict):
+        def build_x_pos_grep(lself, this_pos_dict):
             """Builds the grep line for excluding positions
             """
             # example 'grep -vE \'..b..\'' for b,3
@@ -243,9 +252,9 @@ class Pywordlemainwindow(ctk.CTk):
                 parts = this_pos_dict[x].split(',')
                 ltr = parts[0].lower()
                 p = int(parts[1])
-                self.tool_command_list.add_excl_pos_cmd(ltr, p)
+                lself.tool_command_list.add_excl_pos_cmd(ltr, p)
 
-        def build_r_pos_grep(self, this_pos_dict):
+        def build_r_pos_grep(lself, this_pos_dict):
             """Builds the grep line for including positions
             """
             # example 'grep -vE \'..b..\'' for b,3
@@ -256,7 +265,7 @@ class Pywordlemainwindow(ctk.CTk):
                 parts = this_pos_dict[x].split(',')
                 ltr = parts[0].lower()
                 p = int(parts[1])
-                self.tool_command_list.add_incl_pos_cmd(ltr, p)
+                lself.tool_command_list.add_incl_pos_cmd(ltr, p)
 
         def build_requireall_grep(re_btn_var_list):
             """Builds the grep line for requiring letters
@@ -276,14 +285,13 @@ class Pywordlemainwindow(ctk.CTk):
 
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
-                                         width=900,
-                                         height=100,
                                          corner_radius=10,
                                          borderwidth=0)
-        self.result_frame.pack(padx=20, pady=4)
+        self.result_frame.pack(padx=20, pady=6, fill=tk.X)
+        self.result_frame.grid_columnconfigure(0, weight=1) # non zero weight allows grid to expand
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
-                                text=str_wrd_list_hrd(n_col),
+                                text=str_wrd_list_hrd(ln_col),
                                 relief='sunken',
                                 background='#dedede',
                                 anchor='w',
@@ -314,9 +322,25 @@ class Pywordlemainwindow(ctk.CTk):
                              background='#dedede',
                              borderwidth=0,
                              highlightthickness=0)
-        lb_status.grid(row=2, rowspan=3, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
         lb_status.configure(font=font_tuple)
         self.status.set('=> No status yet.')
+
+        # grep line being used
+        tx_gr = tk.Text(self.result_frame,
+                        wrap='word',
+                        height=2,
+                        background='#dedede',
+                        borderwidth=0,
+                        highlightthickness=0)
+        tx_gr.grid(row=4,  column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        tx_gr.configure(font=font_tuple)
+        tx_gr.delete(1.0, tk.END)
+        # scrollbar for grep line
+        tx_gr_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
+        tx_gr_sb.grid(row=4, column=5, sticky='ens', pady=4)
+        tx_gr.config(yscrollcommand=tx_gr_sb.set)
+        tx_gr_sb.config(command=tx_gr.yview)
 
         # grep criteria outer frame holding:
         # letter require frame
@@ -809,7 +833,7 @@ class Pywordlemainwindow(ctk.CTk):
                 else:
                     l_msg = l_msg + mid_pad + msg
                 c = c + 1
-                if c == n_col:
+                if c == ln_col:
                     tx_result.insert(tk.END, l_msg + '\n')
                     c = 0
                     l_msg = ""
@@ -818,25 +842,9 @@ class Pywordlemainwindow(ctk.CTk):
 
             tx_result.see('end')
             self.status.set(wordletool.show_status())
-            self.allgreps.set("")
-            self.allgreps.set(wrap_this(wordletool.show_cmd(), 120))
+            tx_gr.delete(1.0, tk.END)
+            tx_gr.insert(tk.END, wordletool.show_cmd())
 
-        self.allgreps_frame = ctk.CTkFrame(self,
-                                           width=900,
-                                           height=100,
-                                           corner_radius=10,
-                                           borderwidth=0
-                                           )
-        self.allgreps_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=20, pady=2)
-
-        lb_allgreps = tk.Label(self.allgreps_frame,
-                               textvariable=self.allgreps,
-                               justify=tk.LEFT,
-                               background='#dedede',
-                               borderwidth=0,
-                               highlightthickness=0)
-        lb_allgreps.pack(side=tk.LEFT, padx=6, pady=4, fill=tk.X)
-        self.allgreps.set('Grep commands show here.')
 
         self.bt_grep = ctk.CTkButton(self.actions_frame,
                                      text="Apply Your Thinking", width=100,
@@ -873,32 +881,32 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_help = ctk.CTkButton(self.admin_frame, text="?", width=40, command=self.show_help)
         self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=6, anchor='e')
 
+        self.bt_zap = ctk.CTkButton(self.admin_frame, text="Clear All Settings", width=40, command=clear_all)
+        self.bt_zap.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+
         do_grep()
 
     def create_wnd_help(self):
         global data_path
         self.wnd_help = ctk.CTkToplevel(self)
         self.wnd_help.wm_title('Some Information For You')
-        w_width = 680
-        w_height = 560
-        pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
-        pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
-        self.wnd_help.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
-        # self.wnd_help.resizable(width=False, height=False)
+        self.wnd_help.resizable(width=False, height=False)
 
         full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
         if os.path.exists(full_path_name):
             f = open(full_path_name, "r", encoding="UTF8").read()
         else:
             f = 'This is all the help you get because file helpinfo.txt has gone missing.'
-       
+
         self.wnd_help.info_frame = ttk.LabelFrame(self.wnd_help,
                                                   borderwidth=0,
                                                   )
-        self.wnd_help.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2,  expand=True)
+        self.wnd_help.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2, expand=True)
 
         msg1 = tk.Text(self.wnd_help.info_frame,
-                       wrap='word'
+                       wrap='word',
+                       width=120,
+                       height=30
                        )
         msg1.grid(row=0, column=0, padx=6, pady=2)
         # scrollbar for help
@@ -906,15 +914,12 @@ class Pywordlemainwindow(ctk.CTk):
         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
         msg1.config(yscrollcommand=help_sb.set)
         help_sb.config(command=msg1.yview)
+        msg1.delete(1.0, tk.END)
         msg1.insert(tk.END, f)
 
         button_q = ctk.CTkButton(self.wnd_help, text="Close",
                                  command=self.close_help)
         button_q.pack(side="right", padx=20, pady=20)
-        # This was working once!!
-        # button_f = ctk.CTkButton(self.wnd_help, text="Return Focus",
-        #                          command=this_app.focus_set())
-        # button_f.pack(side="left", padx=20, pady=20)
         self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
 
 
