@@ -79,13 +79,15 @@ class Pywordlemainwindow(ctk.CTk):
 
     def show_help(self):
         global help_showing
-
+        global this_app
         if help_showing is False:
             self.create_wnd_help()
             help_showing = True
         else:
-            self.wnd_help.deiconify()
-            self.wnd_help.focus_set()
+            # this_app.wnd_help.deiconify()
+            # this_app.wnd_help.focus_set()
+            self.wnd_help.destroy()
+            self.create_wnd_help()
 
     # ======== set exclude combos to treeview selection
     def x_pos_tree_view_click(self, event):
@@ -911,7 +913,7 @@ class Pywordlemainwindow(ctk.CTk):
         button_q.pack(side="right", padx=20, pady=20)
         # This was working once!!
         # button_f = ctk.CTkButton(self.wnd_help, text="Return Focus",
-        #                          command=this_app.focus_set)
+        #                          command=this_app.focus_set())
         # button_f.pack(side="left", padx=20, pady=20)
         self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
 

@@ -6,10 +6,10 @@ Word rank represents relative probability. Any word matching the filter could be
 
 The 'Allow Duplicate Letters' option includes words having duplicate letters. After your first or second wordle choice you should start to consider words with duplicate letters. Depending on your known letters status, duplicate letters ought to be shown before making the third selection.
 
-'Letters To Be Excluded' checkboxes result in words not containing those letters. The 'Apply Your Thinking' button needs to be pressed after making any letter exclusion.
+'Letters To Be Excluded' checkboxes result in words not containing those letters. The 'Apply Your Thinking' button needs to be pressed after making any letter exclusion. The Z button clears the checkboxes.
 
-'Letters To Be Required' checkboxes  result in words containing those letters. The 'Apply Your Thinking' button needs to be pressed after making any letter requiring. No words will show when six or more letters are required.
+'Letters To Be Required' checkboxes  result in words containing those letters. The 'Apply Your Thinking' button needs to be pressed after making any letter requiring. No words will show when six or more letters are required. The Z button clears the checkboxes.
 
-'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In the puzzle context the letter is known to be present in the word, so it will also be required. The letter's checkbox will not appear checked in 'Letters To Be Required'.
+'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In the puzzle context the letter is known to be present in the word, so it will also be required. The letter's checkbox will not appear checked in 'Letters To Be Required'. The Z button clears the position list.
 
 One might not use 'Letter Positioning' settings until after letter elimination strategy picks have been made to avoid its interference with letter exclusion settings.
