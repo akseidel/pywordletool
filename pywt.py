@@ -84,7 +84,6 @@ class Pywordlemainwindow(ctk.CTk):
             self.create_wnd_help()
             help_showing = True
         else:
-            # print("Help already exists")
             self.wnd_help.deiconify()
             self.wnd_help.focus_set()
 
@@ -106,7 +105,6 @@ class Pywordlemainwindow(ctk.CTk):
 
     def __init__(self):
         super().__init__()
-        self.info_frame = None
         self.wnd_help = None
         self.title("This Wordle Helper")
         # print(self.winfo_screenheight())
@@ -892,17 +890,17 @@ class Pywordlemainwindow(ctk.CTk):
         else:
             f = 'This is all the help you get because file helpinfo.txt has gone missing.'
        
-        self.info_frame = ttk.LabelFrame(self.wnd_help,
-                                         borderwidth=0,
-                                         )
-        self.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2,  expand=True)
+        self.wnd_help.info_frame = ttk.LabelFrame(self.wnd_help,
+                                                  borderwidth=0,
+                                                  )
+        self.wnd_help.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2,  expand=True)
 
-        msg1 = tk.Text(self.info_frame,
+        msg1 = tk.Text(self.wnd_help.info_frame,
                        wrap='word'
                        )
         msg1.grid(row=0, column=0, padx=6, pady=2)
         # scrollbar for help
-        help_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
+        help_sb = ttk.Scrollbar(self.wnd_help.info_frame, orient='vertical')
         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
         msg1.config(yscrollcommand=help_sb.set)
         help_sb.config(command=msg1.yview)
@@ -911,9 +909,10 @@ class Pywordlemainwindow(ctk.CTk):
         button_q = ctk.CTkButton(self.wnd_help, text="Close",
                                  command=self.close_help)
         button_q.pack(side="right", padx=20, pady=20)
-        button_f = ctk.CTkButton(self.wnd_help, text="Return Focus",
-                                 command=this_app.focus_set)
-        button_f.pack(side="left", padx=20, pady=20)
+        # This was working once!!
+        # button_f = ctk.CTkButton(self.wnd_help, text="Return Focus",
+        #                          command=this_app.focus_set)
+        # button_f.pack(side="left", padx=20, pady=20)
         self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
 
 
