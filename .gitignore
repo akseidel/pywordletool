@@ -139,3 +139,5 @@ dmypy.json
 
 #Exclude
 Exclude/
+.DS_Store
+worddata/.DS_Store
