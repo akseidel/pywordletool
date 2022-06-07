@@ -6,6 +6,7 @@ import os
 import random
 from tkinter import messagebox
 
+
 # Returns the wordle word list full pathname
 # Exits program if not found
 
@@ -16,10 +17,10 @@ def get_word_list_path_name(local_path_file_name):
         # print("Using " + local_path_file_name)
         return full_path_name
     else:
-        msg = 'The wordle word list file '\
-            + local_path_file_name\
-            + ' was not found.'\
-            + ' Expected here:' + full_path_name
+        msg = 'The wordle word list file ' \
+              + local_path_file_name \
+              + ' was not found.' \
+              + ' Expected here:' + full_path_name
         print(msg)
         print()
         messagebox.showerror(title='Stopping Here', message=msg)
@@ -37,9 +38,9 @@ def make_ltr_rank_dictionary(local_path_rank_file):
                 ltr = ltr.split(":")
                 ltr_rank_dict[ltr[0]] = float(ltr[1])
     else:
-        msg = "Letter ranking file "\
-            + local_path_rank_file\
-            + " not found. Switching to built in letter ranking."
+        msg = "Letter ranking file " \
+              + local_path_rank_file \
+              + " not found. Switching to built in letter ranking."
         print(msg)
         messagebox.showwarning('Warning', message=msg)
         ltr_rank_dict = {
@@ -215,10 +216,10 @@ class ShellCmdList:
 
     # returns the list assembled into one command line
     def full_cmd(self):
-        pc = "|"
+        pipe = " | "
         this_cmd = ""
         for w in self.shCMDlist[:-1]:
-            this_cmd = this_cmd + w + pc
+            this_cmd = this_cmd + w + pipe
         this_cmd = this_cmd + self.shCMDlist[-1]
         return this_cmd
 
@@ -272,7 +273,8 @@ class ToolResults:
         return show_this_word_list(self.get_ranked_results_wrd_lst(), n_col)
 
     def show_status(self):
-        status = '=> Showing ' + str(self.ranked_cnt) + ' words from the raw list of ' + str(self.get_results_raw_cnt()) + " duplicate letter words."
+        status = '=> Showing ' + str(self.ranked_cnt) + ' words from the raw list of ' + str(
+            self.get_results_raw_cnt()) + " duplicate letter words."
         return status
 
     def show_full_cmd(self):

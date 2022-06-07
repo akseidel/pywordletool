@@ -136,8 +136,8 @@ dmypy.json
 
 #OSX
 .DS_Store
+*.DS_Store
 
 #Exclude
 Exclude/
 .DS_Store
-worddata/.DS_Store

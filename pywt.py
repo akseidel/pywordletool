@@ -13,22 +13,31 @@ import customtkinter as ctk
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
+# globals
 data_path = 'worddata/'  # path from here to data folder
-n_col = 8  # number of list columns
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 
-def str_wrd_list_hrd():
+
+def set_n_col(self):
+    if self.winfo_screenwidth() > 1280:  # to do
+        return 9
+    else:
+        return 6
+
+
+def str_wrd_list_hrd(ln_col):
     """Creates the word list header line.
     """
     h_txt = " Word : Rank "
     left_pad = ""
     mid_pad = "  "
     h_line = left_pad + h_txt
-    for i in range(1, n_col):
+    for i in range(1, ln_col):
         h_line = h_line + mid_pad + h_txt
     return h_line
+
 
 # return a reformatted string with wordwrapping
 # @staticmethod
@@ -55,10 +64,10 @@ def wrap_this(string, max_chars):
         the_newline += '\n' + w
     return the_newline
 
+
 class Pywordlemainwindow(ctk.CTk):
     """The pywordletool application GUI window
     """
-    global n_col
     global x_pos_dict
     global r_pos_dict
 
@@ -69,14 +78,15 @@ class Pywordlemainwindow(ctk.CTk):
 
     def show_help(self):
         global help_showing
-
+        global this_app
         if help_showing is False:
             self.create_wnd_help()
             help_showing = True
         else:
-            # print("Help already exists")
-            self.wnd_help.deiconify()
-            self.wnd_help.focus_set()
+            # this_app.wnd_help.deiconify()
+            # this_app.wnd_help.focus_set()
+            self.wnd_help.destroy()
+            self.create_wnd_help()
 
     # ======== set exclude combos to treeview selection
     def x_pos_tree_view_click(self, event):
@@ -96,31 +106,31 @@ class Pywordlemainwindow(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+        self.wnd_help = None
         self.title("This Wordle Helper")
         # print(self.winfo_screenheight())
         # print(self.winfo_screenwidth())
-        w_width = 1020
-        w_height = 690 # to do, set according to screen height
+        w_width = 1036
+        w_height = 656  # to do, set according to screen height
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
         # self.resizable(width=False,height=False)
-        font_tuple = ("PT Mono", 14, "normal")
-
+        font_tuple = ("Courier", 12, "normal")
+        ln_col = set_n_col(self)
+        # set the Vars
         self.no_dups = tk.BooleanVar()
         self.no_dupe_state = tk.StringVar()
         self.no_dupe_state.set("on")
         self.vocabulary = tk.StringVar()
         self.status = tk.StringVar()
-        self.allgreps = tk.StringVar()
 
         # configure style
-        # self.style = ttk.Style(self)
         style = ttk.Style()
         style.configure("position.ttk.Treeview", highlightthickness=0, bd=0,
-                        font=('', 14))  # body font
-        style.configure("position.ttk.Treeview.Heading", font=('', 14))  # heading font
-        # style.configure("position.ttk.TCombobox", font=('', 20)) # not working
+                        font=('', 12))  # body font
+        # style.configure("Vertical.TScrollbar", arrowsize= 64, background="green", bordercolor="red", arrowcolor="white")
+        # Some style settings do not work in osx?
 
         def callback_do_grep(self):
             do_grep()
@@ -167,6 +177,12 @@ class Pywordlemainwindow(ctk.CTk):
                 del x_pos_dict[key]
                 fill_treeview_per_dictionary(self.treeview_px, x_pos_dict)
 
+        def clearall_x_pos():
+            x_pos_dict.clear()
+            fill_treeview_per_dictionary(self.treeview_px, x_pos_dict)
+            self.combo_px_l.current(0)
+            self.combo_px_p.current(0)
+
         def remove_r_pos():
             x_ltr = self.pos_pr_l.get().upper()
             x_pos = self.pos_pr_p.get()
@@ -178,6 +194,20 @@ class Pywordlemainwindow(ctk.CTk):
             if key in r_pos_dict:
                 del r_pos_dict[key]
                 fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict)
+
+        def clearall_r_pos():
+            r_pos_dict.clear()
+            fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict)
+            self.combo_pr_l.current(0)
+            self.combo_pr_p.current(0)
+
+        # clears all settings
+        def clear_all():
+            clearall_r_pos()
+            clearall_x_pos()
+            clear_excl_ckbs()
+            clear_reqr_ckbs()
+
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys
@@ -211,7 +241,7 @@ class Pywordlemainwindow(ctk.CTk):
                 grep_exclude = "grep -vE \'" + args + "\'"
             return grep_exclude
 
-        def build_x_pos_grep(self, this_pos_dict):
+        def build_x_pos_grep(lself, this_pos_dict):
             """Builds the grep line for excluding positions
             """
             # example 'grep -vE \'..b..\'' for b,3
@@ -222,9 +252,9 @@ class Pywordlemainwindow(ctk.CTk):
                 parts = this_pos_dict[x].split(',')
                 ltr = parts[0].lower()
                 p = int(parts[1])
-                self.tool_command_list.add_excl_pos_cmd(ltr, p)
+                lself.tool_command_list.add_excl_pos_cmd(ltr, p)
 
-        def build_r_pos_grep(self, this_pos_dict):
+        def build_r_pos_grep(lself, this_pos_dict):
             """Builds the grep line for including positions
             """
             # example 'grep -vE \'..b..\'' for b,3
@@ -235,7 +265,7 @@ class Pywordlemainwindow(ctk.CTk):
                 parts = this_pos_dict[x].split(',')
                 ltr = parts[0].lower()
                 p = int(parts[1])
-                self.tool_command_list.add_incl_pos_cmd(ltr, p)
+                lself.tool_command_list.add_incl_pos_cmd(ltr, p)
 
         def build_requireall_grep(re_btn_var_list):
             """Builds the grep line for requiring letters
@@ -252,18 +282,19 @@ class Pywordlemainwindow(ctk.CTk):
             if len(itms) > 0:
                 grep_requireall = args
             return grep_requireall
+
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
-                                         width=900,
-                                         height=100,
                                          corner_radius=10,
                                          borderwidth=0)
-        self.result_frame.pack(padx=20, pady=4)
+        self.result_frame.pack(padx=20, pady=6, fill=tk.X)
+        self.result_frame.grid_columnconfigure(0, weight=1) # non zero weight allows grid to expand
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
-                                text=str_wrd_list_hrd(),
+                                text=str_wrd_list_hrd(ln_col),
                                 relief='sunken',
                                 background='#dedede',
+                                anchor='w',
                                 borderwidth=0,
                                 highlightthickness=0)
         lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='ew', padx=6, pady=2)
@@ -275,7 +306,10 @@ class Pywordlemainwindow(ctk.CTk):
                             borderwidth=0,
                             highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
-        tx_result.configure(height=14) # to do, set according to screen height
+        if self.winfo_screenheight() <= 800:
+            tx_result.configure(height=12)  # to do, set according to screen height
+        else:
+            tx_result.configure(height=16)
         tx_result.configure(font=font_tuple)
         # scrollbar for wordlist
         tx_results_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
@@ -288,9 +322,25 @@ class Pywordlemainwindow(ctk.CTk):
                              background='#dedede',
                              borderwidth=0,
                              highlightthickness=0)
-        lb_status.grid(row=2, rowspan=3, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
         lb_status.configure(font=font_tuple)
         self.status.set('=> No status yet.')
+
+        # grep line being used
+        tx_gr = tk.Text(self.result_frame,
+                        wrap='word',
+                        height=2,
+                        background='#dedede',
+                        borderwidth=0,
+                        highlightthickness=0)
+        tx_gr.grid(row=4,  column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        tx_gr.configure(font=font_tuple)
+        tx_gr.delete(1.0, tk.END)
+        # scrollbar for grep line
+        tx_gr_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
+        tx_gr_sb.grid(row=4, column=5, sticky='ens', pady=4)
+        tx_gr.config(yscrollcommand=tx_gr_sb.set)
+        tx_gr_sb.config(command=tx_gr.yview)
 
         # grep criteria outer frame holding:
         # letter require frame
@@ -325,7 +375,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                height=100,
                                                text='Letters Positioning',
                                                )
-        self.criteria_frame_p.pack(side=tk.BOTTOM, fill=tk.X, padx=6, pady=2)
+        self.criteria_frame_p.pack(side=tk.BOTTOM, fill=tk.X, padx=4, pady=2)
 
         # letter position frame exclude - uses pack
         self.criteria_frame_px = ttk.LabelFrame(self.criteria_frame_p,
@@ -333,7 +383,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 height=100,
                                                 text='Exclude From Position',
                                                 )
-        self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
 
         # letter position frame require- uses pack
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
@@ -341,7 +391,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 height=100,
                                                 text='Require A Position',
                                                 )
-        self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
 
         # actions frame require- uses pack
         self.actions_frame = ttk.LabelFrame(self.criteria_frame_p,
@@ -349,7 +399,7 @@ class Pywordlemainwindow(ctk.CTk):
                                             height=100,
                                             text='Actions',
                                             )
-        self.actions_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=6, pady=2, expand=True)
+        self.actions_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=4, pady=2, expand=True)
 
         # =======  START ============ exclude from position controls
         self.pos_px_l = tk.StringVar()
@@ -363,7 +413,6 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.combo_px_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.combo_px_l.current(0)
-        # self.combo_px_l.configure(font = font_tuple)
 
         self.pos_px_p = tk.StringVar()
         self.combo_px_p = ttk.Combobox(self.criteria_frame_px,
@@ -372,27 +421,32 @@ class Pywordlemainwindow(ctk.CTk):
                                        justify=tk.CENTER,
                                        textvariable=self.pos_px_p
                                        )
-        self.combo_px_p.grid(row=0, column=1, padx=4, pady=2, sticky='w')
+        self.combo_px_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.combo_px_p.current(0)
 
         self.bt_px_add = ctk.CTkButton(self.criteria_frame_px,
                                        text="+", width=20,
                                        command=add_x_pos
                                        )
-        self.bt_px_add.grid(row=0, column=2, padx=2, pady=2, sticky='ew')
+        self.bt_px_add.grid(row=0, column=2, padx=1, pady=2, sticky='ew')
 
         self.bt_px_rem = ctk.CTkButton(self.criteria_frame_px,
                                        text="-", width=20,
                                        command=remove_x_pos
                                        )
-        self.bt_px_rem.grid(row=0, column=3, padx=2, pady=2, sticky='ew')
+        self.bt_px_rem.grid(row=0, column=3, padx=1, pady=2, sticky='ew')
+        self.bt_px_clr = ctk.CTkButton(self.criteria_frame_px,
+                                       text="z", width=20,
+                                       command=clearall_x_pos
+                                       )
+        self.bt_px_clr.grid(row=0, column=4, padx=1, pady=2, sticky='ew')
 
         # ======  exclude position treeview
         self.treeview_px = ttk.Treeview(self.criteria_frame_px, style='position.ttk.Treeview')
         self.treeview_px.configure(columns=('1', '2'),
                                    show='headings',
                                    height=5)
-        self.treeview_px.grid(row=1, column=0, columnspan=4, padx=6, pady=2, sticky='ew')
+        self.treeview_px.grid(row=1, column=0, columnspan=5, padx=4, pady=2, sticky='ew')
         ttk.Style().configure('Treeview', relief='raised')
         self.treeview_px.heading(1, text='Letter')
         self.treeview_px.heading(2, text='Position')
@@ -403,7 +457,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.treeview_px.bind('<ButtonRelease-1>', self.x_pos_tree_view_click)
         # scrollbar for treeview
         sb = ttk.Scrollbar(self.criteria_frame_px, orient=tk.VERTICAL)
-        sb.grid(row=1, column=4, pady=2, sticky='ens')
+        sb.grid(row=1, column=4, padx=1, pady=2, sticky='ens')
         self.treeview_px.config(yscrollcommand=sb.set)
         sb.config(command=self.treeview_px.yview)
         # =======  END ============ exclude from position controls
@@ -420,7 +474,6 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.combo_pr_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.combo_pr_l.current(0)
-        # self.combo_pr_l.configure(font = font_tuple)
 
         self.pos_pr_p = tk.StringVar()
         self.combo_pr_p = ttk.Combobox(self.criteria_frame_pr,
@@ -429,20 +482,26 @@ class Pywordlemainwindow(ctk.CTk):
                                        justify=tk.CENTER,
                                        textvariable=self.pos_pr_p
                                        )
-        self.combo_pr_p.grid(row=0, column=1, padx=4, pady=2, sticky='w')
+        self.combo_pr_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.combo_pr_p.current(0)
 
         self.bt_pr_add = ctk.CTkButton(self.criteria_frame_pr,
                                        text="+", width=20,
                                        command=add_r_pos
                                        )
-        self.bt_pr_add.grid(row=0, column=2, padx=2, pady=2, sticky='ew')
+        self.bt_pr_add.grid(row=0, column=2, padx=1, pady=2, sticky='ew')
 
         self.bt_pr_rem = ctk.CTkButton(self.criteria_frame_pr,
                                        text="-", width=20,
                                        command=remove_r_pos
                                        )
-        self.bt_pr_rem.grid(row=0, column=3, padx=2, pady=2, sticky='ew')
+        self.bt_pr_rem.grid(row=0, column=3, padx=1, pady=2, sticky='ew')
+
+        self.bt_pr_clr = ctk.CTkButton(self.criteria_frame_pr,
+                                       text="z", width=20,
+                                       command=clearall_r_pos
+                                       )
+        self.bt_pr_clr.grid(row=0, column=4, padx=1, pady=2, sticky='ew')
 
         # style='position.ttk.Treeview')
         self.treeview_pr = ttk.Treeview(self.criteria_frame_pr, style='position.ttk.Treeview')
@@ -450,7 +509,7 @@ class Pywordlemainwindow(ctk.CTk):
                                    show='headings',
                                    height=5
                                    )
-        self.treeview_pr.grid(row=1, column=0, columnspan=4, padx=6, pady=2, sticky='ew')
+        self.treeview_pr.grid(row=1, column=0, columnspan=5, padx=4, pady=2, sticky='ew')
         ttk.Style().configure('Treeview', relief='raised')
         self.treeview_pr.heading(1, text='Letter')
         self.treeview_pr.heading(2, text='Position')
@@ -461,7 +520,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.treeview_pr.bind('<ButtonRelease-1>', self.r_pos_tree_view_click)
         # scrollbar for treeview
         sb = ttk.Scrollbar(self.criteria_frame_pr, orient=tk.VERTICAL)
-        sb.grid(row=1, column=4, pady=2, sticky='ens')
+        sb.grid(row=1, column=4, padx=1, pady=2, sticky='ens')
         self.treeview_pr.config(yscrollcommand=sb.set)
         sb.config(command=self.treeview_pr.yview)
         # =======  END ============ require from position controls
@@ -579,12 +638,24 @@ class Pywordlemainwindow(ctk.CTk):
         self.v_xJ.set('-')
         bt_xJ = ttk.Checkbutton(self.criteria_frame_x, text="J", variable=self.v_xJ, onvalue='j', offvalue='-')
         bt_xJ.pack(side=tk.LEFT, padx=2, pady=2)
-
+        sep_5 = ttk.Separator(self.criteria_frame_x, orient='vertical')
+        sep_5.pack(side=tk.LEFT, fill='y', padx=8)
         self.ex_btn_vars = [self.v_xA, self.v_xB, self.v_xC, self.v_xD, self.v_xE, self.v_xF,
                             self.v_xG, self.v_xH, self.v_xI, self.v_xJ, self.v_xK, self.v_xL,
                             self.v_xM, self.v_xN, self.v_xO, self.v_xP, self.v_xQ, self.v_xR,
                             self.v_xS, self.v_xT, self.v_xU, self.v_xV, self.v_xW, self.v_xX,
                             self.v_xY, self.v_xZ]
+
+        def clear_excl_ckbs():
+            for x_var in self.ex_btn_vars:
+                x_var.set('-')
+            do_grep()
+
+        self.bt_x_clr = ctk.CTkButton(self.criteria_frame_x,
+                                      text="z", width=20,
+                                      command=clear_excl_ckbs
+                                      )
+        self.bt_x_clr.pack(side=tk.LEFT, padx=2, pady=2)
         # ==END========== Exclude Letters =============
 
         # =============== Require Letters =============
@@ -700,12 +771,25 @@ class Pywordlemainwindow(ctk.CTk):
         self.v_rJ.set('-')
         bt_r_J = ttk.Checkbutton(self.criteria_frame_r, text="J", variable=self.v_rJ, onvalue='j', offvalue='-')
         bt_r_J.pack(side=tk.LEFT, padx=2, pady=2)
+        sep_5 = ttk.Separator(self.criteria_frame_r, orient='vertical')
+        sep_5.pack(side=tk.LEFT, fill='y', padx=8)
 
         self.re_btn_vars = [self.v_rA, self.v_rB, self.v_rC, self.v_rD, self.v_rE, self.v_rF,
                             self.v_rG, self.v_rH, self.v_rI, self.v_rJ, self.v_rK, self.v_rL,
                             self.v_rM, self.v_rN, self.v_rO, self.v_rP, self.v_rQ, self.v_rR,
                             self.v_rS, self.v_rT, self.v_rU, self.v_rV, self.v_rW, self.v_rX,
                             self.v_rY, self.v_rZ]
+
+        def clear_reqr_ckbs():
+            for r_var in self.re_btn_vars:
+                r_var.set('-')
+            do_grep()
+
+        self.bt_r_clr = ctk.CTkButton(self.criteria_frame_r,
+                                      text="z", width=20,
+                                      command=clear_reqr_ckbs
+                                      )
+        self.bt_r_clr.pack(side=tk.LEFT, padx=2, pady=2)
 
         # ===END========= Require Letters =============
 
@@ -749,7 +833,7 @@ class Pywordlemainwindow(ctk.CTk):
                 else:
                     l_msg = l_msg + mid_pad + msg
                 c = c + 1
-                if c == n_col:
+                if c == ln_col:
                     tx_result.insert(tk.END, l_msg + '\n')
                     c = 0
                     l_msg = ""
@@ -758,26 +842,9 @@ class Pywordlemainwindow(ctk.CTk):
 
             tx_result.see('end')
             self.status.set(wordletool.show_status())
-            self.allgreps.set("")
-            self.allgreps.set(wrap_this(wordletool.show_cmd(), 120))
+            tx_gr.delete(1.0, tk.END)
+            tx_gr.insert(tk.END, wordletool.show_cmd())
 
-        self.allgreps_frame = ctk.CTkFrame(self,
-                                           width=900,
-                                           height=100,
-                                           corner_radius=10,
-                                           borderwidth=0
-                                           )
-        self.allgreps_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=20, pady=2)
-
-        lb_allgreps = tk.Label(self.allgreps_frame,
-                               textvariable=self.allgreps,
-                               justify=tk.LEFT,
-                               background='#dedede',
-                               borderwidth=0,
-                               highlightthickness=0)
-        lb_allgreps.pack(side=tk.LEFT, padx=6, pady=4, fill=tk.X)
-        lb_allgreps.configure(font=font_tuple)
-        self.allgreps.set('Grep commands show here.')
 
         self.bt_grep = ctk.CTkButton(self.actions_frame,
                                      text="Apply Your Thinking", width=100,
@@ -791,7 +858,6 @@ class Pywordlemainwindow(ctk.CTk):
                                    )
         combo_vocab.pack(side=tk.BOTTOM, padx=6, pady=2, anchor='nw', fill=tk.X)
         combo_vocab.current(0)
-        combo_vocab.configure(font=font_tuple)
         combo_vocab.bind("<<ComboboxSelected>>", callback_do_grep)
 
         sw_no_dups = ctk.CTkSwitch(self.actions_frame,
@@ -799,7 +865,7 @@ class Pywordlemainwindow(ctk.CTk):
                                    onvalue="on",
                                    offvalue="off",
                                    command=do_grep)
-        sw_no_dups.pack(side=tk.TOP, padx=6, pady=6, anchor='w', fill=tk.X)
+        sw_no_dups.pack(side=tk.TOP, padx=6, pady=6, anchor='w')
 
         # admin frame require- uses pack
         self.admin_frame = ttk.LabelFrame(self.criteria_frame_p,
@@ -807,7 +873,7 @@ class Pywordlemainwindow(ctk.CTk):
                                           height=100,
                                           text='Application',
                                           )
-        self.admin_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=6, pady=6, expand=True)
+        self.admin_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=4, pady=2, expand=True)
 
         self.bt_Q = ctk.CTkButton(self.admin_frame, text="Quit", width=100, command=self.destroy)
         self.bt_Q.pack(side=tk.BOTTOM, padx=6, pady=2, anchor='e')
@@ -815,17 +881,15 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_help = ctk.CTkButton(self.admin_frame, text="?", width=40, command=self.show_help)
         self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=6, anchor='e')
 
+        self.bt_zap = ctk.CTkButton(self.admin_frame, text="Clear All Settings", width=40, command=clear_all)
+        self.bt_zap.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+
         do_grep()
 
     def create_wnd_help(self):
         global data_path
         self.wnd_help = ctk.CTkToplevel(self)
         self.wnd_help.wm_title('Some Information For You')
-        w_width = 800
-        w_height = 560
-        pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
-        pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
-        self.wnd_help.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
         self.wnd_help.resizable(width=False, height=False)
 
         full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
@@ -833,14 +897,34 @@ class Pywordlemainwindow(ctk.CTk):
             f = open(full_path_name, "r", encoding="UTF8").read()
         else:
             f = 'This is all the help you get because file helpinfo.txt has gone missing.'
-        msg1 = tk.Label(self.wnd_help, text=f, justify=tk.LEFT, wraplength=740)
-        msg1.pack(side="top", expand=True, padx=6, pady=4)
+
+        self.wnd_help.info_frame = ttk.LabelFrame(self.wnd_help,
+                                                  borderwidth=0,
+                                                  )
+        self.wnd_help.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2, expand=True)
+
+        msg1 = tk.Text(self.wnd_help.info_frame,
+                       wrap='word',
+                       width=120,
+                       height=30,
+                       padx=10,
+                       pady=8,
+                       background='#dedede',
+                       borderwidth=0,
+                       highlightthickness=0
+                       )
+        msg1.grid(row=0, column=0, padx=6, pady=2)
+        # scrollbar for help
+        help_sb = ttk.Scrollbar(self.wnd_help.info_frame, orient='vertical')
+        help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
+        msg1.config(yscrollcommand=help_sb.set)
+        help_sb.config(command=msg1.yview)
+        msg1.delete(1.0, tk.END)
+        msg1.insert(tk.END, f)
+
         button_q = ctk.CTkButton(self.wnd_help, text="Close",
                                  command=self.close_help)
         button_q.pack(side="right", padx=20, pady=20)
-        button_f = ctk.CTkButton(self.wnd_help, text="Return Focus",
-                                 command=this_app.focus_set)
-        button_f.pack(side="left", padx=20, pady=20)
         self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
 
 
