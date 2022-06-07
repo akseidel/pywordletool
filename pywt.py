@@ -906,7 +906,12 @@ class Pywordlemainwindow(ctk.CTk):
         msg1 = tk.Text(self.wnd_help.info_frame,
                        wrap='word',
                        width=120,
-                       height=30
+                       height=30,
+                       padx=10,
+                       pady=8,
+                       background='#dedede',
+                       borderwidth=0,
+                       highlightthickness=0
                        )
         msg1.grid(row=0, column=0, padx=6, pady=2)
         # scrollbar for help

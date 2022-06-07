@@ -15,7 +15,7 @@
 * Open a **Terminal** window
 * Change to the folder where you placed **pywy.py** and the other files and folders.
 * Enter the command: ```python3 pywt.py```
-* For Apple OSX systems double-clicking the **start-pywt.command** file in the **Finder** also starts the wordle helper.
+* For Apple OSX and Linux systems double-clicking the **start-pywt.command** file in the **Finder** also starts the wordle helper.
 
 #### Requirements
 
