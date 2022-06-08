@@ -1,5 +1,5 @@
 #!/bin/bash
-# akseidel 06/09/22
+# akseidel 06/08/22
 # https://github.com/akseidel/
 # A script automating the steps to run pywordletool
 #
@@ -26,6 +26,11 @@ doline(){
 
 dotrailer(){
         printf "You may minimize this window, do not close it. The helper will close. \n"
+        doline
+}
+
+doerror(){
+        printf "    Not starting the helper! Some required parts were not found.      \n"
         doline
 }
 
@@ -60,58 +65,70 @@ chk4parts(){
   file='./worddata/helpinfo.txt'
   if [ ! -f "$file" ]
   then
-      printf "\n%s not found. It is not required.\n" "${file}"
+      notfound $file 0
   else
-    printf " .... found.\n"
+      printf " .... found.\n"
   fi
 
   printf " Checking for ./worddata/letter_ranks.txt"
   file='./worddata/letter_ranks.txt'
   if [ ! -f "$file" ]
   then
-      printf "\n%s not found. It is not required.\n" "${file}"
+      notfound $file 0
   else
-    printf " .... found.\n"
+      printf " .... found.\n"
   fi
 
   printf " Checking for ./pywt.py"
   file='./pywt.py'
   if [ ! -f "$file" ]
   then
-      printf "\n'%s not found. It is needed.\n" "${file}"
+      notfound $file 1
       s=1
   else
-    printf " .... found.\n"
+      printf " .... found.\n"
   fi
 
   printf " Checking for ./helpers.py"
   file='./helpers.py'
   if [ ! -f "$file" ]
   then
-      printf "\n'%s not found. It is needed.\n" "${file}"
+      notfound $file 1
       s=1
   else
-    printf " .... found.\n"
+      printf " .... found.\n"
   fi
 
   printf " Checking for ./worddata/nyt_wordlist.txt"
   file='./worddata/nyt_wordlist.txt'
   if [ ! -f "$file" ]
   then
-      printf "\n'%s not found. It is needed.\n" "${file}"
+      notfound $file 1
       s=1
   else
-    printf " .... found.\n"
+      printf " .... found.\n"
   fi
 
   printf " Checking for ./worddata/wo_nyt_wordlist.txt"
   file='./worddata/wo_nyt_wordlist.txt'
   if [ ! -f "$file" ]
   then
-      printf "\n'%s not found. It is needed.\n" "${file}"
+      notfound $file 1
       s=1
   else
-    printf " .... found.\n"
+      printf " .... found.\n"
+  fi
+}
+
+notfound(){
+  f=$1
+  n=$2
+  printf "\n   %s not found." "${f}"
+  if [ $n -eq 0 ]
+  then
+    printf "  It is not needed.\n"
+  else
+    printf "  It is needed.\n"
   fi
 }
 
@@ -119,7 +136,10 @@ startitup(){
   cd -- "$(dirname "$0")" || exit
   if [ $s -eq 0 ]
   then
+    dotrailer
     python3 pywt.py
+  else
+    doerror
   fi
 }
 
@@ -131,7 +151,6 @@ doline
 chk4customtkinter
 chk4parts
 doline
-dotrailer
 startitup
 # end
 
