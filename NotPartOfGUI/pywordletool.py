@@ -1,22 +1,26 @@
 # ----------------------------------------------------------------
 # pywordletool AKS 5/2022
 # ----------------------------------------------------------------
+
+# temporary path environment to find helpers.py
+import sys
+
+sys.path.append('/Users/aks/Documents/GitHub/pywordletool/')
+
 import helpers
+import grepper
 
-
-data_path = '../worddata/'  # path from here to data folder
+data_path = './worddata/'  # path from here to data folder
 
 # Set no_dups to prevent letters from occurring more than once
 # First pick should not use duplicates, later picks should consider them.
-# no_dups = False
-no_dups = True
+no_dups = False
+# no_dups = True
 
-helpers.clear_scrn()    # clears terminal
-
-
+helpers.clear_scrn()  # clears terminal
 
 # initialize the wordletool
-wordletool = helpers.ToolResults(data_path,'wo_nyt_wordlist.txt', 'letter_ranks.txt', no_dups)
+wordletool = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', 'letter_ranks.txt', no_dups)
 
 # # variables
 # ranked_wrds_dict ={} # dictionary of ranked words resulting from grep filtering
@@ -31,7 +35,8 @@ wordletool = helpers.ToolResults(data_path,'wo_nyt_wordlist.txt', 'letter_ranks.
 # # grep filtering command stack. Guessing because it is a class instance is why it
 # # can be passed around as a global variable where it gets modified along the way.
 # tool_command_list = helpers.ShellCmdList(wrdListFileName)
-# grepper.setup_grep_filtering(tool_command_list)  # fills the stack with grep assignments
+# tool_command_list = wordletool.tool_command_list
+grepper.setup_grep_filtering(wordletool.tool_command_list)  # fills the stack with grep assignments
 #
 # # Get word count
 # raw_cnt = helpers.get_raw_word_count(tool_command_list)
@@ -49,8 +54,6 @@ wordletool.show_col_format_ranked_list(6)
 print(wordletool.show_status())
 
 print(wordletool.show_full_cmd())
-
-
 
 # print()
 # print('Showing word list of ' + str(len(ranked_wrds_dict)) + " from raw list of " + raw_cnt + " having duplicates.")
