@@ -12,8 +12,10 @@ Checking 'Letters To Be Required' checkboxes results in words containing those l
 
 The 'Apply Your Thinking' button needs to be pressed to recognize changes to checkboxes. The Z button clears the checkboxes.
 
-'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In puzzle context a letter not at its correct position is a letter known to be present in the word, so it will also be required. The letter's checkbox will not appear checked in 'Letters To Be Required'. Z buttons clear the position list.
+'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In puzzle context a letter not at its correct position is a letter known to be present in the word, so it will also be required. For such letters, its checkbox will not appear checked in 'Letters To Be Required', but the requirement will be applied. The Z buttons clear the entire position list.
 
 One might not use 'Letter Positioning' settings until after letter elimination strategy picks have been made to avoid its interference with letter exclusion settings.
+
+When adding a new exclusion position for a letter that already has an excluded position, selecting that letter's exclusion in the list enters the letter in the letter combobox so that you need only to indicate the letter position before pressing the plus (+) button.
 
 Seeing an empty list can seem to be an error at times. No, it is not an error. The criteria you entered resulted in the empty list. A simple example is 'Excluding' a letter and then also 'Requiring' that same letter. The filtering happens in discrete stages. In the simple example, the resulting list of words that exclude a letter is then asked to list words having that same letter. There would be none.
