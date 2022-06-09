@@ -12,7 +12,7 @@
 # none
 
 # globals
-s=0
+s=0 # proceed flag 0=yes, 1=no
 
 # print name header if needed
 doheader(){
@@ -25,13 +25,29 @@ doline(){
 }
 
 dotrailer(){
-        printf "You may minimize this window, do not close it. The helper will close. \n"
+        printf "You may minimize this window, do not close it, the helper would close. \n"
         doline
 }
 
 doerror(){
         printf "    Not starting the helper! Some required parts were not found.      \n"
         doline
+}
+
+# check for python3 on this system
+# note to file: &> suppresses the assertion error
+chk4python3(){
+  printf " Checking for python3"
+  if ! python3 -c 'import sys; assert sys.version_info >= (3, 6)' &> /dev/null;
+  then
+      printf "\n======================================================================\n"
+      printf " ! A problem. Python3 is required for pywordletool to work.\n"
+      printf " Search the internet for how to install it for your computer.\n"
+      printf "======================================================================\n"
+      s=1
+  else
+    printf " .... found.\n"
+  fi
 }
 
 # check for python package customtkinter on this system
@@ -41,13 +57,12 @@ chk4customtkinter(){
   then
       printf "\n======================================================================\n"
       printf " ! A problem. The 'customtkinter' package for python is required\n"
-      printf " for pywordletool to work. This package nees to be installed using\n"
+      printf " for pywordletool to work. This package needs to be installed using\n"
       printf " pip. \n"
       printf "\n It can be installed using the command:\n"
       printf "\n     pip3 install customtkinter\n"
       printf "======================================================================\n"
       s=1
-      exit 0
   else
     printf " .... found.\n"
   fi
@@ -60,6 +75,7 @@ initclean(){
     cd -- "$(dirname "$0")" || return
 }
 
+# checking for needed parts
 chk4parts(){
   printf " Checking for ./worddata/helpinfo.txt"
   file='./worddata/helpinfo.txt'
@@ -143,18 +159,13 @@ startitup(){
   fi
 }
 
-
 # program section
 initclean
 doheader
 doline
+chk4python3
 chk4customtkinter
 chk4parts
 doline
 startitup
 # end
-
-
-#####!/bin/bash
-#####cd -- "$(dirname "$0")"
-#####python3 pywt.py
