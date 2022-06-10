@@ -1,0 +1,21 @@
+The wordle helper shows five-letter words from which you can select for playing the wordle game.
+
+The five-letter words are assigned a rank according to how common the letters are in the English wordle words. This helper presents ranked words from lowest rank to highest rank. The word list always shows scrolled to the highest ranking words at its bottom. Scroll the list upwards to see the lower ranking words.
+
+Word rank represents relative occurrence probability; however, any word matching the filter could be the wordle word regardless of its rank.
+
+The 'Allow Duplicate Letters' option includes words having duplicate letters. After your first or second wordle choice you should start to consider words with duplicate letters. Depending on your known letters status, duplicate letters ought to be shown before making the third selection.
+
+Checking 'Letters To Be Excluded' checkboxes results in words not containing those letters.
+
+Checking 'Letters To Be Required' checkboxes results in words containing those letters. No words will show when six or more letters are required for the word.
+
+The 'Apply Your Thinking' button needs to be pressed to recognize changes to checkboxes. The Z button clears the checkboxes.
+
+'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In puzzle context a letter not at its correct position is a letter known to be present in the word, so it will also be required. For such letters, its checkbox will not appear checked in 'Letters To Be Required', but the requirement will be applied. The Z buttons clear the entire position list.
+
+One might not use 'Letter Positioning' settings until after letter elimination strategy picks have been made to avoid its interference with letter exclusion settings.
+
+When adding a new exclusion position for a letter that already has an excluded position, selecting that letter's exclusion in the list enters the letter in the letter combobox so that you need only to indicate the letter position before pressing the plus (+) button.
+
+Seeing an empty list can seem to be an error at times. No, it is not an error. The criteria you entered resulted in the empty list. A simple example is 'Excluding' a letter and then also 'Requiring' that same letter. The filtering happens in discrete stages. In the simple example, the resulting list of words that exclude a letter is then asked to list words having that same letter. There would be none.
