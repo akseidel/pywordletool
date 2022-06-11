@@ -148,7 +148,7 @@ class Pywordlemainwindow(ctk.CTk):
             key = x_ltr + ',' + x_pos
             value = key
             x_pos_dict[key] = value
-            fill_treeview_per_dictionary(self.treeview_px, x_pos_dict)
+            fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
 
         def add_r_pos():
             x_ltr = self.pos_pr_l.get().upper()
@@ -163,7 +163,7 @@ class Pywordlemainwindow(ctk.CTk):
             key = x_ltr + ',' + x_pos
             value = key
             r_pos_dict[key] = value
-            fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict)
+            fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
 
         def remove_x_pos():
             x_ltr = self.pos_px_l.get().upper()
@@ -175,11 +175,11 @@ class Pywordlemainwindow(ctk.CTk):
             key = x_ltr + ',' + x_pos
             if key in x_pos_dict:
                 del x_pos_dict[key]
-                fill_treeview_per_dictionary(self.treeview_px, x_pos_dict)
+                fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
 
         def clearall_x_pos():
             x_pos_dict.clear()
-            fill_treeview_per_dictionary(self.treeview_px, x_pos_dict)
+            fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
             self.combo_px_l.current(0)
             self.combo_px_p.current(0)
 
@@ -193,11 +193,11 @@ class Pywordlemainwindow(ctk.CTk):
             key = x_ltr + ',' + x_pos
             if key in r_pos_dict:
                 del r_pos_dict[key]
-                fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict)
+                fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
 
         def clearall_r_pos():
             r_pos_dict.clear()
-            fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict)
+            fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
             self.combo_pr_l.current(0)
             self.combo_pr_p.current(0)
 
@@ -210,15 +210,22 @@ class Pywordlemainwindow(ctk.CTk):
 
 
         # Clears and fills a treeview with dictionary contents
-        # Results are sorted by the dictionary keys
-        def fill_treeview_per_dictionary(this_treeview, this_pos_dict):
+        # Results are sorted by the dictionary keys.
+        # bywhat indicated by key 0 or by value 1 so that the required position
+        # list sorts by the position while the excluded position list sorts by
+        # the letter.
+        def fill_treeview_per_dictionary(this_treeview, this_pos_dict, bywhat):
             for i in this_treeview.get_children():
                 this_treeview.delete(i)
             i = 0
-            sort_by_key_dict = {}
-            for j in sorted(this_pos_dict):
-                sort_by_key_dict[j] = this_pos_dict[j]
-            for x in sort_by_key_dict:
+            sort_by_what_dict = {}
+            if (bywhat == 0):
+                for j in sorted(this_pos_dict):
+                    sort_by_what_dict[j] = this_pos_dict[j]
+            if (bywhat == 1):
+                tlist = sorted(this_pos_dict.items(), key=lambda x:x[1].split(',')[1])
+                sort_by_what_dict = dict(tlist)
+            for x in sort_by_what_dict:
                 parts = this_pos_dict[x].split(',')
                 this_treeview.insert(parent='', index=i, id=i, values=parts)
                 i += 1
