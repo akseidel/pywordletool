@@ -38,7 +38,7 @@ doerror(){
 # note to file: &> suppresses the assertion error
 chk4python3(){
   printf " Checking for python3"
-  if ! python3 -c 'import sys; assert sys.version_info >= (3, 6)' &> /dev/null;
+  if ! python3 -c 'import sys; assert sys.version_info >= (3, )' &> /dev/null;
   then
       printf "\n======================================================================\n"
       printf " ! A problem. Python3 is required for pywordletool to work.\n"
