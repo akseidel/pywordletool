@@ -92,7 +92,7 @@ class Pywordlemainwindow(ctk.CTk):
     def x_pos_tree_view_click(self, event):
         cur_item = self.treeview_px.focus()
         val_tup = self.treeview_px.item(cur_item).get('values')
-        if val_tup != ():
+        if val_tup != '':
             self.pos_px_l.set(val_tup[0])
             self.pos_px_p.set(val_tup[1])
 
@@ -100,7 +100,7 @@ class Pywordlemainwindow(ctk.CTk):
     def r_pos_tree_view_click(self, event):
         cur_item = self.treeview_pr.focus()
         val_tup = self.treeview_pr.item(cur_item).get('values')
-        if val_tup != ():
+        if val_tup != '':
             self.pos_pr_l.set(val_tup[0])
             self.pos_pr_p.set(val_tup[1])
 
@@ -409,7 +409,9 @@ class Pywordlemainwindow(ctk.CTk):
         self.actions_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=4, pady=2, expand=True)
 
         # =======  START ============ exclude from position controls
-        self.pos_px_l = tk.StringVar()
+        def px_to_uppercase(*args):
+            self.pos_px_l.set(self.pos_px_l.get().upper())
+        self.pos_px_l = tk.StringVar(name='pos_px_l')
         self.combo_px_l = ttk.Combobox(self.criteria_frame_px,
                                        values=('', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
                                                'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
@@ -420,6 +422,12 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.combo_px_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.combo_px_l.current(0)
+        try:
+            # python 3.6
+            self.pos_px_l.trace_add('write', px_to_uppercase)
+        except AttributeError:
+            # python < 3.6
+            self.pos_px_l.trace('w', px_to_uppercase)
 
         self.pos_px_p = tk.StringVar()
         self.combo_px_p = ttk.Combobox(self.criteria_frame_px,
@@ -470,6 +478,8 @@ class Pywordlemainwindow(ctk.CTk):
         # =======  END ============ exclude from position controls
 
         # =======  START ============ require from position controls
+        def pr_to_uppercase(*args):
+            self.pos_pr_l.set(self.pos_pr_l.get().upper())
         self.pos_pr_l = tk.StringVar()
         self.combo_pr_l = ttk.Combobox(self.criteria_frame_pr,
                                        values=('', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
@@ -481,6 +491,12 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.combo_pr_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.combo_pr_l.current(0)
+        try:
+            # python 3.6
+            self.pos_pr_l.trace_add('write', pr_to_uppercase)
+        except AttributeError:
+            # python < 3.6
+            self.pos_pr_l.trace('w', pr_to_uppercase)
 
         self.pos_pr_p = tk.StringVar()
         self.combo_pr_p = ttk.Combobox(self.criteria_frame_pr,
