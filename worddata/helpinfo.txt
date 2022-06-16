@@ -10,7 +10,7 @@ Checking 'Letters To Be Excluded' checkboxes results in words not containing tho
 
 Checking 'Letters To Be Required' checkboxes results in words containing those letters. No words will show when six or more letters are required for the word.
 
-The 'Apply Your Thinking' button needs to be pressed to recognize changes to checkboxes. The Z button clears the checkboxes.
+The Z button at the checkboxes lineup clears the checkboxes.
 
 'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In puzzle context a letter not at its correct position is a letter known to be present in the word, so it will also be required. For such letters, its checkbox will not appear checked in 'Letters To Be Required', but the requirement will be applied. The Z buttons clear the entire position list.
 
