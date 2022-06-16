@@ -1,8 +1,21 @@
 # ----------------------------------------------------------------
 # pywt.py  akseidel 5/2022
 # ----------------------------------------------------------------
+# This program was created without any prior python programing knowledge
+# nor classical training in programming. It must be chock-full of coding
+# misuse. Do not think for a moment the code is "proper". It is likely
+# very good for showing how something should not be done or how what
+# results from not understanding some concepts.
+#
+# For someone who is looking closely at this and wondering why its
+# structure is a bit odd, this program started without a GUI interface
+# so to get the basic engine working first. Then the GUI was created,
+# discarding the original command line interface.
+#
 # get customtkinter  -> pip3 install customtkinter
-# if already, may need to upgrade it -> pip3 install customtkinter --upgrade
+# if already  present, you may need to upgrade it -> pip3 install customtkinter --upgrade
+# Hopefully the upgrade does not break this code.
+#
 import os
 import helpers
 
@@ -83,8 +96,6 @@ class Pywordlemainwindow(ctk.CTk):
             self.create_wnd_help()
             help_showing = True
         else:
-            # this_app.wnd_help.deiconify()
-            # this_app.wnd_help.focus_set()
             self.wnd_help.destroy()
             self.create_wnd_help()
 
@@ -185,7 +196,8 @@ class Pywordlemainwindow(ctk.CTk):
             tx_gr.delete(1.0, tk.END)
             tx_gr.insert(tk.END, wordletool.show_cmd())
 
-        def callback_do_grep(self):
+        # obviously do not have a clue why I had to resort to this.
+        def callback_do_grep(def_self):
             do_grep()
 
         def add_x_pos():
@@ -275,7 +287,7 @@ class Pywordlemainwindow(ctk.CTk):
                 for j in sorted(this_pos_dict):
                     sort_by_what_dict[j] = this_pos_dict[j]
             if bywhat == 1:
-                tlist = sorted(this_pos_dict.items(), key=lambda x: x[1].split(',')[1])
+                tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
                 sort_by_what_dict = dict(tlist)
             for x in sort_by_what_dict:
                 parts = this_pos_dict[x].split(',')
@@ -347,7 +359,7 @@ class Pywordlemainwindow(ctk.CTk):
                                          corner_radius=10,
                                          borderwidth=0)
         self.result_frame.pack(padx=20, pady=6, fill=tk.X)
-        self.result_frame.grid_columnconfigure(0, weight=1)  # non zero weight allows grid to expand
+        self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
                                 text=str_wrd_list_hrd(ln_col),
@@ -460,7 +472,7 @@ class Pywordlemainwindow(ctk.CTk):
                                             )
         self.actions_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=4, pady=2, expand=True)
 
-        # =======  START ============ exclude from position controls
+        # =======  START OF ============ exclude from position controls
         def px_to_uppercase(*args):
             self.pos_px_l.set(self.pos_px_l.get().upper())
 
@@ -529,9 +541,9 @@ class Pywordlemainwindow(ctk.CTk):
         self.treeview_px.config(yscrollcommand=sb.set)
         sb.config(command=self.treeview_px.yview)
 
-        # =======  END ============ exclude from position controls
+        # =======  END OF ============ exclude from position controls
 
-        # =======  START ============ require from position controls
+        # =======  START OF ============ require from position controls
         def pr_to_uppercase(*args):
             self.pos_pr_l.set(self.pos_pr_l.get().upper())
 
@@ -601,9 +613,9 @@ class Pywordlemainwindow(ctk.CTk):
         sb.grid(row=1, column=4, padx=1, pady=2, sticky='ens')
         self.treeview_pr.config(yscrollcommand=sb.set)
         sb.config(command=self.treeview_pr.yview)
-        # =======  END ============ require from position controls
+        # =======  END OF ============ require from position controls
 
-        # =============== Exclude Letters =============
+        # ======= START OF ======== Exclude Letters =============
         self.v_xE = tk.StringVar()
         self.v_xE.set('-')
         bt_x_e = ttk.Checkbutton(self.criteria_frame_x, text="E", variable=self.v_xE, onvalue='e', offvalue='-',
@@ -760,9 +772,9 @@ class Pywordlemainwindow(ctk.CTk):
                                       command=clear_excl_ckbs
                                       )
         self.bt_x_clr.pack(side=tk.LEFT, padx=2, pady=2)
-        # ==END========== Exclude Letters =============
+        # == END OF ========== Exclude Letters =============
 
-        # =============== Require Letters =============
+        # ==== START OF =========== Require Letters =============
         self.v_rE = tk.StringVar()
         self.v_rE.set('-')
         bt_r_E = ttk.Checkbutton(self.criteria_frame_r, text="E", variable=self.v_rE, onvalue='e', offvalue='-',
@@ -920,9 +932,9 @@ class Pywordlemainwindow(ctk.CTk):
                                       command=clear_reqr_ckbs
                                       )
         self.bt_r_clr.pack(side=tk.LEFT, padx=2, pady=2)
+        # === END OF ========= Require Letters =============
 
-        # ===END========= Require Letters =============
-
+        # === START OF ====== General Controls ==========
         sw_no_dups = ctk.CTkSwitch(self.actions_frame,
                                    text="Allow Duplicate Letters",
                                    onvalue="on",
@@ -938,9 +950,10 @@ class Pywordlemainwindow(ctk.CTk):
         combo_vocab.pack(side=tk.TOP, padx=6, pady=2, anchor='nw', fill=tk.X)
         combo_vocab.current(0)
         combo_vocab.bind("<<ComboboxSelected>>", callback_do_grep)
+        # === END OF ====== General Controls ==========
 
-
-        # admin frame require- uses pack
+        # === START OF ====== Application Controls ==========
+        # admin (Application) frame - uses pack
         self.admin_frame = ttk.LabelFrame(self.criteria_frame_p,
                                           width=250,
                                           height=100,
@@ -956,9 +969,12 @@ class Pywordlemainwindow(ctk.CTk):
 
         self.bt_zap = ctk.CTkButton(self.admin_frame, text="Clear All Settings", width=40, command=clear_all)
         self.bt_zap.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+        # === END OF ====== Application Controls ==========
 
+        # run the initial grep
         do_grep()
 
+    # The help information window
     def create_wnd_help(self):
         global data_path
         self.wnd_help = ctk.CTkToplevel(self)
