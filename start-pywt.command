@@ -35,10 +35,11 @@ doerror(){
 }
 
 # check for python3 on this system
-# note to file: &> suppresses the assertion error
+# note to file: 2> suppresses the assertion error but does not discard the
+# standard output. sh in linux kde required the 2 instead of &
 chk4python3(){
   printf " Checking for python3"
-  if ! python3 -c 'import sys; assert sys.version_info >= (3, )' &> /dev/null;
+  if ! python3 -c 'import sys; assert sys.version_info >= (3, )' 2> /dev/null;
   then
       printf "\n======================================================================\n"
       printf " ! A problem. Python3 is required for pywordletool to work.\n"
