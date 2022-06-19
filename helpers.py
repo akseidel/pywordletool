@@ -9,8 +9,6 @@ from tkinter import messagebox
 
 # Returns the wordle word list full pathname
 # Exits program if not found
-
-
 def get_word_list_path_name(local_path_file_name):
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_file_name)
     if os.path.exists(full_path_name):
@@ -90,7 +88,7 @@ def wrd_has_duplicates(wrd):
     return len(ltr_d) < len(wrd)
 
 
-# List out the ranked word list
+# List out the ranked word list in columns
 def show_this_word_list(the_word_list, n_col):
     n_items = len(the_word_list)
     h_txt = " Word : Rank "
@@ -119,7 +117,8 @@ def show_this_word_list(the_word_list, n_col):
             print(l_msg)
 
 
-# Ranking and filtering the words into a dictionary
+# Ranking and filtering the words into a dictionary.
+# Returns that dictionary sorted by the word rank.
 def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups):
     wrds_dict = {}
     for w in wrds:
@@ -135,59 +134,65 @@ def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups):
     return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
 
 
-# Returns the number of matching words
+# Returns the number of words that pass the grep command list
 def get_raw_word_count(this_sh_cmd_lst):
     sh_cmd_cnt = this_sh_cmd_lst.full_cmd() + " | wc -ltr"
     return os.popen(sh_cmd_cnt).read().strip()
 
 
-# Returns the results words list
+# Returns the list of words that pass the grep command list
 def get_results_word_list(this_sh_cmd_lst):
     result = os.popen(this_sh_cmd_lst.full_cmd()).read()
     return result.split("\n")
 
 
-# Clears the console
+# Clears the console window
 def clear_scrn():
     os.system("cls" if os.name == "nt" else "clear")
 
 
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
-# letter conditions.
+# letter conditions. Some functions are not used in the gui
+# pywordletool.
 class ShellCmdList:
-    # command list is by instance
+    # The command list is by instance.
     def __init__(self, list_file_name):
         self.shCMDlist = list()
         self.shCMDlist.append("cat " + list_file_name)
 
+    # Adds string s to the command stack.
     def add_cmd(self, s):
         if len(s) > 0:
             self.shCMDlist.append(s)
 
-    # word includes random letter from list lst
-    # returns the random pick letter
+    # Given a string of letters lst, adds to the command
+    # stack a grep filter requiring a letter picked at random
+    # from string lst. Returns that random picked letter for
+    # feedback purposes.
     def add_rand_incl_frm_cmd(self, lst):
         rand_frm_l = random.choice(lst)
         self.shCMDlist.append("grep -E '" + rand_frm_l + "'")
         return rand_frm_l
 
-    # word requires this letter ltr
+    # Adds command to stack to require letter ltr.
     def add_require_cmd(self, ltr):
         if len(ltr) > 0:
             self.shCMDlist.append("grep -E '" + ltr + "'")
 
-    # word excludes this letter ltr
+    # Adds command to stack to exclude letter ltr.
     def add_excl_any_cmd(self, ltr):
         if len(ltr) > 0:
             self.shCMDlist.append("grep -vE '" + ltr + "'")
 
-    # word excludes letter from position number
+    # Adds command to stack to exclude letter from a position number.
+    # Context is that letter is known, therefore is required but not
+    # at the designated position.
     def add_excl_pos_cmd(self, ltr, p):
         if len(ltr) > 0:
-            # can have letter
+            # Require the letter,
             self.shCMDlist.append("grep -E '" + ltr + "'")
-            # but not in this position
+            # but not in this position.
             if p == 1:
                 self.shCMDlist.append("grep -vE '" + ltr + "....'")
             elif p == 2:
@@ -199,7 +204,7 @@ class ShellCmdList:
             elif p == 5:
                 self.shCMDlist.append("grep -vE '...." + ltr + "'")
 
-    # word includes letter in position number
+    # Adds command to stack to require letter at a position number.
     def add_incl_pos_cmd(self, ltr, p):
         if len(ltr) > 0:
             # Have letter in this position
@@ -214,7 +219,7 @@ class ShellCmdList:
             elif p == 5:
                 self.shCMDlist.append("grep -E '...." + ltr + "'")
 
-    # returns the list assembled into one command line
+    # Returns the command stack assembled into one command line.
     def full_cmd(self):
         pipe = " | "
         this_cmd = ""
@@ -224,35 +229,34 @@ class ShellCmdList:
         return this_cmd
 
 
-# ToolResults(vocabulary file, letter_ranks file, no_dups)
+# ToolResults(data path, vocabulary file name, letter_ranks file, no_dups)
+# The wordle tool all wrapped up into one being, including the grep command list.
 class ToolResults:
-    # constructor
+
     def __init__(self, data_path, vocabulary, letter_ranks, no_dups):
         self.data_path = data_path
         self.vocab = vocabulary  # vocabulary is the words list textfile
         self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
         self.no_dups = no_dups  # no_dups is the-allow-duplicate-letters flag
-        # self.g_cmd_lst = grep_cmd_lst  # grep_cmd_lst is the list of grep commands
 
-        # we have all the setting so do the grep
         wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
         rank_file = self.data_path + self.ltr_ranks
         self.ltr_rank_dict = make_ltr_rank_dictionary(rank_file)  # ltr_rank_dict is the rank dictionary
-        # Initialize and setup the ShellCmdList class instance that holds the
+        # Initialize and set up the ShellCmdList class instance that holds the
         # grep filtering command stack. Guessing because it is a class instance is why it
         # can be passed around as a global variable where it gets modified along the way.
         self.tool_command_list = ShellCmdList(wrd_list_file_name)  # init with cat wordlistfile
-        # grepper.setup_grep_filtering(self.tool_command_list)  # fills the cmd stack with grep assignments
-        # At this point the grep stack is ready for executing
+        # At this point the grep stack is ready for executing in as a class function.
         self.ranked_wrds_dict = {}  # dictionary of ranked words resulting from grep filtering
         self.raw_cnt = 0
         self.ranked_cnt = 0
 
-    # returns the results words list
+    # Return the results words list without any ranking or sorting.
     def get_results_wrd_lst(self):
         return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
 
-    # returns ranked results words list
+    # Returns ranked results words list as dictionary. The ranking function also
+    # sorts the dictionary. So result is sorted.
     def get_ranked_results_wrd_lst(self):
         # Ranking and filtering the words into a dictionary
         # Set no_dups to prevent letters from occurring more than once
@@ -262,24 +266,29 @@ class ToolResults:
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
-    # Get the grepped word count
+    # Return the grepped word count
     def get_results_raw_cnt(self):
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
         self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
         return self.raw_cnt
 
-    # returns ranked word list formatted into columns
+    # Returns sorted ranked word list formatted into n_col columns.
     def show_col_format_ranked_list(self, n_col):
         return show_this_word_list(self.get_ranked_results_wrd_lst(), n_col)
 
+    # Returns the status text line.
     def show_status(self):
         status = '=> Showing ' + str(self.ranked_cnt) + ' words from the raw list of ' + str(
             self.get_results_raw_cnt()) + " duplicate letter words."
         return status
 
+    # Returns the entire fully assembled grep command line. This line includes
+    # the full path names.
     def show_full_cmd(self):
         return self.tool_command_list.full_cmd()
 
+    # Returns the entire fully assembled grep command line. This line excluded
+    # the full path names and so is used in the GUI display.
     def show_cmd(self):
         full_cmd = self.tool_command_list.full_cmd()
         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)

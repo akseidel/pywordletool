@@ -57,7 +57,7 @@ def str_wrd_list_hrd(ln_col):
 def wrap_this(string, max_chars):
     """A helper that will return the string with word-break wrapping.
             :param str string: The text to be wrapped.
-            :param int max_chars: The maximum number of characters on a line before wrapping.
+            param int max_chars: The maximum number of characters on a line before wrapping.
     """
     string = string.replace('\n', '').replace('\r', '')  # strip confusing newlines
     words = string.split(' ')
