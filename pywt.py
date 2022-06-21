@@ -151,7 +151,7 @@ class Pywordlemainwindow(ctk.CTk):
             else:
                 no_dups = True
 
-            if self.vocabulary.get() == "Use Small Vocabulary":
+            if vocab_var.get() == 1:
                 vocab_filename = 'wo_nyt_wordlist.txt'
             else:
                 vocab_filename = 'nyt_wordlist.txt'
@@ -192,10 +192,6 @@ class Pywordlemainwindow(ctk.CTk):
             self.status.set(wordletool.show_status())
             tx_gr.delete(1.0, tk.END)
             tx_gr.insert(tk.END, wordletool.show_cmd())
-
-        # obviously do not have a clue why I had to resort to this.
-        def callback_do_grep(def_self):
-            do_grep()
 
         def add_x_pos():
             x_ltr = self.pos_px_l.get().upper()
@@ -939,14 +935,16 @@ class Pywordlemainwindow(ctk.CTk):
                                    command=do_grep)
         sw_no_dups.pack(side=tk.TOP, padx=6, pady=6, anchor='w')
 
-        combo_vocab = ttk.Combobox(self.actions_frame,
-                                   values=("Use Small Vocabulary", "Use Large Vocabulary"),
-                                   state='readonly',
-                                   textvariable=self.vocabulary
-                                   )
-        combo_vocab.pack(side=tk.TOP, padx=6, pady=2, anchor='nw', fill=tk.X)
-        combo_vocab.current(0)
-        combo_vocab.bind("<<ComboboxSelected>>", callback_do_grep)
+        # Vocabulary selection frame
+        vocab_frame = ttk.LabelFrame(self.actions_frame, text='Word Vocabulary', labelanchor='nw')
+        vocab_frame.pack(anchor='s', fill=tk.X, expand=True)
+        # Vocabulary radio buttons
+        vocab_var = tk.IntVar()
+        vocab_var.set(1)
+        rbv1 = ttk.Radiobutton(vocab_frame, text="Use Small Vocabulary", variable=vocab_var, value=1, command=do_grep)
+        rbv1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+        rbv2 = ttk.Radiobutton(vocab_frame, text="Use Large Vocabulary", variable=vocab_var, value=2, command=do_grep)
+        rbv2.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
         # === END OF ====== General Controls ==========
 
         # === START OF ====== Application Controls ==========
