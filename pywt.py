@@ -31,6 +31,7 @@ data_path = 'worddata/'  # path from here to data folder
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
+font_tuple = ("Courier", 14, "normal")
 
 
 def set_n_col(self):
@@ -57,7 +58,7 @@ def str_wrd_list_hrd(ln_col):
 def wrap_this(string, max_chars):
     """A helper that will return the string with word-break wrapping.
             :param str string: The text to be wrapped.
-            param int max_chars: The maximum number of characters on a line before wrapping.
+            :param int max_chars: The maximum number of characters on a line before wrapping.
     """
     string = string.replace('\n', '').replace('\r', '')  # strip confusing newlines
     words = string.split(' ')
@@ -121,13 +122,13 @@ class Pywordlemainwindow(ctk.CTk):
         self.title("This Wordle Helper")
         # print(self.winfo_screenheight())
         # print(self.winfo_screenwidth())
-        w_width = 1036
-        w_height = 656  # to do, set according to screen height
+        w_width = 1120  # 1036
+        w_height = 664  # to do, set according to screen height
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
         # self.resizable(width=False,height=False)
-        font_tuple = ("Courier", 12, "normal")
+
         ln_col = set_n_col(self)
         # set the Vars
         self.no_dups = tk.BooleanVar()
@@ -138,11 +139,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # configure style
         style = ttk.Style()
-        style.configure("position.ttk.Treeview", highlightthickness=0, bd=0,
-                        font=('', 12))  # body font
-
-        # style.configure("Vertical.TScrollbar", arrowsize= 64, background="green", bordercolor="red", arrowcolor="white")
-        # Some style settings do not work in osx?
+        style.theme_use('aqua')
 
         def do_grep():
             """Runs a wordletool helper grep instance
@@ -358,7 +355,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame = ctk.CTkFrame(self,
                                          corner_radius=10,
                                          borderwidth=0)
-        self.result_frame.pack(padx=20, pady=6, fill=tk.X)
+        self.result_frame.pack(padx=10, pady=2, fill=tk.X)
         self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
@@ -419,39 +416,39 @@ class Pywordlemainwindow(ctk.CTk):
         # letter position frame
         self.criteria_frame = ctk.CTkFrame(self,
                                            width=900,
-                                           height=100,
+                                           # height=100,
                                            corner_radius=10,
                                            borderwidth=0)
-        self.criteria_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=20, pady=8)
+        self.criteria_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=0)
 
         # letter exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
                                                width=900,
-                                               height=100,
+                                               # height=100,
                                                text='Letters To Be Excluded'
                                                )
-        self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=6, pady=6)
+        self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=6, pady=1)
 
         # letter require frame - uses pack
         self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
                                                width=900,
-                                               height=100,
+                                               # height=100,
                                                text='Letters To Be Required'
                                                )
-        self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=6, pady=6)
+        self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=6, pady=1)
 
         # letter position frame overall - uses pack
         self.criteria_frame_p = ttk.LabelFrame(self.criteria_frame,
                                                width=900,
-                                               height=100,
+                                               # height=100,
                                                text='Letters Positioning',
                                                )
-        self.criteria_frame_p.pack(side=tk.BOTTOM, fill=tk.X, padx=4, pady=2)
+        self.criteria_frame_p.pack(side=tk.BOTTOM, fill=tk.X, padx=4, pady=4)
 
         # letter position frame exclude - uses pack
         self.criteria_frame_px = ttk.LabelFrame(self.criteria_frame_p,
                                                 width=450,
-                                                height=100,
+                                                # height=100,
                                                 text='Exclude From Position',
                                                 )
         self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
@@ -459,7 +456,7 @@ class Pywordlemainwindow(ctk.CTk):
         # letter position frame require- uses pack
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
                                                 width=450,
-                                                height=100,
+                                                # height=100,
                                                 text='Require A Position',
                                                 )
         self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
@@ -467,7 +464,7 @@ class Pywordlemainwindow(ctk.CTk):
         # actions frame require- uses pack
         self.actions_frame = ttk.LabelFrame(self.criteria_frame_p,
                                             width=450,
-                                            height=100,
+                                            # height=100,
                                             text='General Settings',
                                             )
         self.actions_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=4, pady=2, expand=True)
@@ -768,10 +765,10 @@ class Pywordlemainwindow(ctk.CTk):
             do_grep()
 
         self.bt_x_clr = ctk.CTkButton(self.criteria_frame_x,
-                                      text="z", width=20,
+                                      text="Clear", width=20,
                                       command=clear_excl_ckbs
                                       )
-        self.bt_x_clr.pack(side=tk.LEFT, padx=2, pady=2)
+        self.bt_x_clr.pack(side=tk.TOP, padx=2, pady=2)
         # == END OF ========== Exclude Letters =============
 
         # ==== START OF =========== Require Letters =============
@@ -928,10 +925,10 @@ class Pywordlemainwindow(ctk.CTk):
             do_grep()
 
         self.bt_r_clr = ctk.CTkButton(self.criteria_frame_r,
-                                      text="z", width=20,
+                                      text='Clear', width=20,
                                       command=clear_reqr_ckbs
                                       )
-        self.bt_r_clr.pack(side=tk.LEFT, padx=2, pady=2)
+        self.bt_r_clr.pack(side=tk.TOP, padx=2, pady=2)
         # === END OF ========= Require Letters =============
 
         # === START OF ====== General Controls ==========
@@ -962,10 +959,10 @@ class Pywordlemainwindow(ctk.CTk):
         self.admin_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=4, pady=2, expand=True)
 
         self.bt_Q = ctk.CTkButton(self.admin_frame, text="Quit", width=100, command=self.destroy)
-        self.bt_Q.pack(side=tk.BOTTOM, padx=6, pady=2, anchor='e')
+        self.bt_Q.pack(side=tk.BOTTOM, padx=6, pady=2, fill=tk.X)
 
-        self.bt_help = ctk.CTkButton(self.admin_frame, text="?", width=40, command=self.show_help)
-        self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=6, anchor='e')
+        self.bt_help = ctk.CTkButton(self.admin_frame, text="Information", width=40, command=self.show_help)
+        self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=6, fill=tk.X)
 
         self.bt_zap = ctk.CTkButton(self.admin_frame, text="Clear All Settings", width=40, command=clear_all)
         self.bt_zap.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
@@ -1003,6 +1000,7 @@ class Pywordlemainwindow(ctk.CTk):
                        highlightthickness=0
                        )
         msg1.grid(row=0, column=0, padx=6, pady=2)
+        msg1.configure(font=font_tuple)
         # scrollbar for help
         help_sb = ttk.Scrollbar(self.wnd_help.info_frame, orient='vertical')
         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
