@@ -142,7 +142,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # configure style
         style = ttk.Style()
-        style.theme_use('aqua')
+        style.theme_use()
 
         def do_grep():
             """Runs a wordletool helper grep instance
@@ -1003,8 +1003,6 @@ class Pywordlemainwindow(ctk.CTk):
 
         msg1 = tk.Text(self.wnd_help.info_frame,
                        wrap='word',
-                       width=120,
-                       height=30,
                        padx=10,
                        pady=8,
                        background='#dedede',
