@@ -48,8 +48,8 @@ def setup_grep_filtering(this_sh_cmd_lst):
     # this_sh_cmd_lst.add_incl_pos_cmd('e',4)
     # this_sh_cmd_lst.add_incl_pos_cmd('p',5)
 
-    this_sh_cmd_lst.add_incl_pos_cmd('t', 1)
-    this_sh_cmd_lst.add_incl_pos_cmd('t', 5)
+    # this_sh_cmd_lst.add_incl_pos_cmd('t', 1)
+    # this_sh_cmd_lst.add_incl_pos_cmd('t', 5)
 
     # # post first pick Low rank inclusions
     # this_sh_cmd_lst.add_cmd('grep -E \'b|f|k|w\'')

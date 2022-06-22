@@ -25,6 +25,7 @@ def get_word_list_path_name(local_path_file_name):
         sys.exit()
 
 
+# ===== Start - Letter ranking functions for rank that includes by letter position method
 # Make and return the letter ranking dictionary
 def make_ltr_rank_dictionary(local_path_rank_file):
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_rank_file)
@@ -34,7 +35,10 @@ def make_ltr_rank_dictionary(local_path_rank_file):
         with open(full_path_name) as f:
             for ltr in f:
                 ltr = ltr.split(":")
-                ltr_rank_dict[ltr[0]] = float(ltr[1])
+                ltr[-1] = ltr[-1].strip()
+                k = ltr[0]
+                ltr.pop(0)
+                ltr_rank_dict[k] = [float(d) for d in ltr]  # want as floats
     else:
         msg = "Letter ranking file " \
               + local_path_rank_file \
@@ -42,42 +46,51 @@ def make_ltr_rank_dictionary(local_path_rank_file):
         print(msg)
         messagebox.showwarning('Warning', message=msg)
         ltr_rank_dict = {
-            "e": 39.0,
-            "a": 33.6,
-            "r": 30.9,
-            "o": 24.9,
-            "t": 24.7,
-            "i": 23.9,
-            "l": 23.9,
-            "s": 22.9,
-            "n": 20.3,
-            "u": 16.9,
-            "c": 16.5,
-            "y": 15.4,
-            "h": 14.0,
-            "d": 13.7,
-            "p": 12.8,
-            "g": 11.1,
-            "m": 11.0,
-            "b": 9.9,
-            "f": 7.6,
-            "k": 7.5,
-            "w": 7.1,
-            "v": 5.5,
-            "x": 1.4,
-            "z": 1.3,
-            "q": 1.1,
-            "j": 1.0,
+            "e": [39.0, 2.28, 7.64, 5.61, 10.08, 13.38],
+            "a": [33.6, 4.82, 10.46, 10.46, 10.53, 5.58, 2.17],
+            "r": [30.9, 3.62, 9.21, 9.21, 5.62, 5.17, 7.31],
+            "o": [24.9, 1.36, 9.22, 9.22, 8.03, 4.36, 1.92],
+            "t": [24.7, 5.05, 2.61, 2.61, 3.76, 4.71, 8.57],
+            "i": [23.9, 1.21, 7.18, 7.18, 9.50, 5.64, 0.39],
+            "l": [23.9, 2.90, 6.67, 6.67, 3.74, 5.41, 5.17],
+            "s": [22.9, 12.49, 0.55, 0.55, 2.74, 5.85, 1.23],
+            "n": [20.3, 1.31, 3.08, 3.08, 4.85, 6.45, 4.60],
+            "u": [16.9, 1.20, 6.70, 6.70, 5.98, 2.97, 0.04],
+            "c": [16.5, 6.89, 1.39, 1.39, 1.95, 5.22, 1.08],
+            "y": [15.4, 0.22, 0.80, 0.80, 1.05, 0.11, 13.23],
+            "h": [14.0, 2.49, 5.20, 5.20, 0.32, 1.01, 4.94],
+            "d": [13.7, 3.87, 0.70, 0.70, 2.62, 2.41, 4.11],
+            "p": [12.8, 4.94, 2.14, 2.14, 2.00, 1.75, 1.96],
+            "g": [11.1, 4.11, 0.39, 0.39, 2.39, 2.71, 1.46],
+            "m": [11.0, 3.74, 1.33, 1.33, 2.13, 2.38, 1.47],
+            "b": [9.9, 6.13, 0.57, 0.57, 1.91, 0.85, 0.39],
+            "f": [7.6, 4.50, 0.27, 0.27, 0.83, 1.17, 0.87],
+            "k": [7.5, 0.71, 0.36, 0.36, 0.43, 1.96, 4.03],
+            "w": [7.1, 3.02, 1.62, 1.62, 0.96, 0.92, 0.63],
+            "v": [5.5, 1.55, 0.54, 0.54, 1.77, 1.62, 0.00],
+            "x": [1.4, 0.00, 0.52, 0.52, 0.44, 0.11, 0.30],
+            "z": [1.3, 0.10, 0.06, 0.06, 0.36, 0.65, 0.13],
+            "q": [1.1, 0.85, 0.19, 0.19, 0.04, 0.00, 0.00],
+            "j": [1.0, 0.74, 0.07, 0.07, 0.11, 0.07, 0.00],
         }
     return ltr_rank_dict
 
 
 # Returns a word's letter frequency ranking
-def wrd_rank(wrd, ltr_rank_dict):
+def wrd_rank(wrd, ltr_rank_dict, method):
     r = 0
-    for x in wrd:
-        r = r + ltr_rank_dict[x]
-    return r
+    if method == 0:  # rank by anywhere in word
+        for x in wrd:
+            # 0th position is rank by anywhere
+            r = r + ltr_rank_dict[x][0]
+        return r
+    if method == 1:  # rank by position in the word
+        p = 1
+        for x in wrd:
+            # 1 to 5th position is rank for being in that position
+            r = r + ltr_rank_dict[x][p]
+            p += 1
+        return r
 
 
 # Returns true if word has duplicate letters
@@ -119,15 +132,15 @@ def show_this_word_list(the_word_list, n_col):
 
 # Ranking and filtering the words into a dictionary.
 # Returns that dictionary sorted by the word rank.
-def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups):
+def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups, rank_mode):
     wrds_dict = {}
     for w in wrds:
         if len(w) == 5:
             if no_dups:
                 if not wrd_has_duplicates(w):
-                    wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict))
+                    wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
             else:
-                wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict))
+                wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
 
     # sorting the ranked word list into a dictionary
     # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
@@ -233,15 +246,18 @@ class ShellCmdList:
 # The wordle tool all wrapped up into one being, including the grep command list.
 class ToolResults:
 
-    def __init__(self, data_path, vocabulary, letter_ranks, no_dups):
+    def __init__(self, data_path, vocabulary, letter_ranks, no_dups, rank_mode):
         self.data_path = data_path
         self.vocab = vocabulary  # vocabulary is the words list textfile
         self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
         self.no_dups = no_dups  # no_dups is the-allow-duplicate-letters flag
+        self.rank_mode = rank_mode
 
         wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
         rank_file = self.data_path + self.ltr_ranks
+
         self.ltr_rank_dict = make_ltr_rank_dictionary(rank_file)  # ltr_rank_dict is the rank dictionary
+
         # Initialize and set up the ShellCmdList class instance that holds the
         # grep filtering command stack. Guessing because it is a class instance is why it
         # can be passed around as a global variable where it gets modified along the way.
@@ -262,7 +278,8 @@ class ToolResults:
         # Set no_dups to prevent letters from occurring more than once
         # First pick should not use duplicates, later picks should consider them.
         wrds = self.get_results_wrd_lst()
-        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.no_dups)
+        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.no_dups,
+                                                                       self.rank_mode)
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 

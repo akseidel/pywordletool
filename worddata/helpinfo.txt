@@ -1,6 +1,6 @@
 The wordle helper shows five-letter words from which you can select for playing the wordle game.
 
-The five-letter words are assigned a rank according to how common the letters are in the English wordle words. This helper presents ranked words from lowest rank to highest rank. The word list always shows scrolled to the highest ranking words at its bottom. Scroll the list upwards to see the lower ranking words.
+The five-letter words are assigned a rank according to how common the letters are in the English wordle words. The 'By Any Occurrence' method does not consider where letters occur in the word. The 'By The Position' method considers the letter's position. This helper presents ranked words from the lowest rank to the highest rank. The word list always shows scrolled to the highest ranking words at its bottom. Scroll the list upwards to see the lower ranking words.
 
 Word rank represents relative occurrence probability; however, any word matching the filter could be the wordle word regardless of its rank.
 

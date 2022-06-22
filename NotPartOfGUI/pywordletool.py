@@ -14,13 +14,15 @@ data_path = './worddata/'  # path from here to data folder
 
 # Set no_dups to prevent letters from occurring more than once
 # First pick should not use duplicates, later picks should consider them.
-no_dups = False
-# no_dups = True
+# no_dups = False
+no_dups = True
+
+rank_mode = 1
 
 helpers.clear_scrn()  # clears terminal
 
 # initialize the wordletool
-wordletool = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', 'letter_ranks.txt', no_dups)
+wordletool = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', 'letter_ranks.txt', no_dups, rank_mode)
 
 # # variables
 # ranked_wrds_dict ={} # dictionary of ranked words resulting from grep filtering

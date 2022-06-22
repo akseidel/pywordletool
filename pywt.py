@@ -28,6 +28,7 @@ ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dar
 
 # globals
 data_path = 'worddata/'  # path from here to data folder
+letter_rank_file = 'letter_ranks.txt'
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
@@ -136,6 +137,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.no_dupe_state.set("on")
         self.vocabulary = tk.StringVar()
         self.status = tk.StringVar()
+        self.rank_mode = tk.IntVar()
+        self.rank_mode.set(0)
 
         # configure style
         style = ttk.Style()
@@ -156,7 +159,9 @@ class Pywordlemainwindow(ctk.CTk):
             else:
                 vocab_filename = 'nyt_wordlist.txt'
 
-            wordletool = helpers.ToolResults(data_path, vocab_filename, 'letter_ranks.txt', no_dups)
+
+
+            wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, no_dups, self.rank_mode.get())
 
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_requireall_grep(self.re_btn_vars))
@@ -934,6 +939,15 @@ class Pywordlemainwindow(ctk.CTk):
                                    offvalue="off",
                                    command=do_grep)
         sw_no_dups.pack(side=tk.TOP, padx=6, pady=6, anchor='w')
+
+        # Ranking selection frame
+        rank_frame = ttk.LabelFrame(self.actions_frame, text='Word Ranking By Letter Method', labelanchor='nw')
+        rank_frame.pack(anchor='s', fill=tk.X, expand=True)
+        # Vocabulary radio buttons
+        rbr1 = ttk.Radiobutton(rank_frame, text="By Any Occurrence", variable=self.rank_mode, value=0, command=do_grep)
+        rbr1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+        rbr2 = ttk.Radiobutton(rank_frame, text="By The Position", variable=self.rank_mode, value=1, command=do_grep)
+        rbr2.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         # Vocabulary selection frame
         vocab_frame = ttk.LabelFrame(self.actions_frame, text='Word Vocabulary', labelanchor='nw')
