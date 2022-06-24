@@ -159,8 +159,6 @@ class Pywordlemainwindow(ctk.CTk):
             else:
                 vocab_filename = 'nyt_wordlist.txt'
 
-
-
             wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, no_dups, self.rank_mode.get())
 
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
@@ -168,6 +166,7 @@ class Pywordlemainwindow(ctk.CTk):
             build_x_pos_grep(wordletool, x_pos_dict)
             build_r_pos_grep(wordletool, r_pos_dict)
 
+            tx_result.configure(state='normal')
             tx_result.delete(1.0, tk.END)
 
             the_word_list = wordletool.get_ranked_results_wrd_lst()
@@ -192,11 +191,13 @@ class Pywordlemainwindow(ctk.CTk):
                     l_msg = ""
                 if i == n_items:
                     tx_result.insert(tk.END, l_msg + '\n')
-
+            tx_result.configure(state='disabled')
             tx_result.see('end')
             self.status.set(wordletool.show_status())
+            tx_gr.configure(state='normal')
             tx_gr.delete(1.0, tk.END)
             tx_gr.insert(tk.END, wordletool.show_cmd())
+            tx_gr.configure(state='disabled')
 
         def add_x_pos():
             x_ltr = self.pos_px_l.get().upper()
@@ -989,17 +990,47 @@ class Pywordlemainwindow(ctk.CTk):
         self.wnd_help = ctk.CTkToplevel(self)
         self.wnd_help.wm_title('Some Information For You')
         self.wnd_help.resizable(width=False, height=False)
+        self.state = 0  # 0 = info 1 = ranking
 
-        full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
-        if os.path.exists(full_path_name):
-            f = open(full_path_name, "r", encoding="UTF8").read()
-        else:
-            f = 'This is all the help you get because file helpinfo.txt has gone missing.'
+        # Returns string that is the information
+        def get_info():
+            full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
+            if os.path.exists(full_path_name):
+                f = open(full_path_name, "r", encoding="UTF8").read()
+            else:
+                f = 'This is all the help you get because file helpinfo.txt has gone missing.'
+            return f
+
+        def get_rankdata():
+            full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'letter_ranks.txt')
+            if os.path.exists(full_path_name):
+                f = open(full_path_name, "r", encoding="UTF8").read()
+            else:
+                f = 'Could not find. ' + full_path_name
+            return f
+
+        def show_info():
+            msg1.configure(state='normal')
+            msg1.delete(1.0, tk.END)
+            msg1.insert(tk.END, get_info())
+            msg1.configure(state='disabled')
+
+        def show_rankinfo():
+            msg1.configure(state='normal')
+            msg1.delete(1.0, tk.END)
+            raw_rank_data = get_rankdata()
+            f = raw_rank_data.replace(":", "\t")
+            msg1.insert(tk.END, "RNK = Rank for any occurrence\n")
+            msg1.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
+            msg1.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
+            msg1.insert(tk.END, "---\t---\t-----\t-----\t-----\t-----\t-----\n")
+            msg1.insert(tk.END, f)
+            msg1.configure(state='disabled')
 
         self.wnd_help.info_frame = ttk.LabelFrame(self.wnd_help,
                                                   borderwidth=0,
                                                   )
-        self.wnd_help.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2, expand=True)
+        self.wnd_help.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=0, expand=True)
 
         msg1 = tk.Text(self.wnd_help.info_frame,
                        wrap='word',
@@ -1007,22 +1038,31 @@ class Pywordlemainwindow(ctk.CTk):
                        pady=8,
                        background='#dedede',
                        borderwidth=0,
-                       highlightthickness=0
+                       highlightthickness=0,
                        )
-        msg1.grid(row=0, column=0, padx=6, pady=2)
+        msg1.grid(row=0, column=0, padx=6, pady=0)
         msg1.configure(font=font_tuple)
         # scrollbar for help
         help_sb = ttk.Scrollbar(self.wnd_help.info_frame, orient='vertical')
         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
         msg1.config(yscrollcommand=help_sb.set)
         help_sb.config(command=msg1.yview)
-        msg1.delete(1.0, tk.END)
-        msg1.insert(tk.END, f)
+        show_info()
 
         button_q = ctk.CTkButton(self.wnd_help, text="Close",
                                  command=self.close_help)
-        button_q.pack(side="right", padx=20, pady=20)
+        button_q.pack(side="right", padx=10, pady=10)
         self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
+
+        button_r = ctk.CTkButton(self.wnd_help, text="Letter Ranking",
+                                 command=show_rankinfo
+                                 )
+        button_r.pack(side="left", padx=10, pady=10)
+
+        button_i = ctk.CTkButton(self.wnd_help, text="Information",
+                                 command=show_info
+                                 )
+        button_i.pack(side="left", padx=10, pady=10)
 
 
 # end Pywordlemainwindow class
