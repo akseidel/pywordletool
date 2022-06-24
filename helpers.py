@@ -91,7 +91,14 @@ def wrd_rank(wrd, ltr_rank_dict, method):
             r = r + ltr_rank_dict[x][p]
             p += 1
         return r
-
+    if method == 2:  # rank by position in the word
+        p = 1
+        for x in wrd:
+            # combine methods 0 and 1
+            r = r + ltr_rank_dict[x][0] + ltr_rank_dict[x][p]
+            p += 1
+        return r
+    return 0
 
 # Returns true if word has duplicate letters
 def wrd_has_duplicates(wrd):

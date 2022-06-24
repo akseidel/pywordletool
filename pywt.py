@@ -949,6 +949,8 @@ class Pywordlemainwindow(ctk.CTk):
         rbr1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
         rbr2 = ttk.Radiobutton(rank_frame, text="By The Position", variable=self.rank_mode, value=1, command=do_grep)
         rbr2.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+        rbr3 = ttk.Radiobutton(rank_frame, text="By Both", variable=self.rank_mode, value=2, command=do_grep)
+        rbr3.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         # Vocabulary selection frame
         vocab_frame = ttk.LabelFrame(self.actions_frame, text='Word Vocabulary', labelanchor='nw')
