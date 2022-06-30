@@ -217,17 +217,26 @@ class Pywordlemainwindow(ctk.CTk):
         def add_r_pos():
             x_ltr = self.pos_pr_l.get().upper()
             x_pos = self.pos_pr_p.get()
+            # toss out of range position numbers
             if not x_pos.isnumeric() or int(x_pos) < 1 or int(x_pos) > 5:
                 self.pos_pr_p.set('1')
                 return
+            # toss any invalid entries in the letter combo
             if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
                 self.pos_pr_l.set('')
                 return
             self.pos_pr_l.set(x_ltr)
-            key = x_ltr + ',' + x_pos
-            value = key
-            r_pos_dict[key] = value
-            fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
+            # continue if pos is available
+            if x_pos in self.rpos:
+                # update r_pos_dict and update treeview
+                key = x_ltr + ',' + x_pos
+                value = key
+                r_pos_dict[key] = value
+                fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
+                # remove position from rpos and in turn the combobox
+                self.rpos.remove(x_pos)
+                conform_combo_pr_p()
+
 
         def remove_x_pos():
             x_ltr = self.pos_px_l.get().upper()
@@ -250,20 +259,35 @@ class Pywordlemainwindow(ctk.CTk):
         def remove_r_pos():
             x_ltr = self.pos_pr_l.get().upper()
             x_pos = self.pos_pr_p.get()
+            # toss any invalid entries in the letter combo
             if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
                 self.pos_pr_l.set('')
                 return
             self.pos_pr_l.set(x_ltr)
-            key = x_ltr + ',' + x_pos
-            if key in r_pos_dict:
-                del r_pos_dict[key]
-                fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
+            if x_pos not in self.rpos:
+                key = x_ltr + ',' + x_pos
+                if key in r_pos_dict:
+                    del r_pos_dict[key]
+                    fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
+                    # add back position to rpos and the combobox
+                    self.rpos.append(x_pos)
+                    self.rpos.sort()
+                    conform_combo_pr_p()
+
+        def conform_combo_pr_p():
+            self.combo_pr_p.configure(values=self.rpos)
+            if self.rpos:
+                self.combo_pr_p.current(0)
+            else:
+                # no more positions, index cannot be set to 0
+                self.pos_pr_p.set('')
 
         def clearall_r_pos():
             r_pos_dict.clear()
             fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
+            self.rpos = ['1', '2', '3', '4', '5']
+            conform_combo_pr_p()
             self.combo_pr_l.current(0)
-            self.combo_pr_p.current(0)
 
         # clears all settings
         def clear_all():
@@ -493,6 +517,7 @@ class Pywordlemainwindow(ctk.CTk):
             # python < 3.6
             self.pos_px_l.trace('w', px_to_uppercase)
 
+
         self.pos_px_p = tk.StringVar()
         self.combo_px_p = ttk.Combobox(self.criteria_frame_px,
                                        values=('1', '2', '3', '4', '5'),
@@ -564,9 +589,11 @@ class Pywordlemainwindow(ctk.CTk):
             # python < 3.6
             self.pos_pr_l.trace('w', pr_to_uppercase)
 
+        # rpos to be a mutable list of unassigned letter positions
+        self.rpos = ['1', '2', '3', '4', '5']
         self.pos_pr_p = tk.StringVar()
         self.combo_pr_p = ttk.Combobox(self.criteria_frame_pr,
-                                       values=('1', '2', '3', '4', '5'),
+                                       values=self.rpos,
                                        width=4,
                                        justify=tk.CENTER,
                                        textvariable=self.pos_pr_p

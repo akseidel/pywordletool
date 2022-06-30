@@ -100,6 +100,7 @@ def wrd_rank(wrd, ltr_rank_dict, method):
         return r
     return 0
 
+
 # Returns true if word has duplicate letters
 def wrd_has_duplicates(wrd):
     ltr_d = {}
