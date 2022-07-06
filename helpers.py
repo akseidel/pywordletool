@@ -104,8 +104,12 @@ def wrd_rank(wrd, ltr_rank_dict, method):
 # Returns true if word has duplicate letters
 def wrd_has_duplicates(wrd):
     ltr_d = {}
+    # This function is also used for the special pattern
+    # where '.' is allowed. These would not be duplicates.
+    wrd = wrd.replace('.','')
+    wrd = wrd.replace(' ','')
     for ltr in wrd:
-        ltr_d[ltr] = ltr
+            ltr_d[ltr] = ltr
     return len(ltr_d) < len(wrd)
 
 
@@ -140,15 +144,16 @@ def show_this_word_list(the_word_list, n_col):
 
 # Ranking and filtering the words into a dictionary.
 # Returns that dictionary sorted by the word rank.
-def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups, rank_mode):
+def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, allow_dups, rank_mode):
     wrds_dict = {}
     for w in wrds:
         if len(w) == 5:
-            if no_dups:
+            if allow_dups:
+                wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
+            else:
                 if not wrd_has_duplicates(w):
                     wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
-            else:
-                wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
+
 
     # sorting the ranked word list into a dictionary
     # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
@@ -250,15 +255,15 @@ class ShellCmdList:
         return this_cmd
 
 
-# ToolResults(data path, vocabulary file name, letter_ranks file, no_dups)
+# ToolResults(data path, vocabulary file name, letter_ranks file, allow_dups)
 # The wordle tool all wrapped up into one being, including the grep command list.
 class ToolResults:
 
-    def __init__(self, data_path, vocabulary, letter_ranks, no_dups, rank_mode):
+    def __init__(self, data_path, vocabulary, letter_ranks, allow_dups, rank_mode):
         self.data_path = data_path
         self.vocab = vocabulary  # vocabulary is the words list textfile
         self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
-        self.no_dups = no_dups  # no_dups is the-allow-duplicate-letters flag
+        self.allow_dups = allow_dups  # allow_dups is the-allow-duplicate-letters flag
         self.rank_mode = rank_mode
 
         wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
@@ -283,10 +288,10 @@ class ToolResults:
     # sorts the dictionary. So result is sorted.
     def get_ranked_results_wrd_lst(self):
         # Ranking and filtering the words into a dictionary
-        # Set no_dups to prevent letters from occurring more than once
+        # Set allow_dups to prevent letters from occurring more than once
         # First pick should not use duplicates, later picks should consider them.
         wrds = self.get_results_wrd_lst()
-        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.no_dups,
+        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.allow_dups,
                                                                        self.rank_mode)
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict

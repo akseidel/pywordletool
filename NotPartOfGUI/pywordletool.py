@@ -12,9 +12,9 @@ import grepper
 
 data_path = './worddata/'  # path from here to data folder
 
-# Set no_dups to prevent letters from occurring more than once
+# Set allow_dups to prevent letters from occurring more than once
 # First pick should not use duplicates, later picks should consider them.
-# no_dups = False
+# allow_dups = False
 no_dups = True
 
 rank_mode = 1
@@ -47,7 +47,7 @@ grepper.setup_grep_filtering(wordletool.tool_command_list)  # fills the stack wi
 # wrds = helpers.get_results_word_list(tool_command_list)
 #
 # # Ranking and filtering the words into a dictionary
-# ranked_wrds_dict = helpers.make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, no_dups)
+# ranked_wrds_dict = helpers.make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, allow_dups)
 
 # helpers.show_this_word_list(ranked_wrds_dict, 6)
 
