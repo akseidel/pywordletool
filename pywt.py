@@ -135,11 +135,10 @@ class Pywordlemainwindow(ctk.CTk):
         # print(self.winfo_screenheight())
         # print(self.winfo_screenwidth())
         w_width = 1120  # 1036
-        w_height = 664  # to do, set according to screen height
+        w_height = 668  # to do, set according to screen height
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
-        # self.resizable(width=False,height=False)
 
         ln_col = set_n_col(self)
         # set the Vars
@@ -392,7 +391,7 @@ class Pywordlemainwindow(ctk.CTk):
             # fill out the trailing undefined positions
             while len(pat) < 5:
                 pat = pat + '.'
-            self.update() # needed to show the last user entry in context with the
+            self.update()  # needed to show the last user entry in context with the
             # sanity question.
             if helpers.wrd_has_duplicates(pat) and (not self.allow_dup_state.get()):
                 sanity_question()
@@ -439,7 +438,7 @@ class Pywordlemainwindow(ctk.CTk):
                             highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
         if self.winfo_screenheight() <= 800:
-            tx_result.configure(height=12)  # to do, set according to screen height
+            tx_result.configure(height=10)  # to do, set according to screen height
         else:
             tx_result.configure(height=16)
         tx_result.configure(font=font_tuple_n)
@@ -549,7 +548,8 @@ class Pywordlemainwindow(ctk.CTk):
 
         def sanity_question():
             res = tk.messagebox.askyesno(title='Sanity Check',
-                                         message='Duplicate letters are being required but that option is not set. Do you want duplicate letters allowed? Otherwise no words will show.')
+                                         message='Duplicate letters are being required but that option is not set. Do '
+                                                 'you want duplicate letters allowed? Otherwise no words will show.')
             if res:
                 self.allow_dup_state.set(True)
 
