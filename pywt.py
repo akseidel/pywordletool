@@ -143,7 +143,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         ln_col = set_n_col(self)
         # set the Vars
-        self.allow_dup_state = tk.StringVar(value="off")
+        self.allow_dup_state = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
         self.rank_mode = tk.IntVar()
@@ -163,12 +163,7 @@ class Pywordlemainwindow(ctk.CTk):
 
             global data_path
 
-            coordinate_special_pattern_dups()
-
-            if self.allow_dup_state.get() == "on":
-                allow_dups = True
-            else:
-                allow_dups = False
+            allow_dups = self.allow_dup_state.get()
 
             if self.vocab_var.get() == 1:
                 vocab_filename = 'wo_nyt_wordlist.txt'
@@ -183,6 +178,12 @@ class Pywordlemainwindow(ctk.CTk):
             build_x_pos_grep(wordletool, x_pos_dict)
             build_r_pos_grep(wordletool, r_pos_dict)
             wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
+            # Allow duplicates could have been changed by this point and also by this next
+            # special pattern check. Thus, the wordletool.allow_dups is reset accordingly before
+            # the final word list is generated.
+            coordinate_special_pattern_dups()
+            allow_dups = self.allow_dup_state.get()
+            wordletool.allow_dups = allow_dups
 
             tx_result.configure(state='normal')
             tx_result.delete(1.0, tk.END)
@@ -326,10 +327,10 @@ class Pywordlemainwindow(ctk.CTk):
                 this_treeview.delete(i)
             i = 0
             sort_by_what_dict = {}
-            if bywhat == 0:
+            if bywhat == 0:  # the letter
                 for j in sorted(this_pos_dict):
                     sort_by_what_dict[j] = this_pos_dict[j]
-            if bywhat == 1:
+            if bywhat == 1:  # the position number
                 tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
                 sort_by_what_dict = dict(tlist)
             for x in sort_by_what_dict:
@@ -371,15 +372,32 @@ class Pywordlemainwindow(ctk.CTk):
         def build_r_pos_grep(lself, this_pos_dict):
             """Builds the grep line for including positions
             """
-            # example 'grep -vE \'..b..\'' for b,3
-            sort_by_key_dict = {}
-            for j in sorted(this_pos_dict):
-                sort_by_key_dict[j] = this_pos_dict[j]
-            for x in sort_by_key_dict:
-                parts = this_pos_dict[x].split(',')
+            # example 'grep -vE \'..b.a\'' for (b,3) (a,5)
+            if len(this_pos_dict) < 1:  # no grep required
+                return
+            pat = ''
+            pos = 1
+            # first make a dictionary of the dictionary sorted by the position number
+            tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
+            sorted_by_pos_dict = dict(tlist)
+            for x in sorted_by_pos_dict:
+                parts = sorted_by_pos_dict[x].split(',')
                 ltr = parts[0].lower()
                 p = int(parts[1])
-                lself.tool_command_list.add_incl_pos_cmd(ltr, p)
+                while pos < p:
+                    pat = pat + '.'
+                    pos += 1
+                pat = pat + ltr
+                pos += 1
+            # fill out the trailing undefined positions
+            while len(pat) < 5:
+                pat = pat + '.'
+            self.update() # needed to show the last user entry in context with the
+            # sanity question.
+            if helpers.wrd_has_duplicates(pat) and (not self.allow_dup_state.get()):
+                sanity_question()
+
+            lself.tool_command_list.add_require_cmd(pat)
 
         def build_requireall_grep(re_btn_var_list):
             """Builds the grep line for requiring letters
@@ -526,11 +544,14 @@ class Pywordlemainwindow(ctk.CTk):
         # Coordinate duplicates in special pattern with no dup setting
         def coordinate_special_pattern_dups():
             self.update()
-            if helpers.wrd_has_duplicates(self.spec_pattern.get()) and (self.allow_dup_state.get() == "off"):
-                res = tk.messagebox.askyesno(title='Sanity Check',
-                                             message='The special pattern has duplicate letters. Do you want duplicate letters allowed? Otherwise no words will show.')
-                if res:
-                    self.allow_dup_state.set("on")
+            if helpers.wrd_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
+                sanity_question()
+
+        def sanity_question():
+            res = tk.messagebox.askyesno(title='Sanity Check',
+                                         message='Duplicate letters are being required but that option is not set. Do you want duplicate letters allowed? Otherwise no words will show.')
+            if res:
+                self.allow_dup_state.set(True)
 
         def do_spec_pat(*args):
             # In this ui all text is shown in uppercase.
@@ -1035,8 +1056,8 @@ class Pywordlemainwindow(ctk.CTk):
         chk_allow_dups = ttk.Checkbutton(self.actions_frame,
                                          text="Allow Duplicate Letters",
                                          variable=self.allow_dup_state,
-                                         onvalue="on",
-                                         offvalue="off",
+                                         onvalue=True,
+                                         offvalue=False,
                                          padding=6,
                                          command=do_grep)
         chk_allow_dups.pack(side=tk.TOP, padx=1, pady=6, anchor='w')
