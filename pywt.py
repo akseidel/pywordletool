@@ -176,7 +176,12 @@ class Pywordlemainwindow(ctk.CTk):
             wordletool.tool_command_list.add_cmd(build_requireall_grep(self.re_btn_vars))
             build_x_pos_grep(wordletool, x_pos_dict)
             build_r_pos_grep(wordletool, r_pos_dict)
-            wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
+
+            if self.sp_pat_mode_var.get() == 1:
+              wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
+            else:
+              wordletool.tool_command_list.add_excl_cmd(self.spec_pattern.get().lower())
+
             # Allow duplicates could have been changed by this point and also by this next
             # special pattern check. Thus, the wordletool.allow_dups is reset accordingly before
             # the final word list is generated.
@@ -535,8 +540,9 @@ class Pywordlemainwindow(ctk.CTk):
                                                 )
         self.specialpatt_frame.pack(side=tk.TOP, fill=tk.BOTH, padx=0, pady=2, expand=True)
 
-        # pattern
+        # special pattern control variables
         self.spec_pattern = tk.StringVar()
+        self.sp_pat_mode_var = tk.IntVar(value=1)
 
         # self.spec_pattern.set("this pattern")
 
@@ -554,8 +560,8 @@ class Pywordlemainwindow(ctk.CTk):
                 self.allow_dup_state.set(True)
 
         def do_spec_pat(*args):
-            # In this ui all text is shown in uppercase.
-            self.spec_pattern.set(scrub_text(self.spec_pattern.get(), '').upper())
+            # In this ui all text is shown in uppercase and there can be only five letters
+            self.spec_pattern.set('%.5s' % scrub_text(self.spec_pattern.get(), '').upper())
             do_grep()
 
         try:
@@ -567,6 +573,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         self.lb_spec_pattern = ttk.Entry(self.specialpatt_frame,
                                          textvariable=self.spec_pattern,
+                                         width=8,
                                          justify='center')
         self.lb_spec_pattern.pack(side=tk.LEFT, padx=4, pady=2)
 
@@ -579,6 +586,13 @@ class Pywordlemainwindow(ctk.CTk):
                                         command=clear_spec_pattern
                                         )
         self.bt_pat_clr.pack(side=tk.LEFT, padx=4, pady=2)
+
+        # special pattern mode radio buttons
+        rb_pi = ttk.Radiobutton(self.specialpatt_frame, text="Require", variable=self.sp_pat_mode_var, value=1, command=do_spec_pat)
+        rb_pi.pack(side=tk.LEFT, padx=10, pady=2)
+        rb_px = ttk.Radiobutton(self.specialpatt_frame, text="Exclude", variable=self.sp_pat_mode_var, value=2, command=do_spec_pat)
+        rb_px.pack(side=tk.LEFT, padx=6, pady=2)
+
         # =======  END OF ============ include special pattern control
 
         # actions frame general - uses pack
@@ -1077,7 +1091,6 @@ class Pywordlemainwindow(ctk.CTk):
         vocab_frame = ttk.LabelFrame(self.actions_frame, text='Word Vocabulary', labelanchor='n')
         vocab_frame.pack(anchor='s', fill=tk.X, expand=True)
         # Vocabulary radio buttons
-
         rbv1 = ttk.Radiobutton(vocab_frame, text="Small Vocabulary", variable=self.vocab_var, value=1, command=do_grep)
         rbv1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
         rbv2 = ttk.Radiobutton(vocab_frame, text="Large Vocabulary", variable=self.vocab_var, value=2, command=do_grep)

@@ -207,7 +207,7 @@ class ShellCmdList:
             self.shCMDlist.append("grep -E '" + ltr + "'")
 
     # Adds command to stack to exclude letter ltr.
-    def add_excl_any_cmd(self, ltr):
+    def add_excl_cmd(self, ltr):
         if len(ltr) > 0:
             self.shCMDlist.append("grep -vE '" + ltr + "'")
 

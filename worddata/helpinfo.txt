@@ -18,7 +18,7 @@ The Clear button at the checkboxes lineup clears the checkboxes.
 
 'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In puzzle context a letter not at its correct position is a letter known to be present in the word, so it will also be required. For such letters, its checkbox will not appear checked in 'Letters To Be Required', but the requirement will be applied. The Z buttons clear the entire position list.
 
-'Special Pattern' allows one to quickly introduce a custom require filter. It is primarily intended for adjacent letter patterns such as TT, ITE, GHT or SS. One might use this to compare the number of words having SS versus S.S or S..S where the "." means 'any letter'. The pattern S..S shows words having any two letters between S letters like the words SMUSH and TSARS.
+'Special Pattern' allows one to quickly introduce a custom require or exclude filter that can operate on letter position. It is primarily intended for adjacent letter patterns such as TT, ITE, GHT or SS. One might use this to compare the number of words having SS versus S.S or S..S where the "." means 'any letter'. The pattern S..S shows words having any two letters between S letters like the words SMUSH and TSARS.
 
 - Tips:
 

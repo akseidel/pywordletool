@@ -6,13 +6,13 @@
 # grep filtering builder
 def setup_grep_filtering(this_sh_cmd_lst):
     # post first pick always exclusions
-    # format is => this_sh_cmd_lst.add_excl_any_cmd('ltr|s')
-    # this_sh_cmd_lst.add_excl_any_cmd('a|s|b|i|e')
+    # format is => this_sh_cmd_lst.add_excl_cmd('ltr|s')
+    # this_sh_cmd_lst.add_excl_cmd('a|s|b|i|e')
     #
     # post first pick temporary exclusions
-    # format is => this_sh_cmd_lst.add_excl_any_cmd('ltr|s')
+    # format is => this_sh_cmd_lst.add_excl_cmd('ltr|s')
     # make sure to remove any position rules for these
-    # this_sh_cmd_lst.add_excl_any_cmd('e|t|r')
+    # this_sh_cmd_lst.add_excl_cmd('e|t|r')
     #
     # Low rank exclusions
     # add back in at some point
