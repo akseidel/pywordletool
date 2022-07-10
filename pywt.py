@@ -82,9 +82,15 @@ def wrap_this(string, max_chars):
     return the_newline
 
 
-# remove certain characters from s string
-def scrub_text(loc_str, ladd):
-    deflt = '\'\"!@#$%^&*(){}_+-=?\\|[]:;<>,/`~1234567890 '
+# Remove certain characters from loc_tr string argument.
+# Nonumbers true removes numbers.
+# Noletters true removes letters and numbers not 1-5.
+def scrub_text(loc_str, ladd, nonumbers, noletters):
+    deflt = '\'\"!@#$%^&*(){}_+-=?\\|[]:;<>,/`~ '
+    if nonumbers:
+        deflt = deflt + '1234567890'
+    if noletters:
+        deflt = deflt + 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM67890'
     deflt = deflt + ladd
     for char in deflt:
         loc_str = loc_str.replace(char, '')
@@ -178,9 +184,9 @@ class Pywordlemainwindow(ctk.CTk):
             build_r_pos_grep(wordletool, r_pos_dict)
 
             if self.sp_pat_mode_var.get() == 1:
-              wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
+                wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
             else:
-              wordletool.tool_command_list.add_excl_cmd(self.spec_pattern.get().lower())
+                wordletool.tool_command_list.add_excl_cmd(self.spec_pattern.get().lower())
 
             # Allow duplicates could have been changed by this point and also by this next
             # special pattern check. Thus, the wordletool.allow_dups is reset accordingly before
@@ -561,7 +567,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         def do_spec_pat(*args):
             # In this ui all text is shown in uppercase and there can be only five letters
-            self.spec_pattern.set('%.5s' % scrub_text(self.spec_pattern.get(), '').upper())
+            self.spec_pattern.set('%.5s' % scrub_text(self.spec_pattern.get(), '', True, False).upper())
             do_grep()
 
         try:
@@ -588,9 +594,11 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_pat_clr.pack(side=tk.LEFT, padx=4, pady=2)
 
         # special pattern mode radio buttons
-        rb_pi = ttk.Radiobutton(self.specialpatt_frame, text="Require", variable=self.sp_pat_mode_var, value=1, command=do_spec_pat)
+        rb_pi = ttk.Radiobutton(self.specialpatt_frame, text="Require", variable=self.sp_pat_mode_var, value=1,
+                                command=do_spec_pat)
         rb_pi.pack(side=tk.LEFT, padx=10, pady=2)
-        rb_px = ttk.Radiobutton(self.specialpatt_frame, text="Exclude", variable=self.sp_pat_mode_var, value=2, command=do_spec_pat)
+        rb_px = ttk.Radiobutton(self.specialpatt_frame, text="Exclude", variable=self.sp_pat_mode_var, value=2,
+                                command=do_spec_pat)
         rb_px.pack(side=tk.LEFT, padx=6, pady=2)
 
         # =======  END OF ============ include special pattern control
@@ -604,7 +612,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # =======  START OF ============ exclude from position controls
         def px_to_uppercase(*args):
-            self.pos_px_l.set(scrub_text(self.pos_px_l.get().upper(), '.'))
+            combobox_l_conform(self.pos_px_l)
 
         self.pos_px_l = tk.StringVar(name='pos_px_l')
         self.combo_px_l = ttk.Combobox(self.criteria_frame_px,
@@ -673,9 +681,23 @@ class Pywordlemainwindow(ctk.CTk):
 
         # =======  END OF ============ exclude from position controls
 
+        # make the combobox letter control accept and show only one letter
+        def combobox_l_conform(stringVar):
+            if len(stringVar.get()) > 0:
+                stringVar.set(scrub_text(stringVar.get().upper(), '.', True, False))
+            if len(stringVar.get()) > 0:
+                stringVar.set(stringVar.get()[-1])
+
+        # make the letter combobox position control accept and show only one letter
+        def combobox_l_conform(stringVar):
+            if len(stringVar.get()) > 0:
+                stringVar.set(scrub_text(stringVar.get().upper(), '.', True, False))
+            if len(stringVar.get()) > 0:
+                stringVar.set(stringVar.get()[-1])
+
         # =======  START OF ============ require from position controls
         def pr_to_uppercase(*args):
-            self.pos_pr_l.set(scrub_text(self.pos_pr_l.get().upper(), '.'))
+            combobox_l_conform(self.pos_pr_l)
 
         self.pos_pr_l = tk.StringVar()
         self.combo_pr_l = ttk.Combobox(self.criteria_frame_pr,
@@ -695,6 +717,17 @@ class Pywordlemainwindow(ctk.CTk):
             # python < 3.6
             self.pos_pr_l.trace('w', pr_to_uppercase)
 
+
+        # make the position combobox position control accept and show only one number
+        def combobox_p_conform(stringVar):
+            if len(stringVar.get()) > 0:
+                stringVar.set(scrub_text(stringVar.get().upper(), '.', False, True))
+            if len(stringVar.get()) > 0:
+                stringVar.set(stringVar.get()[-1])
+
+        def combo_pos_conform(*args):
+            combobox_p_conform(self.combo_pr_p)
+
         # rpos to be a mutable list of unassigned letter positions
         self.rpos = ['1', '2', '3', '4', '5']
         self.pos_pr_p = tk.StringVar()
@@ -706,6 +739,12 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.combo_pr_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.combo_pr_p.current(0)
+        try:
+            # python 3.6
+            self.pos_pr_p.trace_add('write', combo_pos_conform)
+        except AttributeError:
+            # python < 3.6
+            self.pos_pr_p.trace('w', combo_pos_conform)
 
         self.bt_pr_add = ctk.CTkButton(self.criteria_frame_pr,
                                        text="+", width=20,
