@@ -5,11 +5,12 @@ import sys
 import os
 import random
 from tkinter import messagebox
+from typing import NoReturn
 
 
 # Returns the wordle word list full pathname
 # Exits program if not found
-def get_word_list_path_name(local_path_file_name):
+def get_word_list_path_name(local_path_file_name: str) -> str:
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_file_name)
     if os.path.exists(full_path_name):
         # print("Using " + local_path_file_name)
@@ -27,7 +28,7 @@ def get_word_list_path_name(local_path_file_name):
 
 # ===== Start - Letter ranking functions for rank that includes by letter position method
 # Make and return the letter ranking dictionary
-def make_ltr_rank_dictionary(local_path_rank_file):
+def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_rank_file)
     ltr_rank_dict = {}  # ltr_rank_dict will be the rank dictionary
     if os.path.exists(full_path_name):
@@ -77,7 +78,7 @@ def make_ltr_rank_dictionary(local_path_rank_file):
 
 
 # Returns a word's letter frequency ranking
-def wrd_rank(wrd, ltr_rank_dict, method):
+def wrd_rank(wrd, ltr_rank_dict, method) -> float:
     r = 0
     if method == 0:  # rank by anywhere in word
         for x in wrd:
@@ -102,19 +103,19 @@ def wrd_rank(wrd, ltr_rank_dict, method):
 
 
 # Returns true if word has duplicate letters
-def wrd_has_duplicates(wrd):
+def wrd_has_duplicates(wrd) -> bool:
     ltr_d = {}
     # This function is also used for the special pattern
     # where '.' is allowed. These would not be duplicates.
-    wrd = wrd.replace('.','')
-    wrd = wrd.replace(' ','')
+    wrd = wrd.replace('.', '')
+    wrd = wrd.replace(' ', '')
     for ltr in wrd:
-            ltr_d[ltr] = ltr
+        ltr_d[ltr] = ltr
     return len(ltr_d) < len(wrd)
 
 
 # List out the ranked word list in columns
-def show_this_word_list(the_word_list, n_col):
+def print_this_word_list(the_word_list, n_col) -> NoReturn:
     n_items = len(the_word_list)
     h_txt = " Word : Rank "
     left_pad = ""
@@ -144,7 +145,7 @@ def show_this_word_list(the_word_list, n_col):
 
 # Ranking and filtering the words into a dictionary.
 # Returns that dictionary sorted by the word rank.
-def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, allow_dups, rank_mode):
+def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool, rank_mode: int) -> dict:
     wrds_dict = {}
     for w in wrds:
         if len(w) == 5:
@@ -154,26 +155,25 @@ def make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, allow_dups, rank
                 if not wrd_has_duplicates(w):
                     wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
 
-
     # sorting the ranked word list into a dictionary
     # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
     return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
 
 
 # Returns the number of words that pass the grep command list
-def get_raw_word_count(this_sh_cmd_lst):
+def get_raw_word_count(this_sh_cmd_lst) -> str:
     sh_cmd_cnt = this_sh_cmd_lst.full_cmd() + " | wc -ltr"
     return os.popen(sh_cmd_cnt).read().strip()
 
 
 # Returns the list of words that pass the grep command list
-def get_results_word_list(this_sh_cmd_lst):
+def get_results_word_list(this_sh_cmd_lst) -> list:
     result = os.popen(this_sh_cmd_lst.full_cmd()).read()
     return result.split("\n")
 
 
 # Clears the console window
-def clear_scrn():
+def clear_scrn() -> NoReturn:
     os.system("cls" if os.name == "nt" else "clear")
 
 
@@ -183,12 +183,12 @@ def clear_scrn():
 # pywordletool.
 class ShellCmdList:
     # The command list is by instance.
-    def __init__(self, list_file_name):
+    def __init__(self, list_file_name: str) -> NoReturn:
         self.shCMDlist = list()
         self.shCMDlist.append("cat " + list_file_name)
 
     # Adds string s to the command stack.
-    def add_cmd(self, s):
+    def add_cmd(self, s: str) -> NoReturn:
         if len(s) > 0:
             self.shCMDlist.append(s)
 
@@ -196,25 +196,25 @@ class ShellCmdList:
     # stack a grep filter requiring a letter picked at random
     # from string lst. Returns that random picked letter for
     # feedback purposes.
-    def add_rand_incl_frm_cmd(self, lst):
+    def add_rand_incl_frm_cmd(self, lst: str) -> str:
         rand_frm_l = random.choice(lst)
         self.shCMDlist.append("grep -E '" + rand_frm_l + "'")
         return rand_frm_l
 
     # Adds command to stack to require letter ltr.
-    def add_require_cmd(self, ltr):
+    def add_require_cmd(self, ltr: str) -> NoReturn:
         if len(ltr) > 0:
             self.shCMDlist.append("grep -E '" + ltr + "'")
 
     # Adds command to stack to exclude letter ltr.
-    def add_excl_cmd(self, ltr):
+    def add_excl_cmd(self, ltr: str) -> NoReturn:
         if len(ltr) > 0:
             self.shCMDlist.append("grep -vE '" + ltr + "'")
 
     # Adds command to stack to exclude letter from a position number.
     # Context is that letter is known, therefore is required but not
     # at the designated position.
-    def add_excl_pos_cmd(self, ltr, p):
+    def add_excl_pos_cmd(self, ltr: str, p: int) -> NoReturn:
         if len(ltr) > 0:
             # Require the letter,
             self.shCMDlist.append("grep -E '" + ltr + "'")
@@ -231,7 +231,7 @@ class ShellCmdList:
                 self.shCMDlist.append("grep -vE '...." + ltr + "'")
 
     # Adds command to stack to require letter at a position number.
-    def add_incl_pos_cmd(self, ltr, p):
+    def add_incl_pos_cmd(self, ltr: str, p: int) -> NoReturn:
         if len(ltr) > 0:
             # Have letter in this position
             if p == 1:
@@ -246,7 +246,7 @@ class ShellCmdList:
                 self.shCMDlist.append("grep -E '...." + ltr + "'")
 
     # Returns the command stack assembled into one command line.
-    def full_cmd(self):
+    def full_cmd(self) -> str:
         pipe = " | "
         this_cmd = ""
         for w in self.shCMDlist[:-1]:
@@ -281,12 +281,12 @@ class ToolResults:
         self.ranked_cnt = 0
 
     # Return the results words list without any ranking or sorting.
-    def get_results_wrd_lst(self):
+    def get_results_wrd_lst(self) -> list:
         return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
 
     # Returns ranked results words list as dictionary. The ranking function also
     # sorts the dictionary. So result is sorted.
-    def get_ranked_results_wrd_lst(self):
+    def get_ranked_results_wrd_lst(self) -> dict:
         # Ranking and filtering the words into a dictionary
         # Set allow_dups to prevent letters from occurring more than once
         # First pick should not use duplicates, later picks should consider them.
@@ -297,29 +297,29 @@ class ToolResults:
         return self.ranked_wrds_dict
 
     # Return the grepped word count
-    def get_results_raw_cnt(self):
+    def get_results_raw_cnt(self) -> str:
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
         self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
         return self.raw_cnt
 
     # Returns sorted ranked word list formatted into n_col columns.
-    def show_col_format_ranked_list(self, n_col):
-        return show_this_word_list(self.get_ranked_results_wrd_lst(), n_col)
+    def print_col_format_ranked_list(self, n_col: int) -> NoReturn:
+        print_this_word_list(self.get_ranked_results_wrd_lst(), n_col)
 
     # Returns the status text line.
-    def show_status(self):
+    def get_status(self) -> str:
         status = '=> Showing ' + str(self.ranked_cnt) + ' words from the raw list of ' + str(
             self.get_results_raw_cnt()) + " duplicate letter words."
         return status
 
     # Returns the entire fully assembled grep command line. This line includes
     # the full path names.
-    def show_full_cmd(self):
+    def get_full_cmd(self) -> str:
         return self.tool_command_list.full_cmd()
 
     # Returns the entire fully assembled grep command line. This line excluded
     # the full path names and so is used in the GUI display.
-    def show_cmd(self):
+    def get_cmd_less_filepath(self) -> str:
         full_cmd = self.tool_command_list.full_cmd()
         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)
         part_cmd = full_cmd.replace(full_path_name, '', 1)

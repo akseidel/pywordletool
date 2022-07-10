@@ -24,6 +24,7 @@ import helpers
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
 import customtkinter as ctk
+from typing import NoReturn
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -44,8 +45,10 @@ def set_n_col(self):
         return 6
 
 
-def str_wrd_list_hrd(ln_col):
+def str_wrd_list_hrd(ln_col: int) -> str:
     """Creates the word list header line.
+    @param ln_col: number of columns in header
+    @return: column header string
     """
     h_txt = " Word : Rank "
     left_pad = ""
@@ -56,9 +59,8 @@ def str_wrd_list_hrd(ln_col):
     return h_line
 
 
-# return a reformatted string with wordwrapping
-# @staticmethod
-def wrap_this(string, max_chars):
+# return a reformatted string with word wrapping
+def wrap_this(string: str, max_chars: int) -> str:
     """A helper that will return the string with word-break wrapping.
             :param str string: The text to be wrapped.
             :param int max_chars: The maximum number of characters on a line before wrapping.
@@ -82,17 +84,24 @@ def wrap_this(string, max_chars):
     return the_newline
 
 
-# Remove certain characters from loc_tr string argument.
-# Nonumbers true removes numbers.
-# Noletters true removes letters and numbers not 1-5.
-def scrub_text(loc_str, ladd, nonumbers, noletters):
-    deflt = '\'\"!@#$%^&*(){}_+-=?\\|[]:;<>,/`~ '
-    if nonumbers:
-        deflt = deflt + '1234567890'
-    if noletters:
-        deflt = deflt + 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM67890'
-    deflt = deflt + ladd
-    for char in deflt:
+# Remove certain characters from loc_str string argument.
+def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) -> str:
+    """
+    Remove certain characters from loc_str string argument.
+    @loc_str: str - The string that will be scrubbed
+    @l_add: str - A string of characters to include to default exclude characters.
+    For example the default exclude characters omits '.'
+    @no_numbers: bool - If true then also exclude numbers 0-9
+    @no_letters5: bool - If true then exclude letters AND numbers 0,6-9
+    @rtype: str
+    """
+    excludes = '\'\"!@#$%^&*(){}_+-=?\\|[]:;<>,/`~ '
+    if no_numbers:
+        excludes = excludes + '1234567890'
+    if no_letters5:
+        excludes = excludes + 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM67890'
+    excludes = excludes + l_add
+    for char in excludes:
         loc_str = loc_str.replace(char, '')
     return loc_str
 
@@ -103,12 +112,12 @@ class Pywordlemainwindow(ctk.CTk):
     global x_pos_dict
     global r_pos_dict
 
-    def close_help(self):
+    def close_help(self) -> NoReturn:
         global help_showing
         self.wnd_help.destroy()
         help_showing = False
 
-    def show_help(self):
+    def show_help(self) -> NoReturn:
         global help_showing
         global this_app
         if help_showing is False:
@@ -119,7 +128,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.create_wnd_help()
 
     # ======== set exclude combos to treeview selection
-    def x_pos_tree_view_click(self, event):
+    def x_pos_tree_view_click(self, event) -> NoReturn:
         cur_item = self.treeview_px.focus()
         val_tup = self.treeview_px.item(cur_item).get('values')
         if val_tup != '':
@@ -127,7 +136,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.pos_px_p.set(val_tup[1])
 
     # ======== set require combos to treeview selection
-    def r_pos_tree_view_click(self, event):
+    def r_pos_tree_view_click(self, event) -> NoReturn:
         cur_item = self.treeview_pr.focus()
         val_tup = self.treeview_pr.item(cur_item).get('values')
         if val_tup != '':
@@ -159,7 +168,7 @@ class Pywordlemainwindow(ctk.CTk):
         style = ttk.Style()
         style.theme_use()
 
-        def do_grep():
+        def do_grep() -> NoReturn:
             """Runs a wordletool helper grep instance
             """
             # used to suppress multiple greps when clearing all settings
@@ -179,7 +188,7 @@ class Pywordlemainwindow(ctk.CTk):
                                              self.rank_mode.get())
 
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
-            wordletool.tool_command_list.add_cmd(build_requireall_grep(self.re_btn_vars))
+            wordletool.tool_command_list.add_cmd(build_require_these_grep(self.re_btn_vars))
             build_x_pos_grep(wordletool, x_pos_dict)
             build_r_pos_grep(wordletool, r_pos_dict)
 
@@ -222,13 +231,13 @@ class Pywordlemainwindow(ctk.CTk):
                     tx_result.insert(tk.END, l_msg + '\n')
             tx_result.configure(state='disabled')
             tx_result.see('end')
-            self.status.set(wordletool.show_status())
+            self.status.set(wordletool.get_status())
             tx_gr.configure(state='normal')
             tx_gr.delete(1.0, tk.END)
-            tx_gr.insert(tk.END, wordletool.show_cmd())
+            tx_gr.insert(tk.END, wordletool.get_cmd_less_filepath())
             tx_gr.configure(state='disabled')
 
-        def add_x_pos():
+        def add_x_pos() -> NoReturn:
             x_ltr = self.pos_px_l.get().upper()
             x_pos = self.pos_px_p.get()
             if not x_pos.isnumeric() or int(x_pos) < 1 or int(x_pos) > 5:
@@ -243,7 +252,7 @@ class Pywordlemainwindow(ctk.CTk):
             x_pos_dict[key] = value
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
 
-        def add_r_pos():
+        def add_r_pos() -> NoReturn:
             x_ltr = self.pos_pr_l.get().upper()
             x_pos = self.pos_pr_p.get()
             # toss out of range position numbers
@@ -266,7 +275,7 @@ class Pywordlemainwindow(ctk.CTk):
                 self.rpos.remove(x_pos)
                 conform_combo_pr_p()
 
-        def remove_x_pos():
+        def remove_x_pos() -> NoReturn:
             x_ltr = self.pos_px_l.get().upper()
             x_pos = self.pos_px_p.get()
             if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
@@ -278,13 +287,13 @@ class Pywordlemainwindow(ctk.CTk):
                 del x_pos_dict[key]
                 fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
 
-        def clearall_x_pos():
+        def clear_all_x_pos() -> NoReturn:
             x_pos_dict.clear()
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
             self.combo_px_l.current(0)
             self.combo_px_p.current(0)
 
-        def remove_r_pos():
+        def remove_r_pos() -> NoReturn:
             x_ltr = self.pos_pr_l.get().upper()
             x_pos = self.pos_pr_p.get()
             # toss any invalid entries in the letter combo
@@ -302,7 +311,7 @@ class Pywordlemainwindow(ctk.CTk):
                     self.rpos.sort()
                     conform_combo_pr_p()
 
-        def conform_combo_pr_p():
+        def conform_combo_pr_p() -> NoReturn:
             self.combo_pr_p.configure(values=self.rpos)
             if self.rpos:
                 self.combo_pr_p.current(0)
@@ -310,7 +319,7 @@ class Pywordlemainwindow(ctk.CTk):
                 # no more positions, index cannot be set to 0
                 self.pos_pr_p.set('')
 
-        def clearall_r_pos():
+        def clear_all_r_pos() -> NoReturn:
             r_pos_dict.clear()
             fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
             self.rpos = ['1', '2', '3', '4', '5']
@@ -318,29 +327,29 @@ class Pywordlemainwindow(ctk.CTk):
             self.combo_pr_l.current(0)
 
         # clears all settings
-        def clear_all():
+        def clear_all() -> NoReturn:
             self.suppress_grep = True
-            clearall_r_pos()
-            clearall_x_pos()
-            clear_excl_ckbs()
+            clear_all_r_pos()
+            clear_all_x_pos()
+            clear_excl_chkbs()
             clear_reqr_ckbs()
             self.suppress_grep = False
             clear_spec_pattern()
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
-        # bywhat indicated by key 0 or by value 1 so that the required position
+        # by_what indicated by key 0 or by value 1 so that the required position
         # list sorts by the position while the excluded position list sorts by
         # the letter.
-        def fill_treeview_per_dictionary(this_treeview, this_pos_dict, bywhat):
+        def fill_treeview_per_dictionary(this_treeview, this_pos_dict: dict, by_what: int) -> NoReturn:
             for i in this_treeview.get_children():
                 this_treeview.delete(i)
             i = 0
             sort_by_what_dict = {}
-            if bywhat == 0:  # the letter
+            if by_what == 0:  # the letter
                 for j in sorted(this_pos_dict):
                     sort_by_what_dict[j] = this_pos_dict[j]
-            if bywhat == 1:  # the position number
+            if by_what == 1:  # the position number
                 tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
                 sort_by_what_dict = dict(tlist)
             for x in sort_by_what_dict:
@@ -349,7 +358,7 @@ class Pywordlemainwindow(ctk.CTk):
                 i += 1
             do_grep()
 
-        def build_exclude_grep(ex_btn_var_list):
+        def build_exclude_grep(ex_btn_var_list: list) -> str:
             """Builds the grep line for excluding letters
 
             """
@@ -366,7 +375,7 @@ class Pywordlemainwindow(ctk.CTk):
                 grep_exclude = "grep -vE \'" + args + "\'"
             return grep_exclude
 
-        def build_x_pos_grep(lself, this_pos_dict):
+        def build_x_pos_grep(lself, this_pos_dict: dict) -> NoReturn:
             """Builds the grep line for excluding positions
             """
             # example 'grep -vE \'..b..\'' for b,3
@@ -379,7 +388,7 @@ class Pywordlemainwindow(ctk.CTk):
                 p = int(parts[1])
                 lself.tool_command_list.add_excl_pos_cmd(ltr, p)
 
-        def build_r_pos_grep(lself, this_pos_dict):
+        def build_r_pos_grep(lself, this_pos_dict: dict) -> NoReturn:
             """Builds the grep line for including positions
             """
             # example 'grep -vE \'..b.a\'' for (b,3) (a,5)
@@ -409,11 +418,11 @@ class Pywordlemainwindow(ctk.CTk):
 
             lself.tool_command_list.add_require_cmd(pat)
 
-        def build_requireall_grep(re_btn_var_list):
+        def build_require_these_grep(re_btn_var_list: list) -> str:
             """Builds the grep line for requiring letters
             """
             # example 'grep -E \'b|f|k|w\''
-            grep_requireall = ""
+            grep_require_these = ""
             pipe = "|"
             itms = []
             for b in re_btn_var_list:
@@ -422,8 +431,8 @@ class Pywordlemainwindow(ctk.CTk):
                     itms.append("grep -E \'" + ltr + "\'")
             args = pipe.join(itms)
             if len(itms) > 0:
-                grep_requireall = args
-            return grep_requireall
+                grep_require_these = args
+            return grep_require_these
 
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
@@ -553,19 +562,19 @@ class Pywordlemainwindow(ctk.CTk):
         # self.spec_pattern.set("this pattern")
 
         # Coordinate duplicates in special pattern with no dup setting
-        def coordinate_special_pattern_dups():
+        def coordinate_special_pattern_dups() -> NoReturn:
             self.update()
             if helpers.wrd_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
                 sanity_question()
 
-        def sanity_question():
+        def sanity_question() -> NoReturn:
             res = tk.messagebox.askyesno(title='Sanity Check',
                                          message='Duplicate letters are being required but that option is not set. Do '
                                                  'you want duplicate letters allowed? Otherwise no words will show.')
             if res:
                 self.allow_dup_state.set(True)
 
-        def do_spec_pat(*args):
+        def do_spec_pat(*args) -> NoReturn:
             # In this ui all text is shown in uppercase and there can be only five letters
             self.spec_pattern.set('%.5s' % scrub_text(self.spec_pattern.get(), '', True, False).upper())
             do_grep()
@@ -583,7 +592,7 @@ class Pywordlemainwindow(ctk.CTk):
                                          justify='center')
         self.lb_spec_pattern.pack(side=tk.LEFT, padx=4, pady=2)
 
-        def clear_spec_pattern():
+        def clear_spec_pattern() -> NoReturn:
             self.spec_pattern.set('')
 
         self.bt_pat_clr = ctk.CTkButton(self.specialpatt_frame,
@@ -611,7 +620,9 @@ class Pywordlemainwindow(ctk.CTk):
         self.actions_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, padx=0, pady=2, expand=True)
 
         # =======  START OF ============ exclude from position controls
-        def px_to_uppercase(*args):
+        # === position exclude letter
+        # conform the position exclude letter
+        def pos_px_ltr_conform(*args) -> NoReturn:
             combobox_l_conform(self.pos_px_l)
 
         self.pos_px_l = tk.StringVar(name='pos_px_l')
@@ -627,12 +638,17 @@ class Pywordlemainwindow(ctk.CTk):
         self.combo_px_l.current(0)
         try:
             # python 3.6
-            self.pos_px_l.trace_add('write', px_to_uppercase)
+            self.pos_px_l.trace_add('write', pos_px_ltr_conform)
         except AttributeError:
             # python < 3.6
-            self.pos_px_l.trace('w', px_to_uppercase)
+            self.pos_px_l.trace('w', pos_px_ltr_conform)
 
-        self.pos_px_p = tk.StringVar()
+        # === position exclude letter's position
+        # conform the position exclude position
+        def pos_px_p_conform(*args) -> NoReturn:
+            combobox_p_conform(self.pos_px_p)
+
+        self.pos_px_p = tk.StringVar(name='pos_px_p')
         self.combo_px_p = ttk.Combobox(self.criteria_frame_px,
                                        values=('1', '2', '3', '4', '5'),
                                        width=4,
@@ -641,6 +657,12 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.combo_px_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.combo_px_p.current(0)
+        try:
+            # python 3.6
+            self.pos_px_p.trace_add('write', pos_px_p_conform)
+        except AttributeError:
+            # python < 3.6
+            self.pos_px_p.trace('w', pos_px_p_conform)
 
         self.bt_px_add = ctk.CTkButton(self.criteria_frame_px,
                                        text="+", width=20,
@@ -655,7 +677,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_px_rem.grid(row=0, column=3, padx=1, pady=2, sticky='ew')
         self.bt_px_clr = ctk.CTkButton(self.criteria_frame_px,
                                        text="z", width=20,
-                                       command=clearall_x_pos
+                                       command=clear_all_x_pos
                                        )
         self.bt_px_clr.grid(row=0, column=4, padx=1, pady=2, sticky='ew')
 
@@ -682,21 +704,21 @@ class Pywordlemainwindow(ctk.CTk):
         # =======  END OF ============ exclude from position controls
 
         # make the combobox letter control accept and show only one letter
-        def combobox_l_conform(stringVar):
-            if len(stringVar.get()) > 0:
-                stringVar.set(scrub_text(stringVar.get().upper(), '.', True, False))
-            if len(stringVar.get()) > 0:
-                stringVar.set(stringVar.get()[-1])
+        def combobox_l_conform(string_var) -> NoReturn:
+            if len(string_var.get()) > 0:
+                string_var.set(scrub_text(string_var.get().upper(), '.', True, False))
+            if len(string_var.get()) > 0:
+                string_var.set(string_var.get()[-1])
 
-        # make the letter combobox position control accept and show only one letter
-        def combobox_l_conform(stringVar):
-            if len(stringVar.get()) > 0:
-                stringVar.set(scrub_text(stringVar.get().upper(), '.', True, False))
-            if len(stringVar.get()) > 0:
-                stringVar.set(stringVar.get()[-1])
+        # make the letter combobox position control accept and show only one number
+        def combobox_p_conform(string_var) -> NoReturn:
+            if len(string_var.get()) > 0:
+                string_var.set(scrub_text(string_var.get().upper(), '.', True, True))
+            if len(string_var.get()) > 0:
+                string_var.set(string_var.get()[-1])
 
         # =======  START OF ============ require from position controls
-        def pr_to_uppercase(*args):
+        def pr_to_uppercase(*args) -> NoReturn:
             combobox_l_conform(self.pos_pr_l)
 
         self.pos_pr_l = tk.StringVar()
@@ -717,15 +739,15 @@ class Pywordlemainwindow(ctk.CTk):
             # python < 3.6
             self.pos_pr_l.trace('w', pr_to_uppercase)
 
-
         # make the position combobox position control accept and show only one number
-        def combobox_p_conform(stringVar):
-            if len(stringVar.get()) > 0:
-                stringVar.set(scrub_text(stringVar.get().upper(), '.', False, True))
-            if len(stringVar.get()) > 0:
-                stringVar.set(stringVar.get()[-1])
+        # from 1 to 5
+        def combobox_p_conform(string_var) -> NoReturn:
+            if len(string_var.get()) > 0:
+                string_var.set(scrub_text(string_var.get().upper(), '.', False, True))
+            if len(string_var.get()) > 0:
+                string_var.set(string_var.get()[-1])
 
-        def combo_pos_conform(*args):
+        def combo_pos_conform(*args) -> NoReturn:
             combobox_p_conform(self.combo_pr_p)
 
         # rpos to be a mutable list of unassigned letter positions
@@ -760,7 +782,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         self.bt_pr_clr = ctk.CTkButton(self.criteria_frame_pr,
                                        text="z", width=20,
-                                       command=clearall_r_pos
+                                       command=clear_all_r_pos
                                        )
         self.bt_pr_clr.grid(row=0, column=4, padx=1, pady=2, sticky='ew')
 
@@ -784,7 +806,13 @@ class Pywordlemainwindow(ctk.CTk):
         sb.grid(row=1, column=4, padx=1, pady=2, sticky='ens')
         self.treeview_pr.config(yscrollcommand=sb.set)
         sb.config(command=self.treeview_pr.yview)
+
         # =======  END OF ============ require from position controls
+
+        # clears the checkbox vars for vars in the var_list
+        def clear_these_chk_vars(var_list: list) -> NoReturn:
+            for chk_var in var_list:
+                chk_var.set('-')
 
         # ======= START OF ======== Exclude Letters =============
         self.v_xE = tk.StringVar()
@@ -933,14 +961,13 @@ class Pywordlemainwindow(ctk.CTk):
                             self.v_xS, self.v_xT, self.v_xU, self.v_xV, self.v_xW, self.v_xX,
                             self.v_xY, self.v_xZ]
 
-        def clear_excl_ckbs():
-            for x_var in self.ex_btn_vars:
-                x_var.set('-')
+        def clear_excl_chkbs() -> NoReturn:
+            clear_these_chk_vars(self.ex_btn_vars)
             do_grep()
 
         self.bt_x_clr = ctk.CTkButton(self.criteria_frame_x,
                                       text="Clear", width=20,
-                                      command=clear_excl_ckbs
+                                      command=clear_excl_chkbs
                                       )
         self.bt_x_clr.pack(side=tk.TOP, padx=2, pady=2)
         # == END OF ========== Exclude Letters =============
@@ -1093,9 +1120,8 @@ class Pywordlemainwindow(ctk.CTk):
                             self.v_rS, self.v_rT, self.v_rU, self.v_rV, self.v_rW, self.v_rX,
                             self.v_rY, self.v_rZ]
 
-        def clear_reqr_ckbs():
-            for r_var in self.re_btn_vars:
-                r_var.set('-')
+        def clear_reqr_ckbs() -> NoReturn:
+            clear_these_chk_vars(self.re_btn_vars)
             do_grep()
 
         self.bt_r_clr = ctk.CTkButton(self.criteria_frame_r,
@@ -1160,7 +1186,7 @@ class Pywordlemainwindow(ctk.CTk):
         do_grep()
 
     # The help information window
-    def create_wnd_help(self):
+    def create_wnd_help(self) -> NoReturn:
         global data_path
         self.wnd_help = ctk.CTkToplevel(self)
         self.wnd_help.wm_title('Some Information For You')
@@ -1168,7 +1194,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.state = 0  # 0 = info 1 = ranking
 
         # Returns string that is the information
-        def get_info():
+        def get_info() -> str:
             full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
             if os.path.exists(full_path_name):
                 f = open(full_path_name, "r", encoding="UTF8").read()
@@ -1176,7 +1202,7 @@ class Pywordlemainwindow(ctk.CTk):
                 f = 'This is all the help you get because file helpinfo.txt has gone missing.'
             return f
 
-        def get_rankdata():
+        def get_rank_data() -> str:
             full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'letter_ranks.txt')
             if os.path.exists(full_path_name):
                 f = open(full_path_name, "r", encoding="UTF8").read()
@@ -1184,16 +1210,16 @@ class Pywordlemainwindow(ctk.CTk):
                 f = 'Could not find. ' + full_path_name
             return f
 
-        def show_info():
+        def show_info() -> NoReturn:
             msg1.configure(state='normal')
             msg1.delete(1.0, tk.END)
             msg1.insert(tk.END, get_info())
             msg1.configure(state='disabled')
 
-        def show_rankinfo():
+        def show_rank_info() -> NoReturn:
             msg1.configure(state='normal')
             msg1.delete(1.0, tk.END)
-            raw_rank_data = get_rankdata()
+            raw_rank_data = get_rank_data()
             f = raw_rank_data.replace(":", "\t")
             msg1.insert(tk.END, "RNK = Rank for any occurrence\n")
             msg1.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
@@ -1230,7 +1256,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
 
         button_r = ctk.CTkButton(self.wnd_help, text="Letter Ranking",
-                                 command=show_rankinfo
+                                 command=show_rank_info
                                  )
         button_r.pack(side="left", padx=10, pady=10)
 
