@@ -141,7 +141,7 @@ class Pywordlemainwindow(ctk.CTk):
         val_tup = self.treeview_pr.item(cur_item).get('values')
         if val_tup != '':
             self.pos_pr_l.set(val_tup[0])
-            self.pos_pr_p.set(val_tup[1])
+            # Only the letter combobox is matched to the selection letter.
 
     def __init__(self):
         super().__init__()
@@ -294,22 +294,24 @@ class Pywordlemainwindow(ctk.CTk):
             self.combo_px_p.current(0)
 
         def remove_r_pos() -> NoReturn:
-            x_ltr = self.pos_pr_l.get().upper()
-            x_pos = self.pos_pr_p.get()
-            # toss any invalid entries in the letter combo
-            if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
-                self.pos_pr_l.set('')
+            # Note - This differs radically from remove_x_pos because in the
+            # require gui the position number combobox value is prevented from
+            # showing a position that is present in the treeview.
+            cur_item = self.treeview_pr.focus()
+            val_tup = self.treeview_pr.item(cur_item).get('values')
+            if val_tup != '':
+                x_ltr = (val_tup[0]).upper()
+                x_pos = str(val_tup[1])
+            else:
                 return
-            self.pos_pr_l.set(x_ltr)
-            if x_pos not in self.rpos:
-                key = x_ltr + ',' + x_pos
-                if key in r_pos_dict:
-                    del r_pos_dict[key]
-                    fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
-                    # add back position to rpos and the combobox
-                    self.rpos.append(x_pos)
-                    self.rpos.sort()
-                    conform_combo_pr_p()
+            key = x_ltr + ',' + x_pos
+            if key in r_pos_dict:
+                del r_pos_dict[key]
+                fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
+                # add back position to rpos and the combobox
+                self.rpos.append(x_pos)
+                self.rpos.sort()
+                conform_combo_pr_p()
 
         def conform_combo_pr_p() -> NoReturn:
             self.combo_pr_p.configure(values=self.rpos)
@@ -786,7 +788,6 @@ class Pywordlemainwindow(ctk.CTk):
                                        )
         self.bt_pr_clr.grid(row=0, column=4, padx=1, pady=2, sticky='ew')
 
-        # style='position.ttk.Treeview')
         self.treeview_pr = ttk.Treeview(self.criteria_frame_pr, style='position.ttk.Treeview')
         self.treeview_pr.configure(columns=('1', '2'),
                                    show='headings',
