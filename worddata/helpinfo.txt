@@ -10,15 +10,17 @@ Word rank represents relative occurrence probability; however, any word matching
 
 The 'Allow Duplicate Letters' option includes words having duplicate letters. After your first or second wordle choice you should start to consider words with duplicate letters. Depending on your known letters status, duplicate letters ought to be shown before making the third selection.
 
-Checking 'Letters To Be Excluded' checkboxes results in words not containing those letters.
+Checking 'Letters To Be Excluded' letter check boxes results in words not containing those letters.
 
-Checking 'Letters To Be Required' checkboxes results in words containing those letters. No words will show when six or more letters are required for the word.
+Checking 'Letters To Be Required' letter check boxes results in words containing those letters. No words will show when six or more letters are required for the word.
 
-The Clear button at the checkboxes lineup clears the checkboxes.
+The Clear button in the check box lineups clears all the check boxes in that lineup. The letter check boxes are ordered according to letter use frequency. The vertical lines indicate a jump in letter use frequency and are useful to describe letter rank group types. The group descriptions in turn provide a language useful for discussing game strategy and game results.
 
-'Letters Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. In puzzle context a letter not at its correct position is a letter known to be present in the word, so it will also be required. For such letters, its checkbox will not appear checked in 'Letters To Be Required', but the requirement will be applied. The Z buttons clear the entire position list.
+'Letter Positioning' is where letters may be excluded or required for one of the five possible wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. The Z buttons clear the entire position list.
 
-'Special Pattern' allows one to quickly introduce a custom require or exclude filter that can operate on letter position. It is primarily intended for adjacent letter patterns such as TT, ITE, GHT or SS. One might use this to compare the number of words having SS versus S.S or S..S where the "." means 'any letter'. The pattern S..S shows words having any two letters between S letters like the words SMUSH and TSARS.
+In the puzzle game context a letter indicated not at its correct position is a letter known to be present in the word, so it will also be required. For such letters, its checkbox will not appear checked in 'Letters To Be Required', but the requirement will be applied. If perhaps you want to follow a strict letter elimination strategy, and you want the helper word list to not include unknown position letters, then use the letter's 'Letters To Be Excluded' check box and do not apply an 'Exclude From Position' for that letter. Otherwise, the word list will be empty because no word can have the letter and also not have the letter.
+
+'Special Pattern' allows one to quickly introduce a custom require or exclude filter pattern that can operate on letter position. It is primarily intended for adjacent letter patterns such as TT, ITE, GHT or SS. One might use this to compare the number of words having a SS pattern versus S.S or S..S patterns where the "." means 'any letter'. The pattern S..S shows words having any two letters between S letters like the words SMUSH and TSARS.
 
 - Tips:
 
