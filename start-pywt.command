@@ -47,14 +47,16 @@ chk4python3(){
       printf "======================================================================\n"
       s=1
   else
-    printf " .... found.\n"
+    printf " .... found "
+    python3 --version
   fi
 }
 
 # check for python package customtkinter on this system
 chk4customtkinter(){
   printf " Checking for customtkinter"
-  if ! pip3 list | grep 'customtkinter' > /dev/null;
+  test="$(pip3 list | grep 'customtkinter')"
+  if ! [ "$test" ]> /dev/null;
   then
       printf "\n======================================================================\n"
       printf " ! A problem. The 'customtkinter' package for python is required\n"
@@ -65,7 +67,8 @@ chk4customtkinter(){
       printf "======================================================================\n"
       s=1
   else
-    printf " .... found.\n"
+    printf " .... found "
+    printf '%s\n' "$test"
   fi
 }
 
@@ -141,7 +144,7 @@ notfound(){
   f=$1
   n=$2
   printf "\n   %s not found." "${f}"
-  if [ $n -eq 0 ]
+  if [ "$n" -eq 0 ]
   then
     printf "  It is not needed.\n"
   else
