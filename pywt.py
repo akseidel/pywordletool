@@ -251,6 +251,7 @@ class Pywordlemainwindow(ctk.CTk):
             value = key
             x_pos_dict[key] = value
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
+            reset_combo_focus(self.combo_px_l)
 
         def add_r_pos() -> NoReturn:
             x_ltr = self.pos_pr_l.get().upper()
@@ -274,6 +275,13 @@ class Pywordlemainwindow(ctk.CTk):
                 # remove position from rpos and in turn the combobox
                 self.rpos.remove(x_pos)
                 conform_combo_pr_p()
+                reset_combo_focus(self.combo_pr_l)
+
+        def reset_combo_focus(entryWidget) -> NoReturn:
+            # now set focus back to the letter combo for use next assignment convenience
+            entryWidget.focus()
+            # and make the letter look selected even though it makes no difference
+            entryWidget.selection_range(0, 1)
 
         def remove_x_pos() -> NoReturn:
             x_ltr = self.pos_px_l.get().upper()
