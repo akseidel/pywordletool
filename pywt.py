@@ -176,6 +176,8 @@ class Pywordlemainwindow(ctk.CTk):
                 return
 
             global data_path
+            # a set to manage the letter requirements
+            rq_ltrs = get_rq_ltrs()
 
             allow_dups = self.allow_dup_state.get()
 
@@ -188,8 +190,8 @@ class Pywordlemainwindow(ctk.CTk):
                                              self.rank_mode.get())
 
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
-            wordletool.tool_command_list.add_cmd(build_require_these_grep(self.re_btn_vars))
-            build_x_pos_grep(wordletool, x_pos_dict)
+            wordletool.tool_command_list.add_cmd(build_require_these_grep(rq_ltrs))
+            build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
             build_r_pos_grep(wordletool, r_pos_dict)
 
             if self.sp_pat_mode_var.get() == 1:
@@ -237,6 +239,14 @@ class Pywordlemainwindow(ctk.CTk):
             tx_gr.insert(tk.END, wordletool.get_cmd_less_filepath())
             tx_gr.configure(state='disabled')
 
+        def get_rq_ltrs() -> str:
+            rq_l = ''
+            for b in self.re_btn_vars:
+                ltr = b.get()
+                if ltr != '-':
+                    rq_l += ltr
+            return rq_l
+
         def add_x_pos() -> NoReturn:
             x_ltr = self.pos_px_l.get().upper()
             x_pos = self.pos_px_p.get()
@@ -277,11 +287,11 @@ class Pywordlemainwindow(ctk.CTk):
                 conform_combo_pr_p()
                 reset_combo_focus(self.combo_pr_l)
 
-        def reset_combo_focus(entryWidget) -> NoReturn:
+        def reset_combo_focus(entrywidget) -> NoReturn:
             # now set focus back to the letter combo for use next assignment convenience
-            entryWidget.focus()
+            entrywidget.focus()
             # and make the letter look selected even though it makes no difference
-            entryWidget.selection_range(0, 1)
+            entrywidget.selection_range(0, 1)
 
         def remove_x_pos() -> NoReturn:
             x_ltr = self.pos_px_l.get().upper()
@@ -303,7 +313,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         def remove_r_pos() -> NoReturn:
             # Note - This differs radically from remove_x_pos because in the
-            # require gui the position number combobox value is prevented from
+            # requirement gui the position number combobox value is prevented from
             # showing a position that is present in the treeview.
             cur_item = self.treeview_pr.focus()
             val_tup = self.treeview_pr.item(cur_item).get('values')
@@ -385,7 +395,7 @@ class Pywordlemainwindow(ctk.CTk):
                 grep_exclude = "grep -vE \'" + args + "\'"
             return grep_exclude
 
-        def build_x_pos_grep(lself, this_pos_dict: dict) -> NoReturn:
+        def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str) -> NoReturn:
             """Builds the grep line for excluding positions
             """
             # example 'grep -vE \'..b..\'' for b,3
@@ -396,7 +406,14 @@ class Pywordlemainwindow(ctk.CTk):
                 parts = this_pos_dict[x].split(',')
                 ltr = parts[0].lower()
                 p = int(parts[1])
-                lself.tool_command_list.add_excl_pos_cmd(ltr, p)
+                if rq_lts.__contains__(ltr):
+                    # add without the requirement, it has been done already
+                    lself.tool_command_list.add_excl_pos_cmd(ltr, p, False)
+                else:
+                    # add with the requirement
+                    lself.tool_command_list.add_excl_pos_cmd(ltr, p, True)
+                    # keep track of its require in this function
+                    rq_lts += ltr
 
         def build_r_pos_grep(lself, this_pos_dict: dict) -> NoReturn:
             """Builds the grep line for including positions
@@ -428,17 +445,15 @@ class Pywordlemainwindow(ctk.CTk):
 
             lself.tool_command_list.add_require_cmd(pat)
 
-        def build_require_these_grep(re_btn_var_list: list) -> str:
+        def build_require_these_grep(rq_lts: str) -> str:
             """Builds the grep line for requiring letters
             """
             # example 'grep -E \'b|f|k|w\''
             grep_require_these = ""
-            pipe = "|"
+            pipe = "| "
             itms = []
-            for b in re_btn_var_list:
-                ltr = b.get()
-                if ltr != '-':
-                    itms.append("grep -E \'" + ltr + "\'")
+            for ltr in rq_lts:
+                itms.append("grep -E \'" + ltr + "\'")
             args = pipe.join(itms)
             if len(itms) > 0:
                 grep_require_these = args

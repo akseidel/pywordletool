@@ -32,13 +32,13 @@ def setup_grep_filtering(this_sh_cmd_lst):
     # randMidrank = this_sh_cmd_lst.add_rand_incl_frm_cmd('ucyhdpgm')
     #
     # # post first pick required non positions
-    # # format is => this_sh_cmd_lst.add_excl_pos_cmd('ltr',p)
-    # this_sh_cmd_lst.add_excl_pos_cmd('r',4)
-    # this_sh_cmd_lst.add_excl_pos_cmd('e',2)
-    # this_sh_cmd_lst.add_excl_pos_cmd('t',1)
-    # this_sh_cmd_lst.add_excl_pos_cmd('c',4)
-    # this_sh_cmd_lst.add_excl_pos_cmd('e',4)
-    # this_sh_cmd_lst.add_excl_pos_cmd('p',5)
+    # # format is => this_sh_cmd_lst.add_excl_pos_cmd('ltr',p, bool add_require)
+    # this_sh_cmd_lst.add_excl_pos_cmd('j',4, True)
+    # this_sh_cmd_lst.add_excl_pos_cmd('e',2, True)
+    # this_sh_cmd_lst.add_excl_pos_cmd('t',1,True))
+    # this_sh_cmd_lst.add_excl_pos_cmd('c',4,True))
+    # this_sh_cmd_lst.add_excl_pos_cmd('e',4,True))
+    # this_sh_cmd_lst.add_excl_pos_cmd('p',5,True))
     #
     # # post first pick required positions
     # # format is => this_sh_cmd_lst.add_incl_pos_cmd('ltr',p)

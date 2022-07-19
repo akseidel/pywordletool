@@ -214,10 +214,13 @@ class ShellCmdList:
     # Adds command to stack to exclude letter from a position number.
     # Context is that letter is known, therefore is required but not
     # at the designated position.
-    def add_excl_pos_cmd(self, ltr: str, p: int) -> NoReturn:
+    def add_excl_pos_cmd(self, ltr: str, p: int, add_e: bool) -> NoReturn:
         if len(ltr) > 0:
-            # Require the letter,
-            self.shCMDlist.append("grep -E '" + ltr + "'")
+            # add_E a requirement argument, being managed
+            # outside the shCMDList so that the shCMDList
+            # does not duplicate the greg -E for any one letter.
+            if add_e:  # Require the letter if not already done
+                self.shCMDlist.append("grep -E '" + ltr + "'")
             # but not in this position.
             if p == 1:
                 self.shCMDlist.append("grep -vE '" + ltr + "....'")
