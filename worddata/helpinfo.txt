@@ -24,7 +24,7 @@ In the puzzle game context a letter indicated not at its correct position is a l
 
 - Tips:
 
-One might not use 'Letter Positioning' settings until after letter elimination strategy picks have been made to avoid its interference with letter exclusion settings.
+Please develop your own strategy for picks. Sorry, none are mentioned here. What you discover might be surprising at first.
 
 When adding a new exclusion position for a letter that already has an excluded position, first select that letter's exclusion in the list. That selection puts the letter in the combobox so that you need only to indicate the letter position before pressing the plus (+) button.
 

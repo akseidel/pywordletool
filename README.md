@@ -2,22 +2,25 @@
 
 ## A python based wordle game helper
 
+* **Main Window:**
 !['Main Window Image'](InfoImages/PYWTMainWindow.png)
-!['Help Window Image'](InfoImages/PYWTHelp.png)
+* **In Use Main Window Shown Next to NYT Results:**
 !['In use Image Image'](InfoImages/PYWTInUse.png)
+* **Information Window:**
+!['Information Window Image'](InfoImages/PYWTHelp.png)
 
-#### What To Expect From This Helper
+### What To Expect From This Helper
 
 * Expect nothing more than a helper with a thorough vocabulary that presents words only matching the letters you specify.  
 
-#### Running the wordle helper
+### Running the wordle helper
 
 * Open a **Terminal** window
 * Change to the folder where you placed **pywy.py** and the other files and folders.
 * Enter the command: ```python3 pywt.py```
 * For Apple OSX and Linux systems double-clicking the **start-pywt.command** file in the **Finder** also starts the wordle helper.
 
-#### Running the wordle helper with **start-pywt.command**
+### Running the wordle helper with **start-pywt.command**
 
 * **start-pywt.command** is a shell script intended for launching the wordle helper from a computer's file browser. It should run the helper with a double-click after being properly setup.
 * Setting up **start-pywt.command** requires marking it an executable file. This is later described in **Installing the wordle helper**
@@ -25,7 +28,7 @@
 * **start-pywt.command** output looks like this when it has launched the wordle helper:
 !['start-pywt.command Image'](InfoImages/PYWTLauncher.png)
 
-#### Requirements
+### Requirements
 
 * python3: (<https://www.python.org/downloads/>)
 * pip: (<https://pypi.org/project/pip/>)
@@ -36,7 +39,7 @@
 After installing python3 and pip, the following commands entered in a Terminal window will install 'customtkinter':
 `pip3 install customtkinter`
 
-#### Installing the wordle helper
+### Installing the wordle helper
 
 * Download the **pywtpackage.zip** release file from the repository releases link.
 * Unzip the **pywtpackage.zip** release file. It should unzip to be a folder named pywtpackage.
@@ -51,8 +54,9 @@ After installing python3 and pip, the following commands entered in a Terminal w
   * **nyt_wordlist.txt**    (wordlist - shuffled)
   * **wo_nyt_wordlist.txt** (wordlist - shuffled)
 
-#### Word Ranking
+### Word Ranking
 
+* **Letter Ranking Information Window:**
 !['PYWTRanking.png Image'](InfoImages/PYWTRanking.png)
 
 * The five-letter words are assigned a rank according to how common the letters are in the English wordle words list. Three different ranking methods are possible. Each method sums a rank associated with each letter in the word. The above image, which can be shown by pressing **Letter Ranking** in the **Information** window, shows the ranks associated with each letter. This data is read from the **letter_ranks.txt** text file found in the **worddata** directory.
