@@ -127,7 +127,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.wnd_help.destroy()
             self.create_wnd_help()
 
-    # ======== set exclude combos to treeview selection
+    # ======== set exclude cboxes to treeview selection
     def x_pos_tree_view_click(self, event) -> NoReturn:
         cur_item = self.treeview_px.focus()
         val_tup = self.treeview_px.item(cur_item).get('values')
@@ -135,7 +135,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.pos_px_l.set(val_tup[0])
             self.pos_px_p.set(val_tup[1])
 
-    # ======== set require combos to treeview selection
+    # ======== set require cboxes to treeview selection
     def r_pos_tree_view_click(self, event) -> NoReturn:
         cur_item = self.treeview_pr.focus()
         val_tup = self.treeview_pr.item(cur_item).get('values')
@@ -163,6 +163,10 @@ class Pywordlemainwindow(ctk.CTk):
         self.rank_mode = tk.IntVar()
         self.rank_mode.set(0)
         self.suppress_grep = False
+        self.pos5 = ['1', '2', '3', '4', '5']
+        # pos_r to be a mutable list of unassigned letter positions
+        self.pos_r = self.pos5.copy()
+        self.pos_x = self.pos5.copy()
 
         # configure style
         style = ttk.Style()
@@ -261,7 +265,8 @@ class Pywordlemainwindow(ctk.CTk):
             value = key
             x_pos_dict[key] = value
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
-            reset_combo_focus(self.combo_px_l)
+            remove_already_from_cbox_px(self.pos_px_l.get())
+            reset_cbox_focus(self.cbox_px_l)
 
         def add_r_pos() -> NoReturn:
             x_ltr = self.pos_pr_l.get().upper()
@@ -270,25 +275,25 @@ class Pywordlemainwindow(ctk.CTk):
             if not x_pos.isnumeric() or int(x_pos) < 1 or int(x_pos) > 5:
                 self.pos_pr_p.set('1')
                 return
-            # toss any invalid entries in the letter combo
+            # toss any invalid entries in the letter cbox
             if x_ltr == '' or len(x_ltr) > 1 or x_ltr.isnumeric():
                 self.pos_pr_l.set('')
                 return
             self.pos_pr_l.set(x_ltr)
             # continue if pos is available
-            if x_pos in self.rpos:
+            if x_pos in self.pos_r:
                 # update r_pos_dict and update treeview
                 key = x_ltr + ',' + x_pos
                 value = key
                 r_pos_dict[key] = value
                 fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
                 # remove position from rpos and in turn the combobox
-                self.rpos.remove(x_pos)
-                conform_combo_pr_p()
-                reset_combo_focus(self.combo_pr_l)
+                self.pos_r.remove(x_pos)
+                conform_cbox(self.cbox_pr_p, self.pos_r, self.pos_pr_p)
+                reset_cbox_focus(self.cbox_pr_l)
 
-        def reset_combo_focus(entrywidget) -> NoReturn:
-            # now set focus back to the letter combo for use next assignment convenience
+        def reset_cbox_focus(entrywidget) -> NoReturn:
+            # now set focus back to the letter cbox for use next assignment convenience
             entrywidget.focus()
             # and make the letter look selected even though it makes no difference
             entrywidget.selection_range(0, 1)
@@ -308,8 +313,8 @@ class Pywordlemainwindow(ctk.CTk):
         def clear_all_x_pos() -> NoReturn:
             x_pos_dict.clear()
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
-            self.combo_px_l.current(0)
-            self.combo_px_p.current(0)
+            self.cbox_px_l.current(0)
+            self.cbox_px_p.current(0)
 
         def remove_r_pos() -> NoReturn:
             # Note - This differs radically from remove_x_pos because in the
@@ -327,24 +332,25 @@ class Pywordlemainwindow(ctk.CTk):
                 del r_pos_dict[key]
                 fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
                 # add back position to rpos and the combobox
-                self.rpos.append(x_pos)
-                self.rpos.sort()
-                conform_combo_pr_p()
+                self.pos_r.append(x_pos)
+                self.pos_r.sort()
+                conform_cbox(self.cbox_pr_p, self.pos_r, self.pos_pr_p)
 
-        def conform_combo_pr_p() -> NoReturn:
-            self.combo_pr_p.configure(values=self.rpos)
-            if self.rpos:
-                self.combo_pr_p.current(0)
+        def conform_cbox(cbox: ttk.Combobox, vals: list, bindvar: tk.StringVar) -> NoReturn:
+            cbox.configure(values=vals)
+            if vals:
+                cbox.current(0)
             else:
                 # no more positions, index cannot be set to 0
-                self.pos_pr_p.set('')
+                bindvar.set('')
+            self.update()
 
         def clear_all_r_pos() -> NoReturn:
             r_pos_dict.clear()
             fill_treeview_per_dictionary(self.treeview_pr, r_pos_dict, 1)
-            self.rpos = ['1', '2', '3', '4', '5']
-            conform_combo_pr_p()
-            self.combo_pr_l.current(0)
+            self.pos_r = self.pos5.copy()
+            conform_cbox(self.cbox_pr_p, self.pos_r, self.pos_pr_p)
+            self.cbox_pr_l.current(0)
 
         # clears all settings
         def clear_all() -> NoReturn:
@@ -648,19 +654,34 @@ class Pywordlemainwindow(ctk.CTk):
         # === position exclude letter
         # conform the position exclude letter
         def pos_px_ltr_conform(*args) -> NoReturn:
-            combobox_l_conform(self.pos_px_l)
+            cbox_entry_conform(self.pos_px_l, True, False)
+            # Once the letter is set, it would be nice to have the position
+            # cbox reset to have only the positions not already assigned to
+            # the letter.
+            remove_already_from_cbox_px(self.pos_px_l.get())
+
+        def remove_already_from_cbox_px(new_ltr: str):
+            cur_pos_cbox = self.pos5.copy()
+            for x in x_pos_dict:
+                parts = x_pos_dict[x].split(',')
+                ltr = parts[0]
+                p = parts[1]
+                if ltr == new_ltr:
+                    # remove existing position option
+                    cur_pos_cbox.remove(str(p))
+            conform_cbox(self.cbox_px_p, cur_pos_cbox, self.pos_px_p)
 
         self.pos_px_l = tk.StringVar(name='pos_px_l')
-        self.combo_px_l = ttk.Combobox(self.criteria_frame_px,
-                                       values=('', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-                                               'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-                                               'X', 'Y', 'Z'),
-                                       width=4,
-                                       justify=tk.CENTER,
-                                       textvariable=self.pos_px_l
-                                       )
-        self.combo_px_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
-        self.combo_px_l.current(0)
+        self.cbox_px_l = ttk.Combobox(self.criteria_frame_px,
+                                      values=('', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+                                              'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+                                              'X', 'Y', 'Z'),
+                                      width=4,
+                                      justify=tk.CENTER,
+                                      textvariable=self.pos_px_l
+                                      )
+        self.cbox_px_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
+        self.cbox_px_l.current(0)
         try:
             # python 3.6
             self.pos_px_l.trace_add('write', pos_px_ltr_conform)
@@ -671,17 +692,17 @@ class Pywordlemainwindow(ctk.CTk):
         # === position exclude letter's position
         # conform the position exclude position
         def pos_px_p_conform(*args) -> NoReturn:
-            combobox_p_conform(self.pos_px_p)
+            cbox_entry_conform(self.pos_px_p, False, True)
 
         self.pos_px_p = tk.StringVar(name='pos_px_p')
-        self.combo_px_p = ttk.Combobox(self.criteria_frame_px,
-                                       values=('1', '2', '3', '4', '5'),
-                                       width=4,
-                                       justify=tk.CENTER,
-                                       textvariable=self.pos_px_p
-                                       )
-        self.combo_px_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
-        self.combo_px_p.current(0)
+        self.cbox_px_p = ttk.Combobox(self.criteria_frame_px,
+                                      values=('1', '2', '3', '4', '5'),
+                                      width=4,
+                                      justify=tk.CENTER,
+                                      textvariable=self.pos_px_p
+                                      )
+        self.cbox_px_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
+        self.cbox_px_p.current(0)
         try:
             # python 3.6
             self.pos_px_p.trace_add('write', pos_px_p_conform)
@@ -728,35 +749,33 @@ class Pywordlemainwindow(ctk.CTk):
 
         # =======  END OF ============ exclude from position controls
 
-        # make the combobox letter control accept and show only one letter
-        def combobox_l_conform(string_var) -> NoReturn:
+        def cbox_entry_conform(string_var: tk.StringVar, no_nmbrs: bool, no_ltrs5: bool) -> NoReturn:
+            """
+            Make a combobox control accept and show only one letter or number
+            @string_var: tk.StringVar - The string var for the combobox
+            @no_nmbrs: bool - Passed to scrub_text, If true then also exclude numbers 0-9
+            @no_ltrs5: bool - Passed to scrub_text, If true then exclude letters AND numbers 0,6-9
+            """
             if len(string_var.get()) > 0:
-                string_var.set(scrub_text(string_var.get().upper(), '.', True, False))
-            if len(string_var.get()) > 0:
-                string_var.set(string_var.get()[-1])
-
-        # make the letter combobox position control accept and show only one number
-        def combobox_p_conform(string_var) -> NoReturn:
-            if len(string_var.get()) > 0:
-                string_var.set(scrub_text(string_var.get().upper(), '.', True, True))
+                string_var.set(scrub_text(string_var.get().upper(), '.', no_nmbrs, no_ltrs5))
             if len(string_var.get()) > 0:
                 string_var.set(string_var.get()[-1])
 
         # =======  START OF ============ require from position controls
         def pr_to_uppercase(*args) -> NoReturn:
-            combobox_l_conform(self.pos_pr_l)
+            cbox_entry_conform(self.pos_pr_l, True, False)
 
         self.pos_pr_l = tk.StringVar()
-        self.combo_pr_l = ttk.Combobox(self.criteria_frame_pr,
-                                       values=('', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-                                               'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-                                               'X', 'Y', 'Z'),
-                                       width=4,
-                                       justify=tk.CENTER,
-                                       textvariable=self.pos_pr_l
-                                       )
-        self.combo_pr_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
-        self.combo_pr_l.current(0)
+        self.cbox_pr_l = ttk.Combobox(self.criteria_frame_pr,
+                                      values=('', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+                                              'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+                                              'X', 'Y', 'Z'),
+                                      width=4,
+                                      justify=tk.CENTER,
+                                      textvariable=self.pos_pr_l
+                                      )
+        self.cbox_pr_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
+        self.cbox_pr_l.current(0)
         try:
             # python 3.6
             self.pos_pr_l.trace_add('write', pr_to_uppercase)
@@ -764,34 +783,24 @@ class Pywordlemainwindow(ctk.CTk):
             # python < 3.6
             self.pos_pr_l.trace('w', pr_to_uppercase)
 
-        # make the position combobox position control accept and show only one number
-        # from 1 to 5
-        def combobox_p_conform(string_var) -> NoReturn:
-            if len(string_var.get()) > 0:
-                string_var.set(scrub_text(string_var.get().upper(), '.', False, True))
-            if len(string_var.get()) > 0:
-                string_var.set(string_var.get()[-1])
+        def cbox_pos_conform(*args) -> NoReturn:
+            cbox_entry_conform(self.pos_pr_p, False, True)
 
-        def combo_pos_conform(*args) -> NoReturn:
-            combobox_p_conform(self.combo_pr_p)
-
-        # rpos to be a mutable list of unassigned letter positions
-        self.rpos = ['1', '2', '3', '4', '5']
         self.pos_pr_p = tk.StringVar()
-        self.combo_pr_p = ttk.Combobox(self.criteria_frame_pr,
-                                       values=self.rpos,
-                                       width=4,
-                                       justify=tk.CENTER,
-                                       textvariable=self.pos_pr_p
-                                       )
-        self.combo_pr_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
-        self.combo_pr_p.current(0)
+        self.cbox_pr_p = ttk.Combobox(self.criteria_frame_pr,
+                                      values=self.pos5,
+                                      width=4,
+                                      justify=tk.CENTER,
+                                      textvariable=self.pos_pr_p
+                                      )
+        self.cbox_pr_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
+        self.cbox_pr_p.current(0)
         try:
             # python 3.6
-            self.pos_pr_p.trace_add('write', combo_pos_conform)
+            self.pos_pr_p.trace_add('write', cbox_pos_conform)
         except AttributeError:
             # python < 3.6
-            self.pos_pr_p.trace('w', combo_pos_conform)
+            self.pos_pr_p.trace('w', cbox_pos_conform)
 
         self.bt_pr_add = ctk.CTkButton(self.criteria_frame_pr,
                                        text="+", width=20,
