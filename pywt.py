@@ -25,6 +25,7 @@ import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be 
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
 import customtkinter as ctk
 from typing import NoReturn
+import random
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -167,6 +168,7 @@ class Pywordlemainwindow(ctk.CTk):
         # pos_r to be a mutable list of unassigned letter positions
         self.pos_r = self.pos5.copy()
         self.pos_x = self.pos5.copy()
+        self.sel_rando = False
 
         # configure style
         style = ttk.Style()
@@ -218,11 +220,12 @@ class Pywordlemainwindow(ctk.CTk):
             n_items = len(the_word_list)
             left_pad = ""
             mid_pad = "  "
+            mid_div = " : "
             c = 0
             i = 0
             l_msg = ""
             for key, value in the_word_list.items():
-                msg = key + " : " + str(value)
+                msg = key + mid_div + str(value)
                 i = i + 1
                 if c == 0:
                     l_msg = left_pad + msg
@@ -235,6 +238,12 @@ class Pywordlemainwindow(ctk.CTk):
                     l_msg = ""
                 if i == n_items:
                     tx_result.insert(tk.END, l_msg + '\n')
+
+            if self.sel_rando and (n_items > 0):
+                word, rank = random.choice(list(the_word_list.items()))
+                rand_pick = word + mid_div + rank
+                tx_result.highlight_pattern(rand_pick, 'hlt')
+
             tx_result.configure(state='disabled')
             tx_result.see('end')
             self.status.set(wordletool.get_status())
@@ -362,6 +371,12 @@ class Pywordlemainwindow(ctk.CTk):
             self.suppress_grep = False
             clear_spec_pattern()
 
+        # selected a random word in the result
+        def pick_rando() -> NoReturn:
+            self.sel_rando = True
+            do_grep()
+            self.sel_rando = False
+
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
         # by_what indicated by key 0 or by value 1 so that the required position
@@ -482,12 +497,15 @@ class Pywordlemainwindow(ctk.CTk):
         lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='ew', padx=6, pady=2)
         lb_result_hd.configure(font=font_tuple_n)
         # the word list resulting from grep on the main wordlist
-        tx_result = tk.Text(self.result_frame,
-                            wrap='word',
-                            background='#dedede',
-                            borderwidth=0,
-                            highlightthickness=0)
+        # tx_result = tk.Text(self.result_frame,
+        tx_result = helpers.CustomText(self.result_frame,
+                                       wrap='word',
+                                       background='#dedede',
+                                       borderwidth=0,
+                                       highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        # The CustomText class is a tk.Text extended to support a color for matched text.
+        tx_result.tag_configure('hlt', foreground='#ff0000')
         if self.winfo_screenheight() <= 800:
             tx_result.configure(height=10)  # to do, set according to screen height
         else:
@@ -1213,6 +1231,9 @@ class Pywordlemainwindow(ctk.CTk):
 
         self.bt_zap = ctk.CTkButton(self.admin_frame, text="Clear All Settings", width=40, command=clear_all)
         self.bt_zap.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+
+        self.bt_rando = ctk.CTkButton(self.admin_frame, text="Pick A Random Word", width=40, command=pick_rando)
+        self.bt_rando.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
         # === END OF ====== Application Controls ==========
 
         # run the initial grep
