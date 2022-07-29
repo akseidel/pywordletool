@@ -242,10 +242,14 @@ class Pywordlemainwindow(ctk.CTk):
             if self.sel_rando and (n_items > 0):
                 word, rank = random.choice(list(the_word_list.items()))
                 rand_pick = word + mid_div + rank
+                # highlight the rand_pick, which also scrolls the widget
+                # to the rand_pick's line.
                 tx_result.highlight_pattern(rand_pick, 'hlt')
 
             tx_result.configure(state='disabled')
-            tx_result.see('end')
+            if not self.sel_rando:
+                # Do not scroll to end when a rando pick is highlighted
+                tx_result.see('end')
             self.status.set(wordletool.get_status())
             tx_gr.configure(state='normal')
             tx_gr.delete(1.0, tk.END)
@@ -505,7 +509,7 @@ class Pywordlemainwindow(ctk.CTk):
                                        highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
         # The CustomText class is a tk.Text extended to support a color for matched text.
-        tx_result.tag_configure('hlt', foreground='#ff0000')
+        tx_result.tag_configure('hlt', background='#bbd6fb')
         if self.winfo_screenheight() <= 800:
             tx_result.configure(height=10)  # to do, set according to screen height
         else:

@@ -367,3 +367,4 @@ class CustomText(tk.Text):
             self.mark_set("matchStart", index)
             self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.tag_add(tag, "matchStart", "matchEnd")
+            self.see(index) # scroll widget to show the index's line
