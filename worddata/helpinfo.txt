@@ -22,7 +22,7 @@ In the puzzle game context a letter indicated not at its correct position is a l
 
 'Special Pattern' allows one to quickly introduce a custom require or exclude filter pattern that can operate on letter position. It is primarily intended for adjacent letter patterns such as TT, ITE, GHT or SS. One might use this to compare the number of words having a SS pattern versus S.S or S..S patterns where the "." means 'any letter'. The pattern S..S shows words having any two letters between S letters like the words SMUSH and TSARS.
 
-'Pick A Random Word' colors red a random word in the current showing word list. There is a point when narrowing down the list of possible words where the higher ranking words are biased against words containing low ranking letters. Any one of the words shown could be the wordle word. This feature is intended for use when the list has become small where you can surmise the correct word would be a random selection.
+'Pick A Random Word' highlights a random word in the current showing word list. There is a point when narrowing down the list of possible words where the higher ranking words are biased against words containing low ranking letters. Any one of the words shown could be the wordle word. This feature is intended for use when the list has become small where you can surmise the correct word would be a random selection.
 
 - Tips:
 
