@@ -37,7 +37,8 @@
 'tkinter' provides graphical user interface support for python applications. It comes with python. 'customtkinter' is an expansion to 'tkinter'. This wordle game helper uses some customtkinter features and so it needs to be installed along with python3. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
 
 After installing python3 and pip, the following commands entered in a Terminal window will install 'customtkinter':
-`pip3 install customtkinter`
+`pip3 install --upgrade customtkinter==4.5.6`
+* Note: normally we would install customtkinter using `pip3 install customtkinter`, but starting with version 4.5.7 through at least 4.5.10, there is a fatal problem.
 
 ### Installing the wordle helper
 
