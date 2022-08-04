@@ -322,6 +322,7 @@ class Pywordlemainwindow(ctk.CTk):
             if key in x_pos_dict:
                 del x_pos_dict[key]
                 fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
+            remove_already_from_cbox_px(self.pos_px_l.get())
 
         def clear_all_x_pos() -> NoReturn:
             x_pos_dict.clear()
