@@ -25,13 +25,16 @@ doline(){
 }
 
 dotrailer(){
-        printf "You may minimize this window, do not close it, the helper would close. \n"
+        printf "Ok, launching the wordle helper ... \n"
         doline
+        sleep .3
 }
 
 doerror(){
         printf "    Not starting the helper! Some required parts were not found.      \n"
         doline
+        printf "%s " "Press return to close."
+        read -r ans
 }
 
 # check for python3 on this system
@@ -153,11 +156,12 @@ notfound(){
 }
 
 startitup(){
+  sleep 1
   cd -- "$(dirname "$0")" || exit
   if [ $s -eq 0 ]
   then
     dotrailer
-    python3 pywt.py
+    python3 pywt.py &
   else
     doerror
   fi

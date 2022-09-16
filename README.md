@@ -25,7 +25,7 @@
 * **start-pywt.command** is a shell script intended for launching the wordle helper from a computer's file browser. It should run the helper with a double-click after being properly setup.
 * Setting up **start-pywt.command** requires marking it an executable file. This is later described in **Installing the wordle helper**
 * **start-pywt.command** checks for required components before launching the wordle helper. It reports what components are missing and will not launch the wordle helper when critical components are missing.
-* **start-pywt.command** output looks like this when it has launched the wordle helper:
+* **start-pywt.command** output looks like this when it is launching the wordle helper:
 !['start-pywt.command Image'](InfoImages/PYWTLauncher.png)
 
 ### Requirements
