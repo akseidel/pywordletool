@@ -177,6 +177,19 @@ def get_results_word_list(this_sh_cmd_lst) -> list:
 def clear_scrn() -> NoReturn:
     os.system("cls" if os.name == "nt" else "clear")
 
+# Return a word's genetic code
+def get_gencode(word) -> list:
+    gencode = []
+    for x in range(26):
+        gencode.append(0)
+    print(gencode)
+    print(len(word))
+    for l in word:
+        idx = ord(l) - 97
+        print(idx)
+        gencode[idx] = gencode[idx] + 1
+    return gencode
+
 
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
@@ -300,6 +313,13 @@ class ToolResults:
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
+    # aks to do
+    # Genetic note: We still want to know the letter freq rank for the genetic ranked words. The plan will
+    # be to show the normal ranked list with the highest genetics highlighted.
+    # Multiple highlighting is possible. Tested
+
+
+
     # Return the grepped word count
     def get_results_raw_cnt(self) -> str:
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
@@ -344,7 +364,7 @@ class CustomText(tk.Text):
         tk.Text.__init__(self, *args, **kwargs)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=False):
+                          regexp=True):
         """Apply the given tag to all text that matches the given pattern
         If 'regexp' is set to True, pattern will be treated as a regular
         expression according to Tcl's regular expression syntax.
@@ -367,4 +387,4 @@ class CustomText(tk.Text):
             self.mark_set("matchStart", index)
             self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.tag_add(tag, "matchStart", "matchEnd")
-            self.see(index) # scroll widget to show the index's line
+            self.see(index)  # scroll widget to show the index's line

@@ -215,6 +215,8 @@ class Pywordlemainwindow(ctk.CTk):
             tx_result.configure(state='normal')
             tx_result.delete(1.0, tk.END)
 
+            # Wordletool is now ready to filter the list and return the list ranked
+            # according to the rank arguments.
             the_word_list = wordletool.get_ranked_results_wrd_lst()
 
             n_items = len(the_word_list)
@@ -242,6 +244,26 @@ class Pywordlemainwindow(ctk.CTk):
             if self.sel_rando and (n_items > 0):
                 word, rank = random.choice(list(the_word_list.items()))
                 rand_pick = word + mid_div + rank
+
+                # aks to do
+                # shows how to highlight multiple items, to be used
+                # for genetic function
+                # pat_list = [item1,item2]
+                # regex = '|'.join(pat_list)
+                # print(regex)
+                # tx_result.highlight_pattern(regex, 'hlt')
+
+                # genetic dictionary ->
+                # key:woody
+                # value:'abcdefghijklmnopqrstuvwxyz'
+                # value:'00010000000000200000001010'
+
+                print(word)
+                gencode = helpers.get_gencode(word)
+                gencode.append(0)
+                print(gencode)
+
+
                 # highlight the rand_pick, which also scrolls the widget
                 # to the rand_pick's line.
                 tx_result.highlight_pattern(rand_pick, 'hlt')
