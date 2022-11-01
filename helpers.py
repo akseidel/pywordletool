@@ -8,8 +8,8 @@ import tkinter as tk  # assigns tkinter stuff to tk namespace
 from tkinter import messagebox
 from typing import NoReturn
 
-
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 
 # Returns the wordle word list full pathname
 # Exits program if not found
@@ -179,10 +179,11 @@ def get_results_word_list(this_sh_cmd_lst) -> list:
 def clear_scrn() -> NoReturn:
     os.system("cls" if os.name == "nt" else "clear")
 
+
 # Return a word's genetic code
 # example:woody
 # returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
-# returns: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
+# translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
 # genetic rank applies in context of a list of words, so it is calculated later
 def get_gencode(word) -> list:
     # gencode is the list of integers that will be returned
@@ -190,8 +191,8 @@ def get_gencode(word) -> list:
     # dups counts the number of times letters occur more than once
     dups = 0
     # loop through each letter in the word
-    for l in word:
-        idx = ord(l) - 97
+    for ltr in word:
+        idx = ord(ltr) - 97
         # Increment dups if that letter has already been seen.
         if gencode[idx] > 0:
             dups += 1
@@ -199,6 +200,7 @@ def get_gencode(word) -> list:
         gencode[idx] = 1
     gencode[26] = dups
     return gencode
+
 
 # returns genetic letter tally list for a gendictionary
 # this list is 26 members where each member corresponds
@@ -217,33 +219,42 @@ def get_gendict_tally(gendict) -> list:
                 gen_tally[idx] = gen_tally[idx] + gencode[idx]
     return gen_tally
 
+
 # Assigns the genetic rank to the gendict members and returns
 # the maximum genetic rank seen.
-def assign_genrank(gendict,gen_tally) -> int:
+def assign_genrank(gendict, gen_tally) -> int:
     maxrank = 0
     for w, g in gendict.items():
         gr = 0
         for idx in range(26):
-            gr = gr + g[idx]*gen_tally[idx]
+            gr = gr + g[idx] * gen_tally[idx]
         gr = gr + g[26]
         new_g = g
         new_g[27] = gr
         if gr > maxrank:
             maxrank = gr
-        gendict.update({w:new_g})
+        gendict.update({w: new_g})
     return maxrank
 
+
 # returns list of the max genrankers in the gendict
-def get_maxgenrankers(gendict,maxrank) -> list:
+def get_maxgenrankers(gendict, maxrank) -> list:
     max_rankers = []
     for w, g in gendict.items():
         if maxrank == g[27]:
             max_rankers.append(w)
     return max_rankers
 
-def regex_maxgenrankers(max_rankers) -> str:
 
-
+# returns a regex formatted pattern string for highlighting
+def regex_maxgenrankers(max_rankers, wordsdict) -> str:
+    pat_list = []
+    mid_div = " : "
+    for w in max_rankers:
+        r = wordsdict[w]
+        pat_list.append(w + mid_div + r)
+    regex_str = '|'.join(pat_list)
+    return regex_str
 
 
 # A class used for holding list stack of the shell commands
@@ -372,8 +383,6 @@ class ToolResults:
     # Genetic note: We still want to know the letter freq rank for the genetic ranked words. The plan will
     # be to show the normal ranked list with the highest genetics highlighted.
     # Multiple highlighting is possible. Tested
-
-
 
     # Return the grepped word count
     def get_results_raw_cnt(self) -> str:

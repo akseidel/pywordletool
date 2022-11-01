@@ -17,15 +17,15 @@
 # Hopefully the upgrade does not break this code.
 #
 import os
-from tkinter import messagebox
-
-import helpers
-
+import random
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
+from tkinter import messagebox
+from typing import NoReturn
+
 import customtkinter as ctk
-from typing import NoReturn, Dict, Any
-import random
+
+import helpers
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -169,6 +169,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.pos_r = self.pos5.copy()
         self.pos_x = self.pos5.copy()
         self.sel_rando = False
+        self.sel_genetic = False
 
         # configure style
         style = ttk.Style()
@@ -248,31 +249,17 @@ class Pywordlemainwindow(ctk.CTk):
                 # to the rand_pick's line.
                 tx_result.highlight_pattern(rand_pick, 'hlt')
 
-            # Genetic ranking aks to do
-            if True and (n_items > 0):
-                gendict: dict[str, list] ={}
-                for w,r in the_word_list.items():
+            # Genetic ranking
+            if self.sel_genetic and (n_items > 0):
+                gendict: dict[str, list] = {}
+                for w, r in the_word_list.items():
                     gencode = helpers.get_gencode(w)
-                    gendict.update({w:gencode})
-                # for x, g in gendict.items():
-                #     print(x,g)
-
+                    gendict.update({w: gencode})
                 gen_tally = helpers.get_gendict_tally(gendict)
-                maxrank = helpers.assign_genrank(gendict,gen_tally)
-                for x, g in gendict.items():
-                    print(x,g)
-
-                max_rankers = helpers.get_maxgenrankers(gendict,maxrank)
-                print(maxrank, max_rankers)
-
-                # aks to do
-                # shows how to highlight multiple items, to be used
-                # for genetic function
-                # pat_list = [item1,item2]
-                # regex = '|'.join(pat_list)
-                # print(regex)
-                # tx_result.highlight_pattern(regex, 'hlt')
-
+                maxrank = helpers.assign_genrank(gendict, gen_tally)
+                max_rankers = helpers.get_maxgenrankers(gendict, maxrank)
+                regex = helpers.regex_maxgenrankers(max_rankers, the_word_list)
+                tx_result.highlight_pattern(regex, 'hlt')
 
             tx_result.configure(state='disabled')
             if not self.sel_rando:
@@ -409,6 +396,12 @@ class Pywordlemainwindow(ctk.CTk):
             self.sel_rando = True
             do_grep()
             self.sel_rando = False
+
+        # selected genetic ranking in the result
+        def pick_genetic() -> NoReturn:
+            self.sel_genetic = True
+            do_grep()
+            self.sel_genetic = False
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
@@ -1267,6 +1260,10 @@ class Pywordlemainwindow(ctk.CTk):
 
         self.bt_rando = ctk.CTkButton(self.admin_frame, text="Pick A Random Word", width=40, command=pick_rando)
         self.bt_rando.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+
+        self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Genetic Dividers", width=40, command=pick_genetic)
+        self.bt_genetic.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+
         # === END OF ====== Application Controls ==========
 
         # run the initial grep

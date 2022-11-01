@@ -24,6 +24,8 @@ In the puzzle game context a letter indicated not at its correct position is a l
 
 'Pick A Random Word' highlights a random word in the current showing word list. There is a point when narrowing down the list of possible words where the higher ranking words are biased against words containing low ranking letters. Any one of the words shown could be the wordle word. This feature is intended for use when the list has become small where you can surmise the correct word would be a random selection.
 
+'Show Genetic Dividers' highlights the words or words that would minimize the worst possible outcome. This information is useful to know in some circumstances.
+
 - Tips:
 
 Please develop your own strategy for picks. Sorry, none are mentioned here. What you discover might be surprising at first.
