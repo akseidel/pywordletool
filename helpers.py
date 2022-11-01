@@ -9,6 +9,8 @@ from tkinter import messagebox
 from typing import NoReturn
 
 
+gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 # Returns the wordle word list full pathname
 # Exits program if not found
 def get_word_list_path_name(local_path_file_name: str) -> str:
@@ -178,17 +180,70 @@ def clear_scrn() -> NoReturn:
     os.system("cls" if os.name == "nt" else "clear")
 
 # Return a word's genetic code
+# example:woody
+# returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
+# returns: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
+# genetic rank applies in context of a list of words, so it is calculated later
 def get_gencode(word) -> list:
-    gencode = []
-    for x in range(26):
-        gencode.append(0)
-    print(gencode)
-    print(len(word))
+    # gencode is the list of integers that will be returned
+    gencode = gc_z.copy()
+    # dups counts the number of times letters occur more than once
+    dups = 0
+    # loop through each letter in the word
     for l in word:
         idx = ord(l) - 97
-        print(idx)
-        gencode[idx] = gencode[idx] + 1
+        # Increment dups if that letter has already been seen.
+        if gencode[idx] > 0:
+            dups += 1
+        # Mark that letter as having been seen.
+        gencode[idx] = 1
+    gencode[26] = dups
     return gencode
+
+# returns genetic letter tally list for a gendictionary
+# this list is 26 members where each member corresponds
+# to the count for that letter position idx 0-25 where
+# idx 0=a and idx 25=z
+def get_gendict_tally(gendict) -> list:
+    gen_tally = []
+    for x in range(26):
+        gen_tally.append(0)
+    # loop through each gencode values list
+    for gencode in gendict.values():
+        # looking at just the list's a...z letter presence value,
+        # add them up
+        for idx in range(26):
+            if gencode[idx] > 0:
+                gen_tally[idx] = gen_tally[idx] + gencode[idx]
+    return gen_tally
+
+# Assigns the genetic rank to the gendict members and returns
+# the maximum genetic rank seen.
+def assign_genrank(gendict,gen_tally) -> int:
+    maxrank = 0
+    for w, g in gendict.items():
+        gr = 0
+        for idx in range(26):
+            gr = gr + g[idx]*gen_tally[idx]
+        gr = gr + g[26]
+        new_g = g
+        new_g[27] = gr
+        if gr > maxrank:
+            maxrank = gr
+        gendict.update({w:new_g})
+    return maxrank
+
+# returns list of the max genrankers in the gendict
+def get_maxgenrankers(gendict,maxrank) -> list:
+    max_rankers = []
+    for w, g in gendict.items():
+        if maxrank == g[27]:
+            max_rankers.append(w)
+    return max_rankers
+
+def regex_maxgenrankers(max_rankers) -> str:
+
+
 
 
 # A class used for holding list stack of the shell commands

@@ -24,7 +24,7 @@ import helpers
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
 import customtkinter as ctk
-from typing import NoReturn
+from typing import NoReturn, Dict, Any
 import random
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
@@ -244,6 +244,26 @@ class Pywordlemainwindow(ctk.CTk):
             if self.sel_rando and (n_items > 0):
                 word, rank = random.choice(list(the_word_list.items()))
                 rand_pick = word + mid_div + rank
+                # highlight the rand_pick, which also scrolls the widget
+                # to the rand_pick's line.
+                tx_result.highlight_pattern(rand_pick, 'hlt')
+
+            # Genetic ranking aks to do
+            if True and (n_items > 0):
+                gendict: dict[str, list] ={}
+                for w,r in the_word_list.items():
+                    gencode = helpers.get_gencode(w)
+                    gendict.update({w:gencode})
+                # for x, g in gendict.items():
+                #     print(x,g)
+
+                gen_tally = helpers.get_gendict_tally(gendict)
+                maxrank = helpers.assign_genrank(gendict,gen_tally)
+                for x, g in gendict.items():
+                    print(x,g)
+
+                max_rankers = helpers.get_maxgenrankers(gendict,maxrank)
+                print(maxrank, max_rankers)
 
                 # aks to do
                 # shows how to highlight multiple items, to be used
@@ -253,20 +273,6 @@ class Pywordlemainwindow(ctk.CTk):
                 # print(regex)
                 # tx_result.highlight_pattern(regex, 'hlt')
 
-                # genetic dictionary ->
-                # key:woody
-                # value:'abcdefghijklmnopqrstuvwxyz'
-                # value:'00010000000000200000001010'
-
-                print(word)
-                gencode = helpers.get_gencode(word)
-                gencode.append(0)
-                print(gencode)
-
-
-                # highlight the rand_pick, which also scrolls the widget
-                # to the rand_pick's line.
-                tx_result.highlight_pattern(rand_pick, 'hlt')
 
             tx_result.configure(state='disabled')
             if not self.sel_rando:
