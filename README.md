@@ -74,7 +74,7 @@ After installing python3 and pip, the following commands entered in a Terminal w
 ### Genetic Ranking
 
 * Genetic Rank is a measure of how related via its letters a word is to other words amongst a word group. Each word in a group is assigned a 1x26 vector of 0 or 1 entries that flags whether a letter occurs in that word. Those vectors from the word group are summed to result in a 1x26 vector that is counting the letter flags in the word group. A word's genetic rank is calculated as the sum product of a word's flag vector and the word group's summing flag vector. The word's rank is then increased by each time a letter in that word occurs more than once. 
-* Using the highest genetic ranking word minimizes the worst possible Wordel outcome. In s simple example consider a word group of three words. The worst possible outcome is three guesses. If there is one or two highest genetic ranking words in this group, then picking one of those words first reduces the worst possible outcome to two guesses.
+* Using the highest genetic ranking word minimizes the worst possible Wordel outcome. In a simple example consider a word group of three words. The worst possible outcome is three guesses. If there is one or two highest genetic ranking words in this group, then picking one of those words first reduces the worst possible outcome to two guesses.
 
 ### Wordle Play Strategies
 
