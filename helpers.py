@@ -8,6 +8,8 @@ import tkinter as tk  # assigns tkinter stuff to tk namespace
 from tkinter import messagebox
 from typing import NoReturn
 
+gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 
 # Returns the wordle word list full pathname
 # Exits program if not found
@@ -178,6 +180,83 @@ def clear_scrn() -> NoReturn:
     os.system("cls" if os.name == "nt" else "clear")
 
 
+# Return a word's genetic code
+# example:woody
+# returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
+# translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
+# genetic rank applies in context of a list of words, so it is calculated later
+def get_gencode(word) -> list:
+    # gencode is the list of integers that will be returned
+    gencode = gc_z.copy()
+    # dups counts the number of times letters occur more than once
+    dups = 0
+    # loop through each letter in the word
+    for ltr in word:
+        idx = ord(ltr) - 97
+        # Increment dups if that letter has already been seen.
+        if gencode[idx] > 0:
+            dups += 1
+        # Mark that letter as having been seen.
+        gencode[idx] = 1
+    gencode[26] = dups
+    return gencode
+
+
+# returns genetic letter tally list for a gendictionary
+# this list is 26 members where each member corresponds
+# to the count for that letter position idx 0-25 where
+# idx 0=a and idx 25=z
+def get_gendict_tally(gendict) -> list:
+    gen_tally = []
+    for x in range(26):
+        gen_tally.append(0)
+    # loop through each gencode values list
+    for gencode in gendict.values():
+        # looking at just the list's a...z letter presence value,
+        # add them up
+        for idx in range(26):
+            if gencode[idx] > 0:
+                gen_tally[idx] = gen_tally[idx] + gencode[idx]
+    return gen_tally
+
+
+# Assigns the genetic rank to the gendict members and returns
+# the maximum genetic rank seen.
+def assign_genrank(gendict, gen_tally) -> int:
+    maxrank = 0
+    for w, g in gendict.items():
+        gr = 0
+        for idx in range(26):
+            gr = gr + g[idx] * gen_tally[idx]
+        gr = gr + g[26]
+        new_g = g
+        new_g[27] = gr
+        if gr > maxrank:
+            maxrank = gr
+        gendict.update({w: new_g})
+    return maxrank
+
+
+# returns list of the max genrankers in the gendict
+def get_maxgenrankers(gendict, maxrank) -> list:
+    max_rankers = []
+    for w, g in gendict.items():
+        if maxrank == g[27]:
+            max_rankers.append(w)
+    return max_rankers
+
+
+# returns a regex formatted pattern string for highlighting
+def regex_maxgenrankers(max_rankers, wordsdict) -> str:
+    pat_list = []
+    mid_div = " : "
+    for w in max_rankers:
+        r = wordsdict[w]
+        pat_list.append(w + mid_div + r)
+    regex_str = '|'.join(pat_list)
+    return regex_str
+
+
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
 # letter conditions. Some functions are not used in the gui
@@ -300,6 +379,11 @@ class ToolResults:
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
+    # aks to do
+    # Genetic note: We still want to know the letter freq rank for the genetic ranked words. The plan will
+    # be to show the normal ranked list with the highest genetics highlighted.
+    # Multiple highlighting is possible. Tested
+
     # Return the grepped word count
     def get_results_raw_cnt(self) -> str:
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
@@ -344,7 +428,7 @@ class CustomText(tk.Text):
         tk.Text.__init__(self, *args, **kwargs)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=False):
+                          regexp=True):
         """Apply the given tag to all text that matches the given pattern
         If 'regexp' is set to True, pattern will be treated as a regular
         expression according to Tcl's regular expression syntax.
@@ -367,4 +451,4 @@ class CustomText(tk.Text):
             self.mark_set("matchStart", index)
             self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.tag_add(tag, "matchStart", "matchEnd")
-            self.see(index) # scroll widget to show the index's line
+            self.see(index)  # scroll widget to show the index's line

@@ -13,7 +13,7 @@
 ### What To Expect From This Helper
 
 * Expect nothing more than a helper with a thorough vocabulary that presents words only matching the letters you specify.
-* The Helper was created for investigating Wordle word pick strategies. Using the Helper removes the task of thinking up five letter words to allow one to focus only on play strategy.
+* The Helper was created for investigating Wordle word pick strategies. Using the Helper removes the task of thinking up five-letter words to allow one to focus only on play strategy.
 * The Helper "knows" the words but not which word is the solution. As such the Helper ruins the game for those where thinking up words is the attraction to Wordle.  
 
 ### Running the Wordle helper
@@ -70,6 +70,11 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * The **Both** method sums the **Occurrence** and the **Position** methods. The method first biases the word rank according to by letter occurrence ranking. Then it up promotes the rank according to letter position rank.
 * These ranking method are essentially of different scales. Each should not be compared to each other for any particular word.
 * Word rank represents relative occurrence probability; however, any word matching the filter could be the Wordle word regardless of its rank.
+
+### Genetic Ranking
+
+* Genetic Rank is a measure of how related via its letters a word is to other words amongst a word group. Each word in a group is assigned a 1x26 vector of 0 or 1 entries that flags whether a letter occurs in that word. Those vectors from the word group are summed to result in a 1x26 vector that is counting the letter flags in the word group. A word's genetic rank is calculated as the sum product of a word's flag vector and the word group's summing flag vector. The word's rank is then increased by each time a letter in that word occurs more than once. 
+* Using the highest genetic ranking word minimizes the worst possible Wordel outcome. In s simple example consider a word group of three words. The worst possible outcome is three guesses. If there is one or two highest genetic ranking words in this group, then picking one of those words first reduces the worst possible outcome to two guesses.
 
 ### Wordle Play Strategies
 

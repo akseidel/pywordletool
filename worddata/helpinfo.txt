@@ -24,6 +24,8 @@ In the puzzle game context a letter indicated not at its correct position is a l
 
 'Pick A Random Word' highlights a random word in the current showing word list. There is a point when narrowing down the list of possible words where the higher ranking words are biased against words containing low ranking letters. Any one of the words shown could be the wordle word. This feature is intended for use when the list has become small where you can surmise the correct word would be a random selection.
 
+'Show Highest Genetic Rank' highlights the words or words having the highest Genetic Rank in the current word list. Genetic Rank is a measure of how related via its letters a word is to other words amongst a word group.  Using the highest genetic ranking word minimizes the worst possible outcome. In s simple example consider a word group of three words. The worst possible outcome is three guesses. If there is one or two highest genetic ranking words in this group, then picking one of those words first reduces the worst possible outcome to two guesses.
+
 - Tips:
 
 Please develop your own strategy for picks. Sorry, none are mentioned here. What you discover might be surprising at first.
