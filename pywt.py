@@ -1261,7 +1261,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_rando = ctk.CTkButton(self.admin_frame, text="Pick A Random Word", width=40, command=pick_rando)
         self.bt_rando.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
 
-        self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Genetic Dividers", width=40, command=pick_genetic)
+        self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Highest Genetic Rank", width=40, command=pick_genetic)
         self.bt_genetic.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
 
         # === END OF ====== Application Controls ==========
