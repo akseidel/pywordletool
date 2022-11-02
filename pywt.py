@@ -242,12 +242,14 @@ class Pywordlemainwindow(ctk.CTk):
                 if i == n_items:
                     tx_result.insert(tk.END, l_msg + '\n')
 
+            comment = ""
             if self.sel_rando and (n_items > 0):
                 word, rank = random.choice(list(the_word_list.items()))
                 rand_pick = word + mid_div + rank
                 # highlight the rand_pick, which also scrolls the widget
                 # to the rand_pick's line.
                 tx_result.highlight_pattern(rand_pick, 'hlt')
+                comment = " (1 random pick selected)"
 
             # Genetic ranking
             if self.sel_genetic and (n_items > 0):
@@ -260,12 +262,13 @@ class Pywordlemainwindow(ctk.CTk):
                 max_rankers = helpers.get_maxgenrankers(gendict, maxrank)
                 regex = helpers.regex_maxgenrankers(max_rankers, the_word_list)
                 tx_result.highlight_pattern(regex, 'hlt')
+                comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
 
             tx_result.configure(state='disabled')
-            if not self.sel_rando:
-                # Do not scroll to end when a rando pick is highlighted
+            if not self.sel_rando and not self.sel_genetic:
+                # Do not scroll to end when a rando pick or genetic is highlighted
                 tx_result.see('end')
-            self.status.set(wordletool.get_status())
+            self.status.set(wordletool.get_status() + comment)
             tx_gr.configure(state='normal')
             tx_gr.delete(1.0, tk.END)
             tx_gr.insert(tk.END, wordletool.get_cmd_less_filepath())

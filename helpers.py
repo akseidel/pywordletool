@@ -396,8 +396,8 @@ class ToolResults:
 
     # Returns the status text line.
     def get_status(self) -> str:
-        status = '=> Showing ' + str(self.ranked_cnt) + ' words from the raw list of ' + str(
-            self.get_results_raw_cnt()) + " duplicate letter words."
+        status = '=> Showing ' + str(self.ranked_cnt) + ' words from the ' + str(
+            self.get_results_raw_cnt()) + " duplicate letter word list."
         return status
 
     # Returns the entire fully assembled grep command line. This line includes
