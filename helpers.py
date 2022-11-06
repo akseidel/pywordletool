@@ -82,25 +82,32 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
 
 # Returns a word's letter frequency ranking
 def wrd_rank(wrd, ltr_rank_dict, method) -> float:
+    # Any word longer than 5 letters has undefined rank.
+    # This allows for wordlist flexibilty,
+    if len(wrd) > 5:
+        return 0
     r = 0
     if method == 0:  # rank by anywhere in word
         for x in wrd:
             # 0th position is rank by anywhere
-            r = r + ltr_rank_dict[x][0]
+            if 97 <= ord(x) <= 122:
+                r = r + ltr_rank_dict[x][0]
         return r
     if method == 1:  # rank by position in the word
         p = 1
         for x in wrd:
             # 1 to 5th position is rank for being in that position
-            r = r + ltr_rank_dict[x][p]
-            p += 1
+            if 97 <= ord(x) <= 122:
+                r = r + ltr_rank_dict[x][p]
+                p += 1
         return r
     if method == 2:  # rank by position in the word
         p = 1
         for x in wrd:
             # combine methods 0 and 1
-            r = r + ltr_rank_dict[x][0] + ltr_rank_dict[x][p]
-            p += 1
+            if 97 <= ord(x) <= 122:
+                r = r + ltr_rank_dict[x][0] + ltr_rank_dict[x][p]
+                p += 1
         return r
     return 0
 
@@ -151,12 +158,17 @@ def print_this_word_list(the_word_list, n_col) -> NoReturn:
 def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool, rank_mode: int) -> dict:
     wrds_dict = {}
     for w in wrds:
-        if len(w) == 5:
-            if allow_dups:
+        # currently, the wrd_rank function can handle only 5-letter words
+        # if len(w) == 5:
+        if len(w) == 0:
+            print("len 0")
+        if allow_dups:
+            # every word goes into the dictionary
+            wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
+        else:
+            # only words having no duplicates goes into the dictionary
+            if not wrd_has_duplicates(w):
                 wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
-            else:
-                if not wrd_has_duplicates(w):
-                    wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
 
     # sorting the ranked word list into a dictionary
     # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
@@ -302,31 +314,19 @@ class ShellCmdList:
             if add_e:  # Require the letter if not already done
                 self.shCMDlist.append("grep -E '" + ltr + "'")
             # but not in this position.
-            if p == 1:
-                self.shCMDlist.append("grep -vE '" + ltr + "....'")
-            elif p == 2:
-                self.shCMDlist.append("grep -vE '." + ltr + "...'")
-            elif p == 3:
-                self.shCMDlist.append("grep -vE '.." + ltr + "..'")
-            elif p == 4:
-                self.shCMDlist.append("grep -vE '..." + ltr + ".'")
-            elif p == 5:
-                self.shCMDlist.append("grep -vE '...." + ltr + "'")
+            c = 5
+            dp = ''.rjust(p - 1, '.')
+            dpn = ''.rjust(c - p, '.')
+            self.shCMDlist.append("grep -vE '" + dp + ltr + dpn + "'")
 
     # Adds command to stack to require letter at a position number.
     def add_incl_pos_cmd(self, ltr: str, p: int) -> NoReturn:
         if len(ltr) > 0:
             # Have letter in this position
-            if p == 1:
-                self.shCMDlist.append("grep -E '" + ltr + "....'")
-            elif p == 2:
-                self.shCMDlist.append("grep -E '." + ltr + "...'")
-            elif p == 3:
-                self.shCMDlist.append("grep -E '.." + ltr + "..'")
-            elif p == 4:
-                self.shCMDlist.append("grep -E '..." + ltr + ".'")
-            elif p == 5:
-                self.shCMDlist.append("grep -E '...." + ltr + "'")
+            c = 5
+            dp = ''.rjust(p - 1, '.')
+            dpn = ''.rjust(c - p, '.')
+            self.shCMDlist.append("grep -E '" + dp + ltr + dpn + "'")
 
     # Returns the command stack assembled into one command line.
     def full_cmd(self) -> str:
@@ -373,7 +373,8 @@ class ToolResults:
         # Ranking and filtering the words into a dictionary
         # Set allow_dups to prevent letters from occurring more than once
         # First pick should not use duplicates, later picks should consider them.
-        wrds = self.get_results_wrd_lst()
+        # Exclude all empty string. This can happen at the file end.
+        wrds = list(filter(None, self.get_results_wrd_lst()))
         self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.allow_dups,
                                                                        self.rank_mode)
         self.ranked_cnt = len(self.ranked_wrds_dict)
