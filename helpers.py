@@ -397,7 +397,7 @@ class ToolResults:
 
     # Returns the status text line.
     def get_status(self) -> str:
-        status = '=> Showing ' + str(self.ranked_cnt) + ' words from the ' + str(
+        status = 'Showing ' + str(self.ranked_cnt) + ' words from the ' + str(
             self.get_results_raw_cnt()) + " duplicate letter word list."
         return status
 

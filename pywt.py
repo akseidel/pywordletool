@@ -553,7 +553,7 @@ class Pywordlemainwindow(ctk.CTk):
                              highlightthickness=0)
         lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
         lb_status.configure(font=font_tuple_n)
-        self.status.set('=> No status yet.')
+        self.status.set('No status yet.')
 
         # grep line being used
         tx_gr = tk.Text(self.result_frame,
@@ -614,7 +614,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # letter position frame require- uses pack
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
-                                                text='Require A Position',
+                                                text='Require At Position',
                                                 labelanchor='n'
                                                 )
         self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
