@@ -1,6 +1,7 @@
 # ----------------------------------------------------------------
 # helpers akseidel 5/2022
 # ----------------------------------------------------------------
+from subprocess import Popen, PIPE
 import sys
 import os
 import random
@@ -178,13 +179,17 @@ def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allo
 # Returns the number of words that pass the grep command list
 def get_raw_word_count(this_sh_cmd_lst) -> str:
     sh_cmd_cnt = this_sh_cmd_lst.full_cmd() + " | wc -ltr"
-    return os.popen(sh_cmd_cnt).read().strip()
+    with Popen(sh_cmd_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
+        return proc.stdout.readline().strip()
+    # return os.popen(sh_cmd_cnt).read().strip()
 
 
 # Returns the list of words that pass the grep command list
 def get_results_word_list(this_sh_cmd_lst) -> list:
-    result = os.popen(this_sh_cmd_lst.full_cmd()).read()
-    return result.split("\n")
+    with Popen(this_sh_cmd_lst.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
+        return list(map(lambda i: i[: -1], proc.stdout.readlines()))
+    # result = os.popen(this_sh_cmd_lst.full_cmd()).read()
+    # return result.split("\n")
 
 
 # Clears the console window
@@ -365,7 +370,9 @@ class ToolResults:
 
     # Return the results words list without any ranking or sorting.
     def get_results_wrd_lst(self) -> list:
-        return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
+        with Popen(self.tool_command_list.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
+            return list(map(lambda i: i[: -1], proc.stdout.readlines()))
+        # return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
 
     # Returns ranked results words list as dictionary. The ranking function also
     # sorts the dictionary. So result is sorted.
@@ -388,8 +395,10 @@ class ToolResults:
     # Return the grepped word count
     def get_results_raw_cnt(self) -> str:
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
-        self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
-        return self.raw_cnt
+        with Popen(sh_cmd_for_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
+            return proc.stdout.readline().strip()
+        # self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
+        # return self.raw_cnt
 
     # Returns sorted ranked word list formatted into n_col columns.
     def print_col_format_ranked_list(self, n_col: int) -> NoReturn:
