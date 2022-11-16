@@ -2,63 +2,96 @@
 # pywordletool AKS 5/2022
 # ----------------------------------------------------------------
 
-# temporary path environment to find helpers.py
-import sys
 import helpers
-import grepper
+import random
 
-sys.path.append('/Users/aks/Documents/GitHub/pywordletool/')
+data_path = 'worddata/'  # path from here to data folder
+letter_rank_file = 'letter_ranks.txt'
 
-data_path = './worddata/'  # path from here to data folder
+vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
+# vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
+
+x_pos_dict = {}  # exclude position dictionary
+r_pos_dict = {}  # require position dictionary
+excl_l = []  # exclude list
+requ_l = []  # require list
 
 # Set allow_dups to prevent letters from occurring more than once
-# First pick should not use duplicates, later picks should consider them.
 # allow_dups = False
 no_dups = True
 
-rank_mode = 1
+# rank mode:
+# 0 = Occurrence
+# 1 = Position
+# 2 = Both
+rank_mode = 2
 
 helpers.clear_scrn()  # clears terminal
 
-# initialize the wordletool
-wordletool = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', 'letter_ranks.txt', no_dups, rank_mode)
 
-# # variables
-# ranked_wrds_dict = {}  # dictionary of ranked words resulting from grep filtering
-#
-# wrdListFileName = helpers.get_word_list_path_name(data_path + 'wo_nyt_wordlist.txt')
-# # wrdListFileName = helpers.get_word_list_path_name(data_path + 'nyt_wordlist.txt')
+def get_word_list(verbose=False) -> dict:
+    the_word_list = wordletool.get_ranked_results_wrd_lst()
+    if verbose:
+        helpers.print_word_list_col_format(the_word_list, 6)
+        print(wordletool.get_status())
+        print(wordletool.get_cmd_less_filepath())
+    return the_word_list
 
-# rankFile = data_path + 'letter_ranks.txt'  # rankFile is the letter ranking textfile
-# ltr_rank_dict = helpers.make_ltr_rank_dictionary(rankFile)  # ltr_rank_dict is the rank dictionary
 
-# Initialize and set up the ShellCmdList class instance that is used to hold the
-# grep filtering command stack. Guessing because it is a class instance is why it
-# can be passed around as a global variable where it gets modified along the way.
-# tool_command_list = helpers.ShellCmdList(wrdListFileName)
-# tool_command_list = wordletool.tool_command_list
-grepper.setup_grep_filtering(wordletool.tool_command_list)  # fills the stack with grep assignments
-#
-# # Get word count
-# raw_cnt = helpers.get_raw_word_count(tool_command_list)
-#
-# # Get results words list
-# wrds = helpers.get_results_word_list(tool_command_list)
-#
-# # Ranking and filtering the words into a dictionary
-# ranked_wrds_dict = helpers.make_ranked_filtered_result_dictionary(wrds, ltr_rank_dict, allow_dups)
+def clean_slate(excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict):
+    x_pos_dict.clear()
+    r_pos_dict.clear()
+    excl_l.clear()
+    requ_l.clear()
 
-# helpers.print_this_word_list(ranked_wrds_dict, 6)
 
-wordletool.print_col_format_ranked_list(6)
+the_word_list = {}
 
-print(wordletool.get_status())
+sample_number = 100
+target_wrd = 'baker'
+tot = 0
+guessin2 = 0
+guessin1 = 0
 
-print(wordletool.get_full_cmd())
+print('target_wrd : ' + target_wrd + ' Sampling ' + str(sample_number) + ' solving runs with random guesses ...')
+for x in range(sample_number):
+    # initialize a wordletool instance
+    wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, no_dups, rank_mode)
+    guesses = 0
+    run_stats = []
+    run_stats.append(target_wrd)
+    clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
+    helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+    the_word_list.clear()
+    the_word_list = get_word_list()
+    # This loop ends when the last guess results in only one remaining word that fits the
+    # pattern. That word, being the target word, will be the solving guess. The loop's last
+    # guess is therefore the actual second to last guess, except when it happens by chance
+    # to be the target word.
+    while len(the_word_list) > 1:
+        word, rank = random.choice(list(the_word_list.items()))
+        # word, rank = list(the_word_list.items())[-1]
+        guesses += 1
+        run_stats.append(word)
+        helpers.analyze_pick_to_solution(target_wrd, word, excl_l, x_pos_dict, r_pos_dict)
+        helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+        the_word_list = get_word_list()
+        run_stats.append(len(the_word_list))
+    # The ending guess is the second to last guess, except when it happens by chance
+    # to be the target word.
+    if not word == target_wrd:
+        guesses += 1
+    tot = tot + guesses
+    if guesses == 2:
+        print(x, run_stats, guesses)
+        guessin2 += 1
+    if guesses == 1:
+        print(x, run_stats, guesses)
+        guessin1 += 1
+    del wordletool
 
-# print()
-# print('Showing word list of ' + str(len(ranked_wrds_dict)) + " from raw list of " + raw_cnt + " having duplicates.")
-# print()
-
-# print(tool_command_list.full_cmd())
-# print()
+average = tot / sample_number
+print('target_wrd ' + target_wrd + ' : ' + str(average) + ' random guesses to solve. ' + str(sample_number) + ' runs.')
+print('guessin2 % is ' + str(100 * (guessin2 / sample_number)))
+print('guessin2 count is ' + str(guessin2))
+print('guessin1 count is ' + str(guessin1))

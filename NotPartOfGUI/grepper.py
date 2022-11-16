@@ -2,6 +2,7 @@
 # greppers AKS 5/2022
 # ----------------------------------------------------------------
 
+# do not use
 
 # grep filtering builder
 def setup_grep_filtering(this_sh_cmd_lst):
@@ -56,3 +57,4 @@ def setup_grep_filtering(this_sh_cmd_lst):
     # this_sh_cmd_lst.add_cmd('grep -E \'v|x|z|q|j\'')
 
     pass  # Required to avoid error when no statements are made in here.
+

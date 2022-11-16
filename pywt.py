@@ -36,6 +36,7 @@ letter_rank_file = 'letter_ranks.txt'
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
+exclude = []  # exclude list used by monkey sampler
 font_tuple_n = ("Courier", 14, "normal")
 
 
@@ -195,11 +196,16 @@ class Pywordlemainwindow(ctk.CTk):
 
             wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups,
                                              self.rank_mode.get())
-
+            # The filter builders. Each of these adds to the grep command argument list
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_require_these_grep(rq_ltrs))
-            build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
-            build_r_pos_grep(wordletool, r_pos_dict)
+            helpers.build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
+            pat = helpers.build_r_pos_grep(wordletool, r_pos_dict)
+
+            # needed to show the last user entry in context with the sanity question.
+            self.update()
+            if helpers.wrd_has_duplicates(pat) and (not self.allow_dup_state.get()):
+                sanity_question()
 
             if self.sp_pat_mode_var.get() == 1:
                 wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
@@ -251,7 +257,7 @@ class Pywordlemainwindow(ctk.CTk):
                 tx_result.highlight_pattern(rand_pick, 'hlt')
                 comment = " (1 random pick selected)"
 
-            # Genetic ranking
+                # Genetic ranking
             if self.sel_genetic and (n_items > 0):
                 gendict: dict[str, list] = {}
                 for w, r in the_word_list.items():
@@ -347,6 +353,7 @@ class Pywordlemainwindow(ctk.CTk):
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
             self.cbox_px_l.current(0)
             self.cbox_px_p.current(0)
+            exclude.clear()
 
         def remove_r_pos() -> NoReturn:
             # Note - This differs radically from remove_x_pos because in the
@@ -430,7 +437,6 @@ class Pywordlemainwindow(ctk.CTk):
 
         def build_exclude_grep(ex_btn_var_list: list) -> str:
             """Builds the grep line for excluding letters
-
             """
             # example 'grep -vE \'b|f|k|w\''
             grep_exclude = ""
@@ -444,56 +450,6 @@ class Pywordlemainwindow(ctk.CTk):
             if len(lts) > 0:
                 grep_exclude = "grep -vE \'" + args + "\'"
             return grep_exclude
-
-        def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str) -> NoReturn:
-            """Builds the grep line for excluding positions
-            """
-            # example 'grep -vE \'..b..\'' for b,3
-            sort_by_key_dict = {}
-            for j in sorted(this_pos_dict):
-                sort_by_key_dict[j] = this_pos_dict[j]
-            for x in sort_by_key_dict:
-                parts = this_pos_dict[x].split(',')
-                ltr = parts[0].lower()
-                p = int(parts[1])
-                if rq_lts.__contains__(ltr):
-                    # add without the requirement, it has been done already
-                    lself.tool_command_list.add_excl_pos_cmd(ltr, p, False)
-                else:
-                    # add with the requirement
-                    lself.tool_command_list.add_excl_pos_cmd(ltr, p, True)
-                    # keep track of its require in this function
-                    rq_lts += ltr
-
-        def build_r_pos_grep(lself, this_pos_dict: dict) -> NoReturn:
-            """Builds the grep line for including positions
-            """
-            # example 'grep -vE \'..b.a\'' for (b,3) (a,5)
-            if len(this_pos_dict) < 1:  # no grep required
-                return
-            pat = ''
-            pos = 1
-            # first make a dictionary of the dictionary sorted by the position number
-            tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
-            sorted_by_pos_dict = dict(tlist)
-            for x in sorted_by_pos_dict:
-                parts = sorted_by_pos_dict[x].split(',')
-                ltr = parts[0].lower()
-                p = int(parts[1])
-                while pos < p:
-                    pat = pat + '.'
-                    pos += 1
-                pat = pat + ltr
-                pos += 1
-            # fill out the trailing undefined positions
-            while len(pat) < 5:
-                pat = pat + '.'
-            self.update()  # needed to show the last user entry in context with the
-            # sanity question.
-            if helpers.wrd_has_duplicates(pat) and (not self.allow_dup_state.get()):
-                sanity_question()
-
-            lself.tool_command_list.add_require_cmd(pat)
 
         def build_require_these_grep(rq_lts: str) -> str:
             """Builds the grep line for requiring letters
@@ -1264,7 +1220,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_rando = ctk.CTkButton(self.admin_frame, text="Pick A Random Word", width=40, command=pick_rando)
         self.bt_rando.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
 
-        self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Highest Genetic Rank", width=40, command=pick_genetic)
+        self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Highest Genetic Rank", width=40,
+                                        command=pick_genetic)
         self.bt_genetic.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
 
         # === END OF ====== Application Controls ==========
@@ -1355,5 +1312,5 @@ class Pywordlemainwindow(ctk.CTk):
 
 # end Pywordlemainwindow class
 
-this_app = Pywordlemainwindow()
+this_app: Pywordlemainwindow = Pywordlemainwindow()
 this_app.mainloop()
