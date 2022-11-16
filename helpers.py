@@ -125,8 +125,8 @@ def wrd_has_duplicates(wrd) -> bool:
     return len(ltr_d) < len(wrd)
 
 
-# List out the ranked word list in columns
-def print_this_word_list(the_word_list, n_col) -> NoReturn:
+# List out the ranked word list into n_col columns.
+def print_word_list_col_format(the_word_list, n_col) -> NoReturn:
     n_items = len(the_word_list)
     h_txt = " Word : Rank "
     left_pad = ""
@@ -274,6 +274,111 @@ def regex_maxgenrankers(max_rankers, wordsdict) -> str:
     return regex_str
 
 
+# Updates the exclude, exclude position and include position filtering according to
+# what a pick looks like against the solution word.
+def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dict,
+                             r_pos_dict: dict) -> NoReturn:
+    candidate_pos = 0
+    for pl in pick:
+        if sol.find(pl) < 0:
+            if not exclude.__contains__(pl):
+                exclude.append(pl)
+            # done with this letter
+            candidate_pos += 1
+            continue
+        # pl has instances
+        key = pl + ',' + str(candidate_pos + 1)
+        value = key
+        if candidate_pos != sol.find(pl, candidate_pos):
+            # exclude from candidate position
+            x_pos_dict[key] = value
+        else:
+            # include at candidate position
+            r_pos_dict[key] = value
+
+        candidate_pos += 1
+
+    # print(pick + ' against ' + sol)
+    # print('chmp_exclude ' + str(exclude))
+    # print('chmp_r_pos_dict ' + str(r_pos_dict))
+    # print('chmp_x_pos_dict ' + str(x_pos_dict))
+
+
+def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str) -> NoReturn:
+    """Builds the grep line for excluding positions
+    """
+    # example 'grep -vE \'..b..\'' for b,3
+    sort_by_key_dict = {}
+    for j in sorted(this_pos_dict):
+        sort_by_key_dict[j] = this_pos_dict[j]
+    for x in sort_by_key_dict:
+        parts = this_pos_dict[x].split(',')
+        ltr = parts[0].lower()
+        p = int(parts[1])
+        if rq_lts.__contains__(ltr):
+            # add without the requirement, it has been done already
+            lself.tool_command_list.add_excl_pos_cmd(ltr, p, False)
+        else:
+            # add with the requirement
+            lself.tool_command_list.add_excl_pos_cmd(ltr, p, True)
+            # keep track of its require in this function
+            rq_lts += ltr
+
+
+def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
+    """Builds the grep line for including positions
+    """
+    # example 'grep -vE \'..b.a\'' for (b,3) (a,5)
+    pat = ''
+    pos = 1
+    if len(this_pos_dict) < 1:  # no grep required
+        return pat
+    # first make a dictionary of the dictionary sorted by the position number
+    tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
+    sorted_by_pos_dict = dict(tlist)
+    for x in sorted_by_pos_dict:
+        parts = sorted_by_pos_dict[x].split(',')
+        ltr = parts[0].lower()
+        p = int(parts[1])
+        while pos < p:
+            pat = pat + '.'
+            pos += 1
+        pat = pat + ltr
+        pos += 1
+    # fill out the trailing undefined positions
+    while len(pat) < 5:
+        pat = pat + '.'
+    lself.tool_command_list.add_require_cmd(pat)
+    return pat
+
+
+# The filter builder. filter arguments for each type are addedto the grep command argumentlist
+def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict):
+    pipe = "|"
+    pipe2 = "| "
+    # Builds the grep line for excluding letters
+    # example 'grep -vE \'b|f|k|w\''
+    if len(excl_l) > 0:
+        args = pipe.join(excl_l)
+        grep_exclude = "grep -vE \'" + args + "\'"
+        wordle_tool.tool_command_list.add_cmd(grep_exclude)
+
+    # Builds the grep line for requiring letters
+    # Each letter gets its own grep
+    if len(requ_l) > 0:
+        itms = []
+        for ltr in requ_l:
+            itms.append("grep -E \'" + ltr + "\'")
+        grep_require_these = pipe2.join(itms)
+        wordle_tool.tool_command_list.add_cmd(grep_require_these)
+
+    # Build exclude from position, but require
+    rq_ltrs = "".join(requ_l)
+    build_x_pos_grep(wordle_tool, x_pos_dict, rq_ltrs)
+    # Build require at position
+    build_r_pos_grep(wordle_tool, r_pos_dict)
+
+
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
 # letter conditions. Some functions are not used in the gui
@@ -303,7 +408,7 @@ class ShellCmdList:
         if len(ltr) > 0:
             self.shCMDlist.append("grep -E '" + ltr + "'")
 
-    # Adds command to stack to exclude letter ltr.
+    # Adds command to stack to exclude the letter ltr.
     def add_excl_cmd(self, ltr: str) -> NoReturn:
         if len(ltr) > 0:
             self.shCMDlist.append("grep -vE '" + ltr + "'")
@@ -399,10 +504,6 @@ class ToolResults:
             return proc.stdout.readline().strip()
         # self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
         # return self.raw_cnt
-
-    # Returns sorted ranked word list formatted into n_col columns.
-    def print_col_format_ranked_list(self, n_col: int) -> NoReturn:
-        print_this_word_list(self.get_ranked_results_wrd_lst(), n_col)
 
     # Returns the status text line.
     def get_status(self) -> str:
