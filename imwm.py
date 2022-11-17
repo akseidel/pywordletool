@@ -1,12 +1,19 @@
 # ----------------------------------------------------------------
-# pywordletool AKS 5/2022
+# imwm.py                                             AKS 5/2022
+# Infinite Monkey Wordle Machine
+# Measures the average number of guesses required to arrive at the
+# Wordle target word using various guess strategies. Guesses are
+# selected from the vocabulary list that has words removed based
+# upon the previous guesses in the sample trial. The play is
+# 'hard mode'.
+# The base strategy is to guess only random words. One purpose is
+# to examine the average required guesses as word difficulty.
 # ----------------------------------------------------------------
 import sys
-
 import helpers
 import random
 
-data_path = '../worddata/'  # path from here to data folder
+data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
 letter_rank_file = 'letter_ranks.txt'
 
 vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
