@@ -23,7 +23,8 @@ x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 excl_l = []  # exclude letters list
 requ_l = []  # require letters list
-the_word_list = {}  # the ranked word list dictionary
+# the ranked word list dictionary, created now to use for valid input word checking
+the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
 
 
 def get_word_list(guess_no: int, verbose=False) -> dict:
@@ -60,9 +61,15 @@ def clean_slate(excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict):
 
 
 # The number of times to run guessing sessions
-sample_number: int = 600
+sample_number: int = 6000
 # The target Wordle word the guessing sessions is trying to discover.
-target_wrd: str = 'snarl'
+target_wrd: str = ''
+# helpers.clear_scrn()  # clears terminal
+print()
+print('Average guesses to solve Wordle sampling')
+while target_wrd not in the_word_list:
+    target_wrd: str = input('Enter a valid Wordle target word:').lower()
+
 
 # rank mode:
 # 0 = Occurrence
@@ -80,12 +87,13 @@ allow_dups = False
 # allow_dups = True
 
 # monkey type
-rando_mode = True
-# rando_mode = False
+# rando_mode = True
+rando_mode = False
 if rando_mode:
     guess_mode = ' random guesses'
     # For random mode to represent a base condition, duplicate letter
     # words show be allowed regardless of its previous setting.
+    del allow_dups
     allow_dups = True
 else:
     guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
@@ -98,9 +106,7 @@ guessin1: int = 0  # total number of first getters
 average: float = 0  # average guesses to find the target word
 word: str = ''  # the guess
 
-# helpers.clear_scrn()  # clears terminal
-print()
-print('Average guesses to solve Wordle sampling')
+
 print('target_wrd: ' + target_wrd)
 conditions = str(sample_number) + ' runs,' + guess_mode + ', initial allow duplicates: ' + str(allow_dups)
 print(conditions)
@@ -158,12 +164,12 @@ for x in range(sample_number):
         guesses += 1
     tot = tot + guesses
 
-    # if guesses == 2:
-    #     print(x, run_stats, guesses)
-    #     guessin2 += 1
-    # if guesses == 1:
-    #     print(x, run_stats, guesses)
-    #     guessin1 += 1
+    if guesses == 2:
+        # print(x, run_stats, guesses)
+        guessin2 += 1
+    if guesses == 1:
+        # print(x, run_stats, guesses)
+        guessin1 += 1
 
     # print(x, run_stats, guesses)
 
@@ -175,6 +181,6 @@ for x in range(sample_number):
 average = tot / sample_number
 print('target_wrd: ' + target_wrd + ' , averaged ' + f'{average:.3f}' + ' guesses to solve. ' + conditions)
 sys.stdout.write('\n')
-# print('guessin2 % is ' + str(100 * (guessin2 / sample_number)))
-# print('guessin2 count is ' + str(guessin2))
-# print('guessin1 count is ' + str(guessin1))
+print('guessin2 % is ' + f'{(100 * (guessin2 / sample_number)):.2f}')
+print('guessin2 count is ' + str(guessin2))
+print('guessin1 count is ' + str(guessin1))
