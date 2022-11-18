@@ -13,6 +13,7 @@ import sys
 import helpers
 import random
 
+debug_mode = False  # prints out lists, guesses etc.
 data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
 letter_rank_file = 'letter_ranks.txt'
 
@@ -27,11 +28,12 @@ requ_l = []  # require letters list
 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
 
 
-def get_word_list(guess_no: int, verbose=False) -> dict:
+def get_word_list(guess_no: int, gwrd='', verbose=False) -> dict:
     """
     Combines returning the ranked word list dictionary with
     printing out information if needed.
     @param guess_no: The current guess number
+    @param gwrd: The guess word basis is the was one
     @param verbose: Flag to indicate display
     @return: The ranked word list corresponding to the filtering
     arguments already passed to the wordletool device.
@@ -39,10 +41,13 @@ def get_word_list(guess_no: int, verbose=False) -> dict:
     the_word_list = wordletool.get_ranked_results_wrd_lst()
     if verbose:
         print()
-        print('Selection pool for guess ' + str(guess_no))
-        helpers.print_word_list_col_format(the_word_list, 6)
+        if guess_no > 1:
+            print('Selection pool for guess ' + str(guess_no) + ' based on guess ' + str(guess_no-1) + ' => ' + gwrd)
+        else:
+            print('Selection pool for guess ' + str(guess_no))
         print(wordletool.get_status())
         print(wordletool.get_cmd_less_filepath())
+        helpers.print_word_list_col_format(the_word_list, 6)
     return the_word_list
 
 
@@ -108,8 +113,14 @@ if rando_mode:
     allow_dups = True
 else:
     rank_mode = -1
-    while int(rank_mode) < 0 or int(rank_mode) > 2:
-        rank_mode = input('Rank by Occurrence (0), Position (1) or Both (2), Enter 0,1 or 2: ')
+    while rank_mode == -1:
+        response: str = input('Rank by Occurrence (0), Position (1) or Both (2), Enter 0,1 or 2: ')
+        if response == '0':
+            rank_mode = 0
+        if response == '1':
+            rank_mode = 1
+        if response == '2':
+            rank_mode = 2
 
     guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
     # In ranked mode the allow duplicates flag will be not be forced
@@ -129,12 +140,12 @@ for x in range(sample_number):
     # initialize a wordletool instance
     wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode)
     guesses = 0
-    run_stats = []
+    run_stats = list([])
     run_stats.append(target_wrd)
     clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
     helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
     the_word_list.clear()
-    the_word_list = get_word_list(guesses + 1, False)
+    the_word_list = get_word_list(guesses + 1, '', debug_mode)
     # This loop ends when the last guess results in only one remaining word that fits the
     # pattern. That word, being the target word, will be the solving guess. The loop's last
     # guess is therefore the actual second to last guess, except when it happens by chance
@@ -146,6 +157,7 @@ for x in range(sample_number):
             if guesses == 0:
                 # first pick has to be random in this sampling scheme
                 word, rank = random.choice(list(the_word_list.items()))
+                # word, rank = list(the_word_list.items())[-1]
             else:
                 # all other picks are top rank
                 word, rank = list(the_word_list.items())[-1]
@@ -167,9 +179,11 @@ for x in range(sample_number):
 
         # Now load in the filter criteria
         helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
-        the_word_list = get_word_list(guesses + 2, False)
+        the_word_list = get_word_list(guesses + 2, word, debug_mode)
         run_stats.append(len(the_word_list))
         guesses += 1
+        if debug_mode:
+            print(x+1, run_stats, guesses)
 
     # The ending guess is the second to last guess, except when it happens by chance
     # to be the target word. The next guess being the target word can only happen if the
