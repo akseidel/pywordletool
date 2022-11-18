@@ -68,7 +68,7 @@ target_wrd: str = ''
 print()
 print('Average guesses to solve Wordle sampling')
 while target_wrd not in the_word_list:
-    target_wrd: str = input('Enter a valid Wordle target word:').lower()
+    target_wrd: str = input('Enter a valid Wordle target word: ').lower()
 
 
 # rank mode:
@@ -87,8 +87,19 @@ allow_dups = False
 # allow_dups = True
 
 # monkey type
-# rando_mode = True
-rando_mode = False
+rando_mode = True
+# rando_mode = False
+run_type = -1
+while run_type == -1:
+    response: str = input('Random Guesses (0) or Ranked Guesses (1), Enter 0 or 1: ')
+    if response == '0':
+        rando_mode = True
+        run_type = 0
+    if response == '1':
+        rando_mode = False
+        run_type = 1
+
+
 if rando_mode:
     guess_mode = ' random guesses'
     # For random mode to represent a base condition, duplicate letter
@@ -96,6 +107,10 @@ if rando_mode:
     del allow_dups
     allow_dups = True
 else:
+    rank_mode = -1
+    while int(rank_mode) < 0 or int(rank_mode) > 2:
+        rank_mode = input('Rank by Occurrence (0), Position (1) or Both (2), Enter 0,1 or 2: ')
+
     guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
     # In ranked mode the allow duplicates flag will be not be forced
     # so that its influence on the first and second guess can be observed.
