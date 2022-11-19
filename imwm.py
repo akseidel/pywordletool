@@ -12,25 +12,90 @@
 import sys
 import helpers
 import random
+import argparse
+
+
+def set_context_msg():
+    global rand_mode, guess_mode, allow_dups, rank_mode
+    if rand_mode:
+        guess_mode = ' random guesses'
+        # For random mode to represent a base condition, duplicate letter
+        # words show be allowed regardless of its previous setting.
+        del allow_dups
+        allow_dups = True
+    else:
+        guess_mode = ' rank mode ' + str(rank_mode + 1) + " guesses"
+        # In ranked mode the allow_dups flag will be not be forced
+        # so that its influence on the first and second guess can be observed.
 
 
 def process_any_arguments():
     """
     Process any command line arguments
     """
-    global debug_mode, reveal_mode, vocab_filename, use_starting_wrd
-    if '-d' in sys.argv:
-        # prints out lists, guesses etc.
-        debug_mode = True
-    if '-r' in sys.argv:
-        # reveals each solution run data
-        reveal_mode = True
-    if '-tv' in sys.argv:
-        # reveals each solution run data
-        vocab_filename = 'nyt_wordlist.txt'
-    if '-ns' in sys.argv:
+    global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
+        starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, sample_number
+
+    parser = argparse.ArgumentParser(description='Process command line settings.')
+    parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
+    parser.add_argument('-l', action='store_true', help='Lists each solution run data')
+    parser.add_argument('-n', action='store_true', help='Random first guess word, ie skip asking about it')
+    parser.add_argument('-t', action='store', help='Use this target word T.')
+    parser.add_argument('-s', action='store', help='Use this first guess word S.')
+    parser.add_argument('-r', action='store', type=int, choices=range(0, 4),
+                        help='Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)')
+    parser.add_argument('-x', action='store', type=int,
+                        help='Override the number of sampling runs to be this number X.')
+
+    args = parser.parse_args()
+    debug_mode = args.d  # prints out lists, guesses etc.
+    reveal_mode = args.l  # lists each solution run data
+
+    if args.n:
         # no starting word, skip asking about it
         use_starting_wrd = 0
+
+    if args.t is not None:
+        # use this target word
+        target_wrd = args.t
+
+    if args.s is not None:
+        use_starting_wrd = 1
+        starting_wrd = args.s
+
+    if args.r is not None:
+        if args.r == 0:
+            rand_mode = True
+            run_type = 0
+        else:
+            rand_mode = False
+            run_type = 1
+        # wordletool rank mode ranges from 0 to 2. Random was not a rank mode.
+        # But for command line argument reasons random and rank modes are
+        # combined. So ui rank 1 is wordletool rank 0 etc.
+        if args.r == 1:
+            # Rank by Occurrence (1)
+            rank_mode = 0
+        if args.r == 2:
+            # Rank by Position (2)
+            rank_mode = 1
+        if args.r == 3:
+            # Rank by Both (3),
+            rank_mode = 2
+
+        set_context_msg()
+
+    if args.x is not None:
+        if args.x < 1:
+            sample_number = 1
+            print('===> Negative value not allowed. Runs number is set to ' + str(sample_number))
+        elif args.x > 10000:
+            sample_number = 10000
+            print('===> Honestly, even 10,000 is a waste. Runs number is set to ' + str(sample_number))
+            print('===> Control + C will stop the program.')
+        else:
+            sample_number = args.x
+
 
 # The number of times to run guessing sessions
 sample_number: int = 6000
@@ -46,13 +111,25 @@ x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 excl_l = []  # exclude letters list
 requ_l = []  # require letters list
+# rank mode:
+# 0 = Occurrence
+# 1 = Position
+# 2 = Both
 rank_mode = 2
-rand_mode = True
+# monkey type
+rand_mode = True  # random monkeys
+# rand_mode = False  # smart monkeys
+# Set allow_dups to prevent letters from occurring more than once.
+# This condition is used mainly for the first two guesses. Duplicate
+# letter words are allowed after the second guess and due to the code
+# is required to be able to correctly handle target words that have
+# duplicate letters.
 allow_dups = False
 target_wrd = ''
 guess_mode = ''
 starting_wrd = ''
 use_starting_wrd = -1
+run_type = -1
 process_any_arguments()
 # the ranked word list dictionary, created now to use for valid input word checking
 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
@@ -124,34 +201,27 @@ def get_set_guess_mode():
     Gets and sets the general run type: random guess or ranked guess.
     If ranked guess then get and set the ranking type.
     """
-    global rank_mode, allow_dups, rand_mode, guess_mode
-    # rank mode:
-    # 0 = Occurrence
-    # 1 = Position
-    # 2 = Both
-    rank_mode = 2
-
-    # Set allow_dups to prevent letters from occurring more than once.
-    # This condition is used mainly for the first two guesses. Duplicate
-    # letter words are allowed after the second guess and due to the code
-    # is required to be able to correctly handle target words that have
-    # duplicate letters.
-    #
-    allow_dups = False
-    # allow_dups = True
-
-    # monkey type
-    rand_mode = True
-    # rand_mode = False
-    run_type = -1
+    global rank_mode, allow_dups, rand_mode, guess_mode, run_type
+    if run_type != -1:
+        return
     while run_type == -1:
-        response: str = input('Random Guesses (0) or Ranked Guesses (1), Enter 0 or 1: ')
+        response: str = input(
+            'Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Enter 0,1,2 or 3: ')
         if response == '0':
             rand_mode = True
             run_type = 0
         if response == '1':
             rand_mode = False
             run_type = 1
+            rank_mode = 0
+        if response == '2':
+            rand_mode = False
+            run_type = 1
+            rank_mode = 1
+        if response == '3':
+            rand_mode = False
+            run_type = 1
+            rank_mode = 2
 
     if rand_mode:
         guess_mode = ' random guesses'
@@ -160,16 +230,6 @@ def get_set_guess_mode():
         del allow_dups
         allow_dups = True
     else:
-        rank_mode = -1
-        while rank_mode == -1:
-            response: str = input('Rank by Occurrence (0), Position (1) or Both (2), Enter 0,1 or 2: ')
-            if response == '0':
-                rank_mode = 0
-            if response == '1':
-                rank_mode = 1
-            if response == '2':
-                rank_mode = 2
-
         guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
         # In ranked mode the allow_dups flag will be not be forced
         # so that its influence on the first and second guess can be observed.
