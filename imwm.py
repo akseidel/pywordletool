@@ -13,9 +13,29 @@ import sys
 import helpers
 import random
 
+
+def process_any_arguments():
+    """
+    Process any command line arguments
+    """
+    global debug_mode, reveal_mode, vocab_filename, use_starting_wrd
+    if '-d' in sys.argv:
+        # prints out lists, guesses etc.
+        debug_mode = True
+    if '-r' in sys.argv:
+        # reveals each solution run data
+        reveal_mode = True
+    if '-tv' in sys.argv:
+        # reveals each solution run data
+        vocab_filename = 'nyt_wordlist.txt'
+    if '-ns' in sys.argv:
+        # no starting word, skip asking about it
+        use_starting_wrd = 0
+
 # The number of times to run guessing sessions
 sample_number: int = 6000
 debug_mode = False  # prints out lists, guesses etc.
+reveal_mode = False  # reveals each solution run data
 data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
 letter_rank_file = 'letter_ranks.txt'
 
@@ -33,6 +53,7 @@ target_wrd = ''
 guess_mode = ''
 starting_wrd = ''
 use_starting_wrd = -1
+process_any_arguments()
 # the ranked word list dictionary, created now to use for valid input word checking
 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
 
@@ -51,7 +72,7 @@ def get_word_list(guess_no: int, gwrd='', verbose=False) -> dict:
     if verbose:
         print()
         if guess_no > 1:
-            print('Selection pool for guess ' + str(guess_no) + ' based on guess ' + str(guess_no-1) + ' => ' + gwrd)
+            print('Selection pool for guess ' + str(guess_no) + ' based on guess ' + str(guess_no - 1) + ' => ' + gwrd)
         else:
             print('Selection pool for guess ' + str(guess_no))
         print(wordletool.get_status())
@@ -72,6 +93,7 @@ def clean_slate(excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict):
     r_pos_dict.clear()
     excl_l.clear()
     requ_l.clear()
+
 
 def get_set_target_word():
     """
@@ -95,6 +117,7 @@ def get_set_starting_guess():
                 use_starting_wrd = 1
         if response == 'n':
             use_starting_wrd = 0
+
 
 def get_set_guess_mode():
     """
@@ -148,8 +171,9 @@ def get_set_guess_mode():
                 rank_mode = 2
 
         guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
-        # In ranked mode the allow duplicates flag will be not be forced
+        # In ranked mode the allow_dups flag will be not be forced
         # so that its influence on the first and second guess can be observed.
+
 
 # ====================================== start ================================================
 
@@ -172,7 +196,6 @@ guessin2: int = 0  # total number of second getters
 guessin1: int = 0  # total number of first getters
 average: float = 0  # average guesses to find the target word
 word: str = ''  # the guess
-
 
 print('target_wrd: ' + target_wrd)
 conditions = str(sample_number) + ' runs,' + guess_mode + ', initial allow duplicates: ' + str(allow_dups)
@@ -228,31 +251,34 @@ for x in range(sample_number):
         the_word_list = get_word_list(guesses + 2, word, debug_mode)
         run_stats.append(len(the_word_list))
         guesses += 1
-        if debug_mode:
-            print(x+1, run_stats, guesses)
+        # if debug_mode:
+        #     print(x+1, run_stats, guesses)
+        # print(x + 1, run_stats, guesses)
 
     # The ending guess is the second to last guess, except when it happens by chance
     # to be the target word. The next guess being the target word can only happen if the
-    # allow_dups allows for that word to be in the list. Otherwise we get a wrong count.
+    # allow_dups allows for that word to be in the list. Otherwise, we get a wrong count.
     # This is a problem.
     if not word == target_wrd:
         guesses += 1
     tot = tot + guesses
 
     # if guesses == 2:
-    #     # print(x, run_stats, guesses)
+    #     # print(x, guesses, run_stats)
     #     guessin2 += 1
     # if guesses == 1:
-    #     # print(x, run_stats, guesses)
+    #     # print(x, guesses, run_stats)
     #     guessin1 += 1
 
-    # print(x, run_stats, guesses)
+    if reveal_mode:
+        print(x + 1, guesses, run_stats)
 
     del wordletool
     average = tot / (x + 1)
     sys.stdout.write('\033[K' + ">" + str(x + 1) + '  avg: ' + f'{average:.2f}' + '\r')
     # sys.stdout.write('\033[K' + ">" + str(x + 1) + '\r')
 
+# print(x + 1, run_stats, guesses)
 average = tot / sample_number
 print('target_wrd: ' + target_wrd + ' , averaged ' + f'{average:.3f}' + ' guesses to solve. ' + conditions)
 sys.stdout.write('\n')
