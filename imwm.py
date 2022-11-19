@@ -16,6 +16,9 @@ import argparse
 
 
 def set_context_msg():
+    """
+    Sets the guess_mode string that is used to append a status message.
+    """
     global rand_mode, guess_mode, allow_dups, rank_mode
     if rand_mode:
         guess_mode = ' random guesses'
@@ -34,7 +37,8 @@ def process_any_arguments():
     Process any command line arguments
     """
     global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
-        starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, sample_number
+        starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type,\
+        sample_number, vocab_filename
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
@@ -46,10 +50,15 @@ def process_any_arguments():
                         help='Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)')
     parser.add_argument('-x', action='store', type=int,
                         help='Override the number of sampling runs to be this number X.')
+    parser.add_argument('-v', action='store_true', help='Use the Wordle vocabulary that includes non-solution words.')
 
     args = parser.parse_args()
     debug_mode = args.d  # prints out lists, guesses etc.
     reveal_mode = args.l  # lists each solution run data
+
+    if args.v:
+        # Use the Wordle vocabulary that includes non-solution words
+        vocab_filename = 'nyt_wordlist.txt'  # total vocabulary list
 
     if args.n:
         # no starting word, skip asking about it
@@ -96,14 +105,13 @@ def process_any_arguments():
         else:
             sample_number = args.x
 
-
+# Many of these variables can be overriden by command line argument
 # The number of times to run guessing sessions
-sample_number: int = 6000
+sample_number: int = 100
 debug_mode = False  # prints out lists, guesses etc.
 reveal_mode = False  # reveals each solution run data
 data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
 letter_rank_file = 'letter_ranks.txt'
-
 vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 # vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
 
@@ -130,6 +138,7 @@ guess_mode = ''
 starting_wrd = ''
 use_starting_wrd = -1
 run_type = -1
+# These command line arguments processed next will override and previously set variables.
 process_any_arguments()
 # the ranked word list dictionary, created now to use for valid input word checking
 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
