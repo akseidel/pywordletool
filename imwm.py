@@ -13,6 +13,8 @@ import sys
 import helpers
 import random
 
+# The number of times to run guessing sessions
+sample_number: int = 6000
 debug_mode = False  # prints out lists, guesses etc.
 data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
 letter_rank_file = 'letter_ranks.txt'
@@ -24,6 +26,13 @@ x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 excl_l = []  # exclude letters list
 requ_l = []  # require letters list
+rank_mode = 2
+rand_mode = True
+allow_dups = False
+target_wrd = ''
+guess_mode = ''
+starting_wrd = ''
+use_starting_wrd = -1
 # the ranked word list dictionary, created now to use for valid input word checking
 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
 
@@ -64,67 +73,99 @@ def clean_slate(excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict):
     excl_l.clear()
     requ_l.clear()
 
+def get_set_target_word():
+    """
+    Ask and set the target word.
+    """
+    global target_wrd
+    while target_wrd not in the_word_list:
+        target_wrd = input('Enter a valid Wordle target word: ').lower()
 
-# The number of times to run guessing sessions
-sample_number: int = 6000
-# The target Wordle word the guessing sessions is trying to discover.
-target_wrd: str = ''
+
+def get_set_starting_guess():
+    """
+    Ask for and set a given first guess word to be used in every session.
+    """
+    global starting_wrd, use_starting_wrd
+    while use_starting_wrd == -1:
+        response = input('Run using a given first guess? Enter y/n: ').lower()
+        if response == 'y':
+            while starting_wrd not in the_word_list:
+                starting_wrd = input('Enter a valid Wordle first guess word: ').lower()
+                use_starting_wrd = 1
+        if response == 'n':
+            use_starting_wrd = 0
+
+def get_set_guess_mode():
+    """
+    Gets and sets the general run type: random guess or ranked guess.
+    If ranked guess then get and set the ranking type.
+    """
+    global rank_mode, allow_dups, rand_mode, guess_mode
+    # rank mode:
+    # 0 = Occurrence
+    # 1 = Position
+    # 2 = Both
+    rank_mode = 2
+
+    # Set allow_dups to prevent letters from occurring more than once.
+    # This condition is used mainly for the first two guesses. Duplicate
+    # letter words are allowed after the second guess and due to the code
+    # is required to be able to correctly handle target words that have
+    # duplicate letters.
+    #
+    allow_dups = False
+    # allow_dups = True
+
+    # monkey type
+    rand_mode = True
+    # rand_mode = False
+    run_type = -1
+    while run_type == -1:
+        response: str = input('Random Guesses (0) or Ranked Guesses (1), Enter 0 or 1: ')
+        if response == '0':
+            rand_mode = True
+            run_type = 0
+        if response == '1':
+            rand_mode = False
+            run_type = 1
+
+    if rand_mode:
+        guess_mode = ' random guesses'
+        # For random mode to represent a base condition, duplicate letter
+        # words show be allowed regardless of its previous setting.
+        del allow_dups
+        allow_dups = True
+    else:
+        rank_mode = -1
+        while rank_mode == -1:
+            response: str = input('Rank by Occurrence (0), Position (1) or Both (2), Enter 0,1 or 2: ')
+            if response == '0':
+                rank_mode = 0
+            if response == '1':
+                rank_mode = 1
+            if response == '2':
+                rank_mode = 2
+
+        guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
+        # In ranked mode the allow duplicates flag will be not be forced
+        # so that its influence on the first and second guess can be observed.
+
+# ====================================== start ================================================
+
 # helpers.clear_scrn()  # clears terminal
 print()
 print('Average guesses to solve Wordle sampling')
-while target_wrd not in the_word_list:
-    target_wrd: str = input('Enter a valid Wordle target word: ').lower()
-
-
-# rank mode:
-# 0 = Occurrence
-# 1 = Position
-# 2 = Both
-rank_mode = 2
-
-# Set allow_dups to prevent letters from occurring more than once.
-# This condition is used mainly for the first two guesses. Duplicate
-# letter words are allowed after the second guess and due to the code
-# is required to be able to correctly handle target words that have
-# duplicate letters.
-#
-allow_dups = False
-# allow_dups = True
-
-# monkey type
-rando_mode = True
-# rando_mode = False
-run_type = -1
-while run_type == -1:
-    response: str = input('Random Guesses (0) or Ranked Guesses (1), Enter 0 or 1: ')
-    if response == '0':
-        rando_mode = True
-        run_type = 0
-    if response == '1':
-        rando_mode = False
-        run_type = 1
-
-
-if rando_mode:
-    guess_mode = ' random guesses'
-    # For random mode to represent a base condition, duplicate letter
-    # words show be allowed regardless of its previous setting.
-    del allow_dups
-    allow_dups = True
-else:
-    rank_mode = -1
-    while rank_mode == -1:
-        response: str = input('Rank by Occurrence (0), Position (1) or Both (2), Enter 0,1 or 2: ')
-        if response == '0':
-            rank_mode = 0
-        if response == '1':
-            rank_mode = 1
-        if response == '2':
-            rank_mode = 2
-
-    guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
-    # In ranked mode the allow duplicates flag will be not be forced
-    # so that its influence on the first and second guess can be observed.
+# Get the target Wordle word the guessing sessions is trying to discover.
+get_set_target_word()
+# Set the first guess if desired.
+get_set_starting_guess()
+# Set the guess mode and rank mode.
+get_set_guess_mode()
+# All samples are identical when there is a fixed starting word and
+# a fixed rank selection method. So run only one sample.
+if use_starting_wrd == 1 and not rand_mode:
+    sample_number = 1
 
 tot: int = 0  # total number of guesses
 guessin2: int = 0  # total number of second getters
@@ -135,6 +176,8 @@ word: str = ''  # the guess
 
 print('target_wrd: ' + target_wrd)
 conditions = str(sample_number) + ' runs,' + guess_mode + ', initial allow duplicates: ' + str(allow_dups)
+if len(starting_wrd) == 5:
+    conditions = conditions + " , first guess = " + starting_wrd
 print(conditions)
 for x in range(sample_number):
     # initialize a wordletool instance
@@ -151,20 +194,23 @@ for x in range(sample_number):
     # guess is therefore the actual second to last guess, except when it happens by chance
     # to be the target word.
     while len(the_word_list) > 1:
-        if rando_mode:
-            word, rank = random.choice(list(the_word_list.items()))
+        if guesses == 0 and use_starting_wrd == 1:
+            word = starting_wrd
         else:
-            if guesses == 0:
-                # first pick has to be random in this sampling scheme
+            if rand_mode:
                 word, rank = random.choice(list(the_word_list.items()))
-                # word, rank = list(the_word_list.items())[-1]
             else:
-                # all other picks are top rank
-                word, rank = list(the_word_list.items())[-1]
+                if guesses == 0:
+                    # first pick has to be random in this sampling scheme
+                    word, rank = random.choice(list(the_word_list.items()))
+                    # word, rank = list(the_word_list.items())[-1]
+                else:
+                    # all other picks are top rank
+                    word, rank = list(the_word_list.items())[-1]
 
         run_stats.append(word)
         # At this point the guess word has been selected from the results of the prior guess.
-        # Normal strategy for non rando_mode, ie not picking anything random, is to not select
+        # Normal strategy for non rand_mode, ie not picking anything random, is to not select
         # words having duplicate letters for at least the first two guesses. Allow_dups is
         # likely already false for the first selection pool, ie the first pick does not allow dups.
         # Dups should be allowed for the third guess and beyond. Dups at the second guess depends
@@ -193,12 +239,12 @@ for x in range(sample_number):
         guesses += 1
     tot = tot + guesses
 
-    if guesses == 2:
-        # print(x, run_stats, guesses)
-        guessin2 += 1
-    if guesses == 1:
-        # print(x, run_stats, guesses)
-        guessin1 += 1
+    # if guesses == 2:
+    #     # print(x, run_stats, guesses)
+    #     guessin2 += 1
+    # if guesses == 1:
+    #     # print(x, run_stats, guesses)
+    #     guessin1 += 1
 
     # print(x, run_stats, guesses)
 
@@ -210,6 +256,6 @@ for x in range(sample_number):
 average = tot / sample_number
 print('target_wrd: ' + target_wrd + ' , averaged ' + f'{average:.3f}' + ' guesses to solve. ' + conditions)
 sys.stdout.write('\n')
-print('guessin2 % is ' + f'{(100 * (guessin2 / sample_number)):.2f}')
-print('guessin2 count is ' + str(guessin2))
-print('guessin1 count is ' + str(guessin1))
+# print('guessin2 % is ' + f'{(100 * (guessin2 / sample_number)):.2f}')
+# print('guessin2 count is ' + str(guessin2))
+# print('guessin1 count is ' + str(guessin1))
