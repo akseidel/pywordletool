@@ -65,14 +65,21 @@ Here is a use example:
 Average guesses to solve Wordle sampling
 target_wrd: covet
 4 runs, random guesses, initial allow duplicates: True
-1 5 ['covet', 'excel', 25, 'crier', 8, 'cadet', 2, 'comet', 1]
-2 2 ['covet', 'decry', 64, 'covet', 1]
-3 4 ['covet', 'lapel', 159, 'sober', 14, 'coven', 2, 'covet', 1]
-4 5 ['covet', 'kebab', 455, 'snipe', 84, 'lover', 2, 'covey', 1]
+[1, 5, 'covet', 'excel', 25, 'crier', 8, 'cadet', 2, 'comet', 1]
+[2, 2, 'covet', 'decry', 64, 'covet', 1]
+[3, 4, 'covet', 'lapel', 159, 'sober', 14, 'coven', 2, 'covet', 1]
+[4, 5, 'covet', 'kebab', 455, 'snipe', 84, 'lover', 2, 'covey', 1]
 target_wrd: covet , averaged 4.000 guesses to solve. 4 runs, random guesses, initial allow duplicates: True
 ```
-In the above example the **-l** argument 'Lists each solution run data'. The first number is the run number. The second number is the number of guesses required to solve in that run. The first quoted word is the target word. The following quoted words are the guess words. The number following each guess word is the selection pool size remaining after applying the results of the guess. The guess word 'excel' resulted in a 25 word selection pool. Note the last quoted guess 'comet' is the fourth guess. It resulted in one remaining word.  That word would have been 'covet' and thus the fifth required guess.
 
-In contrast to the first run described above the second run solutions list shows 'covet' as the second guess. In this run the solution 'covet' was picked at random from a pool of 64 words. The knowledge gained by its letters combined with that of the previous guess 'decry' results in only one possible word. That is the hallmark of a correct guess.
+In the above example the **-l** argument 'Lists each solution run data' during the **IMWM** operations. The first number is the run number. The second number is the number of guesses required to solve in that run. The first quoted word is the target word. The following quoted words are the guess words. The number following each guess word is the selection pool size remaining after applying the results of the guess. In run #1 the guess word 'excel' resulted in a 25 word selection pool. In run #1 the last quoted guess 'comet' is the fourth guess. One knows that because it resulted in one remaining selection pool word. Target words are first verified to be present in the solutions list. Therefore the target word has to be the word in a one word selection pool that filters for the target word. In run #1 that word could only be 'covet' and thus the fifth required guess would select it.
 
-The last two runs show the two outcomes of a 50% chance of guessing the solution from a list of two words. The third run, 'lapel', narrowed the word options to two words after the third guess 'coven'. The solution 'covet' was the next pick. A similar situation occurred in the fourth, 'kebab', run. There 'covey' was guessed after 'lover' narrowed the selection to two words leaving only the solution for the fifth guess.
+Contrasting to run #1, the run #2 solutions list shows 'covet' as the second guess. In this run #2 the solution 'covet' was picked at random from a pool of 64 words. The knowledge gained by its letters combined with that of the previous guess 'decry' results in only one possible word. That is the hallmark of a correct guess, and thus run #2 was solved in two guesses.
+
+The last two runs #3 and #4 show the two possible outcomes of a 50% chance of guessing the solution from a list of two words. In run #3 , starting with 'lapel', eventually narrowed the word options to two words after the third guess 'coven'. The correct guess 'covet' out of two words, 'covet' and some other unspecified word, was the next pick. A similar situation occurred in the run #4, starting with 'kebab'. There 'covey' was guessed after 'lover' narrowed the selection to two words, which must have been 'covey' and 'covet', leaving only the solution remaining for the fifth guess.
+
+#### Random Mode versus Ranked Mode Inner Workings
+
+**Random** mode Wordle solving is intended to be the benchmark against which all other Wordle solving methods are to be compared. As such **Random** mode needs to a base level of play lacking any sophistication. Therefore **Random** mode makes all its guesses random words and it makes all guesses without regard to when the guess occurs in the play or whether the guess contains multiple occurring letters.
+
+**Ranked** mode on the other hand is intended to model some level of play sophistication. Most reasonable Wordle play does not allow guesses having multiple occurring letters until the third guess. This is what **IMWM** does. If Wordle solutions never had multiple occurring letters then multiple occurring letters would always be excluded. But for **IMWM** to work properly the solution word must be present in the selection pool. For speed purposes **IMWM** lacks code for noticing the dwindling selection pool might or does lack the solution to effect the inclusion change. Often the number of words containing multiple occurring letters is small after the second guess. Therefore allowing multiple occurring letters by the third guess is a reasonable compromise.

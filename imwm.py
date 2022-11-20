@@ -37,7 +37,7 @@ def process_any_arguments():
     Process any command line arguments
     """
     global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
-        starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type,\
+        starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
         sample_number, vocab_filename
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
@@ -98,12 +98,13 @@ def process_any_arguments():
         if args.x < 1:
             sample_number = 1
             print('===> Negative value not allowed. Runs number is set to ' + str(sample_number))
-        elif args.x > 10000:
-            sample_number = 10000
-            print('===> Honestly, even 10,000 is a waste. Runs number is set to ' + str(sample_number))
+        elif args.x > 20000:
+            sample_number = 20000
+            print('===> Honestly, even 20,000 is too many. Runs number is set to ' + str(sample_number))
             print('===> Control + C will stop the program.')
         else:
             sample_number = args.x
+
 
 # Many of these variables can be overriden by command line argument
 # The number of times to run guessing sessions
@@ -340,7 +341,9 @@ for x in range(sample_number):
     #     guessin1 += 1
 
     if reveal_mode:
-        print(x + 1, guesses, run_stats)
+        reveal_stat = [x + 1, guesses]
+        reveal_stat.extend(run_stats)
+        print(reveal_stat)
 
     del wordletool
     average = tot / (x + 1)
