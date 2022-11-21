@@ -1,6 +1,6 @@
 # imwm.py
 
-### Infinite Monkey Wordle Machine (IMWM)
+## Infinite Monkey Wordle Machine (IMWM)
 
 * The **Infinite Monkey Wordle Machine** (**IMWM**)makes guesses in a certain way to calculate the average number of guesses required to solve a known **Wordle** word. The machine’s purpose is for measuring how hard a word is compared to another word or whether a certain guessing mode works better than another guessing mode.
 
@@ -41,6 +41,7 @@ target_wrd: covet , averaged 3.950 guesses to solve. 100 runs, rank mode 1 guess
 #### Command Line Options
 
 This is the help hints for the command line arguments:
+
 ```text
 usage: imwm.py [-h] [-d] [-l] [-n] [-t T] [-s S] [-r {0,1,2,3}] [-x X] [-v]
 
@@ -57,6 +58,7 @@ options:
   -x X          Override the number of sampling runs to be this number X.
   -v            Use the Wordle vocabulary that includes non-solution words.
 ```
+
 Here is a use example:
 
 ```text
