@@ -524,6 +524,31 @@ class ToolResults:
         part_cmd = full_cmd.replace(full_path_name, '', 1)
         return part_cmd
 
+    def get_word_list(self, guess_no: int, guess_wrd='', verbose=False) -> dict:
+        """
+        Used when a guess word has been recently used to be the filter basis
+        for a ranked word list.
+        Combines returning the ranked word list dictionary with
+        printing out information if needed.
+        @param guess_no: The current guess number
+        @param guess_wrd: The guess word basis is the was one
+        @param verbose: Flag to indicate display
+        @return: The ranked word list corresponding to the filtering
+        arguments already passed to the wordletool device.
+        """
+        the_word_list = self.get_ranked_results_wrd_lst()
+        if verbose:
+            print()
+            if guess_no > 1:
+                print('Selection pool for guess ' + str(guess_no) + ' based on guess ' + str(
+                    guess_no - 1) + ' => ' + guess_wrd)
+            else:
+                print('Selection pool for guess ' + str(guess_no))
+            print(self.get_status())
+            print(self.get_cmd_less_filepath())
+            print_word_list_col_format(the_word_list, 6)
+        return the_word_list
+
 
 class CustomText(tk.Text):
     """A text widget with a new method, highlight_pattern()
