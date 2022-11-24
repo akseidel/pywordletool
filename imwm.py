@@ -10,9 +10,12 @@
 # to examine the average required guesses as word difficulty.
 # ----------------------------------------------------------------
 import sys
+from datetime import datetime
+
 import helpers
 import random
 import argparse
+import csv
 
 
 def set_context_msg():
@@ -21,13 +24,13 @@ def set_context_msg():
     """
     global rand_mode, guess_mode, allow_dups, rank_mode
     if rand_mode:
-        guess_mode = ' random guesses'
+        guess_mode = 'random guesses'
         # For random mode to represent a base condition, duplicate letter
         # words show be allowed regardless of its previous setting.
         del allow_dups
         allow_dups = True
     else:
-        guess_mode = ' rank mode ' + str(rank_mode + 1) + " guesses"
+        guess_mode = 'rank mode ' + str(rank_mode + 1) + " guesses"
         # In ranked mode the allow_dups flag will be not be forced
         # so that its influence on the first and second guess can be observed.
 
@@ -38,7 +41,7 @@ def process_any_arguments():
     """
     global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
         starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
-        sample_number, vocab_filename
+        sample_number, vocab_filename, record_run
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
@@ -51,10 +54,15 @@ def process_any_arguments():
     parser.add_argument('-x', action='store', type=int,
                         help='Override the number of sampling runs to be this number X.')
     parser.add_argument('-v', action='store_true', help='Use the Wordle vocabulary that includes non-solution words.')
+    parser.add_argument('-w', action='store_true', help='Writes output to CVS file having a timestamp filename.')
 
     args = parser.parse_args()
     debug_mode = args.d  # prints out lists, guesses etc.
     reveal_mode = args.l  # lists each solution run data
+
+    if args.w:
+        # Writes output to CVS file having a timestamp filename.
+        record_run = True
 
     if args.v:
         # Use the Wordle vocabulary that includes non-solution words
@@ -104,45 +112,6 @@ def process_any_arguments():
             print('===> Control + C will stop the program.')
         else:
             sample_number = args.x
-
-
-# Many of these variables can be overriden by command line argument
-# The number of times to run guessing sessions
-sample_number: int = 100
-debug_mode = False  # prints out lists, guesses etc.
-reveal_mode = False  # reveals each solution run data
-data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
-letter_rank_file = 'letter_ranks.txt'
-vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
-# vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
-
-x_pos_dict = {}  # exclude position dictionary
-r_pos_dict = {}  # require position dictionary
-excl_l = []  # exclude letters list
-requ_l = []  # require letters list
-# rank mode:
-# 0 = Occurrence
-# 1 = Position
-# 2 = Both
-rank_mode = 2
-# monkey type
-rand_mode = True  # random monkeys
-# rand_mode = False  # smart monkeys
-# Set allow_dups to prevent letters from occurring more than once.
-# This condition is used mainly for the first two guesses. Duplicate
-# letter words are allowed after the second guess and due to the code
-# is required to be able to correctly handle target words that have
-# duplicate letters.
-allow_dups = False
-target_wrd = ''
-guess_mode = ''
-starting_wrd = ''
-use_starting_wrd = -1
-run_type = -1
-# These command line arguments processed next will override and previously set variables.
-process_any_arguments()
-# the ranked word list dictionary, created now to use for valid input word checking
-the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
 
 
 def get_word_list(guess_no: int, gwrd='', verbose=False) -> dict:
@@ -245,12 +214,123 @@ def get_set_guess_mode():
         # so that its influence on the first and second guess can be observed.
 
 
-# ====================================== start ================================================
+def imwm_fname() -> str:
+    """
+    Returns a time timestamp like .csv filename
+    @rtype: str
+    """
+    ts = str(datetime.now()).replace(' ', '_')
+    ts = ts.replace(':', '_')
+    return ts + ".csv"
+
+
+def output_msg(msg: any, also2file: bool, fname: str):
+    fn_csv = fname
+    if also2file:
+        with open(fn_csv, 'a') as f:
+            if type(msg) is str:
+                f.write(str(msg) + '\n')
+            if type(msg) is list:
+                csvwriter = csv.writer(f)
+                csvwriter.writerow(msg)
+    else:
+        print(str(msg))
+    return
+
+
+def prelude_output():
+    global conditions, sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd, vocab_filename
+    conditions = str(sample_number) + ' runs, ' + guess_mode + ', initial duplicates: ' + str(allow_dups)
+    if len(starting_wrd) == 5:
+        conditions = conditions + " , first guess = " + starting_wrd
+    output_msg('target_wrd: ' + target_wrd + ", " + conditions + ", " + vocab_filename, False, run_fname)
+    if record_run:
+        msg = ['target wrd', 'samples', 'guess mode', 'initial duplicates', 'first guess', 'vocabulary']
+        output_msg(msg, record_run, run_fname)
+        msg = [target_wrd, sample_number, guess_mode, str(allow_dups), starting_wrd, vocab_filename]
+        output_msg(msg, record_run, run_fname)
+        if reveal_mode:
+            reveal_hdr = ['Run', 'guesses', 'target wrd', 'G1', 'G1R', 'G2', 'G2R', 'G3', 'G3R', 'G4', 'G4R', 'G5',
+                          'G5R', 'G6', 'G6R', 'G7', 'G7R', 'G8', 'G8R', 'G9', 'G9R', 'G10', 'G10R']
+            output_msg(reveal_hdr, record_run, run_fname)
+
+
+def reveal_output():
+    global r, guesses, run_stats, record_run, run_fname
+    reveal_stat = [r, guesses]
+    reveal_stat.extend(run_stats)
+    output_msg(reveal_stat, False, run_fname)
+    if record_run:
+        output_msg(reveal_stat, record_run, run_fname)
+
+
+def prologue_output():
+    global conditions, sample_number, guess_mode, allow_dups, record_run, run_fname
+    global target_wrd, starting_wrd, tot, vocab_filename
+    average = tot / sample_number
+    stat_msg = 'target_wrd: ' + target_wrd + ' , averaged ' + f'{average:.3f}' + ' guesses to solve, '
+    stat_msg = stat_msg + conditions + ", " + vocab_filename
+    output_msg(stat_msg, False, run_fname)
+    if record_run:
+        msg = ['target wrd', 'average', 'guess mode', 'initial duplicates', 'first guess', 'vocabulary']
+        output_msg(msg, record_run, run_fname)
+        msg = [target_wrd, average, guess_mode, str(allow_dups), starting_wrd, vocab_filename]
+        output_msg(msg, record_run, run_fname)
+
+
+# ====================================== setup ================================================
+
+# Many of these variables can be overriden by command line argument
+# The number of times to run guessing sessions
+sample_number: int = 100
+debug_mode = False  # prints out lists, guesses etc.
+reveal_mode = False  # reveals each solution run data
+data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
+letter_rank_file = 'letter_ranks.txt'
+vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
+# vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
+
+x_pos_dict = {}  # exclude position dictionary
+r_pos_dict = {}  # require position dictionary
+excl_l = []  # exclude letters list
+requ_l = []  # require letters list
+# rank mode:
+# 0 = Occurrence
+# 1 = Position
+# 2 = Both
+rank_mode = 2
+# monkey type
+rand_mode = True  # random monkeys
+# rand_mode = False  # smart monkeys
+# Set allow_dups to prevent letters from occurring more than once.
+# This condition is used mainly for the first two guesses. Duplicate
+# letter words are allowed after the second guess and due to the code
+# is required to be able to correctly handle target words that have
+# duplicate letters.
+allow_dups = False
+target_wrd = ''
+guess_mode = ''
+starting_wrd = ''
+use_starting_wrd = -1
+run_type = -1
+# Timestamp like filename used for record_run
+run_fname = imwm_fname()
+# Records output to a CVS file having a timestamp like filename
+record_run = False
+# These command line arguments processed next will override and previously set variables.
+process_any_arguments()
+# the ranked word list dictionary, created now to use for valid input word checking
+the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst()
+
+# ====================================== main ================================================
 
 # helpers.clear_scrn()  # clears terminal
 print()
+if record_run:
+    print('Output being written to ' + run_fname)
+
 print('Average guesses to solve Wordle sampling')
-# Get the target Wordle word the guessing sessions is trying to discover.
+# Get the target Wordle word the guessing sessions is trying to discover.drive
 get_set_target_word()
 # Set the first guess if desired.
 get_set_starting_guess()
@@ -266,12 +346,9 @@ guessin2: int = 0  # total number of second getters
 guessin1: int = 0  # total number of first getters
 average: float = 0  # average guesses to find the target word
 word: str = ''  # the guess
+conditions: str = ''
 
-print('target_wrd: ' + target_wrd)
-conditions = str(sample_number) + ' runs,' + guess_mode + ', initial allow duplicates: ' + str(allow_dups)
-if len(starting_wrd) == 5:
-    conditions = conditions + " , first guess = " + starting_wrd
-print(conditions)
+prelude_output()
 for x in range(sample_number):
     # initialize a wordletool instance
     wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode)
@@ -321,9 +398,6 @@ for x in range(sample_number):
         the_word_list = get_word_list(guesses + 2, word, debug_mode)
         run_stats.append(len(the_word_list))
         guesses += 1
-        # if debug_mode:
-        #     print(x+1, run_stats, guesses)
-        # print(x + 1, run_stats, guesses)
 
     # The ending guess is the second to last guess, except when it happens by chance
     # to be the target word. The next guess being the target word can only happen if the
@@ -334,26 +408,28 @@ for x in range(sample_number):
     tot = tot + guesses
 
     # if guesses == 2:
-    #     # print(x, guesses, run_stats)
+    #     reveal_stat = [r, guesses]
+    #     reveal_stat.extend(run_stats)
+    #     output_msg(reveal_stat, record_run, run_fname)
     #     guessin2 += 1
     # if guesses == 1:
-    #     # print(x, guesses, run_stats)
+    #     reveal_stat = [r, guesses]
+    #     reveal_stat.extend(run_stats)
+    #     output_msg(reveal_stat,record_run, run_fname)
     #     guessin1 += 1
 
+    r = x + 1
     if reveal_mode:
-        reveal_stat = [x + 1, guesses]
-        reveal_stat.extend(run_stats)
-        print(reveal_stat)
+        reveal_output()
 
     del wordletool
-    average = tot / (x + 1)
-    sys.stdout.write('\033[K' + ">" + str(x + 1) + '  avg: ' + f'{average:.2f}' + '\r')
-    # sys.stdout.write('\033[K' + ">" + str(x + 1) + '\r')
+    average = tot / r
+    # animated in progress showing
+    sys.stdout.write('\033[K' + ">" + str(r) + '  avg: ' + f'{average:.2f}' + '\r')
 
-# print(x + 1, run_stats, guesses)
-average = tot / sample_number
-print('target_wrd: ' + target_wrd + ' , averaged ' + f'{average:.3f}' + ' guesses to solve. ' + conditions)
+prologue_output()
+
 sys.stdout.write('\n')
-# print('guessin2 % is ' + f'{(100 * (guessin2 / sample_number)):.2f}')
-# print('guessin2 count is ' + str(guessin2))
-# print('guessin1 count is ' + str(guessin1))
+# output_msg('guessin2 % is ' + f'{(100 * (guessin2 / sample_number)):.2f}', record_run, run_fname)
+# output_msg('guessin2 count is ' + str(guessin2), record_run, run_fname)
+# output_msg('guessin1 count is ' + str(guessin1), record_run, run_fname)

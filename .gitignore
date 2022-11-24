@@ -142,3 +142,4 @@ dmypy.json
 Exclude/
 .DS_Store
 .DS_Store
+*.csv
