@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------
 import sys
 import datetime
+import time
 from typing import NoReturn
 import helpers
 import random
@@ -248,23 +249,27 @@ def reveal_output(r, guesses, run_stats, record_run, run_fname) -> NoReturn:
 
 def prologue_output(conditions, sample_number, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, tot, vocab_filename) -> NoReturn:
-    global first_run
+    global first_run, dur_tw
     average = tot / sample_number
     stat_msg = 'target_wrd: ' + target_wrd + ' , averaged ' + f'{average:.3f}' + ' guesses to solve, '
-    stat_msg = stat_msg + conditions + ", " + vocab_filename
+    stat_msg = stat_msg + conditions + ', ' + vocab_filename + ', ' + f'{sample_number} samples' \
+               + f', {dur_tw:0.4f} seconds '
     output_msg(stat_msg, False, run_fname)
     if record_run:
         if not do_every_wrd or first_run:
-            msg = ['target wrd', 'average', 'guess mode', 'initial duplicates', 'first guess', 'vocabulary']
+            msg = ['target wrd', 'average', 'guess mode', 'initial duplicates', 'first guess',
+                   'vocabulary', 'samples', 'seconds']
             output_msg(msg, record_run, run_fname)
             first_run = False
-        msg = [target_wrd, average, guess_mode, str(allow_dups), starting_wrd, vocab_filename]
+        msg = [target_wrd, average, guess_mode, str(allow_dups), starting_wrd,
+               vocab_filename, sample_number, dur_tw]
         output_msg(msg, record_run, run_fname)
 
 
 def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
-    # helpers.clear_scrn()  # clears terminal
-    print()
+    global dur_tw
+
+    start_mt = time.perf_counter()
     if record_run:
         print('Output being written to ' + run_fname)
 
@@ -297,7 +302,6 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
         run_stats.append(target_wrd)
         clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
         helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
-        the_word_list.clear()
         the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode)
         # This loop ends when the last guess results in only one remaining word that fits the
         # pattern. That word, being the target word, will be the solving guess. The loop's last
@@ -367,6 +371,7 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
         # animated in progress showing
         sys.stdout.write('\033[K' + ">" + str(r) + '  avg: ' + f'{average:.2f}' + '\r')
 
+    dur_tw = time.perf_counter() - start_mt
     prologue_output(conditions, sample_number, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, tot, vocab_filename)
 
@@ -376,8 +381,8 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
     # output_msg('guessin1 count is ' + str(guessin1), record_run, run_fname)
 
 
-# ====================================== setup ================================================
-# Many of these variables can be overriden by command line argument
+# ==== setup ======= These variables can be overriden by command line argument. ================
+
 # The number of times to run guessing sessions
 sample_number: int = 100
 debug_mode = False  # prints out lists, guesses etc.
@@ -412,11 +417,13 @@ use_starting_wrd = -1
 run_type = -1
 first_run = True
 do_every_wrd = False  # Process every vocabulary word as a target word.
+dur_tw = 0.0
+dur_sf = 0.0
 # Timestamp like filename used for record_run
 run_fname = imwm_fname()
 # Records output to a CVS file having a timestamp like filename
 record_run = False
-# These command line arguments processed next will override and previously set variables.
+# These command line arguments processed next will override all previously set variables.
 process_any_arguments()
 
 # ====================================== main ================================================
@@ -425,12 +432,19 @@ the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file,
 wrd_x = 1
 if do_every_wrd:
     targets = the_word_list.copy()
+    n = len(targets)
     for key in targets:
         target_wrd = key
         # the ranked word list dictionary, created now to use for valid input word checking
         the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                             0).get_ranked_results_wrd_lst()
         run_monkey(sample_number, the_word_list, wrd_x)
+
+        dur_sf = dur_sf + dur_tw
+        avg_t = dur_sf / wrd_x
+        etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
+        print(f'Duration so far: {dur_sf:0.4f} seconds, {avg_t:0.4f} seconds/word, ETF: {etf} ')
         wrd_x += 1
+
 else:
     run_monkey(sample_number, the_word_list, wrd_x)
