@@ -262,13 +262,13 @@ def prologue_output(conditions, sample_number, guess_mode, allow_dups, record_ru
         output_msg(msg, record_run, run_fname)
 
 
-def run_monkey(sample_number: int, the_word_list: dict):
+def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
     # helpers.clear_scrn()  # clears terminal
     print()
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print('Average guesses to solve Wordle sampling')
+    print(str(wrd_x) + ' Average guesses to solve Wordle sampling')
     # Get the target Wordle word the guessing sessions is trying to discover.drive
     get_set_target_word()
     # Set the first guess if desired.
@@ -422,6 +422,7 @@ process_any_arguments()
 # ====================================== main ================================================
 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                     0).get_ranked_results_wrd_lst()
+wrd_x = 1
 if do_every_wrd:
     targets = the_word_list.copy()
     for key in targets:
@@ -429,6 +430,7 @@ if do_every_wrd:
         # the ranked word list dictionary, created now to use for valid input word checking
         the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                             0).get_ranked_results_wrd_lst()
-        run_monkey(sample_number, the_word_list)
+        run_monkey(sample_number, the_word_list, wrd_x)
+        wrd_x += 1
 else:
-    run_monkey(sample_number, the_word_list)
+    run_monkey(sample_number, the_word_list, wrd_x)
