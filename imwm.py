@@ -169,13 +169,13 @@ def get_set_guess_mode() -> NoReturn:
             rank_mode = 2
 
     if rand_mode:
-        guess_mode = ' random guesses'
+        guess_mode = 'random guesses'
         # For random mode to represent a base condition, duplicate letter
         # words show be allowed regardless of its previous setting.
         del allow_dups
         allow_dups = True
     else:
-        guess_mode = ' rank mode ' + str(rank_mode) + " guesses"
+        guess_mode = 'rank mode type ' + str(rank_mode + 1) + " guesses"
         # In ranked mode the allow_dups flag will be not be forced
         # so that its influence on the first and second guess can be observed.
 
@@ -192,7 +192,7 @@ def set_context_msg(rand_mode, rank_mode):
         del allow_dups
         allow_dups = True
     else:
-        guess_mode = 'rank mode ' + str(rank_mode + 1) + " guesses"
+        guess_mode = 'rank mode type ' + str(rank_mode + 1) + " guesses"
         # In ranked mode the allow_dups flag will be not be forced
         # so that its influence on the first and second guess can be observed.
 
@@ -223,9 +223,10 @@ def output_msg(msg: any, also2file: bool, fname: str) -> NoReturn:
 
 def prelude_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
                    starting_wrd, vocab_filename, do_every_wrd) -> NoReturn:
-    conditions = str(sample_number) + ' runs, ' + guess_mode + ', initial duplicates: ' + str(allow_dups)
+    global conditions
+    conditions = f'{sample_number} samples, ' + guess_mode + ', initial duplicates:' + str(allow_dups)
     if len(starting_wrd) == 5:
-        conditions = conditions + " , first guess = " + starting_wrd
+        conditions = conditions + " , first guess:" + starting_wrd
     output_msg('target_wrd: ' + target_wrd + ", " + conditions + ", " + vocab_filename, False, run_fname)
     if record_run:
         if not do_every_wrd:
@@ -247,13 +248,12 @@ def reveal_output(r, guesses, run_stats, record_run, run_fname) -> NoReturn:
         output_msg(reveal_stat, record_run, run_fname)
 
 
-def prologue_output(conditions, sample_number, guess_mode, allow_dups, record_run, run_fname,
+def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, tot, vocab_filename) -> NoReturn:
-    global first_run, dur_tw
+    global first_run, dur_tw, conditions
     average = tot / sample_number
-    stat_msg = 'target_wrd: ' + target_wrd + ' , averaged ' + f'{average:.3f}' + ' guesses to solve, '
-    stat_msg = stat_msg + conditions + ', ' + vocab_filename + ', ' + f'{sample_number} samples' \
-               + f', {dur_tw:0.4f} seconds '
+    stat_msg = 'target_wrd: ' + target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
+    stat_msg = stat_msg + conditions + ', ' + vocab_filename + f', {dur_tw:0.4f} seconds'
     output_msg(stat_msg, False, run_fname)
     if record_run:
         if not do_every_wrd or first_run:
@@ -269,11 +269,10 @@ def prologue_output(conditions, sample_number, guess_mode, allow_dups, record_ru
 def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
     global dur_tw
 
-    start_mt = time.perf_counter()
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print(str(wrd_x) + ' Average guesses to solve Wordle sampling')
+    print(str(wrd_x) + ' word: Average guesses to solve Wordle by sampling ' + str(sample_number) + ' tries.')
     # Get the target Wordle word the guessing sessions is trying to discover.drive
     get_set_target_word()
     # Set the first guess if desired.
@@ -286,14 +285,13 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
         sample_number = 1
 
     tot: int = 0  # total number of guesses
-    guessin2: int = 0  # total number of second getters
-    guessin1: int = 0  # total number of first getters
-    average: float = 0  # average guesses to find the target word
+    # guessin2: int = 0  # total number of second getters
+    # guessin1: int = 0  # total number of first getters
     word: str = ''  # the guess
-    conditions: str = ''
 
     prelude_output(sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    vocab_filename, do_every_wrd)
+    start_mt = time.perf_counter()
     for x in range(sample_number):
         # initialize a wordletool instance
         wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode)
@@ -372,7 +370,7 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
         sys.stdout.write('\033[K' + ">" + str(r) + '  avg: ' + f'{average:.2f}' + '\r')
 
     dur_tw = time.perf_counter() - start_mt
-    prologue_output(conditions, sample_number, guess_mode, allow_dups, record_run, run_fname,
+    prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, tot, vocab_filename)
 
     sys.stdout.write('\n')

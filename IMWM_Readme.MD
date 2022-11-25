@@ -2,9 +2,11 @@
 
 ## Infinite Monkey Wordle Machine (IMWM)
 
-* The **Infinite Monkey Wordle Machine** (**IMWM**)makes guesses in a certain way to calculate the average number of guesses required to solve a known **Wordle** word. The machine’s purpose is for measuring how hard a word is compared to another word or whether a certain guessing mode works better than another guessing mode.
+* The **Infinite Monkey Wordle Machine** (**IMWM**) makes guesses in a certain way to calculate the average number of guesses required to solve a known **Wordle** word. The machine’s purpose is for measuring how hard a word is compared to another word or whether a certain guessing mode works better than another guessing mode.
 
-* **IMWM** currently run in console mode, ie without a GUI interface, and it relies on the **pywordletool** backend **helper** and **worddata** files.
+* **IMWM** currently runs in console mode, ie without a GUI interface, and it relies on the **pywordletool** backend **helper** and **worddata** files.
+
+* **IMWM** will calculate the average number of guesses required to solve a known **Wordle** word in interactive mode where it prompts you for the target **Wordle** word. It can also automatically process every word in the **Wordle** word vocabulary by using a command line argument. The results may be written to a text file for further processing.
 
 * **IMWM** runs in a 'dumb monkey' mode and a 'smart monkey' mode. Dumb mode, otherwise called full random mode, guesses a random word in every guess step towards solving the target **Wordle** word. After each guess the pool of words for guess selection gets smaller and smaller according to what was learned by each previous guess. **IMWM** makes all it guesses in what is known as **Wordle** 'hard mode'. The first pick can be any word from the entire **Wordle** ***solutions*** list. Their second pick can be any word from the **Wordle** ***solutions*** list less any words ruled out by the first pick. Since **IMWM** knows the answer, it knows how to properly eliminate words. And so on it goes until the **IMWM** by chance picks the solution out of what remains in the selection list or until only one word, the solution, remains. That process, referred as a 'run', ie a sample, is repeated many times to arrive at an average guesses. This full random mode provides the benchmark for word difficulty.
 
@@ -22,18 +24,19 @@
 
 * **IMWM** prompts for the target word.
 * **IMWM** prompts for an optional first guess word. In other words you can specify the word used for the first guess instead of **IMWM** making a random first guess word.
-* **IMWM** prompts for the running mode. This can be Random where all guesses are random words or it can be a Ranked mode where each guess, starting with the second guess if no first guess option is used, uses one of the three Ranking schemes as used in **The Wordle Helper**, i.e. **pywt.py**, program.
+* **IMWM** prompts for the running mode. This can be **Random** where all guesses are random words or it can be a **Ranked** mode where each guess, starting with the second guess if no first guess option is used, uses one of the three **Ranking** schemes as used in **The Wordle Helper**, i.e. **pywt.py**, program.
 
-* A standard run output looks like this:
+* A standard run interactive output looks like this:
 
 ```text
-Average guesses to solve Wordle sampling
+python3 imwm.py
+
+1 word: Average guesses to solve Wordle by sampling 100 tries.
 Enter a valid Wordle target word: covet
 Run using a given first guess? Enter y/n: n
-Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Enter 0,1,2 or 3: 2
-target_wrd: covet
-100 runs, rank mode 1 guesses, initial allow duplicates: False
-target_wrd: covet , averaged 3.950 guesses to solve. 100 runs, rank mode 1 guesses, initial allow duplicates: False
+Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Enter 0,1,2 or 3: 1
+target_wrd: covet, 100 samples, rank mode type 1 guesses, initial duplicates:False, wo_nyt_wordlist.txt
+target_wrd: covet, averaged 4.480 guesses to solve, 100 samples, rank mode type 1 guesses, initial duplicates:False, wo_nyt_wordlist.txt, 4.4157 seconds
 ```
 
 * Verbose output revealing the guess data during each run is possible when running **IMWM** with command line arguments.
@@ -57,28 +60,63 @@ options:
   -r {0,1,2,3}  Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)
   -x X          Override the number of sampling runs to be this number X.
   -v            Use the Wordle vocabulary that includes non-solution words.
+  -w            Writes output to CVS file having a timestamp filename.
+  -a            Process every vocabulary word as a target word.
 ```
 
-Here is a use example:
+A use example:
 
 ```text
-% python3 imwm.py -l -n -t covet -r 0 -x 4
-
-Average guesses to solve Wordle sampling
-target_wrd: covet
-4 runs, random guesses, initial allow duplicates: True
-[1, 5, 'covet', 'excel', 25, 'crier', 8, 'cadet', 2, 'comet', 1]
-[2, 2, 'covet', 'decry', 64, 'covet', 1]
-[3, 4, 'covet', 'lapel', 159, 'sober', 14, 'coven', 2, 'covet', 1]
-[4, 5, 'covet', 'kebab', 455, 'snipe', 84, 'lover', 2, 'covey', 1]
-target_wrd: covet , averaged 4.000 guesses to solve. 4 runs, random guesses, initial allow duplicates: True
+python3 imwm.py -l -n -t feast -r 0 -x 4
+1 word: Average guesses to solve Wordle by sampling 4 trys.
+target_wrd: feast, 4 samples, random guesses, initial duplicates:True, wo_nyt_wordlist.txt
+[1, 3, 'feast', 'shown', 122, 'flask', 1]
+[2, 3, 'feast', 'mafia', 33, 'fecal', 1]
+[3, 4, 'feast', 'wrack', 106, 'blaze', 8, 'heath', 3, 'feast', 1]
+[4, 5, 'feast', 'lodge', 256, 'teary', 4, 'meant', 2, 'beast', 1]
+target_wrd: feast, averaged 3.750 guesses to solve, 4 samples, random guesses, initial duplicates:True, wo_nyt_wordlist.txt, 0.1681 seconds
 ```
 
-In the above example the **-l** argument 'Lists each solution run data' during the **IMWM** operations. The first number is the run number. The second number is the number of guesses required to solve in that run. The first quoted word is the target word. The following quoted words are the guess words. The number following each guess word is the selection pool size remaining after applying the results of the guess. In run #1 the guess word 'excel' resulted in a 25 word selection pool. In run #1 the last quoted guess 'comet' is the fourth guess. One knows that because it resulted in one remaining selection pool word. Target words are first verified to be present in the solutions list. Therefore the target word has to be the word in a one word selection pool that filters for the target word. In run #1 that word could only be 'covet' and thus the fifth required guess would select it.
+In the above example the **-l** argument 'Lists each solution run data' during the **IMWM** operations in square brackets. The first number is the run number. The second number is the number of guesses required to solve in that run. The first quoted word is the target word. The following quoted words are the guess words. The number following each guess word is the selection pool size remaining after applying the results of the guess. In run #1 the guess word 'shown' resulted in a 122 word selection pool. In run #1 the last quoted guess 'flask' is the third guess. One knows that because it resulted in one remaining selection pool word and it is also not the target word. Target words are first verified to be present in the solutions list. Therefore the target word has to be the word in a one word selection pool that filters for the target word. In run #1 that word could only be 'feast' and thus the third required guess would select it. **IMWM** knows this and thus it does not need to proceed another step in the guessing process.
 
-Contrasting to run #1, the run #2 solutions list shows 'covet' as the second guess. In this run #2 the solution 'covet' was picked at random from a pool of 64 words. The knowledge gained by its letters combined with that of the previous guess 'decry' results in only one possible word. That is the hallmark of a correct guess, and thus run #2 was solved in two guesses.
+Run #2 and Run #4 are similar to Run #1 in that they also result in a single word remaining situation whereupon 'feast' would be the final guess.
 
-The last two runs #3 and #4 show the two possible outcomes of a 50% chance of guessing the solution from a list of two words. In run #3 , starting with 'lapel', eventually narrowed the word options to two words after the third guess 'coven'. The correct guess 'covet' out of two words, 'covet' and some other unspecified word, was the next pick. A similar situation occurred in the run #4, starting with 'kebab'. There 'covey' was guessed after 'lover' narrowed the selection to two words, which must have been 'covey' and 'covet', leaving only the solution remaining for the fifth guess.
+Runs #3 shows the outcome of a 1/3 chance of guessing the solution from a list of three words. Run #3, starting with 'wrack', eventually narrowed the word options to three words after the third guess 'heath'. The next guess 'feast' was the correct guess. The hallmark for a correct guess is it being the target word and also resulting in 1 remaining pool word.
+
+#### Processing the Entire Wordle Vocabulary List
+
+* The **-a** command line argument runs **IMWM** so that it processes every word in the vocabulary list. The **-w** command line argument writes output a CVS text file. Thus **-a** used in combination with the **-w** saves all results in one CVS text file. The filename is automatically generated in a timestamped fashion. The timestamped named file will reside in the directory where **imwm.py** is located.
+* Output also continues to the Terminal window. The output includes an estimate for how long it will take to complete the process.
+* Use the **-x X** command line argument to set the number of sample tries for each word. The default value of 100 sample tries may not have the resolution you want. About 400 tries, ie **-x 400**, results in about 0.1 resolution. Sampling 400 times per word will take many hours to process the entire solutions word list.
+* During the **-a** processes of every word in the vocabulary list, **IMWM** includes in the Terminal window output an estimated time to finish **(ETF)** value. The **ETF** shows up after the first word is finished. This estimated time is how long it will be until the process is complete. It is the average time per word at the moment multiplied by the number of words remaining to be processed.
+* This is a typical output to the Terminal window where the word **least** is designated as the first guess:
+```text
+Duration so far: 27.1431 seconds, 0.9360 seconds/word, ETF: 0:35:34.008221 
+Output being written to 2022-11-25_16_19_15.055581.csv
+30 word: Average guesses to solve Wordle by sampling 20 tries.
+target_wrd: muddy, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
+target_wrd: muddy, averaged 4.700 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.9364 seconds
+
+Duration so far: 28.0795 seconds, 0.9360 seconds/word, ETF: 0:35:33.104436 
+Output being written to 2022-11-25_16_19_15.055581.csv
+31 word: Average guesses to solve Wordle by sampling 20 tries.
+target_wrd: puppy, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
+target_wrd: puppy, averaged 4.550 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.9660 seconds
+```
+* The CVS output written to file for the first two words is this:
+```text
+target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
+fuzzy,5.05,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9627162480028346
+fizzy,4.65,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9443350170040503
+```
+* In comparison, the CVS output written to file for the first two words using 400 tries shows different guess averages but the same general difference order:
+```text
+target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
+fuzzy,4.88,random guesses,True,least,wo_nyt_wordlist.txt,400,19.977324250969104
+fizzy,4.6,random guesses,True,least,wo_nyt_wordlist.txt,400,19.74195557308849
+``` 
+
+* Use the keypress combination **control + C** to stop the **IMWM** prior to its own process completion.
 
 #### Random Mode versus Ranked Mode Inner Workings
 
