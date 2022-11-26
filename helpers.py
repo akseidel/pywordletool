@@ -156,7 +156,8 @@ def print_word_list_col_format(the_word_list, n_col) -> NoReturn:
 
 # Ranking and filtering the words into a dictionary.
 # Returns that dictionary sorted by the word rank.
-def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool, rank_mode: int) -> dict:
+def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool,
+                                           rank_mode: int, no_rank=False) -> dict:
     wrds_dict = {}
     for w in wrds:
         # currently, the wrd_rank function can handle only 5-letter words
@@ -165,15 +166,26 @@ def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allo
             print("len 0")
         if allow_dups:
             # every word goes into the dictionary
-            wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
+            if not no_rank:
+                wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
+            else:
+                # no ranking for speed since pick will be random
+                wrds_dict[w] = '000'
         else:
             # only words having no duplicates goes into the dictionary
             if not wrd_has_duplicates(w):
-                wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
+                if not no_rank:
+                    wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
+                else:
+                    # no ranking for speed since pick will be random
+                    wrds_dict[w] = '000'
 
     # sorting the ranked word list into a dictionary
     # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
-    return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
+    if not no_rank:
+        return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
+    else:
+        return wrds_dict
 
 
 # Returns the number of words that pass the grep command list
@@ -481,14 +493,14 @@ class ToolResults:
 
     # Returns ranked results words list as dictionary. The ranking function also
     # sorts the dictionary. So result is sorted.
-    def get_ranked_results_wrd_lst(self) -> dict:
+    def get_ranked_results_wrd_lst(self, no_rank=False) -> dict:
         # Ranking and filtering the words into a dictionary
         # Set allow_dups to prevent letters from occurring more than once
         # First pick should not use duplicates, later picks should consider them.
         # Exclude all empty string. This can happen at the file end.
         wrds = list(filter(None, self.get_results_wrd_lst()))
         self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.allow_dups,
-                                                                       self.rank_mode)
+                                                                       self.rank_mode, no_rank)
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
@@ -524,7 +536,7 @@ class ToolResults:
         part_cmd = full_cmd.replace(full_path_name, '', 1)
         return part_cmd
 
-    def get_word_list(self, guess_no: int, guess_wrd='', verbose=False) -> dict:
+    def get_word_list(self, guess_no: int, guess_wrd='', verbose=False, no_rank=False) -> dict:
         """
         Used when a guess word has been recently used to be the filter basis
         for a ranked word list.
@@ -533,10 +545,11 @@ class ToolResults:
         @param guess_no: The current guess number
         @param guess_wrd: The guess word basis is the was one
         @param verbose: Flag to indicate display
+        @param no_rank: Flag to indicate no ranking or sorting, used for speed
         @return: The ranked word list corresponding to the filtering
         arguments already passed to the wordletool device.
         """
-        the_word_list = self.get_ranked_results_wrd_lst()
+        the_word_list = self.get_ranked_results_wrd_lst(no_rank)
         if verbose:
             print()
             if guess_no > 1:

@@ -294,14 +294,16 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
                    vocab_filename, do_every_wrd)
     start_mt = time.perf_counter()
     for x in range(sample_number):
-        # initialize a wordletool instance
+        # initialize a fresh wordletool instance
         wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode)
         guesses = 0
         run_stats = list([])
         run_stats.append(target_wrd)
         clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
         helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
-        the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode)
+        # Get the word list using the optional no_rank argument with rand_mode.
+        # No ranking or sorting is needed when all guesses are random.
+        the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
         # This loop ends when the last guess results in only one remaining word that fits the
         # pattern. That word, being the target word, will be the solving guess. The loop's last
         # guess is therefore the actual second to last guess, except when it happens by chance
@@ -338,7 +340,9 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
 
             # Now load in the filter criteria
             helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
-            the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode)
+            # Get the revised word list using the optional no_rank argument with rand_mode
+            # No ranking or sorting is needed when all guesses are random.
+            the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
             run_stats.append(len(the_word_list))
             guesses += 1
 
@@ -427,19 +431,18 @@ record_run = False
 process_any_arguments()
 
 # ====================================== main ================================================
-the_word_sol_list = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True,
-                                        0).get_ranked_results_wrd_lst()
-the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                    0).get_ranked_results_wrd_lst()
 wrd_x = 1
 if do_every_wrd:
-    targets = the_word_sol_list
+    # This list is used only for iterating through every word
+    targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0)\
+        .get_ranked_results_wrd_lst(True)
     n = len(targets)
     for key in targets:
         target_wrd = key
-        # the ranked word list dictionary, created now to use for valid input word checking
+        # the ranked word list dictionary, created now to use for valid input word checking,
+        # ranking is not needed so optional no_rank argument is True
         the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                            0).get_ranked_results_wrd_lst()
+                                            0).get_ranked_results_wrd_lst(True)
         run_monkey(sample_number, the_word_list, wrd_x)
 
         dur_sf = dur_sf + dur_tw
@@ -449,4 +452,6 @@ if do_every_wrd:
         wrd_x += 1
 
 else:
+    the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                        0).get_ranked_results_wrd_lst()
     run_monkey(sample_number, the_word_list, wrd_x)
