@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------
-# imwm.py                                             AKS 5/2022
+# fmwm.py                                             AKS 5/2022
 # Infinite Monkey Wordle Machine
 # Measures the average number of guesses required to arrive at the
 # Wordle target word using various guess strategies. Guesses are
