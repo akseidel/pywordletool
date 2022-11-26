@@ -59,7 +59,7 @@ options:
   -s S          Use this first guess word S.
   -r {0,1,2,3}  Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)
   -x X          Override the number of sampling runs to be this number X.
-  -v            Use the Wordle vocabulary that includes non-solution words.
+  -v            For guessing, use the Wordle vocabulary that includes non-solution words.
   -w            Writes output to CVS file having a timestamp filename.
   -a            Process every vocabulary word as a target word.
 ```

@@ -37,7 +37,8 @@ def process_any_arguments() -> NoReturn:
                         help='Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)')
     parser.add_argument('-x', action='store', type=int,
                         help='Override the number of sampling runs to be this number X.')
-    parser.add_argument('-v', action='store_true', help='Use the Wordle vocabulary that includes non-solution words.')
+    parser.add_argument('-v', action='store_true', help='For guessing, use the Wordle vocabulary that'
+                                                        ' includes non-solution words.')
     parser.add_argument('-w', action='store_true', help='Writes output to CVS file having a timestamp filename.')
     parser.add_argument('-a', action='store_true', help='Process every vocabulary word as a target word.')
 
@@ -387,6 +388,7 @@ debug_mode = False  # prints out lists, guesses etc.
 reveal_mode = False  # reveals each solution run data
 data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
 letter_rank_file = 'letter_ranks.txt'
+vocab_sol_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 # vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
 
@@ -425,11 +427,13 @@ record_run = False
 process_any_arguments()
 
 # ====================================== main ================================================
+the_word_sol_list = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True,
+                                        0).get_ranked_results_wrd_lst()
 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                     0).get_ranked_results_wrd_lst()
 wrd_x = 1
 if do_every_wrd:
-    targets = the_word_list.copy()
+    targets = the_word_sol_list
     n = len(targets)
     for key in targets:
         target_wrd = key
