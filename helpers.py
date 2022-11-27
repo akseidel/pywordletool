@@ -84,7 +84,7 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
 # Returns a word's letter frequency ranking
 def wrd_rank(wrd, ltr_rank_dict, method) -> float:
     # Any word longer than 5 letters has undefined rank.
-    # This allows for wordlist flexibilty,
+    # This allows for wordlist flexibility,
     if len(wrd) > 5:
         return 0
     r = 0
@@ -188,20 +188,10 @@ def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allo
         return wrds_dict
 
 
-# Returns the number of words that pass the grep command list
-def get_raw_word_count(this_sh_cmd_lst) -> str:
-    sh_cmd_cnt = this_sh_cmd_lst.full_cmd() + " | wc -ltr"
-    with Popen(sh_cmd_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
-        return proc.stdout.readline().strip()
-    # return os.popen(sh_cmd_cnt).read().strip()
-
-
 # Returns the list of words that pass the grep command list
 def get_results_word_list(this_sh_cmd_lst) -> list:
     with Popen(this_sh_cmd_lst.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
         return list(map(lambda i: i[: -1], proc.stdout.readlines()))
-    # result = os.popen(this_sh_cmd_lst.full_cmd()).read()
-    # return result.split("\n")
 
 
 # Clears the console window
@@ -309,11 +299,6 @@ def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dic
             r_pos_dict[key] = value
 
         candidate_pos += 1
-
-    # print(pick + ' against ' + sol)
-    # print('chmp_exclude ' + str(exclude))
-    # print('chmp_r_pos_dict ' + str(r_pos_dict))
-    # print('chmp_x_pos_dict ' + str(x_pos_dict))
 
 
 def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str) -> NoReturn:

@@ -77,7 +77,15 @@ target_wrd: feast, 4 samples, random guesses, initial duplicates:True, wo_nyt_wo
 target_wrd: feast, averaged 3.750 guesses to solve, 4 samples, random guesses, initial duplicates:True, wo_nyt_wordlist.txt, 0.1681 seconds
 ```
 
-In the above example the **-l** argument 'Lists each solution run data' during the **FMWM** operations in square brackets. The first number is the run number. The second number is the number of guesses required to solve in that run. The first quoted word is the target word. The following quoted words are the guess words. The number following each guess word is the selection pool size remaining after applying the results of the guess. In run #1 the guess word 'shown' resulted in a 122 word selection pool. In run #1 the last quoted guess 'flask' is the third guess. One knows that because it resulted in one remaining selection pool word and it is also not the target word. Target words are first verified to be present in the solutions list. Therefore the target word has to be the word in a one word selection pool that filters for the target word. In run #1 that word could only be 'feast' and thus the third required guess would select it. **FMWM** knows this and thus it does not need to proceed another step in the guessing process.
+In the above example the **-l** argument 'Lists each solution run data' during the **FMWM** operations in square brackets. 
+
+* The first number is the run number.
+* The second number is the number of guesses required to solve in that run.
+* The first quoted word is the target word.
+* The following quoted words are the guess words.
+* The number following each guess word is the selection pool size remaining after applying the results of the guess. 
+
+In run #1 the guess word 'shown' resulted in a 122 word selection pool. In run #1 the last quoted guess 'flask' is the third guess. One knows that because it resulted in one remaining selection pool word and it is also not the target word. Target words are first verified to be present in the solutions list. Therefore the target word has to be the word in a one word selection pool that filters for the target word. In run #1 that word could only be 'feast' and thus the third required guess would select it. **FMWM** knows this and thus it does not need to proceed another step in the guessing process.
 
 Run #2 and Run #4 are similar to Run #1 in that they also result in a single word remaining situation whereupon 'feast' would be the final guess.
 
@@ -90,6 +98,7 @@ Runs #3 shows the outcome of a 1/3 chance of guessing the solution from a list o
 * Use the **-x X** command line argument to set the number of sample tries for each word. The default value of 100 sample tries may not have the resolution you want. About 400 tries, ie **-x 400**, results in about 0.1 resolution. Sampling 400 times per word will take many hours to process the entire solutions word list.
 * During the **-a** processes of every word in the vocabulary list, **FMWM** includes in the Terminal window output an estimated time to finish **(ETF)** value. The **ETF** shows up after the first word is finished. This estimated time is how long it will be until the process is complete. It is the average time per word at the moment multiplied by the number of words remaining to be processed.
 * This is a typical output to the Terminal window where the word **least** is designated as the first guess:
+
 ```text
 Duration so far: 27.1431 seconds, 0.9360 seconds/word, ETF: 0:35:34.008221 
 Output being written to 2022-11-25_16_19_15.055581.csv
@@ -103,18 +112,22 @@ Output being written to 2022-11-25_16_19_15.055581.csv
 target_wrd: puppy, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
 target_wrd: puppy, averaged 4.550 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.9660 seconds
 ```
+
 * The CVS output written to file for the first two words is this:
+
 ```text
 target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
 fuzzy,5.05,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9627162480028346
 fizzy,4.65,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9443350170040503
 ```
+
 * In comparison, the CVS output written to file for the first two words using 400 tries shows different guess averages but the same general difference order:
+
 ```text
 target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
 fuzzy,4.88,random guesses,True,least,wo_nyt_wordlist.txt,400,19.977324250969104
 fizzy,4.6,random guesses,True,least,wo_nyt_wordlist.txt,400,19.74195557308849
-``` 
+```
 
 * Use the keypress combination **control + C** to stop the **FMWM** prior to its own process completion.
 

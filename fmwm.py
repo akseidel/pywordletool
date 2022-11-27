@@ -267,8 +267,8 @@ def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname
         output_msg(msg, record_run, run_fname)
 
 
-def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
-    global dur_tw
+def run_monkey(sample_number: int, wrd_x: int):
+    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type
 
     if record_run:
         print('Output being written to ' + run_fname)
@@ -337,12 +337,20 @@ def run_monkey(sample_number: int, the_word_list: dict, wrd_x: int):
             if guesses > 0 and not allow_dups:  # need a new wordletool allowing dups
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode)
+                allow_dups = True
 
             # Now load in the filter criteria
             helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
             # Get the revised word list using the optional no_rank argument with rand_mode
             # No ranking or sorting is needed when all guesses are random.
             the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+
+            if len(the_word_list) < 1:
+                del wordletool
+                wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode)
+                helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+                the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+
             run_stats.append(len(the_word_list))
             guesses += 1
 
@@ -421,6 +429,7 @@ use_starting_wrd = -1
 run_type = -1
 first_run = True
 do_every_wrd = False  # Process every vocabulary word as a target word.
+conditions = ''
 dur_tw = 0.0
 dur_sf = 0.0
 # Timestamp like filename used for record_run
@@ -434,7 +443,7 @@ process_any_arguments()
 wrd_x = 1
 if do_every_wrd:
     # This list is used only for iterating through every word
-    targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0)\
+    targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
         .get_ranked_results_wrd_lst(True)
     n = len(targets)
     for key in targets:
@@ -443,15 +452,16 @@ if do_every_wrd:
         # ranking is not needed so optional no_rank argument is True
         the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                             0).get_ranked_results_wrd_lst(True)
-        run_monkey(sample_number, the_word_list, wrd_x)
+        run_monkey(sample_number, wrd_x)
 
         dur_sf = dur_sf + dur_tw
         avg_t = dur_sf / wrd_x
         etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
-        print(f'Duration so far: {dur_sf:0.4f} seconds, {avg_t:0.4f} seconds/word, ETF: {etf} ')
+        dsf = datetime.timedelta(seconds=dur_sf)
+        print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
         wrd_x += 1
 
 else:
     the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                         0).get_ranked_results_wrd_lst()
-    run_monkey(sample_number, the_word_list, wrd_x)
+    run_monkey(sample_number, wrd_x)
