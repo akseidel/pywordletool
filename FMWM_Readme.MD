@@ -1,6 +1,6 @@
 # fmwm.py
 
-## Finite Monkey Wordle Machine (fmwm)
+## Finite Monkey Wordle Machine (FMWM)
 
 * The **Finite Monkey Wordle Machine** (**FMWM**) makes guesses in a certain way to calculate the average number of guesses required to solve a known **Wordle** word. The machine’s purpose is for measuring how hard a word is compared to another word or whether a certain guessing mode works better than another guessing mode.
 
