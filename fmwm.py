@@ -250,8 +250,8 @@ def reveal_output(r, guesses, run_stats, record_run, run_fname) -> NoReturn:
 
 
 def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
-                    target_wrd, starting_wrd, tot, vocab_filename) -> NoReturn:
-    global first_run, dur_tw, conditions
+                    target_wrd, starting_wrd, tot, vocab_filename, dur_tw) -> NoReturn:
+    global first_run, conditions
     average = tot / sample_number
     stat_msg = 'target_wrd: ' + target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
     stat_msg = stat_msg + conditions + ', ' + vocab_filename + f', {dur_tw:0.4f} seconds'
@@ -292,7 +292,7 @@ def run_monkey(sample_number: int, wrd_x: int):
 
     prelude_output(sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    vocab_filename, do_every_wrd)
-    start_mt = time.perf_counter()
+    start_mt = time.perf_counter()  # monkey start time
     for x in range(sample_number):
         # initialize a fresh wordletool instance
         wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode)
@@ -382,9 +382,9 @@ def run_monkey(sample_number: int, wrd_x: int):
         # animated in progress showing
         sys.stdout.write('\033[K' + ">" + str(r) + '  avg: ' + f'{average:.2f}' + '\r')
 
-    dur_tw = time.perf_counter() - start_mt
+    dur_tw = time.perf_counter() - start_mt  # this word's process time
     prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
-                    target_wrd, starting_wrd, tot, vocab_filename)
+                    target_wrd, starting_wrd, tot, vocab_filename, dur_tw)
 
     sys.stdout.write('\n')
     # output_msg('guessin2 % is ' + f'{(100 * (guessin2 / sample_number)):.2f}', record_run, run_fname)
@@ -430,8 +430,8 @@ run_type = -1
 first_run = True
 do_every_wrd = False  # Process every vocabulary word as a target word.
 conditions = ''
-dur_tw = 0.0
-dur_sf = 0.0
+dur_tw = 0.0    # seconds to process word
+dur_sf = 0.0    # seconds so far in list process
 # Timestamp like filename used for record_run
 run_fname = imwm_fname()
 # Records output to a CVS file having a timestamp like filename
@@ -446,6 +446,8 @@ if do_every_wrd:
     targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
         .get_ranked_results_wrd_lst(True)
     n = len(targets)
+    dsf = datetime.timedelta(0)
+    avg_t = 0
     for key in targets:
         target_wrd = key
         # the ranked word list dictionary, created now to use for valid input word checking,
@@ -458,9 +460,10 @@ if do_every_wrd:
         avg_t = dur_sf / wrd_x
         etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
         dsf = datetime.timedelta(seconds=dur_sf)
-        print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
         wrd_x += 1
-
+        if wrd_x < len(targets):
+            print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
+    print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
 else:
     the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                         0).get_ranked_results_wrd_lst()
