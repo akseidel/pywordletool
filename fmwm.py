@@ -107,9 +107,9 @@ def process_any_arguments() -> NoReturn:
         if args.x < 1:
             sample_number = 1
             print('===> Negative value not allowed. Runs number is set to ' + str(sample_number))
-        elif args.x > 20000:
-            sample_number = 20000
-            print('===> Honestly, even 20,000 is too many. Runs number is set to ' + str(sample_number))
+        elif args.x > 1000000:
+            sample_number = 1000000
+            print('===> Honestly, even 1,000,000 is too many. Runs number is set to ' + str(sample_number))
             print('===> Control + C will stop the program.')
         else:
             sample_number = args.x
@@ -278,9 +278,12 @@ def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname
                vocab_filename, sample_number, dur_tw]
         output_msg(msg, record_run, run_fname)
 
+    query_output()
+
+def query_output():
     if query_mode:
-        stat_msg = f'Encountered {len(query_set)} guess number {query_guess - 1} ' \
-                   f'eliminate to the solution guesses: {list(query_set)}'
+        stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
+                   f'that eliminate all but the solution guess:\n{list(query_set)}'
         print(stat_msg)
 
 
@@ -455,31 +458,35 @@ process_any_arguments()
 
 # ====================================== main ================================================
 if __name__ == "__main__":
-    wrd_x = 1
-    if do_every_wrd:
-        # This list is used only for iterating through every word
-        targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
-            .get_ranked_results_wrd_lst(True)
-        n = len(targets)
-        dsf = datetime.timedelta(0)
-        avg_t = 0
-        for key in targets:
-            target_wrd = key
-            # the ranked word list dictionary, created now to use for valid input word checking,
-            # ranking is not needed so optional no_rank argument is True
-            the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                                0).get_ranked_results_wrd_lst(True)
-            run_monkey(sample_number, wrd_x)
+    try:
+        wrd_x = 1
+        if do_every_wrd:
+            # This list is used only for iterating through every word
+            targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
+                .get_ranked_results_wrd_lst(True)
+            n = len(targets)
+            dsf = datetime.timedelta(0)
+            avg_t = 0
+            for key in targets:
+                target_wrd = key
+                # the ranked word list dictionary, created now to use for valid input word checking,
+                # ranking is not needed so optional no_rank argument is True
+                the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                                    0).get_ranked_results_wrd_lst(True)
+                run_monkey(sample_number, wrd_x)
 
-            dur_sf = dur_sf + dur_tw
-            avg_t = dur_sf / wrd_x
-            etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
-            dsf = datetime.timedelta(seconds=dur_sf)
-            wrd_x += 1
-            if wrd_x < len(targets):
-                print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
-        print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
-    else:
-        the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                            0).get_ranked_results_wrd_lst()
-        run_monkey(sample_number, wrd_x)
+                dur_sf = dur_sf + dur_tw
+                avg_t = dur_sf / wrd_x
+                etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
+                dsf = datetime.timedelta(seconds=dur_sf)
+                wrd_x += 1
+                if wrd_x < len(targets):
+                    print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
+            print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
+        else:
+            the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                                0).get_ranked_results_wrd_lst()
+            run_monkey(sample_number, wrd_x)
+    except KeyboardInterrupt:
+        print(' user canceled.')
+        query_output()
