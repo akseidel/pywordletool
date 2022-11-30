@@ -57,7 +57,6 @@ def process_any_arguments() -> NoReturn:
             print(f'Aborting this run. The -q argument must be larger than 0. It was {query_guess}.')
             exit()
 
-
     if args.a:
         # Process every vocabulary word as a target word.
         do_every_wrd = True
@@ -263,11 +262,12 @@ def reveal_output(r, guesses, run_stats, record_run, run_fname) -> NoReturn:
 
 def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, tot, vocab_filename, dur_tw) -> NoReturn:
-    global first_run, conditions
+    global first_run, conditions, query_set
     average = tot / sample_number
     stat_msg = 'target_wrd: ' + target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
     stat_msg = stat_msg + conditions + ', ' + vocab_filename + f', {dur_tw:0.4f} seconds'
     output_msg(stat_msg, False, run_fname)
+
     if record_run:
         if not do_every_wrd or first_run:
             msg = ['target wrd', 'average', 'guess mode', 'initial duplicates', 'first guess',
@@ -278,9 +278,14 @@ def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname
                vocab_filename, sample_number, dur_tw]
         output_msg(msg, record_run, run_fname)
 
+    if query_mode:
+        stat_msg = f'Encountered {len(query_set)} guess number {query_guess - 1} ' \
+                   f'eliminate to the solution guesses: {list(query_set)}'
+        print(stat_msg)
+
 
 def run_monkey(sample_number: int, wrd_x: int):
-    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type
+    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set
 
     if record_run:
         print('Output being written to ' + run_fname)
@@ -354,7 +359,10 @@ def run_monkey(sample_number: int, wrd_x: int):
             # Get the revised word list using the optional no_rank argument with rand_mode
             # No ranking or sorting is needed when all guesses are random.
             the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
-
+            # Because the target word is known to exist in the overall pool then the_word_list can
+            # only be less than 1 when the target had duplicate letters and the pool was not
+            # allowing duplicates. Here that condition is checked and the pool revised to allow
+            # duplicates.
             if len(the_word_list) < 1:
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode)
@@ -373,12 +381,15 @@ def run_monkey(sample_number: int, wrd_x: int):
         tot = tot + guesses
 
         r = x + 1
+        # Reveal_mode is where output is desired to show the guesses and their pool impact or
+        # to show particular guess by words.
         if reveal_mode:
             if not query_mode:
                 reveal_output(r, guesses, run_stats, record_run, run_fname)
             else:
-                if guesses == query_guess and run_stats[(query_guess-1)*2] == 1:
+                if guesses == query_guess and run_stats[(query_guess - 1) * 2] == 1:
                     reveal_output(r, guesses, run_stats, record_run, run_fname)
+                    query_set.add(run_stats[(query_guess - 1) * 2 - 1])
 
         del wordletool
         average = tot / r
@@ -432,6 +443,7 @@ do_every_wrd = False  # Process every vocabulary word as a target word.
 conditions = ''
 dur_tw = 0.0  # seconds to process word
 dur_sf = 0.0  # seconds so far in list process
+query_set = set()
 query_guess = 1
 query_mode = False
 # Timestamp like filename used for record_run
