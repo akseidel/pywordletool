@@ -25,7 +25,7 @@ def process_any_arguments() -> NoReturn:
     """
     global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
         starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
-        sample_number, vocab_filename, record_run, do_every_wrd
+        sample_number, vocab_filename, record_run, do_every_wrd, query_guess, query_mode
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
@@ -41,10 +41,22 @@ def process_any_arguments() -> NoReturn:
                                                         ' includes non-solution words.')
     parser.add_argument('-w', action='store_true', help='Writes output to CVS file having a timestamp filename.')
     parser.add_argument('-a', action='store_true', help='Process every vocabulary word as a target word.')
+    parser.add_argument('-q', action='store', type=int,
+                        help='Query list guesses Q.')
 
     args = parser.parse_args()
     debug_mode = args.d  # prints out lists, guesses etc.
     reveal_mode = args.l  # lists each solution run data
+
+    if args.q is not None:
+        query_guess = args.q
+        if query_guess > 0:
+            reveal_mode = True  # ie as if -l argument is used
+            query_mode = True
+        else:
+            print(f'Aborting this run. The -q argument must be larger than 0. It was {query_guess}.')
+            exit()
+
 
     if args.a:
         # Process every vocabulary word as a target word.
@@ -286,8 +298,6 @@ def run_monkey(sample_number: int, wrd_x: int):
         sample_number = 1
 
     tot: int = 0  # total number of guesses
-    # guessin2: int = 0  # total number of second getters
-    # guessin1: int = 0  # total number of first getters
     word: str = ''  # the guess
 
     prelude_output(sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
@@ -362,20 +372,13 @@ def run_monkey(sample_number: int, wrd_x: int):
             guesses += 1
         tot = tot + guesses
 
-        # if guesses == 2:
-        #     reveal_stat = [r, guesses]
-        #     reveal_stat.extend(run_stats)
-        #     output_msg(reveal_stat, record_run, run_fname)
-        #     guessin2 += 1
-        # if guesses == 1:
-        #     reveal_stat = [r, guesses]
-        #     reveal_stat.extend(run_stats)
-        #     output_msg(reveal_stat,record_run, run_fname)
-        #     guessin1 += 1
-
         r = x + 1
         if reveal_mode:
-            reveal_output(r, guesses, run_stats, record_run, run_fname)
+            if not query_mode:
+                reveal_output(r, guesses, run_stats, record_run, run_fname)
+            else:
+                if guesses == query_guess and run_stats[(query_guess-1)*2] == 1:
+                    reveal_output(r, guesses, run_stats, record_run, run_fname)
 
         del wordletool
         average = tot / r
@@ -387,9 +390,6 @@ def run_monkey(sample_number: int, wrd_x: int):
                     target_wrd, starting_wrd, tot, vocab_filename, dur_tw)
 
     sys.stdout.write('\n')
-    # output_msg('guessin2 % is ' + f'{(100 * (guessin2 / sample_number)):.2f}', record_run, run_fname)
-    # output_msg('guessin2 count is ' + str(guessin2), record_run, run_fname)
-    # output_msg('guessin1 count is ' + str(guessin1), record_run, run_fname)
 
 
 # ==== setup ======= These variables can be overriden by command line argument. ================
@@ -430,8 +430,10 @@ run_type = -1
 first_run = True
 do_every_wrd = False  # Process every vocabulary word as a target word.
 conditions = ''
-dur_tw = 0.0    # seconds to process word
-dur_sf = 0.0    # seconds so far in list process
+dur_tw = 0.0  # seconds to process word
+dur_sf = 0.0  # seconds so far in list process
+query_guess = 1
+query_mode = False
 # Timestamp like filename used for record_run
 run_fname = imwm_fname()
 # Records output to a CVS file having a timestamp like filename
@@ -440,31 +442,32 @@ record_run = False
 process_any_arguments()
 
 # ====================================== main ================================================
-wrd_x = 1
-if do_every_wrd:
-    # This list is used only for iterating through every word
-    targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
-        .get_ranked_results_wrd_lst(True)
-    n = len(targets)
-    dsf = datetime.timedelta(0)
-    avg_t = 0
-    for key in targets:
-        target_wrd = key
-        # the ranked word list dictionary, created now to use for valid input word checking,
-        # ranking is not needed so optional no_rank argument is True
-        the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                            0).get_ranked_results_wrd_lst(True)
-        run_monkey(sample_number, wrd_x)
+if __name__ == "__main__":
+    wrd_x = 1
+    if do_every_wrd:
+        # This list is used only for iterating through every word
+        targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
+            .get_ranked_results_wrd_lst(True)
+        n = len(targets)
+        dsf = datetime.timedelta(0)
+        avg_t = 0
+        for key in targets:
+            target_wrd = key
+            # the ranked word list dictionary, created now to use for valid input word checking,
+            # ranking is not needed so optional no_rank argument is True
+            the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                                0).get_ranked_results_wrd_lst(True)
+            run_monkey(sample_number, wrd_x)
 
-        dur_sf = dur_sf + dur_tw
-        avg_t = dur_sf / wrd_x
-        etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
-        dsf = datetime.timedelta(seconds=dur_sf)
-        wrd_x += 1
-        if wrd_x < len(targets):
-            print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
-    print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
-else:
-    the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                        0).get_ranked_results_wrd_lst()
-    run_monkey(sample_number, wrd_x)
+            dur_sf = dur_sf + dur_tw
+            avg_t = dur_sf / wrd_x
+            etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
+            dsf = datetime.timedelta(seconds=dur_sf)
+            wrd_x += 1
+            if wrd_x < len(targets):
+                print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
+        print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
+    else:
+        the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                            0).get_ranked_results_wrd_lst()
+        run_monkey(sample_number, wrd_x)

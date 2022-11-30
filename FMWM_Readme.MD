@@ -62,7 +62,20 @@ options:
   -v            For guessing, use the Wordle vocabulary that includes non-solution words.
   -w            Writes output to CVS file having a timestamp filename.
   -a            Process every vocabulary word as a target word.
+  -q Q          Query list guesses Q.
 ```
+* **-h** Displays the help hints as shown above.
+* **-d** Prints out all the word lists at each step, the guesses and other data.
+* **-l** Lists out only the guess data and resulting pool sizes for each solution run. For example: [3, 4, 'feast', 'wrack', 106, 'blaze', 8, 'heath', 3, 'feast', 1]
+* **-n** Skips asking for a specified first guess.
+* **-t T** Solve for a target word as in **-t happy**.
+* **-s S** Use this first guess word as in **-t stale**.
+* **-r {0,1,2,3}** Specify the guessing type. **-r 0** means random guesses for all guesses. **-r 1** means rank 1 type guesses and so on.
+* **-x X** Sets the number of sample runs other than the default 100. **-x 1000** would specify 1000 runs.
+* **-v** For guessing purposes only, use the Wordle vocabulary that includes non-solution wordfs in addition to solution words. By default, the solutions only list is used. When processing all the words in the list, it is the solutions only list that is processed, but the pool from which guesses are selected can be either the default solutions list or the larger list that also includes words that would never be a solution.
+* **-w** Writes the output to a CVS file in addition to showing in the Terminal. The CVS file is timestamp named, so it will always be unique, and it will reside at the directory that holds **fmwm.py**.
+* **-a** Processes every vocabulary word (2309 words) in the solutions list as eachh target word.
+* **-q Q** Lists out only the guess data for runs that result in **Q** guesses. For example **-q 2** outputs only the guess data for runs where the target word is solved in two guesses. In other words after the first guess, only the target word remains.
 
 A use example:
 
