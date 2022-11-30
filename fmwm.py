@@ -280,6 +280,7 @@ def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname
 
     query_output()
 
+
 def query_output():
     if query_mode:
         stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
