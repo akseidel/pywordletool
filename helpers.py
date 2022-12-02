@@ -445,7 +445,7 @@ class ShellCmdList:
         return this_cmd
 
 
-# ToolResults(data path, vocabulary file name, letter_ranks file, allow_dups)
+# ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
 # The wordle tool all wrapped up into one being, including the grep command list.
 class ToolResults:
 
@@ -453,7 +453,7 @@ class ToolResults:
         self.data_path = data_path
         self.vocab = vocabulary  # vocabulary is the words list textfile
         self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
-        self.allow_dups = allow_dups  # allow_dups is the-allow-duplicate-letters flag
+        self.allow_dups = allow_dups  # loc_allow_dups is the-allow-duplicate-letters flag
         self.rank_mode = rank_mode
 
         wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
@@ -480,7 +480,7 @@ class ToolResults:
     # sorts the dictionary. So result is sorted.
     def get_ranked_results_wrd_lst(self, no_rank=False) -> dict:
         # Ranking and filtering the words into a dictionary
-        # Set allow_dups to prevent letters from occurring more than once
+        # Set loc_allow_dups to prevent letters from occurring more than once
         # First pick should not use duplicates, later picks should consider them.
         # Exclude all empty string. This can happen at the file end.
         wrds = list(filter(None, self.get_results_wrd_lst()))

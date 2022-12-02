@@ -25,7 +25,8 @@ def process_any_arguments() -> NoReturn:
     """
     global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
         starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
-        sample_number, vocab_filename, record_run, do_every_wrd, query_guess, query_mode
+        sample_number, vocab_filename, record_run, do_every_wrd, query_guess, \
+        query_mode, magic_mode
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
@@ -43,10 +44,12 @@ def process_any_arguments() -> NoReturn:
     parser.add_argument('-a', action='store_true', help='Process every vocabulary word as a target word.')
     parser.add_argument('-q', action='store', type=int,
                         help='Query list guesses Q.')
+    parser.add_argument('-m', action='store_true', help='Find the magic words for a target word.')
 
     args = parser.parse_args()
     debug_mode = args.d  # prints out lists, guesses etc.
     reveal_mode = args.l  # lists each solution run data
+    magic_mode = args.m  # Find the magic words for a target word.
 
     if args.q is not None:
         query_guess = args.q
@@ -115,18 +118,18 @@ def process_any_arguments() -> NoReturn:
             sample_number = args.x
 
 
-def clean_slate(excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict) -> NoReturn:
+def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> NoReturn:
     """
     Clears all the objects used to hold the letter filtering information
-    @param excl_l: List of letters to exclude.
-    @param requ_l: List of letters to require
-    @param x_pos_dict: Dictionary of letter at positions to exclude
-    @param r_pos_dict: Dictionary of letters at position to require
+    @param loc_excl_l: List of letters to exclude.
+    @param loc_requ_l: List of letters to require
+    @param loc_x_pos_dict: Dictionary of letter at positions to exclude
+    @param loc_r_pos_dict: Dictionary of letters at position to require
     """
-    x_pos_dict.clear()
-    r_pos_dict.clear()
-    excl_l.clear()
-    requ_l.clear()
+    loc_x_pos_dict.clear()
+    loc_r_pos_dict.clear()
+    loc_excl_l.clear()
+    loc_requ_l.clear()
 
 
 def get_set_target_word() -> NoReturn:
@@ -188,24 +191,24 @@ def get_set_guess_mode() -> NoReturn:
         allow_dups = True
     else:
         guess_mode = 'rank mode type ' + str(rank_mode + 1) + " guesses"
-        # In ranked mode the allow_dups flag will be not be forced
+        # In ranked mode the loc_allow_dups flag will be not be forced
         # so that its influence on the first and second guess can be observed.
 
 
-def set_context_msg(rand_mode, rank_mode):
+def set_context_msg(loc_rand_mode, loc_rank_mode):
     """
-    Sets the guess_mode string that is used to append a status message.
+    Sets the loc_guess_mode string that is used to append a status message.
     """
     global guess_mode, allow_dups
-    if rand_mode:
+    if loc_rand_mode:
         guess_mode = 'random guesses'
         # For random mode to represent a base condition, duplicate letter
         # words show be allowed regardless of its previous setting.
         del allow_dups
         allow_dups = True
     else:
-        guess_mode = 'rank mode type ' + str(rank_mode + 1) + " guesses"
-        # In ranked mode the allow_dups flag will be not be forced
+        guess_mode = 'rank mode type ' + str(loc_rank_mode + 1) + " guesses"
+        # In ranked mode the loc_allow_dups flag will be not be forced
         # so that its influence on the first and second guess can be observed.
 
 
@@ -219,8 +222,14 @@ def imwm_fname() -> str:
     return ts + ".csv"
 
 
-def output_msg(msg: any, also2file: bool, fname: str) -> NoReturn:
-    fn_csv = fname
+def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
+    """
+    Outputs content to console and to csv file.
+    @param msg: The content to be output
+    @type also2file: bool, If true then save to csv file also.
+    @param loc_fname: The filename for saving to csv file
+    """
+    fn_csv = loc_fname
     if also2file:
         with open(fn_csv, 'a') as f:
             if type(msg) is str:
@@ -229,72 +238,75 @@ def output_msg(msg: any, also2file: bool, fname: str) -> NoReturn:
                 csvwriter = csv.writer(f)
                 csvwriter.writerow(msg)
     else:
-        print(str(msg))
+        sys.stdout.write('\033[K' + str(msg) + '\n')
     return
 
 
-def prelude_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
-                   starting_wrd, vocab_filename, do_every_wrd) -> NoReturn:
+def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
+                   loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd) -> NoReturn:
     global conditions
-    conditions = f'{sample_number} samples, ' + guess_mode + ', initial duplicates:' + str(allow_dups)
-    if len(starting_wrd) == 5:
-        conditions = conditions + " , first guess:" + starting_wrd
-    output_msg('target_wrd: ' + target_wrd + ", " + conditions + ", " + vocab_filename, False, run_fname)
-    if record_run:
-        if not do_every_wrd:
+    conditions = f'{loc_sample_number} samples, ' + loc_guess_mode + ', initial duplicates:' + str(loc_allow_dups)
+    if len(loc_starting_wrd) == 5:
+        conditions = conditions + " , first guess:" + loc_starting_wrd
+    output_msg('loc_target_wrd: ' + target_wrd + ", " + conditions + ", " + loc_vocab_filename, False, loc_run_fname)
+    if loc_record_run:
+        if not loc_do_every_wrd:
             msg = ['target wrd', 'samples', 'guess mode', 'initial duplicates', 'first guess', 'vocabulary']
-            output_msg(msg, record_run, run_fname)
-            msg = [target_wrd, sample_number, guess_mode, str(allow_dups), starting_wrd, vocab_filename]
-            output_msg(msg, record_run, run_fname)
+            output_msg(msg, loc_record_run, loc_run_fname)
+            msg = [target_wrd, loc_sample_number, loc_guess_mode, str(loc_allow_dups), loc_starting_wrd,
+                   loc_vocab_filename]
+            output_msg(msg, loc_record_run, loc_run_fname)
         if reveal_mode:
             reveal_hdr = ['Run', 'guesses', 'target wrd', 'G1', 'G1R', 'G2', 'G2R', 'G3', 'G3R', 'G4', 'G4R', 'G5',
                           'G5R', 'G6', 'G6R', 'G7', 'G7R', 'G8', 'G8R', 'G9', 'G9R', 'G10', 'G10R']
-            output_msg(reveal_hdr, record_run, run_fname)
+            output_msg(reveal_hdr, loc_record_run, loc_run_fname)
 
 
-def reveal_output(r, guesses, run_stats, record_run, run_fname) -> NoReturn:
+def reveal_output(r, guesses, run_stats, loc_record_run, loc_run_fname) -> NoReturn:
     reveal_stat = [r, guesses]
     reveal_stat.extend(run_stats)
-    output_msg(reveal_stat, False, run_fname)
-    if record_run:
-        output_msg(reveal_stat, record_run, run_fname)
+    output_msg(reveal_stat, False, loc_run_fname)
+    if loc_record_run:
+        output_msg(reveal_stat, loc_record_run, loc_run_fname)
 
 
-def prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
-                    target_wrd, starting_wrd, tot, vocab_filename, dur_tw) -> NoReturn:
+def prologue_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
+                    loc_target_wrd, loc_starting_wrd, tot, loc_vocab_filename, loc_dur_tw) -> NoReturn:
     global first_run, conditions, query_set
-    average = tot / sample_number
-    stat_msg = 'target_wrd: ' + target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
-    stat_msg = stat_msg + conditions + ', ' + vocab_filename + f', {dur_tw:0.4f} seconds'
-    output_msg(stat_msg, False, run_fname)
+    average = tot / loc_sample_number
+    stat_msg = 'loc_target_wrd: ' + loc_target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
+    stat_msg = stat_msg + conditions + ', ' + loc_vocab_filename + f', {loc_dur_tw:0.4f} seconds'
+    output_msg(stat_msg, False, loc_run_fname)
 
-    if record_run:
+    if loc_record_run:
         if not do_every_wrd or first_run:
             msg = ['target wrd', 'average', 'guess mode', 'initial duplicates', 'first guess',
                    'vocabulary', 'samples', 'seconds']
-            output_msg(msg, record_run, run_fname)
+            output_msg(msg, loc_record_run, loc_run_fname)
             first_run = False
-        msg = [target_wrd, average, guess_mode, str(allow_dups), starting_wrd,
-               vocab_filename, sample_number, dur_tw]
-        output_msg(msg, record_run, run_fname)
+        msg = [loc_target_wrd, average, loc_guess_mode, str(loc_allow_dups), loc_starting_wrd,
+               loc_vocab_filename, loc_sample_number, loc_dur_tw]
+        output_msg(msg, loc_record_run, loc_run_fname)
 
-    query_output()
+    query_output(loc_target_wrd)
 
 
-def query_output():
+def query_output(loc_target_wrd):
     if query_mode:
+        query_list = list(query_set)
+        query_list.sort()
         stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
-                   f'that eliminate all but the solution guess:\n{list(query_set)}'
+                   f'that eliminate all but the solution {loc_target_wrd} guess:\n{query_list}'
         print(stat_msg)
 
 
-def run_monkey(sample_number: int, wrd_x: int):
+def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set
 
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print(str(wrd_x) + ' word: Average guesses to solve Wordle by sampling ' + str(sample_number) + ' tries.')
+    print(str(loc_wrd_x) + ' word: Average guesses to solve Wordle by sampling ' + str(loc_sample_number) + ' tries.')
     # Get the target Wordle word the guessing sessions is trying to discover.drive
     get_set_target_word()
     # Set the first guess if desired.
@@ -304,15 +316,15 @@ def run_monkey(sample_number: int, wrd_x: int):
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
     if use_starting_wrd == 1 and not rand_mode:
-        sample_number = 1
+        loc_sample_number = 1
 
     tot: int = 0  # total number of guesses
     word: str = ''  # the guess
 
-    prelude_output(sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
+    prelude_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    vocab_filename, do_every_wrd)
-    start_mt = time.perf_counter()  # monkey start time
-    for x in range(sample_number):
+    start_mt = time.perf_counter()  # record monkey start time
+    for x in range(loc_sample_number):
         # initialize a fresh wordletool instance
         wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode)
         guesses = 0
@@ -320,31 +332,31 @@ def run_monkey(sample_number: int, wrd_x: int):
         run_stats.append(target_wrd)
         clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
         helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
-        # Get the word list using the optional no_rank argument with rand_mode.
+        # Get the word list using the optional no_rank argument with loc_rand_mode.
         # No ranking or sorting is needed when all guesses are random.
-        the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
+        loc_the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
         # This loop ends when the last guess results in only one remaining word that fits the
         # pattern. That word, being the target word, will be the solving guess. The loop's last
         # guess is therefore the actual second to last guess, except when it happens by chance
         # to be the target word.
-        while len(the_word_list) > 1:
+        while len(loc_the_word_list) > 1:
             if guesses == 0 and use_starting_wrd == 1:
                 word = starting_wrd
             else:
                 if rand_mode:
-                    word, rank = random.choice(list(the_word_list.items()))
+                    word, rank = random.choice(list(loc_the_word_list.items()))
                 else:
                     if guesses == 0:
                         # first pick has to be random in this sampling scheme
-                        word, rank = random.choice(list(the_word_list.items()))
-                        # word, rank = list(the_word_list.items())[-1]
+                        word, rank = random.choice(list(loc_the_word_list.items()))
+                        # word, rank = list(loc_the_word_list.items())[-1]
                     else:
                         # all other picks are top rank
-                        word, rank = list(the_word_list.items())[-1]
+                        word, rank = list(loc_the_word_list.items())[-1]
 
             run_stats.append(word)
             # At this point the guess word has been selected from the results of the prior guess.
-            # Normal strategy for non rand_mode, ie not picking anything random, is to not select
+            # Normal strategy for non loc_rand_mode, ie not picking anything random, is to not select
             # words having duplicate letters for at least the first two guesses. Allow_dups is
             # likely already false for the first selection pool, ie the first pick does not allow dups.
             # Dups should be allowed for the third guess and beyond. Dups at the second guess depends
@@ -360,25 +372,25 @@ def run_monkey(sample_number: int, wrd_x: int):
 
             # Now load in the filter criteria
             helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
-            # Get the revised word list using the optional no_rank argument with rand_mode
+            # Get the revised word list using the optional no_rank argument with loc_rand_mode
             # No ranking or sorting is needed when all guesses are random.
-            the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
-            # Because the target word is known to exist in the overall pool then the_word_list can
+            loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+            # Because the target word is known to exist in the overall pool then loc_the_word_list can
             # only be less than 1 when the target had duplicate letters and the pool was not
             # allowing duplicates. Here that condition is checked and the pool revised to allow
             # duplicates.
-            if len(the_word_list) < 1:
+            if len(loc_the_word_list) < 1:
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode)
                 helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
-                the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+                loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
 
-            run_stats.append(len(the_word_list))
+            run_stats.append(len(loc_the_word_list))
             guesses += 1
 
         # The ending guess is the second to last guess, except when it happens by chance
         # to be the target word. The next guess being the target word can only happen if the
-        # allow_dups allows for that word to be in the list. Otherwise, we get a wrong count.
+        # loc_allow_dups allows for that word to be in the list. Otherwise, we get a wrong count.
         # This is a problem.
         if not word == target_wrd:
             guesses += 1
@@ -401,8 +413,86 @@ def run_monkey(sample_number: int, wrd_x: int):
         sys.stdout.write('\033[K' + ">" + str(r) + '  avg: ' + f'{average:.2f}' + '\r')
 
     dur_tw = time.perf_counter() - start_mt  # this word's process time
-    prologue_output(sample_number, guess_mode, allow_dups, record_run, run_fname,
+    prologue_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, tot, vocab_filename, dur_tw)
+
+    sys.stdout.write('\n')
+
+
+def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
+    """
+    Intended to find only the first guess words that reduce the -v vocabulary selection
+    pool to the target word.
+    @param loc_wrd_x:
+    """
+    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set, query_mode, target_wrd
+
+    if record_run:
+        print('Output being written to ' + run_fname)
+
+    print(str(loc_wrd_x) + '  Finding lucky charms')
+    # Get the target Wordle word the guessing sessions is trying to discover.drive
+    get_set_target_word()
+    # Need to iterate through all unranked words in the -v vocabulary
+    charm_words = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
+        .get_ranked_results_wrd_lst(True)
+    r = 0
+    rand_mode = True
+    guess_mode = 'iterate guesses'
+    allow_dups = True
+    query_mode = True
+    loc_n = len(charm_words)
+    for loc_key in charm_words:
+        # initialize a fresh wordletool instance, loc_allow_dups must be true
+        wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0)
+        guesses = 1
+        run_stats = list([])
+        run_stats.append(target_wrd)
+        clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
+
+        # This loop ends when the last guess results in only one remaining word that fits the
+        # pattern. That word, being the target word, will be the solving guess. The loop's last
+        # guess is therefore the actual second to last guess, except when it happens by chance
+        # to be the target word.
+        word = loc_key
+        run_stats.append(word)
+
+        # At this point the guess word is selected.
+        # Analyze this new word against the target word and update the filter criteria
+        helpers.analyze_pick_to_solution(target_wrd, word, excl_l, x_pos_dict, r_pos_dict)
+
+        # Now load in the resulting filter criteria
+        helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+
+        # Get the word list using the optional no_rank argument with loc_rand_mode
+        # No ranking or sorting is needed when all guesses are random.
+        loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, True)
+
+        # Because the target word is known to exist in the overall pool then loc_the_word_list can
+        # only be 1 when the filter criteria filters to only the target.
+
+        run_stats.append(len(loc_the_word_list))
+
+        if len(loc_the_word_list) <= 1:
+            # Word is the target or is a charm word.
+            # The ending guess is the second to last guess, except when it happens by chance
+            # to be the target word. The next guess being the target word can only happen if the
+            # loc_allow_dups allows for that word to be in the list. Otherwise, we get a wrong count.
+            #
+            if not word == target_wrd:
+                guesses += 1
+
+            if guesses == 2 and run_stats[2] == 1:
+                query_set.add(run_stats[1])
+                # Reveal_mode is where output is desired to show the guesses and their pool impact
+                if reveal_mode:
+                    reveal_output(r, guesses, run_stats, record_run, run_fname)
+
+        del wordletool
+        # animated in progress showing
+        r += 1
+        sys.stdout.write(f'\033[K> {r} Searching through {loc_n} words in {vocab_filename}'
+                         f' ...  finding: {len(query_set)}\r')
 
     sys.stdout.write('\n')
 
@@ -417,7 +507,7 @@ data_path = 'worddata/'  # path from what will be helpers.py folder to data fold
 letter_rank_file = 'letter_ranks.txt'
 vocab_sol_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
-# vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
+# loc_vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
 
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
@@ -430,8 +520,8 @@ requ_l = []  # require letters list
 rank_mode = 2
 # monkey type
 rand_mode = True  # random monkeys
-# rand_mode = False  # smart monkeys
-# Set allow_dups to prevent letters from occurring more than once.
+# loc_rand_mode = False  # smart monkeys
+# Set loc_allow_dups to prevent letters from occurring more than once.
 # This condition is used mainly for the first two guesses. Duplicate
 # letter words are allowed after the second guess and due to the code
 # is required to be able to correctly handle target words that have
@@ -450,7 +540,8 @@ dur_sf = 0.0  # seconds so far in list process
 query_set = set()
 query_guess = 1
 query_mode = False
-# Timestamp like filename used for record_run
+magic_mode = False
+# Timestamp like filename used for loc_record_run
 run_fname = imwm_fname()
 # Records output to a CVS file having a timestamp like filename
 record_run = False
@@ -462,7 +553,9 @@ if __name__ == "__main__":
     try:
         wrd_x = 1
         if do_every_wrd:
-            # This list is used only for iterating through every word
+            # The targets are the words for which the monkey seeks guesses to solve.
+            # Here only the words that can be a solution will be considered a target word.
+            # The target pool is not the guess pool. The -v argument selects the guess pool.
             targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
                 .get_ranked_results_wrd_lst(True)
             n = len(targets)
@@ -470,24 +563,34 @@ if __name__ == "__main__":
             avg_t = 0
             for key in targets:
                 target_wrd = key
-                # the ranked word list dictionary, created now to use for valid input word checking,
-                # ranking is not needed so optional no_rank argument is True
+                # A ranked word list dictionary is now created to use for valid input word checking,
+                # Ranking is not needed. For faster running the optional no_rank argument is True.
                 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                                     0).get_ranked_results_wrd_lst(True)
-                run_monkey(sample_number, wrd_x)
+                # Run the monkey. The monkey will notice this loc_target_wrd
+                standard_monkey(sample_number, wrd_x)
 
                 dur_sf = dur_sf + dur_tw
                 avg_t = dur_sf / wrd_x
                 etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
                 dsf = datetime.timedelta(seconds=dur_sf)
                 wrd_x += 1
+                # Do targets remain?
                 if wrd_x < len(targets):
                     print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
+            # Finished all targets
             print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
         else:
             the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                                 0).get_ranked_results_wrd_lst()
-            run_monkey(sample_number, wrd_x)
+            if not magic_mode:
+                standard_monkey(sample_number, wrd_x)
+            elif magic_mode:
+                query_guess = 2
+                charm_word_monkey(wrd_x)
+                query_output(target_wrd)
+
     except KeyboardInterrupt:
-        print(' user canceled.')
-        query_output()
+        sys.stdout.write(f'\033[K user canceled. \n')
+        # Output any encountered query results.
+        query_output(target_wrd)

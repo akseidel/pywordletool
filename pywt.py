@@ -64,8 +64,8 @@ def str_wrd_list_hrd(ln_col: int) -> str:
 # return a reformatted string with word wrapping
 def wrap_this(string: str, max_chars: int) -> str:
     """A helper that will return the string with word-break wrapping.
-            :param str string: The text to be wrapped.
-            :param int max_chars: The maximum number of characters on a line before wrapping.
+    @param str string: The text to be wrapped.
+    @param int max_chars: The maximum number of characters on a line before wrapping.
     """
     string = string.replace('\n', '').replace('\r', '')  # strip confusing newlines
     words = string.split(' ')
@@ -213,7 +213,7 @@ class Pywordlemainwindow(ctk.CTk):
                 wordletool.tool_command_list.add_excl_cmd(self.spec_pattern.get().lower())
 
             # Allow duplicates could have been changed by this point and also by this next
-            # special pattern check. Thus, the wordletool.allow_dups is reset accordingly before
+            # special pattern check. Thus, the wordletool.loc_allow_dups is reset accordingly before
             # the final word list is generated.
             coordinate_special_pattern_dups()
             allow_dups = self.allow_dup_state.get()
@@ -319,7 +319,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.pos_pr_l.set(x_ltr)
             # continue if pos is available
             if x_pos in self.pos_r:
-                # update r_pos_dict and update treeview
+                # update loc_r_pos_dict and update treeview
                 key = x_ltr + ',' + x_pos
                 value = key
                 r_pos_dict[key] = value
