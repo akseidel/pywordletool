@@ -14,7 +14,7 @@
 
 ### Magic Words Finder
 
-* The **FMWM** can find all the Magic Words for any particular word. A Magic Word is a word that reduces the possible guesses down to just the solution word. In other words a Magic Word used as a first guess, or as any guess, played in hard mode, forces the next fitting guess to be the solution. 
+* The **FMWM** can find all the Order M Magic Words for any particular word. An Order 1 Magic Word is a word that reduces the possible guesses down to just the solution word. In other words a Magic Word used as a first guess, or as any guess, played in hard mode, forces the next fitting guess to be the solution. 
 
 ### Requirements To Run IMWN
 
@@ -67,7 +67,7 @@ options:
   -w            Writes output to CVS file having a timestamp filename.
   -a            Process every vocabulary word as a target word.
   -q Q          Query list guesses Q.
-  -m            Find the magic words for a target word.
+  -m M          Find the order M magic words for a target word.
 ```
 * **-h** Displays the help hints as shown above.
 * **-d** Prints out all the word lists at each step, the guesses and other data.
@@ -81,7 +81,7 @@ options:
 * **-w** Writes the output to a CVS file in addition to showing in the Terminal. The CVS file is timestamp named, so it will always be unique, and it will reside at the directory that holds **fmwm.py**.
 * **-a** Processes every vocabulary word (2309 words) in the solutions list as each target word.
 * **-q Q** Lists out only the guess data for runs that result in **Q** guesses. For example **-q 2** outputs only the guess data for runs where the target word is solved in two guesses. In other words after the first guess, only the target word remains.
-* **-m** Finds words from the vocabulary that are magic word's for the target word. Magic words reduce the selection pool to contain only the target word. A magic word first guess forces the second guess to be the solution.
+* **-m M** Finds words from the vocabulary that are order **M** magic word's for the target word. Order 1 magic words reduce the selection pool to contain only the target word. A magic word first guess forces the second guess to be the solution. Order 2 magic words reduce the selection pool to two words where there would be a 50% chance to guess the solution. Order **M** magic words reduce the selection pool to **M** words.
 
 A use example:
 

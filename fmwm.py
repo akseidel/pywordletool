@@ -26,7 +26,7 @@ def process_any_arguments() -> NoReturn:
     global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
         starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
         sample_number, vocab_filename, record_run, do_every_wrd, query_guess, \
-        query_mode, magic_mode
+        query_mode, magic_mode, magic_order
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
@@ -44,12 +44,19 @@ def process_any_arguments() -> NoReturn:
     parser.add_argument('-a', action='store_true', help='Process every vocabulary word as a target word.')
     parser.add_argument('-q', action='store', type=int,
                         help='Query list guesses Q.')
-    parser.add_argument('-m', action='store_true', help='Find the magic words for a target word.')
+    parser.add_argument('-m', action='store', type=int,
+                        help='Find the order M magic words for a target word.')
 
     args = parser.parse_args()
     debug_mode = args.d  # prints out lists, guesses etc.
     reveal_mode = args.l  # lists each solution run data
     magic_mode = args.m  # Find the magic words for a target word.
+
+    if args.m is not None:
+        magic_order = args.m
+        if query_guess < 1:
+            print(f'Aborting this run. The -m argument must be larger than 0. It was {query_guess}.')
+            exit()
 
     if args.q is not None:
         query_guess = args.q
@@ -248,7 +255,7 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
 
 def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
                    loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd) -> NoReturn:
-    global conditions, magic_mode
+    global conditions, magic_mode, magic_order
 
     if not magic_mode:
         conditions = f'{loc_sample_number} samples, ' + loc_guess_mode + ', initial duplicates:' + str(loc_allow_dups)
@@ -267,7 +274,7 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
                               'G5R', 'G6', 'G6R', 'G7', 'G7R', 'G8', 'G8R', 'G9', 'G9R', 'G10', 'G10R']
                 output_msg(reveal_hdr, loc_record_run, loc_run_fname)
     else:
-        output_msg(f'Magic words for: {target_wrd} from {loc_vocab_filename}', False,
+        output_msg(f'Order {magic_order} magic words for: {target_wrd} from {loc_vocab_filename}', False,
                    loc_run_fname)
         if loc_record_run:
             if first_run:
@@ -323,9 +330,14 @@ def query_output(loc_target_wrd):
     if query_mode:
         query_list = list(query_set)
         query_list.sort()
-        stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
-                   f'that eliminate all but the solution {loc_target_wrd} guess:\n{query_list}'
-        print(stat_msg)
+        if not magic_mode:
+            stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
+                       f'that eliminate all but the solution {loc_target_wrd} guess:\n{query_list}'
+        else:
+            stat_msg = f'Encountered {len(query_set)} #1 order {magic_order} magic word guesses ' \
+                       f'that eliminate all but {magic_order} guesses:\n{query_list}'
+        # print(stat_msg)
+        sys.stdout.write(f'\033[K {stat_msg}\n')
 
 
 def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
@@ -454,7 +466,8 @@ def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
     pool to the target word.
     @param loc_wrd_x:
     """
-    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set, query_mode, target_wrd
+    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set,\
+        query_mode, target_wrd, magic_order
 
     if record_run:
         print('Output being written to ' + run_fname)
@@ -509,7 +522,7 @@ def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
 
         run_stats.append(len(loc_the_word_list))
 
-        if len(loc_the_word_list) <= 1:
+        if len(loc_the_word_list) == magic_order:
             # Word is the target or is a charm word.
             # The ending guess is the second to last guess, except when it happens by chance
             # to be the target word. The next guess being the target word can only happen if the
@@ -518,7 +531,9 @@ def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
             if not word == target_wrd:
                 guesses += 1
 
-            if guesses == 2 and run_stats[2] == 1:
+            # Only the first guess word that results in the desired magic_order pool size is of interest.
+            # Guesses would be 2 at this point.
+            if guesses == 2 and run_stats[2] == magic_order:
                 query_set.add(run_stats[1])
                 # Reveal_mode is where output is desired to show the guesses and their pool impact
                 if reveal_mode:
@@ -581,6 +596,7 @@ dur_sf = 0.0  # seconds so far in list process
 query_set = set()
 query_guess = 1
 query_mode = False
+magic_order = 1
 magic_mode = False
 # Timestamp like filename used for loc_record_run
 run_fname = imwm_fname()
@@ -612,7 +628,6 @@ if __name__ == "__main__":
                 if not magic_mode:
                     standard_monkey(sample_number, wrd_x)
                 else:
-                    query_guess = 2
                     charm_word_monkey(wrd_x)
 
                 dur_sf = dur_sf + dur_tw
@@ -631,7 +646,6 @@ if __name__ == "__main__":
             if not magic_mode:
                 standard_monkey(sample_number, wrd_x)
             elif magic_mode:
-                query_guess = 2
                 charm_word_monkey(wrd_x)
 
     except KeyboardInterrupt:
