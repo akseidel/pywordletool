@@ -134,7 +134,11 @@ def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_
 
 def get_set_target_word() -> NoReturn:
     """
-    Ask and set the target word.
+    Establish and verify the target word.
+    Any already set target word is verified to be in the_word_list.
+    If not in list or not set, then ask for it.
+    The_word_list is the selection pool. The target word has to be in the
+    selection pool for solution guess verification to work properly.
     """
     global target_wrd
     while target_wrd not in the_word_list:
@@ -244,22 +248,34 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
 
 def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
                    loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd) -> NoReturn:
-    global conditions
-    conditions = f'{loc_sample_number} samples, ' + loc_guess_mode + ', initial duplicates:' + str(loc_allow_dups)
-    if len(loc_starting_wrd) == 5:
-        conditions = conditions + " , first guess:" + loc_starting_wrd
-    output_msg('loc_target_wrd: ' + target_wrd + ", " + conditions + ", " + loc_vocab_filename, False, loc_run_fname)
-    if loc_record_run:
-        if not loc_do_every_wrd:
-            msg = ['target wrd', 'samples', 'guess mode', 'initial duplicates', 'first guess', 'vocabulary']
-            output_msg(msg, loc_record_run, loc_run_fname)
-            msg = [target_wrd, loc_sample_number, loc_guess_mode, str(loc_allow_dups), loc_starting_wrd,
-                   loc_vocab_filename]
-            output_msg(msg, loc_record_run, loc_run_fname)
-        if reveal_mode:
-            reveal_hdr = ['Run', 'guesses', 'target wrd', 'G1', 'G1R', 'G2', 'G2R', 'G3', 'G3R', 'G4', 'G4R', 'G5',
-                          'G5R', 'G6', 'G6R', 'G7', 'G7R', 'G8', 'G8R', 'G9', 'G9R', 'G10', 'G10R']
-            output_msg(reveal_hdr, loc_record_run, loc_run_fname)
+    global conditions, magic_mode
+
+    if not magic_mode:
+        conditions = f'{loc_sample_number} samples, ' + loc_guess_mode + ', initial duplicates:' + str(loc_allow_dups)
+        if len(loc_starting_wrd) == 5:
+            conditions = conditions + " , first guess:" + loc_starting_wrd
+        output_msg('target wrd: ' + target_wrd + ", " + conditions + ", " + loc_vocab_filename, False, loc_run_fname)
+        if loc_record_run:
+            if not loc_do_every_wrd:
+                msg = ['target wrd', 'samples', 'guess mode', 'initial duplicates', 'first guess', 'vocabulary']
+                output_msg(msg, loc_record_run, loc_run_fname)
+                msg = [target_wrd, loc_sample_number, loc_guess_mode, str(loc_allow_dups), loc_starting_wrd,
+                       loc_vocab_filename]
+                output_msg(msg, loc_record_run, loc_run_fname)
+            if reveal_mode:
+                reveal_hdr = ['Run', 'guesses', 'target wrd', 'G1', 'G1R', 'G2', 'G2R', 'G3', 'G3R', 'G4', 'G4R', 'G5',
+                              'G5R', 'G6', 'G6R', 'G7', 'G7R', 'G8', 'G8R', 'G9', 'G9R', 'G10', 'G10R']
+                output_msg(reveal_hdr, loc_record_run, loc_run_fname)
+    else:
+        output_msg(f'Magic words for: {target_wrd} from {loc_vocab_filename}', False,
+                   loc_run_fname)
+        if loc_record_run:
+            if first_run:
+                output_msg(f'{loc_vocab_filename} Magic Words', loc_record_run,
+                           loc_run_fname)
+            if reveal_mode:
+                reveal_hdr = ['Index', 'Guesses', 'Target Wrd', 'Magic Wrd', 'G1R']
+                output_msg(reveal_hdr, loc_record_run, loc_run_fname)
 
 
 def reveal_output(r, guesses, run_stats, loc_record_run, loc_run_fname) -> NoReturn:
@@ -272,23 +288,35 @@ def reveal_output(r, guesses, run_stats, loc_record_run, loc_run_fname) -> NoRet
 
 def prologue_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
                     loc_target_wrd, loc_starting_wrd, tot, loc_vocab_filename, loc_dur_tw) -> NoReturn:
-    global first_run, conditions, query_set
-    average = tot / loc_sample_number
-    stat_msg = 'loc_target_wrd: ' + loc_target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
-    stat_msg = stat_msg + conditions + ', ' + loc_vocab_filename + f', {loc_dur_tw:0.4f} seconds'
-    output_msg(stat_msg, False, loc_run_fname)
+    global first_run, conditions, query_set, magic_mode
+    if not magic_mode:
+        average = tot / loc_sample_number
+        stat_msg = 'target wrd: ' + loc_target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
+        stat_msg = stat_msg + conditions + ', ' + loc_vocab_filename + f', {loc_dur_tw:0.4f} seconds'
+        output_msg(stat_msg, False, loc_run_fname)
 
-    if loc_record_run:
-        if not do_every_wrd or first_run:
-            msg = ['target wrd', 'average', 'guess mode', 'initial duplicates', 'first guess',
-                   'vocabulary', 'samples', 'seconds']
+        if loc_record_run:
+            if not do_every_wrd or first_run:
+                msg = ['target wrd', 'average', 'guess mode', 'initial duplicates', 'first guess',
+                       'vocabulary', 'samples', 'seconds']
+                output_msg(msg, loc_record_run, loc_run_fname)
+            msg = [loc_target_wrd, average, loc_guess_mode, str(loc_allow_dups), loc_starting_wrd,
+                   loc_vocab_filename, loc_sample_number, loc_dur_tw]
             output_msg(msg, loc_record_run, loc_run_fname)
-            first_run = False
-        msg = [loc_target_wrd, average, loc_guess_mode, str(loc_allow_dups), loc_starting_wrd,
-               loc_vocab_filename, loc_sample_number, loc_dur_tw]
-        output_msg(msg, loc_record_run, loc_run_fname)
 
-    query_output(loc_target_wrd)
+    else:
+        if loc_record_run:
+            if not do_every_wrd or first_run:
+                msg = ['Target', 'Qty', 'Sec', 'Magic Wrds =>']
+                output_msg(msg, loc_record_run, loc_run_fname)
+            record_stat = [target_wrd, len(query_set), f'{loc_dur_tw:0.4f}']
+            query_list = list(query_set)
+            query_list.sort()
+            record_stat.extend(query_list)
+            output_msg(record_stat, loc_record_run, loc_run_fname)
+
+    first_run = False
+    query_output(target_wrd)
 
 
 def query_output(loc_target_wrd):
@@ -306,8 +334,9 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print(str(loc_wrd_x) + ' word: Average guesses to solve Wordle by sampling ' + str(loc_sample_number) + ' tries.')
-    # Get the target Wordle word the guessing sessions is trying to discover.drive
+    print(f'{loc_wrd_x}  word: Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
+    # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
+    # be started with the target word already set.
     get_set_target_word()
     # Set the first guess if desired.
     get_set_starting_guess()
@@ -430,19 +459,26 @@ def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print(str(loc_wrd_x) + '  Finding lucky charms')
-    # Get the target Wordle word the guessing sessions is trying to discover.drive
+    print(f'{loc_wrd_x}  Finding lucky charms for: {target_wrd}')
+    # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
+    # be started with the target word already set.
     get_set_target_word()
     # Need to iterate through all unranked words in the -v vocabulary
-    charm_words = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
+    candidate_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
         .get_ranked_results_wrd_lst(True)
     r = 0
+    mw_qty = 0
     rand_mode = True
     guess_mode = 'iterate guesses'
     allow_dups = True
     query_mode = True
-    loc_n = len(charm_words)
-    for loc_key in charm_words:
+    query_set.clear()
+    loc_n = len(candidate_list)
+    prelude_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
+                   vocab_filename, do_every_wrd)
+    # Iterate through each word in the candidates list
+    start_mt = time.perf_counter()  # record monkey start time
+    for loc_key in candidate_list:
         # initialize a fresh wordletool instance, loc_allow_dups must be true
         wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0)
         guesses = 1
@@ -491,8 +527,13 @@ def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
         del wordletool
         # animated in progress showing
         r += 1
+        mw_qty = len(query_set)
         sys.stdout.write(f'\033[K> {r} Searching through {loc_n} words in {vocab_filename}'
-                         f' ...  finding: {len(query_set)}\r')
+                         f' for {target_wrd} magic word ...  finding: {mw_qty}\r')
+
+    dur_tw = time.perf_counter() - start_mt  # this word's process time
+    prologue_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname,
+                    target_wrd, starting_wrd, mw_qty, vocab_filename, dur_tw)
 
     sys.stdout.write('\n')
 
@@ -568,7 +609,11 @@ if __name__ == "__main__":
                 the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
                                                     0).get_ranked_results_wrd_lst(True)
                 # Run the monkey. The monkey will notice this loc_target_wrd
-                standard_monkey(sample_number, wrd_x)
+                if not magic_mode:
+                    standard_monkey(sample_number, wrd_x)
+                else:
+                    query_guess = 2
+                    charm_word_monkey(wrd_x)
 
                 dur_sf = dur_sf + dur_tw
                 avg_t = dur_sf / wrd_x
@@ -588,7 +633,6 @@ if __name__ == "__main__":
             elif magic_mode:
                 query_guess = 2
                 charm_word_monkey(wrd_x)
-                query_output(target_wrd)
 
     except KeyboardInterrupt:
         sys.stdout.write(f'\033[K user canceled. \n')

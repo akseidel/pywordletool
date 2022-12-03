@@ -12,6 +12,10 @@
 
 * An **FMWM** 'smart monkey' does not make random guesses, except for the first guess. Starting with the second guess, the **FMWM** 'smart monkey' guesses the selection pool’s highest ranked word. The first guess was random. That random first guess makes the selection pool for the second guess different for every run. Otherwise the **FMWM** would guess the same highest rank set of words in every run. The second guess is the top ranked word from the second guess pool. The selection pools are created in ranked order. The **FMWM** just picks the top word. The **FMWM** looks at that guess and rules out the right words to get the third guess selection pool. And so it goes just like before.
 
+### Magic Words Finder
+
+* The **FMWM** can find all the Magic Words for any particular word. A Magic Word is a word that reduces the possible guesses down to just the solution word. In other words a Magic Word used as a first guess, or as any guess, played in hard mode, forces the next fitting guess to be the solution. 
+
 ### Requirements To Run IMWN
 
 * **FMWM** is a **python** program and it relies on utilities that are typically present in UNIX, Apple OSX and Linux operating systems. Therefore a recent **python** installation on any UNIX, Apple OSX or Linux operating system computer is the requirement. For Windows based computers a Linux subsystem would need to be installed with **python** installed within it. **FMWM** would need to be run within that Linux subsystem.
@@ -63,6 +67,7 @@ options:
   -w            Writes output to CVS file having a timestamp filename.
   -a            Process every vocabulary word as a target word.
   -q Q          Query list guesses Q.
+  -m            Find the magic words for a target word.
 ```
 * **-h** Displays the help hints as shown above.
 * **-d** Prints out all the word lists at each step, the guesses and other data.
@@ -72,10 +77,11 @@ options:
 * **-s S** Use this first guess word as in **-t stale**.
 * **-r {0,1,2,3}** Specify the guessing type. **-r 0** means random guesses for all guesses. **-r 1** means rank 1 type guesses and so on.
 * **-x X** Sets the number of sample runs other than the default 100. **-x 1000** would specify 1000 runs.
-* **-v** For guessing purposes only, use the Wordle vocabulary that includes non-solution wordfs in addition to solution words. By default, the solutions only list is used. When processing all the words in the list, it is the solutions only list that is processed, but the pool from which guesses are selected can be either the default solutions list or the larger list that also includes words that would never be a solution.
+* **-v** For guessing purposes only, use the Wordle vocabulary that includes non-solution words in addition to solution words. By default, the solutions only list is used. When processing all the words in the list, it is the solutions only list that is processed, but the pool from which guesses are selected can be either the default solutions list or the larger list that also includes words that would never be a solution.
 * **-w** Writes the output to a CVS file in addition to showing in the Terminal. The CVS file is timestamp named, so it will always be unique, and it will reside at the directory that holds **fmwm.py**.
-* **-a** Processes every vocabulary word (2309 words) in the solutions list as eachh target word.
+* **-a** Processes every vocabulary word (2309 words) in the solutions list as each target word.
 * **-q Q** Lists out only the guess data for runs that result in **Q** guesses. For example **-q 2** outputs only the guess data for runs where the target word is solved in two guesses. In other words after the first guess, only the target word remains.
+* **-m** Finds words from the vocabulary that are magic word's for the target word. Magic words reduce the selection pool to contain only the target word. A magic word first guess forces the second guess to be the solution.
 
 A use example:
 
