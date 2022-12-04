@@ -278,7 +278,7 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
                    loc_run_fname)
         if loc_record_run:
             if first_run:
-                output_msg(f'Order {magic_order} magic words for: {target_wrd} from {loc_vocab_filename}',
+                output_msg(f'Order {magic_order} magic words from {loc_vocab_filename}',
                            loc_record_run, loc_run_fname)
             if reveal_mode:
                 reveal_hdr = ['Index', 'Guesses', 'Target Wrd', 'Magic Wrd', 'G1R']
