@@ -237,7 +237,7 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
     """
     Outputs content to console and to csv file.
     @param msg: The content to be output
-    @type also2file: bool, If true then save to csv file also.
+    @param also2file: If true then save to csv file also.
     @param loc_fname: The filename for saving to csv file
     """
     fn_csv = loc_fname
@@ -278,8 +278,8 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
                    loc_run_fname)
         if loc_record_run:
             if first_run:
-                output_msg(f'{loc_vocab_filename} Magic Words', loc_record_run,
-                           loc_run_fname)
+                output_msg(f'Order {magic_order} magic words for: {target_wrd} from {loc_vocab_filename}',
+                           loc_record_run, loc_run_fname)
             if reveal_mode:
                 reveal_hdr = ['Index', 'Guesses', 'Target Wrd', 'Magic Wrd', 'G1R']
                 output_msg(reveal_hdr, loc_record_run, loc_run_fname)
