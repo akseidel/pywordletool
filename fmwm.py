@@ -460,10 +460,11 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     sys.stdout.write('\n')
 
 
-def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
+def magic_word_monkey(loc_wrd_x: int) -> NoReturn:
     """
     Intended to find only the first guess words that reduce the -v vocabulary selection
-    pool to the target word.
+    pool to the magic_order word count. Magic_order 1 means the target word only. Magic_order
+    1 means the target word and one other word. And so on.
     @param loc_wrd_x:
     """
     global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set,\
@@ -472,7 +473,7 @@ def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print(f'{loc_wrd_x}  Finding lucky charms for: {target_wrd}')
+    print(f'{loc_wrd_x}  Finding #{magic_order} order magic words for: {target_wrd}')
     # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
     # be started with the target word already set.
     get_set_target_word()
@@ -523,7 +524,7 @@ def charm_word_monkey(loc_wrd_x: int) -> NoReturn:
         run_stats.append(len(loc_the_word_list))
 
         if len(loc_the_word_list) == magic_order:
-            # Word is the target or is a charm word.
+            # Word is the target or is a magic word.
             # The ending guess is the second to last guess, except when it happens by chance
             # to be the target word. The next guess being the target word can only happen if the
             # loc_allow_dups allows for that word to be in the list. Otherwise, we get a wrong count.
@@ -628,7 +629,7 @@ if __name__ == "__main__":
                 if not magic_mode:
                     standard_monkey(sample_number, wrd_x)
                 else:
-                    charm_word_monkey(wrd_x)
+                    magic_word_monkey(wrd_x)
 
                 dur_sf = dur_sf + dur_tw
                 avg_t = dur_sf / wrd_x
@@ -646,7 +647,7 @@ if __name__ == "__main__":
             if not magic_mode:
                 standard_monkey(sample_number, wrd_x)
             elif magic_mode:
-                charm_word_monkey(wrd_x)
+                magic_word_monkey(wrd_x)
 
     except KeyboardInterrupt:
         sys.stdout.write(f'\033[K user canceled. \n')

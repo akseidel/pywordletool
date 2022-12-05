@@ -2,7 +2,7 @@
 
 ## Finite Monkey Wordle Machine (FMWM)
 
-* The **Finite Monkey Wordle Machine** (**FMWM**) makes guesses in a certain way to calculate the average number of guesses required to solve a known **Wordle** word. The machine’s purpose is for measuring how hard a word is compared to another word or whether a certain guessing mode works better than another guessing mode.
+* The **Finite Monkey Wordle Machine** (**FMWM**) makes guesses in a certain way to calculate the average number of guesses required to solve a known **Wordle** word. The machine’s initial purpose is for measuring how hard a word is compared to another word or whether a certain guessing mode works better than another guessing mode.
 
 * **FMWM** currently runs in console mode, ie without a GUI interface, and it relies on the **pywordletool** backend **helper** and **worddata** files.
 
@@ -14,11 +14,11 @@
 
 ### Magic Words Finder
 
-* The **FMWM** can find all the Order M Magic Words for any particular word. An Order 1 Magic Word is a word that reduces the possible guesses down to just the solution word. In other words a Magic Word used as a first guess, or as any guess, played in hard mode, forces the next fitting guess to be the solution. 
+* The **FMWM** can find all the Order M Magic Words for any particular word. An Order 1 Magic Word is a word that reduces the possible guesses down to just the solution word. In other words a Magic Word used as a first guess, or as any guess, played in hard mode, forces the next fitting guess to be the solution. Likewise, an Order 2 Magic Word reduces the possible guesses to two words, one of which is the solution word. Magic word finding is initiated using the command line arguments **-m M**. See the **Command Line Options** section below for more information.
 
 ### Requirements To Run IMWN
 
-* **FMWM** is a **python** program and it relies on utilities that are typically present in UNIX, Apple OSX and Linux operating systems. Therefore a recent **python** installation on any UNIX, Apple OSX or Linux operating system computer is the requirement. For Windows based computers a Linux subsystem would need to be installed with **python** installed within it. **FMWM** would need to be run within that Linux subsystem.
+* **FMWM** is a **python** program and it relies on utilities that are typically present in UNIX, Apple OSX and Linux operating systems. Therefore, a recent **python** installation on any UNIX, Apple OSX or Linux operating system computer is the requirement. For Windows based computers a Linux subsystem would need to be installed with **python** installed within it. **FMWM** would need to be run within that Linux subsystem.
 
 ### How to run fmwm
 
