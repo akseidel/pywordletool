@@ -1,6 +1,6 @@
 # ----------------------------------------------------------------
-# fmwm.py                                             AKS 5/2022
-# Infinite Monkey Wordle Machine
+# fmwm.py                                             AKS 10/2022
+# Finite Monkey Wordle Machine
 # Measures the average number of guesses required to arrive at the
 # Wordle target word using various guess strategies. Guesses are
 # selected from the vocabulary list that has words removed based
@@ -8,6 +8,8 @@
 # 'hard mode'.
 # The base strategy is to guess only random words. One purpose is
 # to examine the average required guesses as word difficulty.
+#
+# Expanded to find M order magic words.
 # ----------------------------------------------------------------
 import sys
 import datetime
