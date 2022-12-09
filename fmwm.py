@@ -244,12 +244,17 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
     """
     fn_csv = loc_fname
     if also2file:
-        with open(fn_csv, 'a') as f:
-            if type(msg) is str:
-                f.write(str(msg) + '\n')
-            if type(msg) is list:
-                csvwriter = csv.writer(f)
-                csvwriter.writerow(msg)
+        try:
+            with open(fn_csv, 'a') as f:
+                if type(msg) is str:
+                    f.write(str(msg) + '\n')
+                if type(msg) is list:
+                    csvwriter = csv.writer(f)
+                    csvwriter.writerow(msg)
+        except IOError:
+            sys.stdout.write(f'\nIOError for file {fn_csv}\n')
+            sys.stdout.write(f'trying to write {msg}\n')
+            exit()
     else:
         sys.stdout.write('\033[K' + str(msg) + '\n')
     return
@@ -339,7 +344,7 @@ def query_output(loc_target_wrd):
             stat_msg = f'Encountered {len(query_set)} #1 order {magic_order} magic word guesses ' \
                        f'that eliminate all but {magic_order} guesses:\n{query_list}'
         # print(stat_msg)
-        sys.stdout.write(f'\033[K {stat_msg}\n')
+        sys.stdout.write(f'\033[K{stat_msg}\n')
 
 
 def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
