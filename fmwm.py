@@ -341,7 +341,7 @@ def query_output(loc_target_wrd):
             stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
                        f'that eliminate all but the solution {loc_target_wrd} guess:\n{query_list}'
         else:
-            stat_msg = f'Encountered {len(query_set)} #1 order {magic_order} magic word guesses ' \
+            stat_msg = f'Encountered {len(query_set)} order #{magic_order} magic word guesses ' \
                        f'that eliminate all but {magic_order} guesses:\n{query_list}'
         # print(stat_msg)
         sys.stdout.write(f'\033[K{stat_msg}\n')
