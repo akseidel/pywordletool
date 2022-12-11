@@ -638,14 +638,15 @@ if __name__ == "__main__":
                 else:
                     magic_word_monkey(wrd_x)
 
+                # dur_tw is measured by the monkey
                 dur_sf = dur_sf + dur_tw
                 avg_t = dur_sf / wrd_x
-                etf = datetime.timedelta(seconds=((n - wrd_x) * avg_t))
+                etf = datetime.timedelta(seconds=((n - wrd_x) * dur_tw))
                 dsf = datetime.timedelta(seconds=dur_sf)
                 wrd_x += 1
                 # Do targets remain?
                 if wrd_x < len(targets):
-                    print(f'Duration so far: {dsf}, {avg_t:0.4f} seconds/word, ETF: {etf}')
+                    print(f'Duration so far: {dsf}, avg. {avg_t:0.4f} s/wrd, last word {dur_tw:0.4f} s/wrd, ETF: {etf}')
             # Finished all targets
             print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
         else:
