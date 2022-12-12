@@ -254,7 +254,7 @@ class Pywordlemainwindow(ctk.CTk):
                 rand_pick = word + mid_div + rank
                 # highlight the rand_pick, which also scrolls the widget
                 # to the rand_pick's line.
-                tx_result.highlight_pattern(rand_pick, 'hlt')
+                tx_result.highlight_pattern(rand_pick, 'ran')
                 comment = " (1 random pick selected)"
 
                 # Genetic ranking
@@ -263,10 +263,10 @@ class Pywordlemainwindow(ctk.CTk):
                 for w, r in the_word_list.items():
                     gencode = helpers.get_gencode(w)
                     gendict.update({w: gencode})
-                gen_tally = helpers.get_gendict_tally(gendict)
-                maxrank = helpers.assign_genrank(gendict, gen_tally)
-                max_rankers = helpers.get_maxgenrankers(gendict, maxrank)
-                regex = helpers.regex_maxgenrankers(max_rankers, the_word_list)
+                gen_tally: list = helpers.get_gendict_tally(gendict)
+                maxrank: int = helpers.assign_genrank(gendict, gen_tally)
+                max_rankers: list = helpers.get_maxgenrankers(gendict, maxrank)
+                regex: str = helpers.regex_maxgenrankers(max_rankers, the_word_list)
                 tx_result.highlight_pattern(regex, 'hlt')
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
 
@@ -490,7 +490,11 @@ class Pywordlemainwindow(ctk.CTk):
                                        highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
         # The CustomText class is a tk.Text extended to support a color for matched text.
-        tx_result.tag_configure('hlt', background='#bbd6fb')
+        # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
+        # tag 'hlt' is used to highlight genetic ranker
+        tx_result.tag_configure('hlt', background='#c6e2ff')
+        # tag 'ran' is used to highlight random pick
+        tx_result.tag_configure('ran', background='#b4eeb4')
         if self.winfo_screenheight() <= 800:
             tx_result.configure(height=10)  # to do, set according to screen height
         else:

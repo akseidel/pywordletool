@@ -241,7 +241,16 @@ def get_gendict_tally(gendict) -> list:
 
 # Assigns the genetic rank to the gendict members and returns
 # the maximum genetic rank seen.
-def assign_genrank(gendict, gen_tally) -> int:
+def assign_genrank(gendict: dict, gen_tally: list) -> int:
+    """
+    Places the product sums of gendict values and the gen_tally vector. This value is
+    the genetic rank for the gendict words (the keys). The genetic rank is injected into
+    the gendict value vector as the 27th item of the 1 x 27 value vector. The maximum
+    genetic rank calculated is the integer being returned.
+    @param gendict: dictionary of words (keys) with values being 1 x 27 letter count vectors
+    @param gen_tally: 1 x 26 vector of letter tallies
+    @return: maximum genetic rank seen as integer
+    """
     maxrank = 0
     for w, g in gendict.items():
         gr = 0
