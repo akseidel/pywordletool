@@ -1,4 +1,3 @@
-death
 shorn
 story
 debar
@@ -1128,6 +1127,7 @@ knack
 eclat
 verge
 other
+death
 scope
 white
 piety

@@ -28,7 +28,8 @@ def process_any_arguments() -> NoReturn:
     global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
         starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
         sample_number, vocab_filename, record_run, do_every_wrd, query_guess, \
-        query_mode, magic_mode, magic_order
+        query_mode, magic_mode, magic_order, ts_ptw, ts_psw, ts_pmo, ts_pqm, ts_ptw, \
+        ts_prt, ts_psn
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
@@ -42,10 +43,10 @@ def process_any_arguments() -> NoReturn:
                         help='Override the number of sampling runs to be this number X.')
     parser.add_argument('-v', action='store_true', help='For guessing, use the Wordle vocabulary that'
                                                         ' includes non-solution words.')
-    parser.add_argument('-w', action='store_true', help='Writes output to CVS file having a timestamp filename.')
+    parser.add_argument('-w', action='store_true', help='Writes output to CSV file having a timestamp filename.')
     parser.add_argument('-a', action='store_true', help='Process every vocabulary word as a target word.')
     parser.add_argument('-q', action='store', type=int,
-                        help='Query list guesses Q.')
+                        help='Show guesses that solve on the Qth guess.')
     parser.add_argument('-m', action='store', type=int,
                         help='Find the order M magic words for a target word.')
 
@@ -56,6 +57,7 @@ def process_any_arguments() -> NoReturn:
 
     if args.m is not None:
         magic_order = args.m
+        ts_pmo = f'M{magic_order:03.0f}_'  # magic order timestamp element
         if query_guess < 1:
             print(f'Aborting this run. The -m argument must be larger than 0. It was {query_guess}.')
             exit()
@@ -65,6 +67,7 @@ def process_any_arguments() -> NoReturn:
         if query_guess > 0:
             reveal_mode = True  # ie as if -l argument is used
             query_mode = True
+            ts_pqm = f'Q{query_guess}_'  # query guess timestamp element
         else:
             print(f'Aborting this run. The -q argument must be larger than 0. It was {query_guess}.')
             exit()
@@ -74,7 +77,7 @@ def process_any_arguments() -> NoReturn:
         do_every_wrd = True
 
     if args.w:
-        # Writes output to CVS file having a timestamp filename.
+        # Writes output to CSV file having a timestamp filename.
         record_run = True
 
     if args.v:
@@ -88,15 +91,18 @@ def process_any_arguments() -> NoReturn:
     if args.t is not None:
         # use this target word
         target_wrd = args.t
+        ts_ptw = f'T_{target_wrd}_'  # target word timestamp element
 
     if args.s is not None:
         use_starting_wrd = 1
         starting_wrd = args.s
+        ts_psw = f'S_{starting_wrd}_'  # starting word timestamp element
 
     if args.r is not None:
         if args.r == 0:
             rand_mode = True
             run_type = 0
+            rank_mode = -1
         else:
             rand_mode = False
             run_type = 1
@@ -115,6 +121,8 @@ def process_any_arguments() -> NoReturn:
 
         set_context_msg(rand_mode, rank_mode)
 
+    ts_prt = f'R{(rank_mode + 1)}_'  # rank mode timestamp element
+
     if args.x is not None:
         if args.x < 1:
             sample_number = 1
@@ -125,6 +133,8 @@ def process_any_arguments() -> NoReturn:
             print('===> Control + C will stop the program.')
         else:
             sample_number = args.x
+
+    ts_psn = f'X{sample_number}_'  # sample number timestamp element
 
 
 def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> NoReturn:
@@ -141,6 +151,15 @@ def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_
     loc_requ_l.clear()
 
 
+def set_late_timestamp_elements() -> NoReturn:
+    global ts_ptw, ts_psw, ts_prt
+    if len(target_wrd) > 0:
+        ts_ptw = f'T_{target_wrd}_'  # target word timestamp element
+    if use_starting_wrd:
+        ts_psw = f'S_{starting_wrd}_'  # starting word timestamp element
+    ts_prt = f'R{(rank_mode + 1)}_'  # rank mode timestamp element
+
+
 def get_set_target_word() -> NoReturn:
     """
     Establish and verify the target word.
@@ -150,7 +169,13 @@ def get_set_target_word() -> NoReturn:
     selection pool for solution guess verification to work properly.
     """
     global target_wrd
-    while target_wrd not in the_word_list:
+    if do_every_wrd:
+        return
+    # A ranked word list dictionary is now created to use for valid input word checking,
+    # Ranking is not needed. For faster running the optional no_rank argument is True.
+    loc_the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                            0).get_ranked_results_wrd_lst(True)
+    while target_wrd not in loc_the_word_list:
         target_wrd = input('Enter a valid Wordle target word: ').lower()
 
 
@@ -159,10 +184,14 @@ def get_set_starting_guess() -> NoReturn:
     Ask for and set a given first guess word to be used in every session.
     """
     global starting_wrd, use_starting_wrd
+    # A ranked word list dictionary is now created to use for valid input word checking,
+    # Ranking is not needed. For faster running the optional no_rank argument is True.
+    loc_the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                            0).get_ranked_results_wrd_lst(True)
     while use_starting_wrd == -1:
         response = input('Run using a given first guess? Enter y/n: ').lower()
         if response == 'y':
-            while starting_wrd not in the_word_list:
+            while starting_wrd not in loc_the_word_list:
                 starting_wrd = input('Enter a valid Wordle first guess word: ').lower()
                 use_starting_wrd = 1
         if response == 'n':
@@ -230,9 +259,16 @@ def imwm_fname() -> str:
     Returns a time timestamp like .csv filename
     @rtype: str
     """
+    global ts_pmo, ts_pqm, ts_prt, ts_psn, ts_ptw, ts_psw
+    fx = '.csv'
     ts = str(datetime.datetime.now()).replace(' ', '_')
     ts = ts.replace(':', '_')
-    return ts + ".csv"
+
+    if len(ts_pmo):
+        ts_psn = ''
+    ts = f'{ts_pmo}{ts_prt}{ts_pqm}{ts_psn}{ts_ptw}{ts_psw}{ts}{fx}'
+
+    return ts
 
 
 def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
@@ -353,14 +389,8 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print(f'{loc_wrd_x}  word: Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
-    # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
-    # be started with the target word already set.
-    get_set_target_word()
-    # Set the first guess if desired.
-    get_set_starting_guess()
-    # Set the guess mode and rank mode.
-    get_set_guess_mode()
+    print(f'{loc_wrd_x} word:{target_wrd}  Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
+
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
     if use_starting_wrd == 1 and not rand_mode:
@@ -474,16 +504,13 @@ def magic_word_monkey(loc_wrd_x: int) -> NoReturn:
     1 means the target word and one other word. And so on.
     @param loc_wrd_x:
     """
-    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set,\
+    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set, \
         query_mode, target_wrd, magic_order
 
     if record_run:
         print('Output being written to ' + run_fname)
-
     print(f'{loc_wrd_x}  Finding #{magic_order} order magic words for: {target_wrd}')
-    # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
-    # be started with the target word already set.
-    get_set_target_word()
+
     # Need to iterate through all unranked words in the -v vocabulary
     candidate_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
         .get_ranked_results_wrd_lst(True)
@@ -578,10 +605,11 @@ r_pos_dict = {}  # require position dictionary
 excl_l = []  # exclude letters list
 requ_l = []  # require letters list
 # rank mode:
+# -1 = Random
 # 0 = Occurrence
 # 1 = Position
 # 2 = Both
-rank_mode = 2
+rank_mode = -1
 # monkey type
 rand_mode = True  # random monkeys
 # loc_rand_mode = False  # smart monkeys
@@ -606,16 +634,35 @@ query_guess = 1
 query_mode = False
 magic_order = 1
 magic_mode = False
-# Timestamp like filename used for loc_record_run
-run_fname = imwm_fname()
-# Records output to a CVS file having a timestamp like filename
+ts_pmo = ''  # magic order timestamp element
+ts_pqm = ''  # query guess timestamp element
+ts_prt = ''  # rank type timestamp element
+ts_psn = ''  # sample number timestamp element
+ts_ptw = ''  # target word timestamp element
+ts_psw = ''  # starting word timestamp element
+# Records output to a CSV file having a timestamp like filename
 record_run = False
-# These command line arguments processed next will override all previously set variables.
-process_any_arguments()
 
 # ====================================== main ================================================
 if __name__ == "__main__":
     try:
+        # These command line arguments processed next will override all previously set variables.
+        process_any_arguments()
+        if not magic_mode:
+            # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
+            # be started with the target word already set.
+            get_set_target_word()
+            # Set the first guess if desired.
+            get_set_starting_guess()
+            # Set the guess mode and rank mode.
+            get_set_guess_mode()
+        else:
+            # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
+            # be started with the target word already set.
+            get_set_target_word()
+        set_late_timestamp_elements()
+        # Timestamp like filename used for loc_record_run
+        run_fname = imwm_fname()
         wrd_x = 1
         if do_every_wrd:
             # The targets are the words for which the monkey seeks guesses to solve.
@@ -628,10 +675,7 @@ if __name__ == "__main__":
             avg_t = 0
             for key in targets:
                 target_wrd = key
-                # A ranked word list dictionary is now created to use for valid input word checking,
-                # Ranking is not needed. For faster running the optional no_rank argument is True.
-                the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                                    0).get_ranked_results_wrd_lst(True)
+
                 # Run the monkey. The monkey will notice this loc_target_wrd
                 if not magic_mode:
                     standard_monkey(sample_number, wrd_x)

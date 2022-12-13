@@ -64,11 +64,12 @@ options:
   -r {0,1,2,3}  Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)
   -x X          Override the number of sampling runs to be this number X.
   -v            For guessing, use the Wordle vocabulary that includes non-solution words.
-  -w            Writes output to CVS file having a timestamp filename.
+  -w            Writes output to CSV file having a timestamp filename.
   -a            Process every vocabulary word as a target word.
-  -q Q          Query list guesses Q.
+  -q Q          Show guesses that solve on the Qth guess.
   -m M          Find the order M magic words for a target word.
 ```
+
 * **-h** Displays the help hints as shown above.
 * **-d** Prints out all the word lists at each step, the guesses and other data.
 * **-l** Lists out only the guess data and resulting pool sizes for each solution run. For example: [3, 4, 'feast', 'wrack', 106, 'blaze', 8, 'heath', 3, 'feast', 1]
@@ -78,7 +79,7 @@ options:
 * **-r {0,1,2,3}** Specify the guessing type. **-r 0** means random guesses for all guesses. **-r 1** means rank 1 type guesses and so on.
 * **-x X** Sets the number of sample runs other than the default 100. **-x 1000** would specify 1000 runs.
 * **-v** For guessing purposes only, use the Wordle vocabulary that includes non-solution words in addition to solution words. By default, the solutions only list is used. When processing all the words in the list, it is the solutions only list that is processed, but the pool from which guesses are selected can be either the default solutions list or the larger list that also includes words that would never be a solution.
-* **-w** Writes the output to a CVS file in addition to showing in the Terminal. The CVS file is timestamp named, so it will always be unique, and it will reside at the directory that holds **fmwm.py**.
+* **-w** Writes the output to a CSV file in addition to showing in the Terminal. The CSV file is timestamp named, so it will always be unique, and it will reside at the directory that holds **fmwm.py**.
 * **-a** Processes every vocabulary word (2309 words) in the solutions list as each target word.
 * **-q Q** Lists out only the guess data for runs that result in **Q** guesses. For example **-q 2** outputs only the guess data for runs where the target word is solved in two guesses. In other words after the first guess, only the target word remains.
 * **-m M** Finds words from the vocabulary that are order **M** magic word's for the target word. Order 1 magic words reduce the selection pool to contain only the target word. A magic word first guess forces the second guess to be the solution. Order 2 magic words reduce the selection pool to two words where there would be a 50% chance to guess the solution. Order **M** magic words reduce the selection pool to **M** words.
@@ -112,41 +113,43 @@ Runs #3 shows the outcome of a 1/3 chance of guessing the solution from a list o
 
 #### Processing the Entire Wordle Vocabulary List
 
-* The **-a** command line argument runs **FMWM** so that it processes every word in the vocabulary list. The **-w** command line argument writes output a CVS text file. Thus **-a** used in combination with the **-w** saves all results in one CVS text file. The filename is automatically generated in a timestamped fashion. The timestamped named file will reside in the directory where **fmwm.py** is located.
+* The **-a** command line argument runs **FMWM** so that it processes every word in the vocabulary list. The **-w** command line argument writes output a CSV text file. Thus **-a** used in combination with the **-w** saves all results in one CSV text file. The filename is automatically generated in a timestamped fashion. The timestamped named file will reside in the directory where **fmwm.py** is located.
 * Output also continues to the Terminal window. The output includes an estimate for how long it will take to complete the process.
 * Use the **-x X** command line argument to set the number of sample tries for each word. The default value of 100 sample tries may not have the resolution you want. About 400 tries, ie **-x 400**, results in about 0.1 resolution. Sampling 400 times per word will take many hours to process the entire solutions word list.
 * During the **-a** processes of every word in the vocabulary list, **FMWM** includes in the Terminal window output an estimated time to finish **(ETF)** value. The **ETF** shows up after the first word is finished. This estimated time is how long it will be until the process is complete. It is the average time per word at the moment multiplied by the number of words remaining to be processed.
 * This is a typical output to the Terminal window where the word **least** is designated as the first guess:
 
 ```text
-Duration so far: 27.1431 seconds, 0.9360 seconds/word, ETF: 0:35:34.008221 
-Output being written to 2022-11-25_16_19_15.055581.csv
-30 word: Average guesses to solve Wordle by sampling 20 tries.
-target_wrd: muddy, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
-target_wrd: muddy, averaged 4.700 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.9364 seconds
+Duration so far: 0:00:11.452955, avg. 0.8810 s/wrd, last word 0.5527 s/wrd, ETF: 0:21:08.923988
+Output being written to R0_X20_S_least_2022-12-13_15_28_41.512153.csv
+14 word:gnome  Average guesses to solve Wordle by sampling 20 tries.
+target wrd: gnome, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
+target wrd: gnome, averaged 3.700 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.8255 seconds
 
-Duration so far: 28.0795 seconds, 0.9360 seconds/word, ETF: 0:35:33.104436 
-Output being written to 2022-11-25_16_19_15.055581.csv
-31 word: Average guesses to solve Wordle by sampling 20 tries.
-target_wrd: puppy, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
-target_wrd: puppy, averaged 4.550 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.9660 seconds
+Duration so far: 0:00:12.278500, avg. 0.8770 s/wrd, last word 0.8255 s/wrd, ETF: 0:31:34.625034
+Output being written to R0_X20_S_least_2022-12-13_15_28_41.512153.csv
+15 word:snaky  Average guesses to solve Wordle by sampling 20 tries.
+target wrd: snaky, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
+target wrd: snaky, averaged 3.600 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.7987 seconds
 ```
 
-* The CVS output written to file for the first two words is this:
+* The CSV output written to file for the first two words is this:
 
 ```text
 target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
-fuzzy,5.05,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9627162480028346
-fizzy,4.65,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9443350170040503
+shorn,4.0,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9372296719811857
+story,4.4,random guesses,True,least,wo_nyt_wordlist.txt,20,1.0770448269322515
 ```
 
-* In comparison, the CVS output written to file for the first two words using 400 tries shows different guess averages but the same general difference order:
+* In comparison, the CSV output written to file for the first two words using 400 tries shows different guess averages but the same general character:
 
 ```text
 target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
-fuzzy,4.88,random guesses,True,least,wo_nyt_wordlist.txt,400,19.977324250969104
-fizzy,4.6,random guesses,True,least,wo_nyt_wordlist.txt,400,19.74195557308849
+shorn,4.13,random guesses,True,least,wo_nyt_wordlist.txt,400,20.533432631287724
+story,4.11,random guesses,True,least,wo_nyt_wordlist.txt,400,23.28290557442233
 ```
+
+* 400 samples is not large enough to compare words with this measure at the 1/10th of a guess resolution.
 
 * Use the keypress combination **control + C** to stop the **FMWM** prior to its own process completion.
 
