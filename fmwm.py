@@ -155,7 +155,7 @@ def set_late_timestamp_elements() -> NoReturn:
     global ts_ptw, ts_psw, ts_prt
     if len(target_wrd) > 0:
         ts_ptw = f'T_{target_wrd}_'  # target word timestamp element
-    if use_starting_wrd:
+    if len(starting_wrd) > 0:
         ts_psw = f'S_{starting_wrd}_'  # starting word timestamp element
     ts_prt = f'R{(rank_mode + 1)}_'  # rank mode timestamp element
 
