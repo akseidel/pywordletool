@@ -68,6 +68,7 @@ options:
   -a            Process every vocabulary word as a target word.
   -q Q          Show guesses that solve on the Qth guess.
   -m M          Find the order M magic words for a target word.
+  -p P          Pick-up, ie. resume, after seeing word P.
 ```
 
 * **-h** Displays the help hints as shown above.
@@ -83,6 +84,7 @@ options:
 * **-a** Processes every vocabulary word (2309 words) in the solutions list as each target word.
 * **-q Q** Lists out only the guess data for runs that result in **Q** guesses. For example **-q 2** outputs only the guess data for runs where the target word is solved in two guesses. In other words after the first guess, only the target word remains.
 * **-m M** Finds words from the vocabulary that are order **M** magic word's for the target word. Order 1 magic words reduce the selection pool to contain only the target word. A magic word first guess forces the second guess to be the solution. Order 2 magic words reduce the selection pool to two words where there would be a 50% chance to guess the solution. Order **M** magic words reduce the selection pool to **M** words.
+* **-p P** Picks up, ie. restarts, a vocabulary process after the word **P**. Depending on the process type and its settings, a vocabulary process can take over a day to complete. If for some reason such a process was terminated early after yielding valid data, that process can be restarted after the last valid word data in the previously terminated process. You provide that word as the **P** argument. If .csv files were being made, the restarted run will be a new .csv file with the **P** argument as part of the filename. 
 
 A use example:
 

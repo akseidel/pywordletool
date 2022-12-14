@@ -29,7 +29,7 @@ def process_any_arguments() -> NoReturn:
         starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
         sample_number, vocab_filename, record_run, do_every_wrd, query_guess, \
         query_mode, magic_mode, magic_order, ts_ptw, ts_psw, ts_pmo, ts_pqm, ts_ptw, \
-        ts_prt, ts_psn
+        ts_prt, ts_psn, ts_ppw, resume, resume_after_wrd
 
     parser = argparse.ArgumentParser(description='Process command line settings.')
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
@@ -49,6 +49,7 @@ def process_any_arguments() -> NoReturn:
                         help='Show guesses that solve on the Qth guess.')
     parser.add_argument('-m', action='store', type=int,
                         help='Find the order M magic words for a target word.')
+    parser.add_argument('-p', action='store', help='Pick-up, ie. restart, after seeing word P.')
 
     args = parser.parse_args()
     debug_mode = args.d  # prints out lists, guesses etc.
@@ -97,6 +98,11 @@ def process_any_arguments() -> NoReturn:
         use_starting_wrd = 1
         starting_wrd = args.s
         ts_psw = f'S_{starting_wrd}_'  # starting word timestamp element
+
+    if args.p is not None:
+        resume = True
+        resume_after_wrd = args.p
+        ts_ppw = f'P_{resume_after_wrd}_'  # resume_after_wrd timestamp element
 
     if args.r is not None:
         if args.r == 0:
@@ -152,12 +158,38 @@ def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_
 
 
 def set_late_timestamp_elements() -> NoReturn:
-    global ts_ptw, ts_psw, ts_prt
+    """
+    Sometimes a .csv file is desired but not every run parameters is specified
+    in the command line arguments. These parameters are set late outside the
+    command line parser where the associated file name prefix clues are set. This
+    function sets the prefixes again regardless of needing to do so.
+    """
+    global ts_ptw, ts_psw, ts_prt, ts_ppw
     if len(target_wrd) > 0:
         ts_ptw = f'T_{target_wrd}_'  # target word timestamp element
     if len(starting_wrd) > 0:
         ts_psw = f'S_{starting_wrd}_'  # starting word timestamp element
+    if len(resume_after_wrd) > 0:
+        ts_ppw = f'P_{resume_after_wrd}_'  # resume_after_wrd timestamp element
     ts_prt = f'R{(rank_mode + 1)}_'  # rank mode timestamp element
+
+
+def confirm_resume_after_wrd() -> NoReturn:
+    """
+    If this is a resume run where process needs to resume after a certain word,
+    that resume_after_wrd, which would have come in as a command line argument,
+    needs to be confirmed to exist in the vocabulary.
+    @return:
+    """
+    global resume_after_wrd, resume
+    if not resume:
+        return
+    # A ranked word list dictionary is now created to use for valid input word checking,
+    # Ranking is not needed. For faster running the optional no_rank argument is True.
+    loc_the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
+                                            0).get_ranked_results_wrd_lst(True)
+    while resume_after_wrd not in loc_the_word_list:
+        resume_after_wrd = input('Enter a valid Wordle word to resume after: ').lower()
 
 
 def get_set_target_word() -> NoReturn:
@@ -257,16 +289,19 @@ def set_context_msg(loc_rand_mode, loc_rank_mode):
 def imwm_fname() -> str:
     """
     Returns a time timestamp like .csv filename
+    Added to the actual timestamp are filename prefixes that correspond
+    to many of the operation modes so that it is possible to know the
+    .csv file purpose.
     @rtype: str
     """
-    global ts_pmo, ts_pqm, ts_prt, ts_psn, ts_ptw, ts_psw
+    global ts_pmo, ts_pqm, ts_prt, ts_psn, ts_ptw, ts_psw, ts_ppw
     fx = '.csv'
     ts = str(datetime.datetime.now()).replace(' ', '_')
     ts = ts.replace(':', '_')
 
     if len(ts_pmo):
         ts_psn = ''
-    ts = f'{ts_pmo}{ts_prt}{ts_pqm}{ts_psn}{ts_ptw}{ts_psw}{ts}{fx}'
+    ts = f'{ts_pmo}{ts_prt}{ts_pqm}{ts_psn}{ts_ptw}{ts_psw}{ts_ppw}{ts}{fx}'
 
     return ts
 
@@ -634,12 +669,15 @@ query_guess = 1
 query_mode = False
 magic_order = 1
 magic_mode = False
+resume = False
+resume_after_wrd = ''
 ts_pmo = ''  # magic order timestamp element
 ts_pqm = ''  # query guess timestamp element
 ts_prt = ''  # rank type timestamp element
 ts_psn = ''  # sample number timestamp element
 ts_ptw = ''  # target word timestamp element
 ts_psw = ''  # starting word timestamp element
+ts_ppw = ''  # resume after word timestamp element
 # Records output to a CSV file having a timestamp like filename
 record_run = False
 
@@ -660,6 +698,7 @@ if __name__ == "__main__":
             # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
             # be started with the target word already set.
             get_set_target_word()
+        confirm_resume_after_wrd()
         set_late_timestamp_elements()
         # Timestamp like filename used for loc_record_run
         run_fname = imwm_fname()
@@ -673,24 +712,35 @@ if __name__ == "__main__":
             n = len(targets)
             dsf = datetime.timedelta(0)
             avg_t = 0
+            skip_qty = 0
             for key in targets:
                 target_wrd = key
-
-                # Run the monkey. The monkey will notice this loc_target_wrd
-                if not magic_mode:
-                    standard_monkey(sample_number, wrd_x)
+                # Resume allows for resuming from after a target_wrd being the resume_after_wrd
+                if not resume:
+                    # Run the monkey. The monkey will notice this loc_target_wrd
+                    if not magic_mode:
+                        standard_monkey(sample_number, wrd_x)
+                    else:
+                        magic_word_monkey(wrd_x)
+                    # dur_tw is measured by the monkey
+                    dur_sf = dur_sf + dur_tw
+                    avg_t = dur_sf / (wrd_x - skip_qty)
+                    etf = datetime.timedelta(seconds=((n - wrd_x) * dur_tw))
+                    dsf = datetime.timedelta(seconds=dur_sf)
+                    wrd_x += 1
+                    # Do targets remain?
+                    if wrd_x < len(targets):
+                        print(
+                            f'Duration so far: {dsf}, avg. {avg_t:0.4f} s/wrd, last word {dur_tw:0.4f}'
+                            f' s/wrd, ETF: {etf}')
                 else:
-                    magic_word_monkey(wrd_x)
-
-                # dur_tw is measured by the monkey
-                dur_sf = dur_sf + dur_tw
-                avg_t = dur_sf / wrd_x
-                etf = datetime.timedelta(seconds=((n - wrd_x) * dur_tw))
-                dsf = datetime.timedelta(seconds=dur_sf)
-                wrd_x += 1
-                # Do targets remain?
-                if wrd_x < len(targets):
-                    print(f'Duration so far: {dsf}, avg. {avg_t:0.4f} s/wrd, last word {dur_tw:0.4f} s/wrd, ETF: {etf}')
+                    if target_wrd == resume_after_wrd:
+                        print(f'Seen {resume_after_wrd}, will start on the next word.')
+                        resume = False
+                    else:
+                        sys.stdout.write(f'\033[KSkipping {target_wrd}, waiting for {resume_after_wrd}\r')
+                    wrd_x += 1
+                    skip_qty += 1
             # Finished all targets
             print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
         else:
