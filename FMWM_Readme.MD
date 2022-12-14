@@ -16,7 +16,7 @@
 
 * The **FMWM** can find all the Order M Magic Words for any particular word. An Order 1 Magic Word is a word that reduces the possible guesses down to just the solution word. In other words a Magic Word used as a first guess, or as any guess, played in hard mode, forces the next fitting guess to be the solution. Likewise, an Order 2 Magic Word reduces the possible guesses to two words, one of which is the solution word. Magic word finding is initiated using the command line arguments **-m M**. See the **Command Line Options** section below for more information.
 
-### Requirements To Run IMWN
+### Requirements To Run FMWN
 
 * **FMWM** is a **python** program and it relies on utilities that are typically present in UNIX, Apple OSX and Linux operating systems. Therefore, a recent **python** installation on any UNIX, Apple OSX or Linux operating system computer is the requirement. For Windows based computers a Linux subsystem would need to be installed with **python** installed within it. **FMWM** would need to be run within that Linux subsystem.
 
