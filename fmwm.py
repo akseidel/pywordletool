@@ -58,10 +58,14 @@ def process_any_arguments() -> NoReturn:
 
     if args.m is not None:
         magic_order = args.m
-        ts_pmo = f'M{magic_order:03.0f}_'  # magic order timestamp element
-        if query_guess < 1:
-            print(f'Aborting this run. The -m argument must be larger than 0. It was {query_guess}.')
+        m_max = len(unranked_word_dict())-1
+        if magic_order < 1:
+            print(f'Aborting this run. The magic order -m argument must be larger than 0. It was {magic_order}.')
             exit()
+        elif magic_order > m_max:
+            print(f'Aborting this run. The magic order -m argument must be smaller than {m_max}. It was {magic_order}.')
+            exit()
+        ts_pmo = f'M{magic_order:03.0f}_'  # magic order timestamp element
 
     if args.q is not None:
         query_guess = args.q
@@ -143,6 +147,16 @@ def process_any_arguments() -> NoReturn:
     ts_psn = f'X{sample_number}_'  # sample number timestamp element
 
 
+def unranked_word_dict() -> dict:
+    """
+    A ranked word list dictionary is now created to use for valid input word checking
+    and other uses where ranking is not needed. For faster running the optional
+    no_rank argument is True.
+    @return: dict
+    """
+    return helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst(True)
+
+
 def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> NoReturn:
     """
     Clears all the objects used to hold the letter filtering information
@@ -184,11 +198,7 @@ def confirm_resume_after_wrd() -> NoReturn:
     global resume_after_wrd, resume
     if not resume:
         return
-    # A ranked word list dictionary is now created to use for valid input word checking,
-    # Ranking is not needed. For faster running the optional no_rank argument is True.
-    loc_the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                            0).get_ranked_results_wrd_lst(True)
-    while resume_after_wrd not in loc_the_word_list:
+    while resume_after_wrd not in unranked_word_dict():
         resume_after_wrd = input('Enter a valid Wordle word to resume after: ').lower()
 
 
@@ -203,11 +213,7 @@ def get_set_target_word() -> NoReturn:
     global target_wrd
     if do_every_wrd:
         return
-    # A ranked word list dictionary is now created to use for valid input word checking,
-    # Ranking is not needed. For faster running the optional no_rank argument is True.
-    loc_the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                            0).get_ranked_results_wrd_lst(True)
-    while target_wrd not in loc_the_word_list:
+    while target_wrd not in unranked_word_dict():
         target_wrd = input('Enter a valid Wordle target word: ').lower()
 
 
@@ -216,14 +222,10 @@ def get_set_starting_guess() -> NoReturn:
     Ask for and set a given first guess word to be used in every session.
     """
     global starting_wrd, use_starting_wrd
-    # A ranked word list dictionary is now created to use for valid input word checking,
-    # Ranking is not needed. For faster running the optional no_rank argument is True.
-    loc_the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                            0).get_ranked_results_wrd_lst(True)
     while use_starting_wrd == -1:
         response = input('Run using a given first guess? Enter y/n: ').lower()
         if response == 'y':
-            while starting_wrd not in loc_the_word_list:
+            while starting_wrd not in unranked_word_dict():
                 starting_wrd = input('Enter a valid Wordle first guess word: ').lower()
                 use_starting_wrd = 1
         if response == 'n':
@@ -534,7 +536,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
 def magic_word_monkey(loc_wrd_x: int) -> NoReturn:
     """
-    Intended to find only the first guess words that reduce the -v vocabulary selection
+    Intended to find only the first guess words that reduce the vocabulary selection,
     pool to the magic_order word count. Magic_order 1 means the target word only. Magic_order
     1 means the target word and one other word. And so on.
     @param loc_wrd_x:
@@ -546,7 +548,7 @@ def magic_word_monkey(loc_wrd_x: int) -> NoReturn:
         print('Output being written to ' + run_fname)
     print(f'{loc_wrd_x}  Finding #{magic_order} order magic words for: {target_wrd}')
 
-    # Need to iterate through all unranked words in the -v vocabulary
+    # Need to iterate through all unranked words in the specified vocabulary
     candidate_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
         .get_ranked_results_wrd_lst(True)
     r = 0
@@ -744,8 +746,7 @@ if __name__ == "__main__":
             # Finished all targets
             print(f'Process done. Duration: {dsf}, {avg_t:0.4f} seconds/word')
         else:
-            the_word_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True,
-                                                0).get_ranked_results_wrd_lst()
+            # Not doing every word
             if not magic_mode:
                 standard_monkey(sample_number, wrd_x)
             elif magic_mode:
