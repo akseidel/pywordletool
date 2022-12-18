@@ -58,7 +58,7 @@ def process_any_arguments() -> NoReturn:
 
     if args.m is not None:
         magic_order = args.m
-        m_max = len(unranked_word_dict())-1
+        m_max = len(unranked_word_dict()) - 1
         if magic_order < 1:
             print(f'Aborting this run. The magic order -m argument must be larger than 0. It was {magic_order}.')
             exit()
@@ -288,7 +288,7 @@ def set_context_msg(loc_rand_mode, loc_rank_mode):
         # so that its influence on the first and second guess can be observed.
 
 
-def imwm_fname() -> str:
+def fmwm_fname() -> str:
     """
     Returns a time timestamp like .csv filename
     Added to the actual timestamp are filename prefixes that correspond
@@ -335,7 +335,18 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
 
 def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
                    loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd) -> NoReturn:
-    global conditions, magic_mode, magic_order
+    """
+    Reports the conditions for the impending sample run
+    @param loc_sample_number: total overall number of guesses
+    @param loc_guess_mode: guess mode description
+    @param loc_allow_dups: allow duplicates bool
+    @param loc_record_run: save to a file bool
+    @param loc_run_fname: filename to save to
+    @param loc_starting_wrd: the starting word for this run, could be blank
+    @param loc_vocab_filename: the vocabulary being used
+    @param loc_do_every_wrd: bool indicates all words in vocabulary are being examined
+    """
+    global conditions, magic_mode, magic_order, first_run
 
     if not magic_mode:
         conditions = f'{loc_sample_number} samples, ' + loc_guess_mode + ', initial duplicates:' + str(loc_allow_dups)
@@ -365,8 +376,16 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
                 output_msg(reveal_hdr, loc_record_run, loc_run_fname)
 
 
-def reveal_output(r, guesses, run_stats, loc_record_run, loc_run_fname) -> NoReturn:
-    reveal_stat = [r, guesses]
+def reveal_output(x, guesses, run_stats, loc_record_run, loc_run_fname) -> NoReturn:
+    """
+    Reveal mode is the option to report the results for an xth sample run
+    @param x: The xth sample attempt
+    @param guesses: the number of guesses required
+    @param run_stats: the guesses and their resulting pool sizes
+    @param loc_record_run: save to file bool
+    @param loc_run_fname: filename for recording
+    """
+    reveal_stat = [x, guesses]
     reveal_stat.extend(run_stats)
     output_msg(reveal_stat, False, loc_run_fname)
     if loc_record_run:
@@ -375,7 +394,20 @@ def reveal_output(r, guesses, run_stats, loc_record_run, loc_run_fname) -> NoRet
 
 def prologue_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
                     loc_target_wrd, loc_starting_wrd, tot, loc_vocab_filename, loc_dur_tw) -> NoReturn:
-    global first_run, conditions, query_set, magic_mode
+    """
+    Reports the results of a sample run
+    @param loc_sample_number: total overall number of guesses
+    @param loc_guess_mode: guess mode description
+    @param loc_allow_dups: allow duplicates bool
+    @param loc_record_run: save to a file bool
+    @param loc_run_fname: filename to save
+    @param loc_target_wrd: the target word for this run
+    @param loc_starting_wrd: the starting word for this run, could be blank
+    @param tot: total overall number of guesses required to solve
+    @param loc_vocab_filename: the vocabulary filename
+    @param loc_dur_tw: the time duration for this run
+    """
+    global first_run, conditions, query_set, magic_mode, query_mode
     if not magic_mode:
         average = tot / loc_sample_number
         stat_msg = 'target wrd: ' + loc_target_wrd + ', averaged ' + f'{average:.3f} guesses to solve, '
@@ -403,21 +435,25 @@ def prologue_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_recor
             output_msg(record_stat, loc_record_run, loc_run_fname)
 
     first_run = False
-    query_output(target_wrd)
+    if query_mode:
+        query_output(target_wrd)
 
 
 def query_output(loc_target_wrd):
-    if query_mode:
-        query_list = list(query_set)
-        query_list.sort()
-        if not magic_mode:
-            stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
-                       f'that eliminate all but the solution {loc_target_wrd} guess:\n{query_list}'
-        else:
-            stat_msg = f'Encountered {len(query_set)} order #{magic_order} magic word guesses ' \
-                       f'that eliminate all but {magic_order} guesses:\n{query_list}'
-        # print(stat_msg)
-        sys.stdout.write(f'\033[K{stat_msg}\n')
+    """
+    Output query type summary to the console
+    @param loc_target_wrd:
+    """
+    query_list = list(query_set)
+    query_list.sort()
+    if not magic_mode:
+        stat_msg = f'Encountered {len(query_set)} #{query_guess - 1} guesses ' \
+                   f'that eliminate all but the solution {loc_target_wrd} guess:\n{query_list}'
+    else:
+        stat_msg = f'Encountered {len(query_set)} order #{magic_order} magic word guesses ' \
+                   f'that eliminate all but {magic_order} guesses:\n{query_list}'
+    # print(stat_msg)
+    sys.stdout.write(f'\033[K{stat_msg}\n')
 
 
 def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
@@ -615,8 +651,10 @@ def magic_word_monkey(loc_wrd_x: int) -> NoReturn:
         # animated in progress showing
         r += 1
         mw_qty = len(query_set)
-        sys.stdout.write(f'\033[K> {r} Searching through {loc_n} words in {vocab_filename}'
-                         f' for {target_wrd} magic word ...  finding: {mw_qty}\r')
+        msg = f'\033[K> {r} Searching {loc_n} words in {vocab_filename} for {target_wrd} magic word ...  ' \
+              f'finding: {mw_qty}\r '
+        sys.stdout.write(msg)
+        sys.stdout.flush()
 
     dur_tw = time.perf_counter() - start_mt  # this word's process time
     prologue_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname,
@@ -703,7 +741,7 @@ if __name__ == "__main__":
         confirm_resume_after_wrd()
         set_late_timestamp_elements()
         # Timestamp like filename used for loc_record_run
-        run_fname = imwm_fname()
+        run_fname = fmwm_fname()
         wrd_x = 1
         if do_every_wrd:
             # The targets are the words for which the monkey seeks guesses to solve.
