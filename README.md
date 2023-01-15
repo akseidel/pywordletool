@@ -40,10 +40,10 @@
 
 'tkinter' provides graphical user interface support for python applications. It comes with python. 'customtkinter' is an expansion to 'tkinter'. This Wordle game helper uses some customtkinter features and so it needs to be installed along with python3. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
 
-After installing python3 and pip, the following commands entered in a Terminal window will install 'customtkinter':
-`pip3 install --upgrade customtkinter`
+After installing python3 and pip, the following commands entered in a Terminal window will install the 4.6.3 version of 'customtkinter':
+`pip3 install --upgrade customtkinter==4.6.3`
 
-* Note: As of this writing customtkinter is version 4.6.3. Some prior versions did not function properly. Version 4.6.3 works with this Helper in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
+* Note: As of this writing customtkinter is higher than version 4.6.3. Some prior to 4.6.3 versions and post 4.6.3 versions do not function properly. The result will be the Wordle helper not running at all with no feedback.  Version 4.6.3 works with this Helper in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
 
 ### Installing the Wordle helper
 
