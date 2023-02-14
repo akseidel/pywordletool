@@ -26,6 +26,8 @@ In the puzzle game context a letter indicated not at its correct position is a l
 
 'Show Highest Genetic Rank' highlights the words or words having the highest Genetic Rank in the current word list. Genetic Rank is a measure of how related via its letters a word is to other words amongst a word group. Using the highest genetic ranking word minimizes the worst possible outcome. In a simple example consider a word group of three words. The worst possible outcome is three guesses. If there is one or two highest genetic ranking words in this group, then picking one of those words first reduces the worst possible outcome to two guesses. Multiple highlighted highest genetic rank words may not be visible all at once in the words list. Slowly scroll the words list to find the other highlighted words.
 
+'Show Group Optimal' highlights the word or words that result in the lowest average resulting group size when that word is used as a guess. This analysis is performed on the current displayed words. The computation process is intensive and may take time to finish. The group optimal guess word is likely to result in remaining words of smaller choice quantity, thus increasing chances to find the solution in fewer guesses.
+
 - Tips:
 
 Please develop your own strategy for picks. Sorry, none are mentioned here. What you discover might be surprising at first.

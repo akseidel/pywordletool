@@ -275,12 +275,15 @@ class Pywordlemainwindow(ctk.CTk):
             if self.sel_grpoptimal and (n_items > 0):
                 word_list = list(the_word_list.keys())
                 optimal_group_guesses = helpers.best_groups_guess_dict(word_list)
+                opt_group_guesses = []
+                optimal_rank = 0.0
                 for w, r in optimal_group_guesses.items():
                     optimal_rank = w
                     opt_group_guesses = r
                 regex: str = helpers.regex_maxgenrankers(opt_group_guesses, the_word_list)
                 tx_result.highlight_pattern(regex, 'hlt')
-                comment = " (" + str(len(opt_group_guesses)) + " group optimal selected, ave: " + '{0:.3f}'.format(optimal_rank) + ")"
+                comment = " (" + str(len(opt_group_guesses)) + " group optimal selected, ave. grp. size: " +\
+                          '{0:.2f}'.format(optimal_rank) + ")"
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_genetic:
