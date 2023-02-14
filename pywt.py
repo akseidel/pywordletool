@@ -280,7 +280,7 @@ class Pywordlemainwindow(ctk.CTk):
                     opt_group_guesses = r
                 regex: str = helpers.regex_maxgenrankers(opt_group_guesses, the_word_list)
                 tx_result.highlight_pattern(regex, 'hlt')
-                comment = " (" + str(len(opt_group_guesses)) + " group optim selected (ave=" + '{0:.3f}'.format(optimal_rank) + "))"
+                comment = " (" + str(len(opt_group_guesses)) + " group optimal selected, ave: " + '{0:.3f}'.format(optimal_rank) + ")"
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_genetic:
