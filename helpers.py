@@ -266,6 +266,7 @@ def assign_genrank(gendict: dict, gen_tally: list) -> int:
 
 
 # returns list of the max genrankers in the gendict
+# that have a genrank equal to a given rank maxrank
 def get_maxgenrankers(gendict, maxrank) -> list:
     max_rankers = []
     for w, g in gendict.items():
@@ -383,6 +384,96 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
     build_x_pos_grep(wordle_tool, x_pos_dict, rq_ltrs)
     # Build require at position
     build_r_pos_grep(wordle_tool, r_pos_dict)
+
+
+def get_genpattern(subject_word: str, target_word: str) -> str:
+    """
+    Return a subject word's genetic pattern against a target guess word
+    example:heavy against leash is the string 12200 pattern
+    @param subject_word: The word to check against the guess word.
+    @param target_word: The guess word
+    @return: String pattern representing each digit in the subject word where
+    0 = letter not present, 1 = letter present but not this position and
+    2 = letter present at correct position
+    """
+    ltr_pos = [0, 1, 2, 3, 4]
+    genpat = '00000'
+
+    # dictionary of subject sltr instances in target. sltr is key, value is sltr positions
+    subj_in_target_dict = {}
+    for sltr in subject_word:
+        subj_in_target = ([pos for pos, char in enumerate(target_word) if char == sltr])
+        if subj_in_target:
+            subj_in_target_dict[sltr] = subj_in_target
+
+    rec_pos = ltr_pos.copy()
+    # first find all ltr matches, mark as 2s and remove their positions
+    # from rec_pos and the subject_in_target dictionary
+    for slp in ltr_pos:
+        sl = subject_word[slp]
+        if subject_word[slp] == target_word[slp]:
+            genpat = genpat[:slp] + '2' + genpat[slp + 1:]
+            rec_pos.remove(slp)
+            subj_in_target_dict[sl].remove(slp)
+            if not subj_in_target_dict[sl]:
+                subj_in_target_dict.pop(sl)
+
+    # rec_pos now holds only the positions needing further examination
+    for slp in rec_pos:
+        sl = subject_word[slp]
+        if sl in subj_in_target_dict:
+            genpat = genpat[:slp] + '1' + genpat[slp + 1:]
+            subj_in_target_dict[sl].pop(0)
+            if not subj_in_target_dict[sl]:
+                subj_in_target_dict.pop(sl)
+
+    return genpat
+
+
+def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
+    """
+    Returns a dictionary of the word groups the guess_word would result
+    from applying the guess_word on the word_list. The key values will be
+    five-digit codes where 0 means letter is not present, 1 letter is present
+    but at wrong position and 2 means letter is present and in correct position.
+    @param guess_word: target word
+    @param word_list: list of subject words
+    @return: The keys will be five-digit codes where 0 means letter is
+    not present, 1 letter is present but at wrong position and 2 means letter
+    is present and in correct position. Values are the words categorized by that code.
+    """
+    groups_dict = {}
+    for subject_word in word_list:
+        genpat = get_genpattern(subject_word, guess_word)
+        if genpat not in groups_dict:
+            groups_dict[genpat] = [subject_word]
+        else:
+            groups_dict[genpat].append(subject_word)
+    return groups_dict
+
+
+def best_groups_guess_dict(word_lst: list) -> dict:
+    """
+    Wraps guess word group ranking to return the best
+    group rank guesses.
+    @param word_lst: possible guess words
+    @return: dictionary of the best group ranked guesses
+    """
+    guess_rank_dict = {}
+    best_rank_dict = {}
+    min_score = len(word_lst)
+    for guess in word_lst:
+        groups_dict = groups_for_this_guess(guess, word_lst)
+        group_score = len(word_lst) / len(groups_dict.keys())
+        guess_rank_dict[guess] = group_score
+        min_score = min(group_score, min_score)
+    for guess in word_lst:
+        if guess_rank_dict[guess] == min_score:
+            if min_score not in best_rank_dict:
+                best_rank_dict[min_score] = [guess]
+            else:
+                best_rank_dict[min_score].append(guess)
+    return best_rank_dict
 
 
 # A class used for holding list stack of the shell commands

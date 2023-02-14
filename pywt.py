@@ -171,6 +171,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.pos_x = self.pos5.copy()
         self.sel_rando = False
         self.sel_genetic = False
+        self.sel_grpoptimal = False
 
         # configure style
         style = ttk.Style()
@@ -269,6 +270,17 @@ class Pywordlemainwindow(ctk.CTk):
                 regex: str = helpers.regex_maxgenrankers(max_rankers, the_word_list)
                 tx_result.highlight_pattern(regex, 'hlt')
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
+
+            # group ranking
+            if self.sel_grpoptimal and (n_items > 0):
+                word_list = list(the_word_list.keys())
+                optimal_group_guesses = helpers.best_groups_guess_dict(word_list)
+                for w, r in optimal_group_guesses.items():
+                    optimal_rank = w
+                    opt_group_guesses = r
+                regex: str = helpers.regex_maxgenrankers(opt_group_guesses, the_word_list)
+                tx_result.highlight_pattern(regex, 'hlt')
+                comment = " (" + str(len(opt_group_guesses)) + " group optim selected (ave=" + '{0:.3f}'.format(optimal_rank) + "))"
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_genetic:
@@ -412,6 +424,12 @@ class Pywordlemainwindow(ctk.CTk):
             self.sel_genetic = True
             do_grep()
             self.sel_genetic = False
+
+        # selected optimal group ranking in the result
+        def pick_optimals() -> NoReturn:
+            self.sel_grpoptimal = True
+            do_grep()
+            self.sel_grpoptimal = False
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
@@ -1216,17 +1234,21 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_Q.pack(side=tk.BOTTOM, padx=6, pady=2, fill=tk.X)
 
         self.bt_help = ctk.CTkButton(self.admin_frame, text="Information", width=40, command=self.show_help)
-        self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=6, fill=tk.X)
+        self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=3, fill=tk.X)
 
         self.bt_zap = ctk.CTkButton(self.admin_frame, text="Clear All Settings", width=40, command=clear_all)
-        self.bt_zap.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+        self.bt_zap.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
 
         self.bt_rando = ctk.CTkButton(self.admin_frame, text="Pick A Random Word", width=40, command=pick_rando)
-        self.bt_rando.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+        self.bt_rando.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
 
         self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Highest Genetic Rank", width=40,
                                         command=pick_genetic)
-        self.bt_genetic.pack(side=tk.TOP, padx=6, pady=6, fill=tk.X)
+        self.bt_genetic.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
+
+        self.bt_groups = ctk.CTkButton(self.admin_frame, text="Show Group Optimal", width=40,
+                                       command=pick_optimals)
+        self.bt_groups.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
 
         # === END OF ====== Application Controls ==========
 
