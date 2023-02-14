@@ -464,6 +464,7 @@ def best_groups_guess_dict(word_lst: list) -> dict:
     min_score = len(word_lst)
     for guess in word_lst:
         groups_dict = groups_for_this_guess(guess, word_lst)
+        # print(guess, groups_dict)
         group_score = len(word_lst) / len(groups_dict.keys())
         guess_rank_dict[guess] = group_score
         min_score = min(group_score, min_score)
@@ -473,6 +474,7 @@ def best_groups_guess_dict(word_lst: list) -> dict:
                 best_rank_dict[min_score] = [guess]
             else:
                 best_rank_dict[min_score].append(guess)
+    # print(best_rank_dict)
     return best_rank_dict
 
 

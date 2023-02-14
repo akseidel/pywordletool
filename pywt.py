@@ -431,7 +431,9 @@ class Pywordlemainwindow(ctk.CTk):
         # selected optimal group ranking in the result
         def pick_optimals() -> NoReturn:
             self.sel_grpoptimal = True
+            self.title("This Wordle Helper ... is busy, please wait.")
             do_grep()
+            self.title("This Wordle Helper")
             self.sel_grpoptimal = False
 
         # Clears and fills a treeview with dictionary contents
