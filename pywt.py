@@ -282,7 +282,7 @@ class Pywordlemainwindow(ctk.CTk):
                     opt_group_guesses = r
                 regex: str = helpers.regex_maxgenrankers(opt_group_guesses, the_word_list)
                 tx_result.highlight_pattern(regex, 'hlt')
-                comment = " (" + str(len(opt_group_guesses)) + " group optimal selected, ave. grp. size: " +\
+                comment = " (" + str(len(opt_group_guesses)) + " group optimal selected, score: " +\
                           '{0:.2f}'.format(optimal_rank) + ")"
 
             tx_result.configure(state='disabled')

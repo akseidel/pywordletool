@@ -452,10 +452,29 @@ def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
     return groups_dict
 
 
+def max_group_size(groups_dict: dict) -> tuple:
+    """
+    Given a groups dictionary, returns the group
+    pattern that has the maximum number of words
+    and that word count.
+    @param groups_dict:
+    @return: max group pattern, word count for that pattern
+    """
+    max_grp = ""
+    max_size = 0
+    for k, v in groups_dict.items():
+        sz = len(v)
+        if sz > max_size:
+            max_size = sz
+            max_grp = k
+    return max_grp, max_size
+
+
 def best_groups_guess_dict(word_lst: list) -> dict:
     """
     Wraps guess word group ranking to return the best
-    group rank guesses.
+    group rank guesses. Guesses resulting in more groups
+    and smaller groups are better guesses.
     @param word_lst: possible guess words
     @return: dictionary of the best group ranked guesses
     """
@@ -464,8 +483,14 @@ def best_groups_guess_dict(word_lst: list) -> dict:
     min_score = len(word_lst)
     for guess in word_lst:
         groups_dict = groups_for_this_guess(guess, word_lst)
-        # print(guess, groups_dict)
-        group_score = len(word_lst) / len(groups_dict.keys())
+
+        # The following prints will crash pywt that is run by the start-pywt script.
+        # print(guess, groups_dict) print(guess + ' has ' + str(len(groups_dict.keys())) + ' groups, max group is ' +
+        # str(max_group_size(groups_dict)))
+
+        # max group size is added to score to discount guesses that have the same number of groups
+        # but have a largest group larger than what other guesses have for their largest group.
+        group_score = max_group_size(groups_dict)[1] + len(word_lst) / len(groups_dict.keys())
         guess_rank_dict[guess] = group_score
         min_score = min(group_score, min_score)
     for guess in word_lst:
@@ -474,6 +499,7 @@ def best_groups_guess_dict(word_lst: list) -> dict:
                 best_rank_dict[min_score] = [guess]
             else:
                 best_rank_dict[min_score].append(guess)
+    # The following print will crash pywt that is run by the start-pywt script.
     # print(best_rank_dict)
     return best_rank_dict
 
