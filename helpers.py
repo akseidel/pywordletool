@@ -454,7 +454,7 @@ def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
 
 def max_group_size(groups_dict: dict) -> tuple:
     """
-    Given a groups dictionary, returns the group
+    Given a group's dictionary, returns the group
     pattern that has the maximum number of words
     and that word count.
     @param groups_dict:
@@ -468,6 +468,20 @@ def max_group_size(groups_dict: dict) -> tuple:
             max_size = sz
             max_grp = k
     return max_grp, max_size
+
+
+def ave_sum_sqr_group_size(groups_dict: dict) -> float:
+    """
+    Given a group's dictionary, returns the average of
+    the group sizes squared.
+    @param groups_dict:
+    @return: max group pattern, word count for that pattern
+    """
+    sums = 0
+    for k, v in groups_dict.items():
+        sz = len(v)
+        sums = sums + (sz * sz)
+    return sums / len(groups_dict)
 
 
 def best_groups_guess_dict(word_lst: list) -> dict:
@@ -485,12 +499,14 @@ def best_groups_guess_dict(word_lst: list) -> dict:
         groups_dict = groups_for_this_guess(guess, word_lst)
 
         # The following prints will crash pywt that is run by the start-pywt script.
-        # print(guess, groups_dict) print(guess + ' has ' + str(len(groups_dict.keys())) + ' groups, max group is ' +
-        # str(max_group_size(groups_dict)))
+        # print(guess, groups_dict)
+        # print(guess + ' has ' + str(len(groups_dict.keys())) + ' groups, score is ' +
+        # str(ave_sum_sqr_group_size(groups_dict)))
 
-        # max group size is added to score to discount guesses that have the same number of groups
-        # but have a largest group larger than what other guesses have for their largest group.
-        group_score = max_group_size(groups_dict)[1] + len(word_lst) / len(groups_dict.keys())
+        # The score is calculated as the average of the group's squared sizes. This is to
+        # account for guesses that have the same number of groups but have a larger
+        # largest group than what other guesses have for their largest group.
+        group_score = ave_sum_sqr_group_size(groups_dict)
         guess_rank_dict[guess] = group_score
         min_score = min(group_score, min_score)
     for guess in word_lst:
