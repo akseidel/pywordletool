@@ -77,6 +77,13 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * Genetic Rank is a measure of how related via its letters a word is to other words amongst a word group. Each word in a group is assigned a 1x26 vector of 0 or 1 entries that flags whether a letter occurs in that word. Those vectors from the word group are summed to result in a 1x26 vector that is counting the letter flags in the word group. A word's genetic rank is calculated as the sum product of a word's flag vector and the word group's summing flag vector. The word's rank is then increased by each time a letter in that word occurs more than once.
 * Using the highest genetic ranking word minimizes the worst possible Wordle outcome. In a simple example consider a word group of three words. The worst possible outcome is three guesses. If there is one or two highest genetic ranking words in this group, then picking one of those words first reduces the worst possible outcome to two guesses.
 
+### Group Optimal
+
+* Groups are words that match a unique solution clue pattern. Thus a group is an abstract that is both the clue pattern and the group of words.  
+* Group Optimal identifies the words in the currently displayed word list that when used as a guess against the word list result in remaining choice lists containing the smallest number of choices.
+* Assuming the various settings have not excluded the solution from the currently displayed word list and considering the solution is a random list member, dividing the list into the smallest choice groups will on average minimize the number of guess required to narrow down to the solution.
+* The group optimal score is calculated as the average of the squared clue pattern group sizes resulting from the guess considered as the solution to which the currently displayed words generate clue patterns.
+
 ### Wordle Play Strategies
 
 * Discover Wordle play strategies yourself with the Helper's assistance. That was the reason for creating this Helper.
@@ -112,7 +119,7 @@ The Wordle helper shows five-letter words from which you can select for playing 
 
 * **Show Highest Genetic Rank** highlights the words or words having the highest **Genetic Rank** in the current word list. Genetic Rank is a measure of how related via its letters a word is to other words amongst a word group. Using the highest genetic ranking word minimizes the worst possible outcome. In a simple example consider a word group of three words. The worst possible outcome is three guesses. If there is one or two highest genetic ranking words in this group, then picking one of those words first reduces the worst possible outcome to two guesses. Multiple highlighted highest genetic rank words may not be visible all at once in the words list. Slowly scroll the words list to find the other highlighted words.
 
-* **Show Group Optimal** highlights the word or words that result in the lowest average resulting group rank when that word is used as a guess. The rank is the sum of the guess's group size's squared. This analysis is performed on the current displayed words. The computation process is intensive and may take extended time to finish. The group optimal guess word is likely to result in remaining smaller word groups, thus increasing chances to find the solution in fewer guesses.   
+* **Show Group Optimal** highlights the word or words that result in the lowest average group score when that word is used as a guess. The score is the average of the squared guess's groups sizes. This analysis is performed on the current displayed words. The group finding process is lengthy and may take extended time to finish. The group optimal guess word is likely to result in remaining smaller word groups, thus increasing chances to find the solution in fewer guesses. 
 
 #### Tips
 
