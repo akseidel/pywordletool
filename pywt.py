@@ -281,7 +281,7 @@ class Pywordlemainwindow(ctk.CTk):
                     optimal_rank = w
                     opt_group_guesses = r
                 regex: str = helpers.regex_maxgenrankers(opt_group_guesses, the_word_list)
-                tx_result.highlight_pattern(regex, 'hlt')
+                tx_result.highlight_pattern(regex, 'grp')
                 comment = " (" + str(len(opt_group_guesses)) + " group optimal selected, score: " +\
                           '{0:.2f}'.format(optimal_rank) + ")"
 
@@ -514,10 +514,12 @@ class Pywordlemainwindow(ctk.CTk):
         tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
+        # tag 'grp' is used to highlight group ranker
+        tx_result.tag_configure('grp', background='#ffd700')
         # tag 'hlt' is used to highlight genetic ranker
-        tx_result.tag_configure('hlt', background='#c6e2ff')
+        tx_result.tag_configure('hlt', background='#00ffff')
         # tag 'ran' is used to highlight random pick
-        tx_result.tag_configure('ran', background='#b4eeb4')
+        tx_result.tag_configure('ran', background='#7cfc00')
         if self.winfo_screenheight() <= 800:
             tx_result.configure(height=10)  # to do, set according to screen height
         else:
