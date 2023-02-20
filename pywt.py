@@ -160,6 +160,7 @@ class Pywordlemainwindow(ctk.CTk):
         ln_col = set_n_col(self)
         # set the Vars
         self.allow_dup_state = tk.BooleanVar(value=False)
+        self.verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
         self.rank_mode = tk.IntVar()
@@ -170,7 +171,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.pos_r = self.pos5.copy()
         self.pos_x = self.pos5.copy()
         self.sel_rando = False
-        self.sel_genetic = False
+        # self.sel_genetic = False
         self.sel_grpoptimal = False
 
         # configure style
@@ -258,36 +259,25 @@ class Pywordlemainwindow(ctk.CTk):
                 tx_result.highlight_pattern(rand_pick, 'ran')
                 comment = " (1 random pick selected)"
 
-                # Genetic ranking
-            if self.sel_genetic and (n_items > 0):
-                gendict: dict[str, list] = {}
-                for w, r in the_word_list.items():
-                    gencode = helpers.get_gencode(w)
-                    gendict.update({w: gencode})
-                gen_tally: list = helpers.get_gendict_tally(gendict)
-                maxrank: int = helpers.assign_genrank(gendict, gen_tally)
-                max_rankers: list = helpers.get_maxgenrankers(gendict, maxrank)
-                regex: str = helpers.regex_maxgenrankers(max_rankers, the_word_list)
-                tx_result.highlight_pattern(regex, 'hlt')
-                comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
-
             # group ranking
             if self.sel_grpoptimal and (n_items > 0):
                 word_list = list(the_word_list.keys())
-                optimal_group_guesses = helpers.best_groups_guess_dict(word_list)
-                opt_group_guesses = []
-                optimal_rank = 0.0
-                for w, r in optimal_group_guesses.items():
-                    optimal_rank = w
-                    opt_group_guesses = r
+                optimal_group_guesses = helpers.best_groups_guess_dict(word_list, self.verbose_grps.get())
+                opt_group_guesses = list(optimal_group_guesses.keys())
+                g_stats = optimal_group_guesses[list(optimal_group_guesses.keys())[0]]
+                optimal_rank = g_stats[2]
+                grps_qty = g_stats[0]
+                max_grp_size = g_stats[1]
                 regex: str = helpers.regex_maxgenrankers(opt_group_guesses, the_word_list)
                 tx_result.highlight_pattern(regex, 'grp')
-                comment = " (" + str(len(opt_group_guesses)) + " group optimal selected, score: " +\
-                          '{0:.2f}'.format(optimal_rank) + ")"
+                comment = " (" + str(len(opt_group_guesses)) + " optimals " + \
+                          ", grp qty: " + '{0:.0f}'.format(grps_qty) + \
+                          ", max size: " + '{0:.0f}'.format(max_grp_size) + \
+                          ", ave size: " + '{0:.2f}'.format(optimal_rank) + ")"
 
             tx_result.configure(state='disabled')
-            if not self.sel_rando and not self.sel_genetic:
-                # Do not scroll to end when a rando pick or genetic is highlighted
+            if not self.sel_rando and not self.sel_grpoptimal:
+                # Do not scroll to end when a rando pick or optimal group is highlighted
                 tx_result.see('end')
             self.status.set(wordletool.get_status() + comment)
             tx_gr.configure(state='normal')
@@ -422,12 +412,6 @@ class Pywordlemainwindow(ctk.CTk):
             do_grep()
             self.sel_rando = False
 
-        # selected genetic ranking in the result
-        def pick_genetic() -> NoReturn:
-            self.sel_genetic = True
-            do_grep()
-            self.sel_genetic = False
-
         # selected optimal group ranking in the result
         def pick_optimals() -> NoReturn:
             self.sel_grpoptimal = True
@@ -516,8 +500,6 @@ class Pywordlemainwindow(ctk.CTk):
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
         # tag 'grp' is used to highlight group ranker
         tx_result.tag_configure('grp', background='#ffd700')
-        # tag 'hlt' is used to highlight genetic ranker
-        tx_result.tag_configure('hlt', background='#00ffff')
         # tag 'ran' is used to highlight random pick
         tx_result.tag_configure('ran', background='#7cfc00')
         if self.winfo_screenheight() <= 800:
@@ -561,24 +543,18 @@ class Pywordlemainwindow(ctk.CTk):
         # letter exclusion frame
         # letter position frame
         self.criteria_frame = ctk.CTkFrame(self,
-                                           # width=900,
-                                           # height=100,
                                            corner_radius=10,
                                            borderwidth=0)
         self.criteria_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=0)
 
         # letter exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
-                                               # width=900,
-                                               # height=100,
                                                text='Letters To Be Excluded'
                                                )
         self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=0, pady=1)
 
         # letter require frame - uses pack
         self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
-                                               # width=900,
-                                               # height=100,
                                                text='Letters To Be Required'
                                                )
         self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=0, pady=1)
@@ -1238,24 +1214,35 @@ class Pywordlemainwindow(ctk.CTk):
         self.admin_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=0, pady=2, expand=True)
 
         self.bt_Q = ctk.CTkButton(self.admin_frame, text="Quit", width=100, command=self.destroy)
-        self.bt_Q.pack(side=tk.BOTTOM, padx=6, pady=2, fill=tk.X)
+        self.bt_Q.pack(side=tk.BOTTOM, padx=4, pady=2, fill=tk.X)
 
         self.bt_help = ctk.CTkButton(self.admin_frame, text="Information", width=40, command=self.show_help)
-        self.bt_help.pack(side=tk.BOTTOM, padx=6, pady=3, fill=tk.X)
+        self.bt_help.pack(side=tk.BOTTOM, padx=4, pady=3, fill=tk.X)
 
         self.bt_zap = ctk.CTkButton(self.admin_frame, text="Clear All Settings", width=40, command=clear_all)
-        self.bt_zap.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
+        self.bt_zap.pack(side=tk.TOP, padx=4, pady=3, fill=tk.X)
 
         self.bt_rando = ctk.CTkButton(self.admin_frame, text="Pick A Random Word", width=40, command=pick_rando)
-        self.bt_rando.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
+        self.bt_rando.pack(side=tk.TOP, padx=4, pady=3, fill=tk.X)
 
-        self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Highest Genetic Rank", width=40,
-                                        command=pick_genetic)
-        self.bt_genetic.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
+        # self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Highest Genetic Rank", width=40,
+        #                                 command=pick_genetic)
+        # self.bt_genetic.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
 
-        self.bt_groups = ctk.CTkButton(self.admin_frame, text="Show Group Optimal", width=40,
+        self.grp_frame = ttk.Frame(self.admin_frame)
+        self.grp_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
+
+        self.bt_groups = ctk.CTkButton(self.grp_frame,
+                                       text=" Highlight Group Optimal ",
                                        command=pick_optimals)
-        self.bt_groups.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
+        self.bt_groups.pack(side=tk.LEFT, padx=4, pady=3, fill=tk.X)
+        self.chk_grp_disp = ttk.Checkbutton(self.grp_frame,
+                                            text="Verbose Report",
+                                            variable=self.verbose_grps,
+                                            onvalue=True,
+                                            offvalue=False
+                                            )
+        self.chk_grp_disp.pack(side=tk.LEFT, padx=0, pady=3)
 
         # === END OF ====== Application Controls ==========
 

@@ -6,8 +6,11 @@ import sys
 import os
 import random
 import tkinter as tk  # assigns tkinter stuff to tk namespace
+import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
 from tkinter import messagebox
 from typing import NoReturn
+
+import customtkinter as ctk
 
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -197,82 +200,6 @@ def get_results_word_list(this_sh_cmd_lst) -> list:
 # Clears the console window
 def clear_scrn() -> NoReturn:
     os.system("cls" if os.name == "nt" else "clear")
-
-
-# Return a word's genetic code
-# example:woody
-# returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
-# translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
-# genetic rank applies in context of a list of words, so it is calculated later
-def get_gencode(word) -> list:
-    # gencode is the list of integers that will be returned
-    gencode = gc_z.copy()
-    # dups counts the number of times letters occur more than once
-    dups = 0
-    # loop through each letter in the word
-    for ltr in word:
-        idx = ord(ltr) - 97
-        # Increment dups if that letter has already been seen.
-        if gencode[idx] > 0:
-            dups += 1
-        # Mark that letter as having been seen.
-        gencode[idx] = 1
-    gencode[26] = dups
-    return gencode
-
-
-# returns genetic letter tally list for a gendictionary
-# this list is 26 members where each member corresponds
-# to the count for that letter position idx 0-25 where
-# idx 0=a and idx 25=z
-def get_gendict_tally(gendict) -> list:
-    gen_tally = []
-    for x in range(26):
-        gen_tally.append(0)
-    # loop through each gencode values list
-    for gencode in gendict.values():
-        # looking at just the list's a...z letter presence value,
-        # add them up
-        for idx in range(26):
-            if gencode[idx] > 0:
-                gen_tally[idx] = gen_tally[idx] + gencode[idx]
-    return gen_tally
-
-
-# Assigns the genetic rank to the gendict members and returns
-# the maximum genetic rank seen.
-def assign_genrank(gendict: dict, gen_tally: list) -> int:
-    """
-    Places the product sums of gendict values and the gen_tally vector. This value is
-    the genetic rank for the gendict words (the keys). The genetic rank is injected into
-    the gendict value vector as the 27th item of the 1 x 27 value vector. The maximum
-    genetic rank calculated is the integer being returned.
-    @param gendict: dictionary of words (keys) with values being 1 x 27 letter count vectors
-    @param gen_tally: 1 x 26 vector of letter tallies
-    @return: maximum genetic rank seen as integer
-    """
-    maxrank = 0
-    for w, g in gendict.items():
-        gr = 0
-        for idx in range(26):
-            gr = gr + g[idx] * gen_tally[idx]
-        gr = gr + g[26]
-        new_g = g
-        new_g[27] = gr
-        if gr > maxrank:
-            maxrank = gr
-        gendict.update({w: new_g})
-    return maxrank
-
-
-# returns list of the max genrankers in the gendict
-# that have a genrank equal to a given rank maxrank
-def get_maxgenrankers(gendict, maxrank) -> list:
-    max_rankers = []
-    for w, g in gendict.items():
-        if maxrank == g[27]:
-            max_rankers.append(w)
-    return max_rankers
 
 
 # returns a regex formatted pattern string for highlighting
@@ -470,53 +397,105 @@ def max_group_size(groups_dict: dict) -> tuple:
     return max_grp, max_size
 
 
-def ave_sum_sqr_group_size(groups_dict: dict) -> float:
+def group_stats(groups_dict: dict) -> tuple:
+    """
+    Given a guess group's dictionary and the guess, returns group stats:
+    pattern group quantity,
+    largest pattern group size,
+    average pattern group size
+    @param groups_dict:
+    @return: tuple - quantity, largest, average
+    """
+    sums = 0
+    largest = 0
+    qty = len(groups_dict)
+    for k, v in groups_dict.items():
+        size = len(v)
+        sums = sums + size
+        largest = max(largest, size)
+    return qty, largest, sums / qty
+
+
+def ave_group_size(groups_dict: dict) -> float:
     """
     Given a group's dictionary, returns the average of
-    the group sizes squared.
+    the group sizes.
     @param groups_dict:
-    @return: max group pattern, word count for that pattern
+    @return: average as float
     """
     sums = 0
     for k, v in groups_dict.items():
         sz = len(v)
-        sums = sums + (sz * sz)
+        sums = sums + sz
     return sums / len(groups_dict)
 
 
-def best_groups_guess_dict(word_lst: list) -> dict:
+def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
     and smaller groups are better guesses.
+    @param reporting: flag for verbose printing to rptwnd
     @param word_lst: possible guess words
     @return: dictionary of the best group ranked guesses
     """
     guess_rank_dict = {}
     best_rank_dict = {}
     min_score = len(word_lst)
+
+    if reporting:
+        rptwnd = RptWnd()
+        rptwnd.title("Group Pattern Reporting")
+        rptl = "-- Current Displayed Word List Pattern Groups --\n"
+        rptwnd.msg1.insert(tk.END, rptl)
+
     for guess in word_lst:
         groups_dict = groups_for_this_guess(guess, word_lst)
+        # grp_stats are: qty, largest, average as a tuple
+        grp_stats = group_stats(groups_dict)
 
-        # The following prints will crash pywt that is run by the start-pywt script.
-        # print(guess, groups_dict)
-        # print(guess + ' has ' + str(len(groups_dict.keys())) + ' groups, score is ' +
-        # str(ave_sum_sqr_group_size(groups_dict)))
+        if reporting:
+            rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
+            rptwnd.msg1.insert(tk.END, rptl)
+            data = tuple(str(x) for x in grp_stats)
+            rptl = '\n> qty: ' + data[0] + ', largest size: ' + data[1] + ', average size: ' + '{0:.3f}'.format(
+                grp_stats[2])
+            rptwnd.msg1.insert(tk.END, rptl)
+            rptwnd.msg1.insert(tk.END, '\n')
+            for key in sorted(groups_dict):
+                g = groups_dict[key]
+                rptl = 'pat: ' + key + ', ' + str(len(g)) + ' wrds: ' + ', '.join(g)
+                rptwnd.msg1.insert(tk.END, '\n' + rptl)
+            rptwnd.msg1.insert(tk.END, '\n')
 
-        # The score is calculated as the average of the group's squared sizes. This is to
-        # account for guesses that have the same number of groups but have a larger
-        # largest group than what other guesses have for their largest group.
-        group_score = ave_sum_sqr_group_size(groups_dict)
-        guess_rank_dict[guess] = group_score
-        min_score = min(group_score, min_score)
-    for guess in word_lst:
-        if guess_rank_dict[guess] == min_score:
-            if min_score not in best_rank_dict:
-                best_rank_dict[min_score] = [guess]
-            else:
-                best_rank_dict[min_score].append(guess)
-    # The following print will crash pywt that is run by the start-pywt script.
-    # print(best_rank_dict)
+        # The rank is calculated as the average of the group's sizes.
+        # Guesses that have the same number of groups but have a larger
+        # , largest group have equal prob. to other guesses having the same
+        # average.
+        guess_rank_dict[guess] = grp_stats
+
+        # Record the smallest average pattern groups size.
+        min_score = min(grp_stats[2], min_score)
+
+    # Populate the best_rank_dict with the best guesses.
+    for g, s in guess_rank_dict.items():
+        if s[2] == min_score:
+            if g not in best_rank_dict:
+                best_rank_dict[g] = s
+
+    if reporting:
+        wrds = list(best_rank_dict.keys())
+        rptl = '\nOptimal group guesses: ' + ', '.join(wrds)
+        rptwnd.msg1.insert(tk.END, rptl)
+        g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
+        optimal_rank = g_stats[2]
+        grps_qty = g_stats[0]
+        max_grp_size = g_stats[1]
+        rptl = "\nGroup qty: " + '{0:.0f}'.format(grps_qty) + \
+               ", max size: " + '{0:.0f}'.format(max_grp_size) + \
+               ", ave size: " + '{0:.2f}'.format(optimal_rank) + ")"
+        rptwnd.msg1.insert(tk.END, rptl)
+        rptwnd.msg1.see('end')
     return best_rank_dict
 
 
@@ -526,7 +505,7 @@ def best_groups_guess_dict(word_lst: list) -> dict:
 # pywordletool.
 class ShellCmdList:
     # The command list is by instance.
-    def __init__(self, list_file_name: str) -> NoReturn:
+    def __init__(self, list_file_name: str) -> None:
         self.shCMDlist = list()
         self.shCMDlist.append("cat " + list_file_name)
 
@@ -633,11 +612,6 @@ class ToolResults:
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
-    # aks to do
-    # Genetic note: We still want to know the letter freq rank for the genetic ranked words. The plan will
-    # be to show the normal ranked list with the highest genetics highlighted.
-    # Multiple highlighting is possible. Tested
-
     # Return the grepped word count
     def get_results_raw_cnt(self) -> str:
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
@@ -730,3 +704,55 @@ class CustomText(tk.Text):
             self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.tag_add(tag, "matchStart", "matchEnd")
             self.see(index)  # scroll widget to show the index's line
+
+
+# The help information window
+class RptWnd(ctk.CTkToplevel):
+
+    def clear_msg1(self) -> NoReturn:
+        self.msg1.configure(state='normal')
+        self.msg1.delete(1.0, tk.END)
+        self.msg1.configure(state='disabled')
+
+    def close_rpt(self) -> NoReturn:
+        self.destroy()
+
+    def __init__(self):
+        super().__init__()
+        self.resizable(width=True, height=True)
+        self.geometry('740x600')
+
+        font_tuple_n = ("Courier", 14, "normal")
+
+        self.info_frame = ctk.CTkFrame(self,
+                                       corner_radius=10,
+                                       borderwidth=0
+                                       )
+        self.info_frame.pack(fill='both',
+                             padx=2,
+                             pady=0,
+                             expand=True
+                             )
+        self.info_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
+        self.info_frame.grid_rowconfigure(0, weight=1)  # non-zero weight allows grid to expand
+        self.msg1 = tk.Text(self.info_frame,
+                            wrap='word',
+                            padx=6,
+                            pady=6,
+                            background='#dedede',
+                            borderwidth=0,
+                            highlightthickness=0
+                            )
+        self.msg1.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
+        self.msg1.configure(font=font_tuple_n)
+        # scrollbar for rpt
+        rpt_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
+        rpt_sb.grid(row=0, column=1, sticky='ens')
+
+        self.msg1.config(yscrollcommand=rpt_sb.set)
+        rpt_sb.config(command=self.msg1.yview)
+
+        button_q = ctk.CTkButton(self, text="Close",
+                                 command=self.close_rpt)
+        button_q.pack(side="right", padx=10, pady=10)
+        self.protocol("WM_DELETE_WINDOW", self.close_rpt)  # assign to closing button [X]
