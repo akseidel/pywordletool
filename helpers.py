@@ -706,7 +706,7 @@ class CustomText(tk.Text):
             self.see(index)  # scroll widget to show the index's line
 
 
-# The help information window
+# The verbose information window
 class RptWnd(ctk.CTkToplevel):
 
     def clear_msg1(self) -> NoReturn:
