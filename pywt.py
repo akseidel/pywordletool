@@ -267,33 +267,34 @@ class Pywordlemainwindow(ctk.CTk):
                 use_all_targets = self.use_all_targets.get()
                 # current displayed word list
                 word_list = list(the_word_list.keys())
-                optimal_group_guesses = {}
+                # optimal_group_guesses = {}
                 if not use_all_targets:
                     optimal_group_guesses = helpers.best_groups_guess_dict(word_list, self.verbose_grps.get())
                 else:
                     # get the entire possible guess list
-                    all_targets = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', letter_rank_file, True, 0) \
+                    all_targets = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
                         .get_ranked_results_wrd_lst(True)
-                    optimal_group_guesses = helpers.x_best_groups_guess_dict(word_list, self.verbose_grps.get(),
-                                                                             all_targets)
+                    optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list, self.verbose_grps.get(),
+                                                                                    all_targets)
 
-                lst_opt_group_guesses = list(optimal_group_guesses.keys())
-                g_stats = optimal_group_guesses[list(optimal_group_guesses.keys())[0]]
-                optimal_rank = g_stats[2]
-                grps_qty = g_stats[0]
-                max_grp_size = g_stats[1]
+                opt_group_guesses_as_list = list(optimal_group_guesses.keys())
+                stats_summary = helpers.groups_stat_summary(optimal_group_guesses)
                 if not use_all_targets:
-                    regex: str = helpers.regex_maxgenrankers(lst_opt_group_guesses, the_word_list)
+                    regex: str = helpers.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
                 else:
-                    lst_displayed = list(the_word_list.keys())
-                    lst_common = list(set(lst_displayed) & set(lst_opt_group_guesses))
-                    regex: str = helpers.regex_maxgenrankers(lst_common, the_word_list)
+                    # The displayed list may not have the words to highlight when use_all_targets.
+                    # Will highlight any common words.
+                    displayed_as_list = list(the_word_list.keys())
+                    words_in_common = list(set(displayed_as_list) & set(opt_group_guesses_as_list))
+                    regex: str = helpers.regex_maxgenrankers(words_in_common, the_word_list)
 
                 tx_result.highlight_pattern(regex, 'grp')
-                comment = " (" + str(len(lst_opt_group_guesses)) + " optimals " + \
-                          ", grp qty: " + '{0:.0f}'.format(grps_qty) + \
-                          ", max size: " + '{0:.0f}'.format(max_grp_size) + \
-                          ", ave size: " + '{0:.2f}'.format(optimal_rank) + ")"
+                comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
+                          ", grp qty: " + '{0:.0f}'.format(stats_summary[0]) + \
+                          ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
+                          ", max " + '{0:.0f}'.format(stats_summary[2]) + \
+                          ", ave " + '{0:.2f}'.format(stats_summary[3]) + \
+                          ", max p:" + '{0:.4f}'.format(stats_summary[4]) + ")"
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_grpoptimal:

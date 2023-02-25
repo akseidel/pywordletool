@@ -379,125 +379,103 @@ def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
     return groups_dict
 
 
-def max_group_size(groups_dict: dict) -> tuple:
+def get_a_groups_stats(a_groups_dict: dict) -> tuple:
     """
-    Given a group's dictionary, returns the group
-    pattern that has the maximum number of words
-    and that word count.
-    @param groups_dict:
-    @return: max group pattern, word count for that pattern
-    """
-    max_grp = ""
-    max_size = 0
-    for k, v in groups_dict.items():
-        sz = len(v)
-        if sz > max_size:
-            max_size = sz
-            max_grp = k
-    return max_grp, max_size
-
-
-def group_stats(groups_dict: dict) -> tuple:
-    """
-    Given a guess group's dictionary and the guess, returns group stats:
+    Given a single guess group's dictionary, returns stats:
     pattern group quantity,
+    smallest pattern group size,
     largest pattern group size,
     average pattern group size
-    @param groups_dict:
-    @return: tuple - quantity, largest, average
+    group probability
+    @param a_groups_dict: dictionary for a single guess group
+    @return: tuple - quantity, smallest, largest, average
     """
-    sums = 0
+    qty = len(a_groups_dict)
+    smallest = qty
     largest = 0
-    qty = len(groups_dict)
-    for k, v in groups_dict.items():
+    sums = 0
+    p = 0.0
+    invqty = 1 / qty
+    for k, v in a_groups_dict.items():
         size = len(v)
         sums = sums + size
         largest = max(largest, size)
-    return qty, largest, sums / qty
+        smallest = min(smallest, size)
+        p += invqty / size
+    p /= sums
+    return qty, smallest, largest, sums / qty, p
 
 
-def ave_group_size(groups_dict: dict) -> float:
+def groups_stat_summary(best_rank_dict: dict) -> tuple:
     """
-    Given a group's dictionary, returns the average of
-    the group sizes.
-    @param groups_dict:
-    @return: average as float
+    Summarizes the groups best_rank_dictionary, mainly to extract the
+    minimum and maximum group sizes
+    @param best_rank_dict:
+    @return: groups_stat_summary tuple: [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
     """
-    sums = 0
-    for k, v in groups_dict.items():
-        sz = len(v)
-        sums = sums + sz
-    return sums / len(groups_dict)
+    # grp_stats in best_rank_dict are: [0]:qty, [1]:smallest, [2]:largest, [3]:average as a tuple
+    # Each has same optimal_rank and grps_qty as [0]
+    g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
+    optimal_rank = g_stats[3]
+    grps_qty = g_stats[0]
+    # But not always max_grp_size, max_grp_size and max_grp_prob
+    min_grp_size = grps_qty
+    max_grp_size = 0
+    max_grp_prob = 0.0
+    for g_stats in best_rank_dict.values():
+        min_grp_size = min(g_stats[1], min_grp_size)
+        max_grp_size = max(g_stats[2], max_grp_size)
+        max_grp_prob = max(g_stats[4], max_grp_prob)
+    # groups_stat_summary are: [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
+    return grps_qty, min_grp_size, max_grp_size, optimal_rank, max_grp_prob
 
 
-def x_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict) -> dict:
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
     and smaller groups are better guesses.
     @param reporting: flag for verbose printing to rptwnd
     @param word_lst: possible guess words
+    @param all_targets: vocabulary dictionary
     @return: dictionary of the best group ranked guesses
     """
     guess_rank_dict = {}
     best_rank_dict = {}
     min_score = len(word_lst)
-
+    rptwnd = RptWnd()
+    rptwnd.withdraw()
     if reporting:
-        rptwnd = RptWnd()
-        rptwnd.title("Group Pattern Reporting")
-        rptl = "-- Current Vocabulary Words List (" + '{0:.0f}'.format(len(all_targets)) + " words) Pattern Groups --\n"
-        rptwnd.msg1.insert(tk.END, rptl)
+        rptwnd.deiconify()
+        reporting_header_to_window("Vocabulary", all_targets, rptwnd)
 
     for guess in all_targets.keys():
-        groups_dict = groups_for_this_guess(guess, word_lst)
-        # grp_stats are: qty, largest, average as a tuple
-        grp_stats = group_stats(groups_dict)
+        guess_groups_dict = groups_for_this_guess(guess, word_lst)
+        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:probability as a tuple
+        grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
-            rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
-            rptwnd.msg1.insert(tk.END, rptl)
-            data = tuple(str(x) for x in grp_stats)
-            rptl = '\n> qty: ' + data[0] + ', largest size: ' + data[1] + ', average size: ' + '{0:.3f}'.format(
-                grp_stats[2])
-            rptwnd.msg1.insert(tk.END, rptl)
-            rptwnd.msg1.insert(tk.END, '\n')
-            for key in sorted(groups_dict):
-                g = groups_dict[key]
-                rptl = 'pat: ' + key + ', ' + str(len(g)) + ' wrds: ' + ', '.join(g)
-                rptwnd.msg1.insert(tk.END, '\n' + rptl)
-            rptwnd.msg1.insert(tk.END, '\n')
+            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd)
 
         # The rank is calculated as the average of the group's sizes.
-        # Guesses that have the same number of groups but have a larger
-        # , largest group have equal prob. to other guesses having the same
-        # average.
+        # Guesses that have the same number of groups but have a larger largest group have a
+        # slightly higher prob. than other guesses having the same average.
+        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:probability as a tuple
         guess_rank_dict[guess] = grp_stats
 
         # Record the smallest average pattern groups size.
-        min_score = min(grp_stats[2], min_score)
+        min_score = min(grp_stats[3], min_score)
 
     # Populate the best_rank_dict with the best guesses.
+    # This dictionary's values are grp_stats tuples.
     for g, s in guess_rank_dict.items():
-        if s[2] == min_score:
+        if s[3] == min_score:
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
 
     if reporting:
-        wrds = list(best_rank_dict.keys())
-        rptl = "\nOut Of Current Vocabulary Words List Of " + '{0:.0f}'.format(len(all_targets)) + " Words"
-        rptwnd.msg1.insert(tk.END, rptl)
-        rptl = '\nOptimal group guesses: ' + ', '.join(wrds)
-        rptwnd.msg1.insert(tk.END, rptl)
-        g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
-        optimal_rank = g_stats[2]
-        grps_qty = g_stats[0]
-        max_grp_size = g_stats[1]
-        rptl = "\nGroup qty: " + '{0:.0f}'.format(grps_qty) + \
-               ", max size: " + '{0:.0f}'.format(max_grp_size) + \
-               ", ave size: " + '{0:.2f}'.format(optimal_rank) + ")"
-        rptwnd.msg1.insert(tk.END, rptl)
-        rptwnd.msg1.see('end')
+        reporting_summary_header_to_window("vocabulary", all_targets, best_rank_dict, rptwnd)
+        stats_summary_to_window(best_rank_dict, rptwnd)
     return best_rank_dict
 
 
@@ -508,68 +486,104 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
     and smaller groups are better guesses.
     @param reporting: flag for verbose printing to rptwnd
     @param word_lst: possible guess words
-    @return: dictionary of the best group ranked guesses
+    @return: dictionary of the best group ranked guesses where
+    guess words are the keys, grp_stats tuples are the values
+    grp_stats tuples are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:probability
     """
     guess_rank_dict = {}
     best_rank_dict = {}
     min_score = len(word_lst)
+    rptwnd = RptWnd()
+    rptwnd.withdraw()
 
     if reporting:
-        rptwnd = RptWnd()
-        rptwnd.title("Group Pattern Reporting")
-        rptl = "-- Current Displayed Words List (" + '{0:.0f}'.format(len(word_lst)) + " words) Pattern Groups --\n"
-        rptwnd.msg1.insert(tk.END, rptl)
+        rptwnd.deiconify()
+        reporting_header_to_window("Displayed", word_lst, rptwnd)
 
     for guess in word_lst:
-        groups_dict = groups_for_this_guess(guess, word_lst)
-        # grp_stats are: qty, largest, average as a tuple
-        grp_stats = group_stats(groups_dict)
+        guess_groups_dict = groups_for_this_guess(guess, word_lst)
+        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:probability as a tuple
+        grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
-            rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
-            rptwnd.msg1.insert(tk.END, rptl)
-            data = tuple(str(x) for x in grp_stats)
-            rptl = '\n> qty: ' + data[0] + ', largest size: ' + data[1] + ', average size: ' + '{0:.3f}'.format(
-                grp_stats[2])
-            rptwnd.msg1.insert(tk.END, rptl)
-            rptwnd.msg1.insert(tk.END, '\n')
-            for key in sorted(groups_dict):
-                g = groups_dict[key]
-                rptl = 'pat: ' + key + ', ' + str(len(g)) + ' wrds: ' + ', '.join(g)
-                rptwnd.msg1.insert(tk.END, '\n' + rptl)
-            rptwnd.msg1.insert(tk.END, '\n')
+            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd)
 
         # The rank is calculated as the average of the group's sizes.
-        # Guesses that have the same number of groups but have a larger
-        # , largest group have equal prob. to other guesses having the same
-        # average.
+        # Guesses that have the same number of groups but have a larger largest group have a
+        # slightly higher prob. than other guesses having the same average.
+        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:probability as a tuple
         guess_rank_dict[guess] = grp_stats
-
         # Record the smallest average pattern groups size.
-        min_score = min(grp_stats[2], min_score)
+        min_score = min(grp_stats[3], min_score)
 
     # Populate the best_rank_dict with the best guesses.
+    # This dictionary's values are grp_stats tuples.
     for g, s in guess_rank_dict.items():
-        if s[2] == min_score:
+        if s[3] == min_score:
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
 
+    # Reporting only the best ranking guesses. These were collected into the
+    # best_rank_dict dictionary of words as keys, grp_stats as values.
     if reporting:
-        wrds = list(best_rank_dict.keys())
-        rptl = "\nOut Of Current Displayed Words List Of " + '{0:.0f}'.format(len(word_lst)) + " Words"
-        rptwnd.msg1.insert(tk.END, rptl)
-        rptl = '\nOptimal group guesses: ' + ', '.join(wrds)
-        rptwnd.msg1.insert(tk.END, rptl)
-        g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
-        optimal_rank = g_stats[2]
-        grps_qty = g_stats[0]
-        max_grp_size = g_stats[1]
-        rptl = "\nGroup qty: " + '{0:.0f}'.format(grps_qty) + \
-               ", max size: " + '{0:.0f}'.format(max_grp_size) + \
-               ", ave size: " + '{0:.2f}'.format(optimal_rank) + ")"
+        reporting_summary_header_to_window("displayed", word_lst, best_rank_dict, rptwnd)
+        stats_summary_to_window(best_rank_dict, rptwnd)
+    return best_rank_dict
+
+
+def reporting_summary_header_to_window(msg: str, source_list: any, best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+    wrds = list(best_rank_dict.keys())
+    rptl = "\nIdentified in the current " + msg + " words list of " + \
+           '{0:.0f}'.format(len(source_list)) + " words."
+    rptwnd.msg1.insert(tk.END, rptl)
+    rptl = '\n{0:.0f}'.format(len(wrds)) + ' optimal group guesses: ' + ', '.join(wrds)
+    rptwnd.msg1.insert(tk.END, rptl)
+
+
+def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
+    rptwnd.title("Group Pattern Reporting")
+    rptl = "-- Current " + msg + " Words List (" + \
+           '{0:.0f}'.format(len(source_list)) + \
+           " words) Pattern Groups --\n"
+    rptwnd.msg1.insert(tk.END, rptl)
+
+
+def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict, rptwnd: ctk) -> NoReturn:
+    rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
+    rptwnd.msg1.insert(tk.END, rptl)
+    data = tuple(str(x) for x in grp_stats)
+    rptl = '\n> qty: ' + data[0] + \
+           ', smallest size: ' + data[1] + \
+           ', largest size: ' + data[2] + \
+           ', average size: ' + '{0:.3f}'.format(grp_stats[3]) + \
+           ', p: ' + '{0:.5f}'.format(grp_stats[4])
+    rptwnd.msg1.insert(tk.END, rptl)
+    rptwnd.msg1.insert(tk.END, '\n')
+    for key in sorted(guess_groups_dict):
+        g = guess_groups_dict[key]
+        rptl = 'pat: ' + key + ', ' + str(len(g)) + ' wrds: ' + ', '.join(g)
+        rptwnd.msg1.insert(tk.END, '\n' + rptl)
+    rptwnd.msg1.insert(tk.END, '\n')
+
+
+def stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+    # stats_summary [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
+    stats_summary = groups_stat_summary(best_rank_dict)
+    rptl = "\ngroup qty " + '{0:.0f}'.format(stats_summary[0]) + \
+           ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
+           ", max " + '{0:.0f}'.format(stats_summary[2]) + \
+           ", ave " + '{0:.3f}'.format(stats_summary[3]) + \
+           ", max p: " + '{0:.4f}'.format(stats_summary[4])
+    rptwnd.msg1.insert(tk.END, rptl)
+    rptwnd.msg1.see('end')
+    for w, s in best_rank_dict.items():
+        rptl = "\n" + w + " - sizes:" + \
+               " min " + '{0:.0f}'.format(s[1]) + \
+               ", max " + '{0:.0f}'.format(s[2]) + \
+               ", ave " + '{0:.3f}'.format(s[3]) + \
+               ", p: " + '{0:.4f}'.format(s[4])
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.see('end')
-    return best_rank_dict
 
 
 # A class used for holding list stack of the shell commands
@@ -695,8 +709,8 @@ class ToolResults:
 
     # Returns the status text line.
     def get_status(self) -> str:
-        status = 'Showing ' + str(self.ranked_cnt) + ' words from the ' + str(
-            self.get_results_raw_cnt()) + " duplicate letter word list."
+        status = str(self.ranked_cnt) + ' words shown from the ' + str(
+            self.get_results_raw_cnt()) + " full word list"
         return status
 
     # Returns the entire fully assembled grep command line. This line includes
