@@ -430,6 +430,77 @@ def ave_group_size(groups_dict: dict) -> float:
     return sums / len(groups_dict)
 
 
+def x_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict) -> dict:
+    """
+    Wraps guess word group ranking to return the best
+    group rank guesses. Guesses resulting in more groups
+    and smaller groups are better guesses.
+    @param reporting: flag for verbose printing to rptwnd
+    @param word_lst: possible guess words
+    @return: dictionary of the best group ranked guesses
+    """
+    guess_rank_dict = {}
+    best_rank_dict = {}
+    min_score = len(word_lst)
+
+    if reporting:
+        rptwnd = RptWnd()
+        rptwnd.title("Group Pattern Reporting")
+        rptl = "-- Current Vocabulary Words List (" + '{0:.0f}'.format(len(all_targets)) + " words) Pattern Groups --\n"
+        rptwnd.msg1.insert(tk.END, rptl)
+
+    for guess in all_targets.keys():
+        groups_dict = groups_for_this_guess(guess, word_lst)
+        # grp_stats are: qty, largest, average as a tuple
+        grp_stats = group_stats(groups_dict)
+
+        if reporting:
+            rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
+            rptwnd.msg1.insert(tk.END, rptl)
+            data = tuple(str(x) for x in grp_stats)
+            rptl = '\n> qty: ' + data[0] + ', largest size: ' + data[1] + ', average size: ' + '{0:.3f}'.format(
+                grp_stats[2])
+            rptwnd.msg1.insert(tk.END, rptl)
+            rptwnd.msg1.insert(tk.END, '\n')
+            for key in sorted(groups_dict):
+                g = groups_dict[key]
+                rptl = 'pat: ' + key + ', ' + str(len(g)) + ' wrds: ' + ', '.join(g)
+                rptwnd.msg1.insert(tk.END, '\n' + rptl)
+            rptwnd.msg1.insert(tk.END, '\n')
+
+        # The rank is calculated as the average of the group's sizes.
+        # Guesses that have the same number of groups but have a larger
+        # , largest group have equal prob. to other guesses having the same
+        # average.
+        guess_rank_dict[guess] = grp_stats
+
+        # Record the smallest average pattern groups size.
+        min_score = min(grp_stats[2], min_score)
+
+    # Populate the best_rank_dict with the best guesses.
+    for g, s in guess_rank_dict.items():
+        if s[2] == min_score:
+            if g not in best_rank_dict:
+                best_rank_dict[g] = s
+
+    if reporting:
+        wrds = list(best_rank_dict.keys())
+        rptl = "\nOut Of Current Vocabulary Words List Of " + '{0:.0f}'.format(len(all_targets)) + " Words"
+        rptwnd.msg1.insert(tk.END, rptl)
+        rptl = '\nOptimal group guesses: ' + ', '.join(wrds)
+        rptwnd.msg1.insert(tk.END, rptl)
+        g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
+        optimal_rank = g_stats[2]
+        grps_qty = g_stats[0]
+        max_grp_size = g_stats[1]
+        rptl = "\nGroup qty: " + '{0:.0f}'.format(grps_qty) + \
+               ", max size: " + '{0:.0f}'.format(max_grp_size) + \
+               ", ave size: " + '{0:.2f}'.format(optimal_rank) + ")"
+        rptwnd.msg1.insert(tk.END, rptl)
+        rptwnd.msg1.see('end')
+    return best_rank_dict
+
+
 def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
     """
     Wraps guess word group ranking to return the best
@@ -446,7 +517,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
     if reporting:
         rptwnd = RptWnd()
         rptwnd.title("Group Pattern Reporting")
-        rptl = "-- Current Displayed Word List Pattern Groups --\n"
+        rptl = "-- Current Displayed Words List (" + '{0:.0f}'.format(len(word_lst)) + " words) Pattern Groups --\n"
         rptwnd.msg1.insert(tk.END, rptl)
 
     for guess in word_lst:
@@ -485,6 +556,8 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
 
     if reporting:
         wrds = list(best_rank_dict.keys())
+        rptl = "\nOut Of Current Displayed Words List Of " + '{0:.0f}'.format(len(word_lst)) + " Words"
+        rptwnd.msg1.insert(tk.END, rptl)
         rptl = '\nOptimal group guesses: ' + ', '.join(wrds)
         rptwnd.msg1.insert(tk.END, rptl)
         g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]

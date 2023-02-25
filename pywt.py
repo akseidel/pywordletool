@@ -159,6 +159,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         ln_col = set_n_col(self)
         # set the Vars
+        self.use_all_targets = tk.BooleanVar(value=False)
         self.allow_dup_state = tk.BooleanVar(value=False)
         self.verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
@@ -171,7 +172,6 @@ class Pywordlemainwindow(ctk.CTk):
         self.pos_r = self.pos5.copy()
         self.pos_x = self.pos5.copy()
         self.sel_rando = False
-        # self.sel_genetic = False
         self.sel_grpoptimal = False
 
         # configure style
@@ -261,16 +261,36 @@ class Pywordlemainwindow(ctk.CTk):
 
             # group ranking
             if self.sel_grpoptimal and (n_items > 0):
+                # Flag to use all solutions as guesses instead of the current displayed word list. This is to allow
+                # option to group rank from the entire guess list.
+                # use_all_targets = True
+                use_all_targets = self.use_all_targets.get()
+                # current displayed word list
                 word_list = list(the_word_list.keys())
-                optimal_group_guesses = helpers.best_groups_guess_dict(word_list, self.verbose_grps.get())
-                opt_group_guesses = list(optimal_group_guesses.keys())
+                optimal_group_guesses = {}
+                if not use_all_targets:
+                    optimal_group_guesses = helpers.best_groups_guess_dict(word_list, self.verbose_grps.get())
+                else:
+                    # get the entire possible guess list
+                    all_targets = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', letter_rank_file, True, 0) \
+                        .get_ranked_results_wrd_lst(True)
+                    optimal_group_guesses = helpers.x_best_groups_guess_dict(word_list, self.verbose_grps.get(),
+                                                                             all_targets)
+
+                lst_opt_group_guesses = list(optimal_group_guesses.keys())
                 g_stats = optimal_group_guesses[list(optimal_group_guesses.keys())[0]]
                 optimal_rank = g_stats[2]
                 grps_qty = g_stats[0]
                 max_grp_size = g_stats[1]
-                regex: str = helpers.regex_maxgenrankers(opt_group_guesses, the_word_list)
+                if not use_all_targets:
+                    regex: str = helpers.regex_maxgenrankers(lst_opt_group_guesses, the_word_list)
+                else:
+                    lst_displayed = list(the_word_list.keys())
+                    lst_common = list(set(lst_displayed) & set(lst_opt_group_guesses))
+                    regex: str = helpers.regex_maxgenrankers(lst_common, the_word_list)
+
                 tx_result.highlight_pattern(regex, 'grp')
-                comment = " (" + str(len(opt_group_guesses)) + " optimals " + \
+                comment = " (" + str(len(lst_opt_group_guesses)) + " optimals " + \
                           ", grp qty: " + '{0:.0f}'.format(grps_qty) + \
                           ", max size: " + '{0:.0f}'.format(max_grp_size) + \
                           ", ave size: " + '{0:.2f}'.format(optimal_rank) + ")"
@@ -1225,10 +1245,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_rando = ctk.CTkButton(self.admin_frame, text="Pick A Random Word", width=40, command=pick_rando)
         self.bt_rando.pack(side=tk.TOP, padx=4, pady=3, fill=tk.X)
 
-        # self.bt_genetic = ctk.CTkButton(self.admin_frame, text="Show Highest Genetic Rank", width=40,
-        #                                 command=pick_genetic)
-        # self.bt_genetic.pack(side=tk.TOP, padx=6, pady=3, fill=tk.X)
-
+        # frame for groups section
         self.grp_frame = ttk.Frame(self.admin_frame)
         self.grp_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
 
@@ -1243,6 +1260,16 @@ class Pywordlemainwindow(ctk.CTk):
                                             offvalue=False
                                             )
         self.chk_grp_disp.pack(side=tk.LEFT, padx=0, pady=3)
+        # frame within groups frame for which list option
+        self.grp_lst_ops_frame = ttk.Frame(self.admin_frame)
+        self.grp_lst_ops_frame.pack(side=tk.BOTTOM, padx=0, pady=3, fill=tk.X)
+        rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Use Displayed List", variable=self.use_all_targets, value=0)
+        rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2, expand=True)
+        rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Use Vocabulary List", variable=self.use_all_targets, value=1)
+        rbrB.pack(side=tk.RIGHT, fill=tk.X, padx=0, pady=2, expand=True)
+
+
+        # end groups frame
 
         # === END OF ====== Application Controls ==========
 
