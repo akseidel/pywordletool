@@ -573,7 +573,7 @@ def stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
            ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
            ", max " + '{0:.0f}'.format(stats_summary[2]) + \
            ", ave " + '{0:.3f}'.format(stats_summary[3]) + \
-           ", max p: " + '{0:.4f}'.format(stats_summary[4])
+           ", max p: " + '{0:.5f}'.format(stats_summary[4])
     rptwnd.msg1.insert(tk.END, rptl)
     rptwnd.msg1.see('end')
     for w, s in best_rank_dict.items():
@@ -581,7 +581,7 @@ def stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
                " min " + '{0:.0f}'.format(s[1]) + \
                ", max " + '{0:.0f}'.format(s[2]) + \
                ", ave " + '{0:.3f}'.format(s[3]) + \
-               ", p: " + '{0:.4f}'.format(s[4])
+               ", p: " + '{0:.5f}'.format(s[4])
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.see('end')
 

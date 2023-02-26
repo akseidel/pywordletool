@@ -272,7 +272,7 @@ class Pywordlemainwindow(ctk.CTk):
                     optimal_group_guesses = helpers.best_groups_guess_dict(word_list, self.verbose_grps.get())
                 else:
                     # get the entire possible guess list
-                    all_targets = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
+                    all_targets = helpers.ToolResults(data_path, 'nyt_wordlist.txt', letter_rank_file, True, 0) \
                         .get_ranked_results_wrd_lst(True)
                     optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list, self.verbose_grps.get(),
                                                                                     all_targets)
@@ -1266,7 +1266,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.grp_lst_ops_frame.pack(side=tk.BOTTOM, padx=0, pady=3, fill=tk.X)
         rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Use Displayed List", variable=self.use_all_targets, value=0)
         rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2, expand=True)
-        rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Use Vocabulary List", variable=self.use_all_targets, value=1)
+        rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Very Large Vocabulary", variable=self.use_all_targets, value=1)
         rbrB.pack(side=tk.RIGHT, fill=tk.X, padx=0, pady=2, expand=True)
 
 
