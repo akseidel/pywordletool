@@ -533,8 +533,8 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
 
 def reporting_summary_header_to_window(msg: str, source_list: any, best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
     wrds = list(best_rank_dict.keys())
-    rptl = "\nIdentified in the current " + msg + " words list of " + \
-           '{0:.0f}'.format(len(source_list)) + " words."
+    rptl = "\n> >  Identified in the current " + msg + " words list of " + \
+           '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.msg1.insert(tk.END, rptl)
     rptl = '\n{0:.0f}'.format(len(wrds)) + ' optimal group guesses: ' + ', '.join(wrds)
     rptwnd.msg1.insert(tk.END, rptl)
@@ -542,9 +542,9 @@ def reporting_summary_header_to_window(msg: str, source_list: any, best_rank_dic
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
     rptwnd.title("Group Pattern Reporting")
-    rptl = "-- Current " + msg + " Words List (" + \
+    rptl = "> >  Current " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + \
-           " words) Pattern Groups --\n"
+           " words) Pattern Groups  < <\n"
     rptwnd.msg1.insert(tk.END, rptl)
 
 
