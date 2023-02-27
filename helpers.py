@@ -804,12 +804,19 @@ class RptWnd(ctk.CTkToplevel):
     def close_rpt(self) -> NoReturn:
         self.destroy()
 
+    def search_for_text(self):
+        search_text= ''
+        regex: search_text = self.search_text.get().strip()
+        if len(regex) > 0:
+            self.msg1.highlight_pattern(regex, 'grp')
+
     def __init__(self):
         super().__init__()
         self.resizable(width=True, height=True)
-        self.geometry('740x600')
+        self.geometry('780x600')
 
-        font_tuple_n = ("Courier", 14, "normal")
+        font_tuple_n = ("Courier", 12, "normal")
+        self.search_text = tk.StringVar()
 
         self.info_frame = ctk.CTkFrame(self,
                                        corner_radius=10,
@@ -822,16 +829,18 @@ class RptWnd(ctk.CTkToplevel):
                              )
         self.info_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         self.info_frame.grid_rowconfigure(0, weight=1)  # non-zero weight allows grid to expand
-        self.msg1 = tk.Text(self.info_frame,
-                            wrap='word',
-                            padx=6,
-                            pady=6,
-                            background='#dedede',
-                            borderwidth=0,
-                            highlightthickness=0
-                            )
+
+        self.msg1 = CustomText(self.info_frame,
+                               wrap='word',
+                               padx=6,
+                               pady=6,
+                               background='#dedede',
+                               borderwidth=0,
+                               highlightthickness=0
+                               )
         self.msg1.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
         self.msg1.configure(font=font_tuple_n)
+        self.msg1.tag_configure('grp', background='#ffd700')
         # scrollbar for rpt
         rpt_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
         rpt_sb.grid(row=0, column=1, sticky='ens')
@@ -843,3 +852,13 @@ class RptWnd(ctk.CTkToplevel):
                                  command=self.close_rpt)
         button_q.pack(side="right", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.close_rpt)  # assign to closing button [X]
+
+        entry_find = ctk.CTkEntry(self,
+                                  textvariable=self.search_text
+                                  )
+        entry_find.pack(side=tk.LEFT, padx=2, pady=10)
+
+        button_f = ctk.CTkButton(self, text="Find",
+                                 command=self.search_for_text
+                                 )
+        button_f.pack(side="left", padx=10, pady=10)
