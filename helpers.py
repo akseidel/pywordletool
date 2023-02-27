@@ -475,7 +475,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
 
     if reporting:
         reporting_summary_header_to_window("vocabulary", all_targets, best_rank_dict, rptwnd)
-        stats_summary_to_window(best_rank_dict, rptwnd)
+        stats_summary_footer_to_window(best_rank_dict, rptwnd)
     return best_rank_dict
 
 
@@ -527,7 +527,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
     # best_rank_dict dictionary of words as keys, grp_stats as values.
     if reporting:
         reporting_summary_header_to_window("displayed", word_lst, best_rank_dict, rptwnd)
-        stats_summary_to_window(best_rank_dict, rptwnd)
+        stats_summary_footer_to_window(best_rank_dict, rptwnd)
     return best_rank_dict
 
 
@@ -538,6 +538,7 @@ def reporting_summary_header_to_window(msg: str, source_list: any, best_rank_dic
     rptwnd.msg1.insert(tk.END, rptl)
     rptl = '\n{0:.0f}'.format(len(wrds)) + ' optimal group guesses: ' + ', '.join(wrds)
     rptwnd.msg1.insert(tk.END, rptl)
+
 
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
@@ -566,7 +567,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
     rptwnd.msg1.insert(tk.END, '\n')
 
 
-def stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+def stats_summary_footer_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
     # stats_summary [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
     stats_summary = groups_stat_summary(best_rank_dict)
     rptl = "\ngroup qty " + '{0:.0f}'.format(stats_summary[0]) + \
@@ -584,7 +585,8 @@ def stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
                ", p: " + '{0:.5f}'.format(s[4])
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.see('end')
-
+    # lock the text widget to prevent user editing
+    rptwnd.msg1.configure(state='disabled')
 
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
@@ -767,11 +769,13 @@ class CustomText(tk.Text):
         tk.Text.__init__(self, *args, **kwargs)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=True):
+                          regexp=True, remove_priors=True):
         """Apply the given tag to all text that matches the given pattern
         If 'regexp' is set to True, pattern will be treated as a regular
         expression according to Tcl's regular expression syntax.
         """
+        if remove_priors:
+            self.tag_remove(tag, "1.0", "end")
 
         start = self.index(start)
         end = self.index(end)
@@ -805,10 +809,10 @@ class RptWnd(ctk.CTkToplevel):
         self.destroy()
 
     def search_for_text(self):
-        search_text= ''
+        search_text = ''
         regex: search_text = self.search_text.get().strip()
-        if len(regex) > 0:
-            self.msg1.highlight_pattern(regex, 'grp')
+        if len(regex) > 4:
+            self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
 
     def __init__(self):
         super().__init__()
@@ -817,6 +821,7 @@ class RptWnd(ctk.CTkToplevel):
 
         font_tuple_n = ("Courier", 12, "normal")
         self.search_text = tk.StringVar()
+        self.search_text.set('for: ')
 
         self.info_frame = ctk.CTkFrame(self,
                                        corner_radius=10,
@@ -856,9 +861,9 @@ class RptWnd(ctk.CTkToplevel):
         entry_find = ctk.CTkEntry(self,
                                   textvariable=self.search_text
                                   )
-        entry_find.pack(side=tk.LEFT, padx=2, pady=10)
+        entry_find.pack(side=tk.LEFT, padx=10, pady=10)
 
         button_f = ctk.CTkButton(self, text="Find",
                                  command=self.search_for_text
                                  )
-        button_f.pack(side="left", padx=10, pady=10)
+        button_f.pack(side="left", padx=0, pady=10)

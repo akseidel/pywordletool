@@ -256,7 +256,7 @@ class Pywordlemainwindow(ctk.CTk):
                 rand_pick = word + mid_div + rank
                 # highlight the rand_pick, which also scrolls the widget
                 # to the rand_pick's line.
-                tx_result.highlight_pattern(rand_pick, 'ran')
+                tx_result.highlight_pattern(rand_pick, 'ran', remove_priors=False)
                 comment = " (1 random pick selected)"
 
             # group ranking
@@ -300,7 +300,7 @@ class Pywordlemainwindow(ctk.CTk):
                         words_in_common = list(set(displayed_as_list) & set(opt_group_guesses_as_list))
                         regex: str = helpers.regex_maxgenrankers(words_in_common, the_word_list)
 
-                tx_result.highlight_pattern(regex, 'grp')
+                tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
                 comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
                           ", grp qty: " + '{0:.0f}'.format(stats_summary[0]) + \
                           ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
