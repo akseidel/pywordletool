@@ -1257,10 +1257,10 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_grpA_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
 
         self.bt_zap = ctk.CTkButton(self.bt_grpA_frame, text="Clear All Settings", width=40, command=clear_all)
-        self.bt_zap.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
+        self.bt_zap.pack(side=tk.RIGHT, padx=4, pady=1, fill=tk.X, expand=True)
 
         self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Pick A Random", width=40, command=pick_rando)
-        self.bt_rando.pack(side=tk.RIGHT, padx=4, pady=1, fill=tk.X, expand=True)
+        self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
         # end frame for Clear and Random buttons
 
         # frame for groups section

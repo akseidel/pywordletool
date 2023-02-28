@@ -372,6 +372,7 @@ def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
     groups_dict = {}
     for subject_word in word_list:
         genpat = get_genpattern(subject_word, guess_word)
+
         if genpat not in groups_dict:
             groups_dict[genpat] = [subject_word]
         else:
@@ -542,10 +543,10 @@ def reporting_summary_header_to_window(msg: str, source_list: any, best_rank_dic
 
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
-    rptwnd.title("Group Pattern Reporting")
     rptl = "> >  Current " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + \
            " words) Pattern Groups  < <\n"
+    rptwnd.title(rptl)
     rptwnd.msg1.insert(tk.END, rptl)
 
 
