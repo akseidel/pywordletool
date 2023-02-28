@@ -261,6 +261,10 @@ class Pywordlemainwindow(ctk.CTk):
 
             # group ranking
             if self.sel_grpoptimal and (n_items > 0):
+                # Clear any highlighting prior to what could be a long wait.
+                tx_result.remove_tag('grp')
+                # This requires forcing TK to update the display now instead of later.
+                this_app.update()
                 # current displayed word list
                 word_list = list(the_word_list.keys())
                 # Flag to use various solutions as guesses instead of the current displayed word list.
@@ -448,7 +452,7 @@ class Pywordlemainwindow(ctk.CTk):
         # selected optimal group ranking in the result
         def pick_optimals() -> NoReturn:
             self.sel_grpoptimal = True
-            self.title("This Wordle Helper ... is busy, please wait.")
+            self.title("> > > ... Busy, Please Wait ... < < <")
             do_grep()
             self.title("This Wordle Helper")
             self.sel_grpoptimal = False

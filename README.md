@@ -81,11 +81,11 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * The max p value is the maximum probability discovered amongst the optimal guess words. Refer to the verbose output to see which optimal word has the maximum probability. It can vary. P values vary when guess words share the same average clue pattern group size but vary in their maximum clue pattern group size.
 * Optimal group analysis should be performed on the total selection list that contains multiple letters because the analysis is for selecting the solution versus guessing for letter discovery.
 
-!['Main Window Image'](InfoImages/PYWTVerboseGrpsTop.png)
+!['Main Window Image'](InfoImages/PYWTVerboseGrpsBot.png)
 
 * The **Verbose Report** **Find** button scrolls the report window to the last found search text instance, which will be highlighted. Include **'for: '** in the search text when searching for a guess word's pattern. Include **'qty: '**' when searching for guesses having the same group quantities. To avoid finding to many text instances the search text must have five or more characters, beware however; it is possible to hopelessly bog down the search when trying to highlight commonly found text. Verbose reports using the **Large** vocabulary can be 400,000 text lines. Verbose report text can be copy-pasted into text editors.
 
-!['Main Window Image'](InfoImages/PYWTVerboseGrpsBot.png)
+!['Main Window Image'](InfoImages/PYWTVerboseGrpsTop.png)
 
 ### Wordle Play Strategies
 

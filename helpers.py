@@ -371,7 +371,8 @@ def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
     """
     groups_dict = {}
     for subject_word in word_list:
-        genpat = get_genpattern(subject_word, guess_word)
+        # This appears to be the correct context.
+        genpat = get_genpattern(guess_word, subject_word)
 
         if genpat not in groups_dict:
             groups_dict[genpat] = [subject_word]
@@ -541,7 +542,6 @@ def reporting_summary_header_to_window(msg: str, source_list: any, best_rank_dic
     rptwnd.msg1.insert(tk.END, rptl)
 
 
-
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
     rptl = "> >  Current " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + \
@@ -588,6 +588,7 @@ def stats_summary_footer_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoRetur
         rptwnd.msg1.see('end')
     # lock the text widget to prevent user editing
     rptwnd.msg1.configure(state='disabled')
+
 
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
@@ -769,6 +770,9 @@ class CustomText(tk.Text):
     def __init__(self, *args, **kwargs):
         tk.Text.__init__(self, *args, **kwargs)
 
+    def remove_tag(self, tag):
+        self.tag_remove(tag, "1.0", "end")
+
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
                           regexp=True, remove_priors=True):
         """Apply the given tag to all text that matches the given pattern
@@ -776,7 +780,7 @@ class CustomText(tk.Text):
         expression according to Tcl's regular expression syntax.
         """
         if remove_priors:
-            self.tag_remove(tag, "1.0", "end")
+            self.remove_tag(tag)
 
         start = self.index(start)
         end = self.index(end)
