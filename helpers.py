@@ -392,20 +392,19 @@ def get_a_groups_stats(a_groups_dict: dict) -> tuple:
     @param a_groups_dict: dictionary for a single guess group
     @return: tuple - quantity, smallest, largest, average
     """
-    qty = len(a_groups_dict)
-    smallest = qty
+    g_qty = len(a_groups_dict)
+    smallest = g_qty
     largest = 0
     sums = 0
     p = 0.0
-    invqty = 1 / qty
     for k, v in a_groups_dict.items():
         size = len(v)
         sums = sums + size
         largest = max(largest, size)
         smallest = min(smallest, size)
-        p += invqty / size
-    p /= sums
-    return qty, smallest, largest, sums / qty, p
+        p += 1 / size
+    p /= sums * g_qty
+    return g_qty, smallest, largest, sums / g_qty, p
 
 
 def groups_stat_summary(best_rank_dict: dict) -> tuple:
@@ -563,7 +562,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
     rptwnd.msg1.insert(tk.END, '\n')
     for key in sorted(guess_groups_dict):
         g = guess_groups_dict[key]
-        rptl = 'pat: ' + key + ', ' + str(len(g)) + ' wrds: ' + ', '.join(g)
+        rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(g)
         rptwnd.msg1.insert(tk.END, '\n' + rptl)
     rptwnd.msg1.insert(tk.END, '\n')
 
