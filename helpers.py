@@ -553,11 +553,11 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
     rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
     rptwnd.msg1.insert(tk.END, rptl)
     data = tuple(str(x) for x in grp_stats)
-    rptl = '\n> qty: ' + data[0] + \
-           ', smallest size: ' + data[1] + \
-           ', largest size: ' + data[2] + \
-           ', average size: ' + '{0:.3f}'.format(grp_stats[3]) + \
-           ', p: ' + '{0:.5f}'.format(grp_stats[4])
+    rptl = '\n> qty ' + data[0] + \
+           ', smallest size ' + data[1] + \
+           ', largest size ' + data[2] + \
+           ', average size ' + '{0:.3f}'.format(grp_stats[3]) + \
+           ', p ' + '{0:.5f}'.format(grp_stats[4])
     rptwnd.msg1.insert(tk.END, rptl)
     rptwnd.msg1.insert(tk.END, '\n')
     for key in sorted(guess_groups_dict):
@@ -574,7 +574,7 @@ def stats_summary_footer_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoRetur
            ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
            ", max " + '{0:.0f}'.format(stats_summary[2]) + \
            ", ave " + '{0:.3f}'.format(stats_summary[3]) + \
-           ", max p: " + '{0:.5f}'.format(stats_summary[4])
+           ", max p " + '{0:.5f}'.format(stats_summary[4])
     rptwnd.msg1.insert(tk.END, rptl)
     rptwnd.msg1.see('end')
     for w, s in best_rank_dict.items():
@@ -582,7 +582,7 @@ def stats_summary_footer_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoRetur
                " min " + '{0:.0f}'.format(s[1]) + \
                ", max " + '{0:.0f}'.format(s[2]) + \
                ", ave " + '{0:.3f}'.format(s[3]) + \
-               ", p: " + '{0:.5f}'.format(s[4])
+               ", p " + '{0:.5f}'.format(s[4])
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.see('end')
     # lock the text widget to prevent user editing

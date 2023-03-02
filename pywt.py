@@ -306,11 +306,11 @@ class Pywordlemainwindow(ctk.CTk):
 
                 tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
                 comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
-                          ", grp qty: " + '{0:.0f}'.format(stats_summary[0]) + \
+                          ", grp qty " + '{0:.0f}'.format(stats_summary[0]) + \
                           ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
                           ", max " + '{0:.0f}'.format(stats_summary[2]) + \
                           ", ave " + '{0:.2f}'.format(stats_summary[3]) + \
-                          ", max p:" + '{0:.4f}'.format(stats_summary[4]) + ")"
+                          ", max p " + '{0:.4f}'.format(stats_summary[4]) + ")"
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_grpoptimal:
