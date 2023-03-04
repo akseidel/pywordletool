@@ -534,7 +534,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
 
 def reporting_summary_header_to_window(msg: str, source_list: any, best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
     wrds = list(best_rank_dict.keys())
-    rptl = "\n> >  Identified in the current " + msg + " words list of " + \
+    rptl = "\n> >  Groups summary for the " + msg + " words list of " + \
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.msg1.insert(tk.END, rptl)
     rptl = '\n{0:.0f}'.format(len(wrds)) + ' optimal group guesses: ' + ', '.join(wrds)
