@@ -278,16 +278,20 @@ class Pywordlemainwindow(ctk.CTk):
                         # get the entire possible solutions list
                         all_targets = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', letter_rank_file, True, 0) \
                             .get_ranked_results_wrd_lst(True)
+                        msg1 = 'Small Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
-                                                                                        all_targets)
+                                                                                        all_targets,
+                                                                                        msg1)
                     case 2:
                         # get the entire possible guess list
                         all_targets = helpers.ToolResults(data_path, 'nyt_wordlist.txt', letter_rank_file, True, 0) \
                             .get_ranked_results_wrd_lst(True)
+                        msg1 = 'Large Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
-                                                                                        all_targets)
+                                                                                        all_targets,
+                                                                                        msg1)
                     case _:
                         pass
 

@@ -434,7 +434,7 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple:
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, max_grp_prob
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict) -> dict:
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict, msg1: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
@@ -442,6 +442,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
     @param reporting: flag for verbose printing to rptwnd
     @param word_lst: possible guess words
     @param all_targets: vocabulary dictionary
+    @param msg1: text to pass to verbose window
     @return: dictionary of the best group ranked guesses
     """
     guess_rank_dict = {}
@@ -451,7 +452,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window("Vocabulary", all_targets, rptwnd)
+        reporting_header_to_window(msg1, all_targets, rptwnd)
 
     for guess in all_targets.keys():
         # pdepth and ptype are work in progress.
@@ -555,10 +556,10 @@ def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: c
 
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
-    rptl = "> >  Current " + msg + " Words List (" + \
-           '{0:.0f}'.format(len(source_list)) + \
-           " words) Pattern Groups  < <\n"
+    rptl = "Pattern Groups For Guesses From The " + msg + " Words List (" + \
+           '{0:.0f}'.format(len(source_list)) + ")"
     rptwnd.title(rptl)
+    rptl = "> >  " + rptl + "  < <\n"
     rptwnd.msg1.insert(tk.END, rptl)
 
 

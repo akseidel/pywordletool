@@ -19,7 +19,8 @@ def process_grp_list(g_word_lst: list) -> dict:
                                       0).get_ranked_results_wrd_lst(True)
     optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                     True,
-                                                                    all_targets)
+                                                                    all_targets,
+                                                                    'Large Vocabulary')
     return optimal_group_guesses
 
 
@@ -48,7 +49,7 @@ class GrpsDrillingMain(ctk.CTk):
 
     def __init__(self):
         super().__init__()
-        self.title("Groups Drilling")
+        self.title("Groups Drilling Using The Large Vocabulary")
         w_width = 1120
         w_height = 100
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
