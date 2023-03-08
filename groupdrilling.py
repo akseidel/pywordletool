@@ -29,14 +29,19 @@ class GrpsDrillingMain(ctk.CTk):
 
     def clean_grp_list(self):
         this_grp = self.grp_words_text.get()
-        this_lst = [x.strip(' ,\"\'0123456789()[]') for x in this_grp.split(',')]
+        # A paste from a spreadsheet row will be tab deliniated.
+        # Its newline character will be stripped later on.
+        this_grp = this_grp.replace('\t', ',')
+        # Strip unwanted characters that might be.
+        this_lst = [x.strip(' ,\"\'\n:;0123456789()[]') for x in this_grp.split(',')]
+        # Remove any empty strings from list.
+        this_lst = [i for i in this_lst if i]
         self.grp_words_text.set(', '.join(this_lst))
         if len(this_lst) > 2:
             self.title("> > > ... Busy, Please Wait ... < < <")
             self.update()
             process_grp_list(this_lst)
             self.title("Groups Drilling")
-
 
     def clear_list(self):
         self.grp_words_text.set('')
@@ -87,6 +92,7 @@ class GrpsDrillingMain(ctk.CTk):
 def drilling():
     drill_app: GrpsDrillingMain = GrpsDrillingMain()
     drill_app.mainloop()
+
 
 drill_app: GrpsDrillingMain = GrpsDrillingMain()
 drill_app.mainloop()
