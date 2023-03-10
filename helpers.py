@@ -203,7 +203,7 @@ def clear_scrn() -> NoReturn:
 
 
 # returns a regex formatted pattern string for highlighting
-def regex_maxgenrankers(max_rankers, wordsdict) -> str:
+def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
     pat_list = []
     mid_div = " : "
     for w in max_rankers:
@@ -594,11 +594,13 @@ def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> 
 
 
 def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+    rptwnd.msg1.insert(tk.END, opt_wrds_for_reporting(best_rank_dict))
+
+
+def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
     wrds = list(best_rank_dict.keys())
-    rptl = '\n> >  {0:.0f}'.format(len(wrds)) + ' Optimal group guess words:'
-    rptwnd.msg1.insert(tk.END, rptl)
-    rptl = '\n' + ', '.join(wrds)
-    rptwnd.msg1.insert(tk.END, rptl)
+    rptl = '\n> >  {0:.0f}'.format(len(wrds)) + ' Optimal group guess words:' + '\n' + ', '.join(wrds)
+    return rptl
 
 
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
@@ -860,7 +862,7 @@ class RptWnd(ctk.CTkToplevel):
         self.resizable(width=True, height=True)
         self.geometry('780x600')
 
-        font_tuple_n = ("Courier", 12, "normal")
+        font_tuple_n = ("Courier", 14, "normal")
         self.search_text = tk.StringVar()
         self.search_text.set('for: ')
 
