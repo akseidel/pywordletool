@@ -50,7 +50,7 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * Download the **pywtpackage.zip** release file from the repository releases link.
 * Unzip the **pywtpackage.zip** release file. It should unzip to be a folder named pywtpackage.
 * Rename the **pywtpackage** folder as you wish and place the folder with its contents to where you would like to keep it.
-* A file privilege for the **start-pywt.command** double-click-to-run convenience file needs to be changed for it to work. Use the command: ```chmod +x start-pywt.command``` executed in Terminal, at the file's folder, to make the change.
+* A file privilege for the **start-pywt.command** double-click-to-run convenience file needs to be changed for it to work. Use the command: ```chmod +x start-pywt.command``` executed in Terminal, at the file's folder, to make the change. The same applies to the other convenience files: **start-fmwm.command** and **start-groupdrilling.command**. For these use the commands: ```chmod +x start-fmwm.command``` and ```chmod +x start-groupdrilling.command``` executed in Terminal, at the file's folder, to make the changes.
 * In the zip package, this **README.md** file, the images it uses and a couple of files in the **worddata** folder regarding letter ranking may be deleted if desired. The only required files, and their associated folder, that are in **pywtpackage.zip** are:
   * **start-pywt.command**  (the double-click-to-run convenience file)
   * **pywt.py**             (the app.)
@@ -73,7 +73,7 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * Word rank represents relative occurrence probability; however, any word matching the filter could be the Wordle word regardless of its rank.
 
 ### Highlight Group Optimal
- 
+
 * **Highlight Group Optimal** identifies from the words in the current **Words Showing**, or in one of the vocabulary sources: **Small** or **Large**, that when used as a guess against the current word list will result in remaining choice lists containing the smallest number of choices ***when that guess is wrong***. In other words, any word you pick from a given list has an even chance of being the solution, but some picks leave you fewer remaining words to choose from, like only one word. It is possible for a word to leave only one word remaining for every which way that word was wrong. You would solve the Wordle in your next guess under that condition. **Highlight Group Optimal** identifies that word.
 * Groups are words that share a unique clue pattern. Thus, a group is an abstract that is both the clue pattern and the group of words. A separate window opens to report all the group pattern information when the **Verbose Report** checkbox is checked.
 * Assuming the various settings have not excluded the solution from the current words showing and considering the solution is a random list member, then dividing the list into many small choice groups will on average minimize the number of guess required to narrow down to the solution.
@@ -81,11 +81,23 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * The max p value is the maximum probability discovered amongst the optimal guess words. Refer to the verbose output to see which optimal word has the maximum probability. It can vary. P values vary when guess words share the same average clue pattern group size but vary in their maximum clue pattern group size.
 * Optimal group analysis should be performed on the total selection list that contains multiple letters because the analysis is for selecting the solution versus guessing for letter discovery.
 
-!['Main Window Image'](InfoImages/PYWTVerboseGrpsBot.png)
+!['Verbose Window Bottom Image'](InfoImages/PYWTVerboseGrpsBot.png)
 
 * The **Verbose Report** **Find** button scrolls the report window to the last found search text instance, which will be highlighted. Include **'for: '** in the search text when searching for a guess word's pattern. Include **'qty: '**' when searching for guesses having the same group quantities. To avoid finding to many text instances the search text must have five or more characters, beware however; it is possible to hopelessly bog down the search when trying to highlight commonly found text. Verbose reports using the **Large** vocabulary can be 400,000 text lines. Verbose report text can be copy-pasted into text editors.
 
-!['Main Window Image'](InfoImages/PYWTVerboseGrpsTop.png)
+!['Verbose Window Top Image'](InfoImages/PYWTVerboseGrpsTop.png)
+
+### Groupdrilling
+!['Group Drilling Main Window Image'](InfoImages/PYWTGroupDrillingMain.png)
+
+* **Groupdrilling.py** is a utility that performs a groups analysis using the large vocabulary against any group of words. It is intended for investigating a word group's effective size, in other words how easily a word's group resolves to a single word.
+* Copy a word group from any **Verbose Report** (or a spreadsheet row) and paste it into the **Groupdrilling** entry field. Text that includes rank numbers copied from the Helper words list may also be pasted. Pasted text will be properly formatted into a list and analysed when pressing the **Process** button.
+* With **Groupdrilling.py** running, one leaves the Helper's **Verbose Report** open using its **Find** feature to show a guess's groups. Copy and Paste a group to be further analysed into the **Groupdrilling.py** entry field. Then press the **Process** button. 
+* **Groupdrilling.py** summarizes the results and also opens a **Verbose Report** identical to the type shown by the Helper. The workflow allows one to leave the Helper's verbose window open to navigate to different guess word results to be then further investigated by pastes into the **Groupdrilling.py**.
+
+!['Group Drilling Result Window Image'](InfoImages/PYWTGroupDrillingResult.png)
+
+* The convenience script **start-groupdrilling.command** may be used to run **Groupdrilling.py**. **start-groupdrilling.command** will need to be made executable as described in **Installing the Wordle helper**.
 
 ### Wordle Play Strategies
 

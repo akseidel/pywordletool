@@ -64,8 +64,8 @@ class GrpsDrillingMain(ctk.CTk):
         entry_status = self.clean_the_grp_list()
         if not entry_status[0]:
             self.update()
-            tkinter.messagebox.showerror(title='Will Not Proceed', message='Not proceeding.\nOnly five letter words '
-                                                                           'allowed.')
+            tkinter.messagebox.showerror(title='Will Not Proceed',
+                                         message='Not proceeding.\nOnly five letter words allowed.')
             return
         this_lst = entry_status[1]
         if len(this_lst) > 2:
@@ -75,16 +75,18 @@ class GrpsDrillingMain(ctk.CTk):
             optimal_group_guesses = process_grp_list(this_lst)
             self.title("Groups Drilling")
         else:
-            tkinter.messagebox.showerror(title='Will Not Proceed', message='Three or more words are needed for finding'
-                                                                           ' groups.')
+            tkinter.messagebox.showerror(title='Will Not Proceed',
+                                         message='Three or more words are needed for finding groups.')
             return
-        # Common words will be highlighted.
+        # The words in common will be highlighted.
         words_in_common = list(set(this_lst) & set(optimal_group_guesses))
         regex: str = '|'.join(words_in_common)
         wrds = helpers.opt_wrds_for_reporting(optimal_group_guesses)
         self.tx_status.delete("1.0", "end")
+        self.tx_status.insert('end', '> >  ' + str(len(this_lst)) + ' submitted words')
         if len(words_in_common) > 0:
             self.tx_status.insert('end', self.common_msg)
+        self.tx_status.insert('end', helpers.groups_stats_summary_line(optimal_group_guesses))
         self.tx_status.insert('end', wrds)
         self.tx_status.see('1.0')
         self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False)

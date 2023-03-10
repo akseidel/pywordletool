@@ -582,6 +582,11 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
 
 
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+    rptwnd.msg1.insert(tk.END, groups_stats_summary_line(best_rank_dict))
+    rptwnd.msg1.see('end')
+
+
+def groups_stats_summary_line(best_rank_dict: dict) -> str:
     # stats_summary [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
     stats_summary = groups_stat_summary(best_rank_dict)
     rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(stats_summary[0]) + \
@@ -589,8 +594,7 @@ def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> 
            ", max " + '{0:.0f}'.format(stats_summary[2]) + \
            ", ave " + '{0:.3f}'.format(stats_summary[3]) + \
            ", max p " + '{0:.5f}'.format(stats_summary[4])
-    rptwnd.msg1.insert(tk.END, rptl)
-    rptwnd.msg1.see('end')
+    return rptl
 
 
 def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
