@@ -52,11 +52,15 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * Rename the **pywtpackage** folder as you wish and place the folder with its contents to where you would like to keep it.
 * A file privilege for the **start-pywt.command** double-click-to-run convenience file needs to be changed for it to work. Use the command: ```chmod +x start-pywt.command``` executed in Terminal, at the file's folder, to make the change. The same applies to the other convenience files: **start-fmwm.command** and **start-groupdrilling.command**. For these use the commands: ```chmod +x start-fmwm.command``` and ```chmod +x start-groupdrilling.command``` executed in Terminal, at the file's folder, to make the changes.
 * In the zip package, this **README.md** file, the images it uses and a couple of files in the **worddata** folder regarding letter ranking may be deleted if desired. The only required files, and their associated folder, that are in **pywtpackage.zip** are:
-  * **start-pywt.command**  (the double-click-to-run convenience file)
-  * **pywt.py**             (the app.)
+  * **start-pywt.command**  (the double-click-to-run convenience script file)
+  * **pywt.py**             (the wordle helper app.)
   * **helpers.py**          (a helper to the app.)
+  * **groupdrilling.py**    (a helper app for groups analysis)
+  * **start-groupdrilling.command** (convenience script file)
+  * **fmwm.py**             (a command line application to measure strategies)
+  * **start-fmwm.command**  (convenience script file to run fmwm.py)
   * **helpinfo.txt**        (help information)
-  * **letter_ranks.txt**    (letter ranking)
+  * **letter_ranks.txt**    (letter ranking data file)
   * **nyt_wordlist.txt**    (wordlist - shuffled)
   * **wo_nyt_wordlist.txt** (wordlist - shuffled)
 
