@@ -357,7 +357,7 @@ def get_genpattern(subject_word: str, target_word: str) -> str:
     return genpat
 
 
-def groups_for_this_guess(guess_word: str, word_list: list, pdepth: str, ptype: str) -> dict:
+def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
     """
     Returns a dictionary of the word groups the guess_word would result
     from applying the guess_word on the word_list. The key values will be
@@ -365,8 +365,6 @@ def groups_for_this_guess(guess_word: str, word_list: list, pdepth: str, ptype: 
     but at wrong position and 2 means letter is present and in correct position.
     @param guess_word: target word
     @param word_list: list of subject words
-    @param pdepth: work in progress
-    @param ptype: work in progress
     @return: The keys will be five-digit codes where 0 means letter is
     not present, 1 letter is present but at wrong position and 2 means letter
     is present and in correct position. Values are the words categorized by that code.
@@ -456,9 +454,9 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
 
     for guess in all_targets:
         # pdepth and ptype are work in progress.
-        pdepth = '.0'
-        ptype = '.0'
-        guess_groups_dict = groups_for_this_guess(guess, word_lst, pdepth, ptype)
+        # pdepth = '.0'
+        # ptype = '.0'
+        guess_groups_dict = groups_for_this_guess(guess, word_lst)
         # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:probability as a tuple
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
@@ -510,9 +508,9 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
 
     for guess in word_lst:
         # pdepth and ptype are work in progress.
-        pdepth = '.0'
-        ptype = '.0'
-        guess_groups_dict = groups_for_this_guess(guess, word_lst, pdepth, ptype)
+        # pdepth = '.0'
+        # ptype = '.0'
+        guess_groups_dict = groups_for_this_guess(guess, word_lst)
         # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:probability as a tuple
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
@@ -547,6 +545,7 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
     report_footer_stats_summary_to_window(best_rank_dict, rptwnd)
     report_footer_opt_wrds_to_window(best_rank_dict, rptwnd)
     report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
+    rptwnd.back_to_summary()
 
 
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
@@ -566,12 +565,12 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoRet
 def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict, rptwnd: ctk) -> NoReturn:
     rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
     rptwnd.msg1.insert(tk.END, rptl)
-    data = tuple(str(x) for x in grp_stats)
-    rptl = '\n> qty ' + data[0] + \
-           ', smallest size ' + data[1] + \
-           ', largest size ' + data[2] + \
-           ', average size ' + '{0:.3f}'.format(grp_stats[3]) + \
-           ', p ' + '{0:.5f}'.format(grp_stats[4])
+    (qty, smallest, largest, average, p) = grp_stats
+    rptl = '\n> qty ' + str(qty) + \
+           ', smallest size ' + str(smallest) + \
+           ', largest size ' + str(largest) + \
+           ', average size ' + '{0:.3f}'.format(average) + \
+           ', p ' + '{0:.5f}'.format(p)
     rptwnd.msg1.insert(tk.END, rptl)
     rptwnd.msg1.insert(tk.END, '\n')
     for key in sorted(guess_groups_dict):
@@ -588,12 +587,12 @@ def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> 
 
 def groups_stats_summary_line(best_rank_dict: dict) -> str:
     # stats_summary [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
-    stats_summary = groups_stat_summary(best_rank_dict)
-    rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(stats_summary[0]) + \
-           ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
-           ", max " + '{0:.0f}'.format(stats_summary[2]) + \
-           ", ave " + '{0:.3f}'.format(stats_summary[3]) + \
-           ", max p " + '{0:.5f}'.format(stats_summary[4])
+    (g_qty, g_min, g_max, g_ave, g_p) = groups_stat_summary(best_rank_dict)
+    rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(g_qty) + \
+           ", sizes: min " + '{0:.0f}'.format(g_min) + \
+           ", max " + '{0:.0f}'.format(g_max) + \
+           ", ave " + '{0:.3f}'.format(g_ave) + \
+           ", max p " + '{0:.5f}'.format(g_p)
     return rptl
 
 
@@ -609,16 +608,16 @@ def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
 
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
     # stats_summary [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
-    # stats_summary [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
     stats_summary = groups_stat_summary(best_rank_dict)
     rptl = '\n> >  Optimal guess word stats, each has group qty ' + '{0:.0f}'.format(stats_summary[0]) + ':'
     rptwnd.msg1.insert(tk.END, rptl)
     for w, s in best_rank_dict.items():
+        (_, g_min, g_max, g_ave, g_p) = s
         rptl = "\n" + w + " - sizes:" + \
-               " min " + '{0:.0f}'.format(s[1]) + \
-               ", max " + '{0:.0f}'.format(s[2]) + \
-               ", ave " + '{0:.3f}'.format(s[3]) + \
-               ", p " + '{0:.5f}'.format(s[4])
+               " min " + '{0:.0f}'.format(g_min) + \
+               ", max " + '{0:.0f}'.format(g_max) + \
+               ", ave " + '{0:.3f}'.format(g_ave) + \
+               ", p " + '{0:.5f}'.format(g_p)
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.see('end')
     # lock the text widget to prevent user editing
@@ -809,7 +808,7 @@ class CustomText(tk.Text):
         self.tag_remove(tag, "1.0", "end")
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=True, remove_priors=True):
+                          regexp=True, remove_priors=True, do_scroll=True):
         """Apply the given tag to all text that matches the given pattern
         If 'regexp' is set to True, pattern will be treated as a regular
         expression according to Tcl's regular expression syntax.
@@ -834,7 +833,8 @@ class CustomText(tk.Text):
             self.mark_set("matchStart", index)
             self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.tag_add(tag, "matchStart", "matchEnd")
-            self.see(index)  # scroll widget to show the index's line
+            if do_scroll:
+                self.see(index)  # scroll widget to show the index's line
 
 
 # The verbose information window
@@ -859,7 +859,6 @@ class RptWnd(ctk.CTkToplevel):
         regex: search_text = 'Groups summary'
         self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
         self.msg1.remove_tag('grp')
-        # self.search_text.set('for: ')
 
     def __init__(self):
         super().__init__()

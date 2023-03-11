@@ -61,13 +61,12 @@ class GrpsDrillingMain(ctk.CTk):
         return status, this_lst
 
     def process_entry_list(self):
-        entry_status = self.clean_the_grp_list()
-        if not entry_status[0]:
+        (entry_status, this_lst) = self.clean_the_grp_list()
+        if not entry_status:
             self.update()
             tkinter.messagebox.showerror(title='Will Not Proceed',
                                          message='Not proceeding.\nOnly five letter words allowed.')
             return
-        this_lst = entry_status[1]
         if len(this_lst) > 2:
             self.title("> > > ... Busy, Please Wait ... < < <")
             self.set_busy_status_msg()
@@ -78,10 +77,15 @@ class GrpsDrillingMain(ctk.CTk):
             tkinter.messagebox.showerror(title='Will Not Proceed',
                                          message='Three or more words are needed for finding groups.')
             return
+        # Report the results
+        self.report_results(this_lst, optimal_group_guesses)
+
+    def report_results(self, this_lst: list, optimal_group_guesses: dict) -> NoReturn:
         # The words in common will be highlighted.
         words_in_common = list(set(this_lst) & set(optimal_group_guesses))
         regex: str = '|'.join(words_in_common)
         wrds = helpers.opt_wrds_for_reporting(optimal_group_guesses)
+        self.tx_status.configure(state='normal')
         self.tx_status.delete("1.0", "end")
         self.tx_status.insert('end', '> >  ' + str(len(this_lst)) + ' submitted words')
         if len(words_in_common) > 0:
@@ -89,17 +93,22 @@ class GrpsDrillingMain(ctk.CTk):
         self.tx_status.insert('end', helpers.groups_stats_summary_line(optimal_group_guesses))
         self.tx_status.insert('end', wrds)
         self.tx_status.see('1.0')
-        self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False)
+        self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False, do_scroll=False)
+        self.tx_status.configure(state='disabled')
 
     def clear_list(self):
         self.grp_words_text.set('')
         self.set_default_status_msg()
 
     def set_default_status_msg(self):
+        self.tx_status.configure(state='normal')
         self.tx_status.replace('1.0', 'end', self.def_msg)
+        self.tx_status.configure(state='disabled')
 
     def set_busy_status_msg(self):
+        self.tx_status.configure(state='normal')
         self.tx_status.replace('1.0', 'end', 'Busy, please wait ...')
+        self.tx_status.configure(state='disabled')
 
     def __init__(self):
         super().__init__()

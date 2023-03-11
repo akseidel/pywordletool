@@ -272,11 +272,16 @@ class Pywordlemainwindow(ctk.CTk):
                 optimal_group_guesses = {}
                 match grps_guess_source:
                     case 0:
-                        optimal_group_guesses = helpers.best_groups_guess_dict(word_list, self.verbose_grps.get())
+                        optimal_group_guesses = helpers.best_groups_guess_dict(word_list,
+                                                                               self.verbose_grps.get())
+
                     case 1:
                         # get the entire possible solutions list
-                        all_targets = helpers.ToolResults(data_path, 'wo_nyt_wordlist.txt', letter_rank_file, True, 0) \
-                            .get_ranked_results_wrd_lst(True)
+                        all_targets = helpers.ToolResults(data_path,
+                                                          'wo_nyt_wordlist.txt',
+                                                          letter_rank_file,
+                                                          True,
+                                                          0).get_ranked_results_wrd_lst(True)
                         msg1 = 'Small Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
@@ -295,7 +300,7 @@ class Pywordlemainwindow(ctk.CTk):
                         pass
 
                 opt_group_guesses_as_list = list(optimal_group_guesses.keys())
-                stats_summary = helpers.groups_stat_summary(optimal_group_guesses)
+                (g_qty, g_min, g_max, g_ave, g_q) = helpers.groups_stat_summary(optimal_group_guesses)
                 match grps_guess_source:
                     case 0:
                         regex: str = helpers.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
@@ -309,11 +314,11 @@ class Pywordlemainwindow(ctk.CTk):
 
                 tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
                 comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
-                          ", grp qty " + '{0:.0f}'.format(stats_summary[0]) + \
-                          ", sizes: min " + '{0:.0f}'.format(stats_summary[1]) + \
-                          ", max " + '{0:.0f}'.format(stats_summary[2]) + \
-                          ", ave " + '{0:.2f}'.format(stats_summary[3]) + \
-                          ", max p " + '{0:.4f}'.format(stats_summary[4]) + ")"
+                          ", grp qty " + '{0:.0f}'.format(g_qty) + \
+                          ", sizes: min " + '{0:.0f}'.format(g_min) + \
+                          ", max " + '{0:.0f}'.format(g_max) + \
+                          ", ave " + '{0:.2f}'.format(g_ave) + \
+                          ", max p " + '{0:.4f}'.format(g_q) + ")"
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_grpoptimal:
