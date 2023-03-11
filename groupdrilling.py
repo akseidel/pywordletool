@@ -179,10 +179,12 @@ class GrpsDrillingMain(ctk.CTk):
 
 # end GrpsDrillingMain class
 
-def drilling():
+
+def main(args=None):
     drill_app: GrpsDrillingMain = GrpsDrillingMain()
     drill_app.mainloop()
 
 
-drill_app: GrpsDrillingMain = GrpsDrillingMain()
-drill_app.mainloop()
+# ====================================== main ================================================
+if __name__ == '__main__':
+    main()

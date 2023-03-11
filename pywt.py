@@ -121,7 +121,6 @@ class Pywordlemainwindow(ctk.CTk):
 
     def show_help(self) -> NoReturn:
         global help_showing
-        global this_app
         if help_showing is False:
             self.create_wnd_help()
             help_showing = True
@@ -264,7 +263,7 @@ class Pywordlemainwindow(ctk.CTk):
                 # Clear any highlighting prior to what could be a long wait.
                 tx_result.remove_tag('grp')
                 # This requires forcing TK to update the display now instead of later.
-                this_app.update()
+                self.update()
                 # current displayed word list
                 word_list = list(the_word_list.keys())
                 # Flag to use various solutions as guesses instead of the current displayed word list.
@@ -1390,5 +1389,11 @@ class Pywordlemainwindow(ctk.CTk):
 
 # end Pywordlemainwindow class
 
-this_app: Pywordlemainwindow = Pywordlemainwindow()
-this_app.mainloop()
+def main(args=None):
+    this_app: Pywordlemainwindow = Pywordlemainwindow()
+    this_app.mainloop()
+
+
+# ====================================== main ================================================
+if __name__ == '__main__':
+    main()

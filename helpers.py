@@ -454,7 +454,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
         rptwnd.deiconify()
         reporting_header_to_window(msg1, all_targets, rptwnd)
 
-    for guess in all_targets.keys():
+    for guess in all_targets:
         # pdepth and ptype are work in progress.
         pdepth = '.0'
         ptype = '.0'

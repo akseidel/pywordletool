@@ -700,6 +700,7 @@ starting_wrd = ''
 use_starting_wrd = -1
 run_type = -1
 first_run = True
+run_fname = ''
 do_every_wrd = False  # Process every vocabulary word as a target word.
 conditions = ''
 dur_tw = 0.0  # seconds to process word
@@ -721,8 +722,9 @@ ts_ppw = ''  # resume after word timestamp element
 # Records output to a CSV file having a timestamp like filename
 record_run = False
 
+
 # ====================================== main ================================================
-if __name__ == "__main__":
+def main(args=None):
     try:
         # These command line arguments processed next will override all previously set variables.
         process_any_arguments()
@@ -794,3 +796,8 @@ if __name__ == "__main__":
         sys.stdout.write(f'\033[K user canceled. \n')
         # Output any encountered query results.
         query_output(target_wrd)
+
+
+# ====================================== main ================================================
+if __name__ == "__main__":
+    main()
