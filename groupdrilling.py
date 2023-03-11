@@ -28,7 +28,7 @@ def process_grp_list(g_word_lst: list) -> dict:
 
 
 class GrpsDrillingMain(ctk.CTk):
-    common_msg = '> >  Highlighted words are common to both the entry words and the optimal group guess words.'
+    common_msg = '\n> >  Highlighted words are common to both the entry words and the optimal group guess words.'
     def_msg = 'Paste or write in the words list into the above entry field.' + \
               '\n\nRaw pastes from the This Wordle Helper will be automatically cleaned and converted to ' + \
               'a valid word list entry.'
