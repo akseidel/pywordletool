@@ -36,7 +36,7 @@ class GrpsDrillingMain(ctk.CTk):
     def close_rpt(self) -> NoReturn:
         self.destroy()
 
-    def clean_the_grp_list(self) -> tuple:
+    def clean_the_grp_list(self) -> tuple[bool, list[str]]:
         this_grp = self.grp_words_text.get()
         # First strip out numbers, like those that are rankings from
         # the wordle helper.
@@ -95,6 +95,7 @@ class GrpsDrillingMain(ctk.CTk):
         self.tx_status.see('1.0')
         self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False, do_scroll=False)
         self.tx_status.configure(state='disabled')
+        self.attributes("-topmost", True)
 
     def clear_list(self):
         self.grp_words_text.set('')

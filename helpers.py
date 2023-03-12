@@ -382,7 +382,7 @@ def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
     return groups_dict
 
 
-def get_a_groups_stats(a_groups_dict: dict) -> tuple:
+def get_a_groups_stats(a_groups_dict: dict) -> tuple[int, int, int, float, float]:
     """
     Given a single guess group's dictionary, returns stats:
     pattern group quantity,
@@ -408,7 +408,7 @@ def get_a_groups_stats(a_groups_dict: dict) -> tuple:
     return g_qty, smallest, largest, sums / g_qty, p
 
 
-def groups_stat_summary(best_rank_dict: dict) -> tuple:
+def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float]:
     """
     Summarizes the groups best_rank_dictionary, mainly to extract the
     minimum and maximum group sizes
@@ -425,9 +425,10 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple:
     max_grp_size = 0
     max_grp_prob = 0.0
     for g_stats in best_rank_dict.values():
-        min_grp_size = min(g_stats[1], min_grp_size)
-        max_grp_size = max(g_stats[2], max_grp_size)
-        max_grp_prob = max(g_stats[4], max_grp_prob)
+        (_, min_stat, max_stat, _, p_stat) = g_stats
+        min_grp_size = min(min_stat, min_grp_size)
+        max_grp_size = max(max_stat, max_grp_size)
+        max_grp_prob = max(p_stat, max_grp_prob)
     # groups_stat_summary are: [0]:qty, [1]:smallest, [2]:largest, [3]:average , [4]:max prob as a tuple
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, max_grp_prob
 
