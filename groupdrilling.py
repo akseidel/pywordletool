@@ -1,6 +1,11 @@
-import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
+# ----------------------------------------------------------------
+# groupdrilling akseidel 2/2023
+# ----------------------------------------------------------------
+import tkinter as tk  # assigns tkinter stuff to tk namespace so that
+# it may be separate from ttk
 import tkinter.messagebox
-import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
+import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
+# namespace so that tk is preserved
 from typing import NoReturn
 import customtkinter as ctk
 import helpers
@@ -72,13 +77,13 @@ class GrpsDrillingMain(ctk.CTk):
             self.set_busy_status_msg()
             self.update()
             optimal_group_guesses = process_grp_list(this_lst)
+            # Report the results
+            self.report_results(this_lst, optimal_group_guesses)
             self.title("Groups Drilling")
         else:
             tkinter.messagebox.showerror(title='Will Not Proceed',
                                          message='Three or more words are needed for finding groups.')
             return
-        # Report the results
-        self.report_results(this_lst, optimal_group_guesses)
 
     def report_results(self, this_lst: list, optimal_group_guesses: dict) -> NoReturn:
         # The words in common will be highlighted.

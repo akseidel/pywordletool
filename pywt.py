@@ -18,8 +18,10 @@
 #
 import os
 import random
-import tkinter as tk  # assigns tkinter stuff to tk namespace so that it may be separate from ttk
-import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk namespace so that tk is preserved
+import tkinter as tk  # assigns tkinter stuff to tk namespace so that
+# it may be separate from ttk
+import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
+# namespace so that tk is preserved
 from tkinter import messagebox
 from typing import NoReturn
 
