@@ -80,6 +80,8 @@ class GrpsDrillingMain(ctk.CTk):
             # Report the results
             self.report_results(this_lst, optimal_group_guesses)
             self.title("Groups Drilling")
+            self.deiconify()
+
         else:
             tkinter.messagebox.showerror(title='Will Not Proceed',
                                          message='Three or more words are needed for finding groups.')
@@ -100,7 +102,6 @@ class GrpsDrillingMain(ctk.CTk):
         self.tx_status.see('1.0')
         self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False, do_scroll=False)
         self.tx_status.configure(state='disabled')
-        self.attributes("-topmost", True)
 
     def clear_list(self):
         self.grp_words_text.set('')
