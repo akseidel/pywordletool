@@ -75,11 +75,14 @@ class GrpsDrillingMain(ctk.CTk):
         if len(this_lst) > 2:
             self.title("> > > ... Busy, Please Wait ... < < <")
             self.set_busy_status_msg()
+            self.button_process.configure(state='disabled')
             self.update()
             optimal_group_guesses = process_grp_list(this_lst)
             # Report the results
             self.report_results(this_lst, optimal_group_guesses)
             self.title("Groups Drilling")
+            self.button_process.configure(state='enabled')
+
             self.deiconify()
 
         else:
@@ -142,10 +145,10 @@ class GrpsDrillingMain(ctk.CTk):
         self.cnt_frame.pack(fill=tk.X, padx=8, pady=2)
 
         # controls
-        self.button_q = ctk.CTkButton(self.cnt_frame, text="Close",
-                                      width=80,
-                                      command=self.destroy)
-        self.button_q.pack(side="right", padx=10, pady=10)
+        self.button_close = ctk.CTkButton(self.cnt_frame, text="Close",
+                                          width=80,
+                                          command=self.destroy)
+        self.button_close.pack(side="right", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.destroy)  # assign to closing button [X]
 
         self.entry_find = ctk.CTkEntry(self.cnt_frame,
@@ -153,17 +156,17 @@ class GrpsDrillingMain(ctk.CTk):
                                        )
         self.entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=1, fill=tk.X)
 
-        self.button_f = ctk.CTkButton(self.cnt_frame, text="Process",
-                                      width=80,
-                                      command=self.process_entry_list
-                                      )
-        self.button_f.pack(side="left", padx=0, pady=10)
+        self.button_process = ctk.CTkButton(self.cnt_frame, text="Process",
+                                            width=80,
+                                            command=self.process_entry_list
+                                            )
+        self.button_process.pack(side="left", padx=0, pady=10)
 
-        self.button_f = ctk.CTkButton(self.cnt_frame, text="Clear",
-                                      width=40,
-                                      command=self.clear_list
-                                      )
-        self.button_f.pack(side="left", padx=6, pady=10)
+        self.button_clear = ctk.CTkButton(self.cnt_frame, text="Clear",
+                                          width=40,
+                                          command=self.clear_list
+                                          )
+        self.button_clear.pack(side="left", padx=6, pady=10)
 
         # status frame
         self.stat_frame = ctk.CTkFrame(self,

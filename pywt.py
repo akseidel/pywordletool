@@ -146,6 +146,20 @@ class Pywordlemainwindow(ctk.CTk):
             self.pos_pr_l.set(val_tup[0])
             # Only the letter combobox is matched to the selection letter.
 
+    def EnableOptimalControls(self, yesno: bool) -> NoReturn:
+        if yesno:
+            self.bt_groups.configure(state='active')
+            self.chk_grp_disp.configure(state='active')
+            self.rbrA.configure(state='active')
+            self.rbrB.configure(state='active')
+            self.rbrC.configure(state='active')
+        else:
+            self.bt_groups.configure(state='disabled')
+            self.chk_grp_disp.configure(state='disabled')
+            self.rbrA.configure(state='disabled')
+            self.rbrB.configure(state='disabled')
+            self.rbrC.configure(state='disabled')
+
     def __init__(self):
         super().__init__()
         self.wnd_help = None
@@ -262,6 +276,7 @@ class Pywordlemainwindow(ctk.CTk):
 
             # group ranking
             if self.sel_grpoptimal and (n_items > 0):
+                self.EnableOptimalControls(False)
                 # Clear any highlighting prior to what could be a long wait.
                 tx_result.remove_tag('grp')
                 # This requires forcing TK to update the display now instead of later.
@@ -321,6 +336,7 @@ class Pywordlemainwindow(ctk.CTk):
                           ", max " + '{0:.0f}'.format(g_max) + \
                           ", ave " + '{0:.2f}'.format(g_ave) + \
                           ", max p " + '{0:.4f}'.format(g_q) + ")"
+                self.EnableOptimalControls(True)
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_grpoptimal:
@@ -1298,12 +1314,13 @@ class Pywordlemainwindow(ctk.CTk):
                                                 labelanchor='n'
                                                 )
         self.grp_lst_ops_frame.pack(side=tk.TOP, padx=0, pady=4, fill=tk.X)
-        rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Words Showing", variable=self.grps_guess_source, value=0)
-        rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2, expand=True)
-        rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Small", variable=self.grps_guess_source, value=1)
-        rbrB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
-        rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large", variable=self.grps_guess_source, value=2)
-        rbrC.pack(side=tk.RIGHT, fill=tk.X, padx=0, pady=2, expand=True)
+        self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Words Showing", variable=self.grps_guess_source,
+                                    value=0)
+        self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2, expand=True)
+        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Small", variable=self.grps_guess_source, value=1)
+        self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large", variable=self.grps_guess_source, value=2)
+        self.rbrC.pack(side=tk.RIGHT, fill=tk.X, padx=0, pady=2, expand=True)
         # end labelframe within groups frame for which list option
 
         # end groups frame
