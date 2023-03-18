@@ -7,15 +7,16 @@
 * **In Use Main Window Shown Next to NYT Results:**
 !['In use Image Image'](InfoImages/PYWTInUse.png)
 * **Information Window:**
-  The information window explains the Helper features in detail. Its content is included at this Readme's end section. The previous two images are intended to show what the Helper does.
+  The information window explains the **Helper** features in detail. Its content is included at this Readme's end section. The previous two images are intended to show what the **Helper** does.
 !['Information Window Image'](InfoImages/PYWTHelp.png)
 
 ### What To Expect From This Helper
 
 * Expect nothing more than a helper with a thorough vocabulary that presents words only matching the letters you specify.
-* The Helper was created for investigating Wordle word pick strategies. Using the Helper removes the task of thinking up five-letter words to allow one to focus only on play strategy.
-* The Helper "knows" the words but not which word is the solution. As such the Helper ruins the game for those where thinking up words is the attraction to Wordle.
-* A companion to the helper is **fmwm.py**, the Finite Monkey Wordle Machine. With **fmwm.py** one can measure how many random guesses are required to solve Wordles. It can also find all the **Magic Words** present in the vocabulary for a given word. **Magic Words** reduce the selection guess pool to contain just the solution word. See [FMWM_Readme.md](FMWM_Readme.MD) for more information.
+* The **Helper** was created for investigating Wordle word pick strategies. Using the **Helper** removes the task of thinking up five-letter words to allow one to focus only on play strategy.
+* The **Helper** "knows" the words but not which word is the solution. As such the Helper ruins the game for those where thinking up words is the attraction to Wordle.
+* A companion to the **Helper** is **groupdrilling.py**, a word groups analyzer separate from the **Helper's** groups analyzer. Its purpose is for examining groups properties in a manor independent of the **Helper**  and thus without disturbing the **Helper's** current state.
+* Another companion to the **Helper** is **fmwm.py**, the Finite Monkey Wordle Machine. With **fmwm.py** one can measure how many random guesses are required to solve Wordles. It can also find all the **Magic Words** present in the vocabulary for a given word. **Magic Words** reduce the selection guess pool to contain just the solution word. See [FMWM_Readme.md](FMWM_Readme.MD) for more information.
 
 ### Running the Wordle helper
 
@@ -24,16 +25,18 @@
 * Enter the command: ```python3 pywt.py```
 * For Apple OSX and Linux systems double-clicking the **start-pywt.command** file in the **Finder** also starts the Wordle helper.
 
-### Running the Wordle helper with **start-pywt.command**
+### Running the Wordle Helper with **start-pywt.command**
 
 * **start-pywt.command** is a shell script intended for launching the Wordle helper from a computer's file browser. It should run the helper with a double-click after being properly setup.
-* Setting up **start-pywt.command** requires marking it an executable file. This is later described in **Installing the Wordle helper**
+* Setting up **start-pywt.command** requires marking it an executable file. This is later described in **Installing the Wordle Helper**
 * **start-pywt.command** checks for required components before launching the Wordle helper. It reports what components are missing and will not launch the Wordle helper when critical components are missing.
 * **start-pywt.command** output looks like this when it is launching the Wordle helper:
 !['start-pywt.command Image'](InfoImages/PYWTLauncher.png)
 
 ### Requirements
 
+* Linux, Apple OSX or Microsoft Windows running a Linux subsystem
+  * It should be possible to have the **Helper** running in a Linux subsystem running in Microsoft Windows, but these instructions do not explain how. The Linux subsystem would need to have OS components, like 'cat', 'grep' and 'bash' typically present on any Apple OSX or Linux system in addition to the python3, pip and customtkinter installs.  
 * python3: (<https://www.python.org/downloads/>)
 * pip: (<https://pypi.org/project/pip/>)
 * customtkinter
@@ -43,9 +46,9 @@
 After installing python3 and pip, the following commands entered in a Terminal window will install the 4.6.3 version of 'customtkinter':
 `pip3 install --upgrade customtkinter==4.6.3`
 
-* Note: As of this writing customtkinter is higher than version 4.6.3. Some prior to 4.6.3 versions and post 4.6.3 versions do not function properly. The result will be the Wordle helper not running at all with no feedback.  Version 4.6.3 works with this Helper in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
+* Note: As of this writing customtkinter is higher than version 4.6.3. Some prior to 4.6.3 versions and post 4.6.3 versions do not function properly. The result will be the Wordle **Helper** not running at all with no feedback.  Version 4.6.3 works with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
 
-### Installing the Wordle helper
+### Installing the Wordle Helper
 
 * Download the **pywtpackage.zip** release file from the repository releases link.
 * Unzip the **pywtpackage.zip** release file. It should unzip to be a folder named pywtpackage.
@@ -92,15 +95,17 @@ After installing python3 and pip, the following commands entered in a Terminal w
 !['Verbose Window Top Image'](InfoImages/PYWTVerboseGrpsTop.png)
 
 ### Groupdrilling
+
 !['Group Drilling Main Window Image'](InfoImages/PYWTGroupDrillingMain.png)
 
-* **Groupdrilling.py** is a utility that performs a groups analysis using the large vocabulary against any group of words. It is intended for investigating a word group's effective size, in other words how easily a word's group resolves to a single word.
-* Copy a word group from any **Verbose Report** (or a spreadsheet row) and paste it into the **Groupdrilling** entry field. Text that includes rank numbers copied from the Helper words list may also be pasted. Pasted text will be properly formatted into a list and analysed when pressing the **Process** button.
-* With **Groupdrilling.py** running, one leaves the Helper's **Verbose Report** open using its **Find** feature to show a guess's groups. Copy and Paste a group to be further analysed into the **Groupdrilling.py** entry field. Then press the **Process** button. 
-* **Groupdrilling.py** summarizes the results and also opens a **Verbose Report** identical to the type shown by the Helper. The workflow allows one to leave the Helper's verbose window open to navigate to different guess word results to be then further investigated by pastes into the **Groupdrilling.py**.
+* **Groupdrilling.py** is a utility that performs a groups analysis using the list, small and large vocabulary against any group of words. It is intended for investigating a word group's effective size, in other words how easily a word's group resolves to a single word.
+* Copy a word group from any **Verbose Report** (or a spreadsheet row) and paste it into the **Groupdrilling** entry field. Text that includes rank numbers copied from the Helper words list may also be pasted. Pasted text will be properly formatted into a list and analyzed when pressing the **Process** button. Pressing and releasing the **Return** keyboard key will instead clean and format the entry without starting the analyze process.
+* With **Groupdrilling.py** running, one leaves the Helper's **Verbose Report** open using its **Find** feature to show a guess's groups. Copy and Paste a group to be further analyzed into the **Groupdrilling.py** entry field. Then press the **Process** button. 
+* **Groupdrilling.py** summarizes the results and also opens a **Verbose Report** identical to the type shown by the Helper. The workflow allows one to leave the Helper's verbose groups window open to navigate to different guess word results that can be then investigated further by pastes into the **Groupdrilling.py**.
 
 !['Group Drilling Result Window Image'](InfoImages/PYWTGroupDrillingResult.png)
 
+* The **Groupdrilling.py** verbose report window is not being shown in this **README**. It is identical in function and appearance to the **Helper's** verbose report window.  
 * The convenience script **start-groupdrilling.command** may be used to run **Groupdrilling.py**. **start-groupdrilling.command** will need to be made executable as described in **Installing the Wordle helper**.
 
 ### Wordle Play Strategies

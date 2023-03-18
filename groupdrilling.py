@@ -18,17 +18,54 @@ data_path = 'worddata/'  # path from here to data folder
 letter_rank_file = 'letter_ranks.txt'
 
 
-def process_grp_list(g_word_lst: list) -> dict:
-    all_targets = helpers.ToolResults(data_path,
-                                      'nyt_wordlist.txt',
-                                      letter_rank_file,
-                                      True,
-                                      0).get_ranked_results_wrd_lst(True)
+def process_grp_list(self, g_word_lst: list) -> dict:
+    # all_targets = helpers.ToolResults(data_path,
+    #                                   'nyt_wordlist.txt',
+    #                                   letter_rank_file,
+    #                                   True,
+    #                                   0).get_ranked_results_wrd_lst(True)
+    #
+    # optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
+    #                                                                 True,
+    #                                                                 all_targets,
+    #                                                                 'Large Vocabulary')
 
-    optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
-                                                                    True,
-                                                                    all_targets,
-                                                                    'Large Vocabulary')
+    # Flag to use various solutions as guesses instead of the current displayed word list.
+    # This is allows the option to group rank from the entire guess list.
+    grps_guess_source = self.grps_guess_source.get()
+    optimal_group_guesses = {}
+    match grps_guess_source:
+        case 0:
+            optimal_group_guesses = helpers.best_groups_guess_dict(g_word_lst,
+                                                                   self.verbose_grps.get()
+                                                                   )
+
+        case 1:
+            # get the entire possible solutions list
+            all_targets = helpers.ToolResults(data_path,
+                                              'wo_nyt_wordlist.txt',
+                                              letter_rank_file,
+                                              True,
+                                              0).get_ranked_results_wrd_lst(True)
+            msg1 = 'Small Vocabulary'
+            optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
+                                                                            self.verbose_grps.get(),
+                                                                            all_targets,
+                                                                            msg1)
+        case 2:
+            # get the entire possible guess list
+            all_targets = helpers.ToolResults(data_path,
+                                              'nyt_wordlist.txt',
+                                              letter_rank_file,
+                                              True, 0).get_ranked_results_wrd_lst(True)
+            msg1 = 'Large Vocabulary'
+            optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
+                                                                            self.verbose_grps.get(),
+                                                                            all_targets,
+                                                                            msg1)
+        case _:
+            pass
+
     return optimal_group_guesses
 
 
@@ -41,11 +78,11 @@ class GrpsDrillingMain(ctk.CTk):
     def close_rpt(self) -> NoReturn:
         self.destroy()
 
-    def clean_the_grp_list(self) -> tuple[bool, list[str]]:
+    def clean_the_grp_list(self) -> tuple[bool, list[str], list[str]]:
         this_grp = self.grp_words_text.get()
         # First strip out numbers, like those that are rankings from
         # the wordle helper.
-        this_grp = re.sub('[-:;.0123456789()]', '', this_grp).lower()
+        this_grp = re.sub('[-:;.0123456789()~!@#$%^&*+_|?><`/{}]', '', this_grp).lower()
         # Let spaces comma separate the words. Commas will be used in a
         # later strip function that operates on section split by comma.
         # Empty words will be culled later on.
@@ -60,13 +97,15 @@ class GrpsDrillingMain(ctk.CTk):
         self.grp_words_text.set(', '.join(this_lst))
 
         status = True
+        bads = []
         for w in this_lst:
             if len(w) != 5:
                 status = False
-        return status, this_lst
+                bads.append(w)
+        return status, this_lst, bads
 
     def process_entry_list(self):
-        (entry_status, this_lst) = self.clean_the_grp_list()
+        (entry_status, this_lst, bads) = self.clean_the_grp_list()
         if not entry_status:
             self.update()
             tkinter.messagebox.showerror(title='Will Not Proceed',
@@ -77,7 +116,7 @@ class GrpsDrillingMain(ctk.CTk):
             self.set_busy_status_msg()
             self.button_process.configure(state='disabled')
             self.update()
-            optimal_group_guesses = process_grp_list(this_lst)
+            optimal_group_guesses = process_grp_list(self, this_lst)
             # Report the results
             self.report_results(this_lst, optimal_group_guesses)
             self.title("Groups Drilling")
@@ -120,6 +159,29 @@ class GrpsDrillingMain(ctk.CTk):
         self.tx_status.replace('1.0', 'end', 'Busy, please wait ...')
         self.tx_status.configure(state='disabled')
 
+    def title_status(self):
+        match self.grps_guess_source.get():
+            case 0:
+                self.title("Groups Drilling Using The Words Entered List For Guesses")
+            case 1:
+                self.title("Groups Drilling Using The Small Vocabulary For Guesses")
+            case 2:
+                self.title("Groups Drilling Using The Large Vocabulary For Guesses")
+            case _:
+                pass
+        # Focus is most likely best at the entry field.
+        self.entry_find.focus()
+
+    def on_list_entry_return_release(self, _):
+        (entry_status, this_lst, bads) = self.clean_the_grp_list()
+        if not entry_status:
+            self.update()
+            tkinter.messagebox.showerror(title='Entry Will Not Be Processed',
+                                         message='\nOnly five letter words allowed.'
+                                                 '\nCheck the entry for:'
+                                                 '\n{}'.format(str(bads)[1:-1])
+                                         )
+
     def __init__(self):
         super().__init__()
         self.title("Groups Drilling Using The Large Vocabulary")
@@ -131,6 +193,8 @@ class GrpsDrillingMain(ctk.CTk):
 
         # set the Vars
         self.grp_words_text = tk.StringVar()
+        self.grps_guess_source = tk.IntVar(value=0)
+        self.verbose_grps = tk.BooleanVar(value=True)
 
         # configure style
         style = ttk.Style()
@@ -145,28 +209,65 @@ class GrpsDrillingMain(ctk.CTk):
         self.cnt_frame.pack(fill=tk.X, padx=8, pady=2)
 
         # controls
-        self.button_close = ctk.CTkButton(self.cnt_frame, text="Close",
+
+        self.bts_frame = ctk.CTkFrame(self.cnt_frame,
+                                      corner_radius=10,
+                                      borderwidth=0
+                                      )
+        self.bts_frame.pack(fill=tk.X, padx=0, pady=2)
+
+        self.entry_find = ctk.CTkEntry(self.bts_frame,
+                                       textvariable=self.grp_words_text
+                                       )
+        self.entry_find.pack(side=tk.LEFT, padx=10, pady=6, expand=1, fill=tk.X)
+        self.entry_find.bind("<KeyRelease-Return>", self.on_list_entry_return_release)
+
+        self.button_close = ctk.CTkButton(self.bts_frame, text="Close",
                                           width=80,
                                           command=self.destroy)
         self.button_close.pack(side="right", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.destroy)  # assign to closing button [X]
 
-        self.entry_find = ctk.CTkEntry(self.cnt_frame,
-                                       textvariable=self.grp_words_text,
-                                       )
-        self.entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=1, fill=tk.X)
-
-        self.button_process = ctk.CTkButton(self.cnt_frame, text="Process",
+        self.button_process = ctk.CTkButton(self.bts_frame, text="Process",
                                             width=80,
                                             command=self.process_entry_list
                                             )
-        self.button_process.pack(side="left", padx=0, pady=10)
+        self.button_process.pack(side="left", padx=10, pady=10)
 
-        self.button_clear = ctk.CTkButton(self.cnt_frame, text="Clear",
+        self.button_clear = ctk.CTkButton(self.bts_frame, text="Clear",
                                           width=40,
                                           command=self.clear_list
                                           )
         self.button_clear.pack(side="left", padx=6, pady=10)
+
+        # labelframe within groups frame for which list option
+        self.grp_lst_ops_frame = ttk.LabelFrame(self,
+                                                text='Vocabulary Source For Guess Group Words:',
+                                                labelanchor='w'
+                                                )
+        self.grp_lst_ops_frame.pack(side=tk.TOP, padx=0, pady=4, fill=tk.X)
+        self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Words Entered",
+                                    variable=self.grps_guess_source, value=0,
+                                    command=self.title_status)
+        self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Small Vocabulary",
+                                    variable=self.grps_guess_source, value=1,
+                                    command=self.title_status)
+        self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large Vocabulary",
+                                    variable=self.grps_guess_source, value=2,
+                                    command=self.title_status)
+        self.rbrC.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+
+        # Show Verbose Report checkbox
+        self.chk_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
+                                            text="Show Verbose Report",
+                                            variable=self.verbose_grps,
+                                            onvalue=True,
+                                            offvalue=False
+                                            )
+        self.chk_grp_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+        # end labelframe within groups frame for which list option
 
         # status frame
         self.stat_frame = ctk.CTkFrame(self,
@@ -194,6 +295,8 @@ class GrpsDrillingMain(ctk.CTk):
         self.tx_status_sb.pack(side="right", fill=tk.Y)
         self.tx_status.config(yscrollcommand=self.tx_status_sb.set)
         self.tx_status_sb.config(command=self.tx_status.yview)
+        # Respond to initial state
+        self.title_status()
 
 
 # end GrpsDrillingMain class
