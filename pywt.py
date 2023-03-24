@@ -335,7 +335,7 @@ class Pywordlemainwindow(ctk.CTk):
                           ", sizes: min " + '{0:.0f}'.format(g_min) + \
                           ", max " + '{0:.0f}'.format(g_max) + \
                           ", ave " + '{0:.2f}'.format(g_ave) + \
-                          ", max p " + '{0:.4f}'.format(g_q) + ")"
+                          ", Lqty/max " + '{0:.3f}'.format(g_q) + ")"
                 self.EnableOptimalControls(True)
 
             tx_result.configure(state='disabled')

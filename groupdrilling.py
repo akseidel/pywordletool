@@ -19,17 +19,6 @@ letter_rank_file = 'letter_ranks.txt'
 
 
 def process_grp_list(self, g_word_lst: list) -> dict:
-    # all_targets = helpers.ToolResults(data_path,
-    #                                   'nyt_wordlist.txt',
-    #                                   letter_rank_file,
-    #                                   True,
-    #                                   0).get_ranked_results_wrd_lst(True)
-    #
-    # optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
-    #                                                                 True,
-    #                                                                 all_targets,
-    #                                                                 'Large Vocabulary')
-
     # Flag to use various solutions as guesses instead of the current displayed word list.
     # This is allows the option to group rank from the entire guess list.
     grps_guess_source = self.grps_guess_source.get()
@@ -109,7 +98,8 @@ class GrpsDrillingMain(ctk.CTk):
         if not entry_status:
             self.update()
             tkinter.messagebox.showerror(title='Will Not Proceed',
-                                         message='Not proceeding.\nOnly five letter words allowed.')
+                                         message='Not proceeding.\nOnly five letter words allowed.'
+                                         )
             return
         if len(this_lst) > 2:
             self.title("> > > ... Busy, Please Wait ... < < <")
@@ -126,7 +116,10 @@ class GrpsDrillingMain(ctk.CTk):
 
         else:
             tkinter.messagebox.showerror(title='Will Not Proceed',
-                                         message='Three or more words are needed for finding groups.')
+                                         message='Finding groups requires at least three words.'
+                                         '\nFor group of 2, E(G) is 1.5 when the guess is from the list.'
+                                         '\nOtherwise E(G) is 2.'
+                                         )
             return
 
     def report_results(self, this_lst: list, optimal_group_guesses: dict) -> NoReturn:
@@ -136,7 +129,7 @@ class GrpsDrillingMain(ctk.CTk):
         wrds = helpers.opt_wrds_for_reporting(optimal_group_guesses)
         self.tx_status.configure(state='normal')
         self.tx_status.delete("1.0", "end")
-        self.tx_status.insert('end', '> >  ' + str(len(this_lst)) + ' submitted words')
+        self.tx_status.insert('end', '> >  {} submitted words'.format(len(this_lst)))
         if len(words_in_common) > 0:
             self.tx_status.insert('end', self.common_msg)
         self.tx_status.insert('end', helpers.groups_stats_summary_line(optimal_group_guesses))
@@ -151,11 +144,23 @@ class GrpsDrillingMain(ctk.CTk):
         self.entry_find.focus()
 
     def clear_and_paste(self):
-        self.grp_words_text.set('')
         self.set_default_status_msg()
         self.entry_find.focus()
-        ntext = self.clipboard_get()
-        self.grp_words_text.set(ntext)
+        ntext = ''
+        try:
+            ntext = self.clipboard_get()
+        except tkinter.TclError:
+            tkinter.messagebox.showerror(title='Clipboard Is Empty',
+                                         message='\nThere is nothing to paste.'
+                                                 '\nFirst copy a group. Then use this. The clipboard will '
+                                                 'be empty afterwards.'
+                                         )
+            return
+        finally:
+            self.clipboard_clear()
+            if ntext:
+                self.grp_words_text.set(ntext)
+                self.just_clean_list()
 
     def set_default_status_msg(self):
         self.tx_status.configure(state='normal')
@@ -165,6 +170,12 @@ class GrpsDrillingMain(ctk.CTk):
     def set_busy_status_msg(self):
         self.tx_status.configure(state='normal')
         self.tx_status.replace('1.0', 'end', 'Busy, please wait ...')
+        self.tx_status.configure(state='disabled')
+
+    def set_clean_status_msg(self, this_lst: list[str]):
+        self.tx_status.configure(state='normal')
+        self.tx_status.delete("1.0", "end")
+        self.tx_status.insert('end', '> >  {} words ready'.format(len(this_lst)))
         self.tx_status.configure(state='disabled')
 
     def title_status(self):
@@ -181,6 +192,9 @@ class GrpsDrillingMain(ctk.CTk):
         self.entry_find.focus()
 
     def on_list_entry_return_release(self, _):
+        self.just_clean_list()
+
+    def just_clean_list(self):
         (entry_status, this_lst, bads) = self.clean_the_grp_list()
         if not entry_status:
             self.update()
@@ -189,6 +203,11 @@ class GrpsDrillingMain(ctk.CTk):
                                                  '\nCheck the entry for:'
                                                  '\n{}'.format(str(bads)[1:-1])
                                          )
+        else:
+            self.set_clean_status_msg(this_lst)
+            pass
+        self.focus()
+        self.entry_find.focus()
 
     def __init__(self):
         super().__init__()

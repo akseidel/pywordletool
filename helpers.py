@@ -24,10 +24,7 @@ def get_word_list_path_name(local_path_file_name: str) -> str:
         # print("Using " + local_path_file_name)
         return full_path_name
     else:
-        msg = 'The wordle word list file ' \
-              + local_path_file_name \
-              + ' was not found.' \
-              + ' Expected here:' + full_path_name
+        msg = f'The wordle word list file {local_path_file_name} was not found. Expected here: {full_path_name}'
         print(msg)
         print()
         messagebox.showerror(title='Stopping Here', message=msg)
@@ -49,9 +46,7 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
                 ltr.pop(0)
                 ltr_rank_dict[k] = [float(d) for d in ltr]  # want as floats
     else:
-        msg = "Letter ranking file " \
-              + local_path_rank_file \
-              + " not found. Switching to built in letter ranking."
+        msg = f'Letter ranking file {local_path_rank_file} not found. Switching to built in letter ranking.'
         print(msg)
         messagebox.showwarning('Warning', message=msg)
         ltr_rank_dict = {
@@ -295,7 +290,7 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
     # example 'grep -vE \'b|f|k|w\''
     if len(excl_l) > 0:
         args = pipe.join(excl_l)
-        grep_exclude = "grep -vE \'" + args + "\'"
+        grep_exclude = f"grep -vE \'{args}\'"
         wordle_tool.tool_command_list.add_cmd(grep_exclude)
 
     # Builds the grep line for requiring letters
@@ -303,7 +298,7 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
     if len(requ_l) > 0:
         itms = []
         for ltr in requ_l:
-            itms.append("grep -E \'" + ltr + "\'")
+            itms.append(f"grep -E \'{ltr}\'")
         grep_require_these = pipe2.join(itms)
         wordle_tool.tool_command_list.add_cmd(grep_require_these)
 
@@ -736,13 +731,10 @@ class ToolResults:
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
         with Popen(sh_cmd_for_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
             return proc.stdout.readline().strip()
-        # self.raw_cnt = os.popen(sh_cmd_for_cnt).read().strip()
-        # return self.raw_cnt
 
     # Returns the status text line.
     def get_status(self) -> str:
-        status = str(self.ranked_cnt) + ' words shown from the ' + str(
-            self.get_results_raw_cnt()) + " full word list"
+        status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.get_results_raw_cnt())
         return status
 
     # Returns the entire fully assembled grep command line. This line includes
@@ -775,10 +767,10 @@ class ToolResults:
         if verbose:
             print()
             if guess_no > 1:
-                print('Selection pool for guess ' + str(guess_no) + ' based on guess ' + str(
-                    guess_no - 1) + ' => ' + guess_wrd)
+                print('Selection pool for guess {} based on guess {} => {}'
+                      .format(guess_no, (guess_no - 1), guess_wrd))
             else:
-                print('Selection pool for guess ' + str(guess_no))
+                print('Selection pool for guess {}'.format(guess_no))
             print(self.get_status())
             print(self.get_cmd_less_filepath())
             print_word_list_col_format(the_word_list, 6)
