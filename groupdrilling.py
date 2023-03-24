@@ -148,6 +148,7 @@ class GrpsDrillingMain(ctk.CTk):
     def clear_list(self):
         self.grp_words_text.set('')
         self.set_default_status_msg()
+        self.entry_find.focus()
 
     def set_default_status_msg(self):
         self.tx_status.configure(state='normal')
@@ -243,9 +244,10 @@ class GrpsDrillingMain(ctk.CTk):
         # labelframe within groups frame for which list option
         self.grp_lst_ops_frame = ttk.LabelFrame(self,
                                                 text='Vocabulary Source For Guess Group Words:',
-                                                labelanchor='w'
+                                                labelanchor='w',
+                                                borderwidth=0
                                                 )
-        self.grp_lst_ops_frame.pack(side=tk.TOP, padx=0, pady=4, fill=tk.X)
+        self.grp_lst_ops_frame.pack(side=tk.TOP, padx=10, pady=4, fill=tk.X)
         self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Words Entered",
                                     variable=self.grps_guess_source, value=0,
                                     command=self.title_status)
