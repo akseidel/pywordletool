@@ -150,6 +150,13 @@ class GrpsDrillingMain(ctk.CTk):
         self.set_default_status_msg()
         self.entry_find.focus()
 
+    def clear_and_paste(self):
+        self.grp_words_text.set('')
+        self.set_default_status_msg()
+        self.entry_find.focus()
+        ntext = self.clipboard_get()
+        self.grp_words_text.set(ntext)
+
     def set_default_status_msg(self):
         self.tx_status.configure(state='normal')
         self.tx_status.replace('1.0', 'end', self.def_msg)
@@ -238,6 +245,12 @@ class GrpsDrillingMain(ctk.CTk):
         self.button_clear = ctk.CTkButton(self.bts_frame, text="Clear",
                                           width=40,
                                           command=self.clear_list
+                                          )
+        self.button_clear.pack(side="left", padx=6, pady=10)
+
+        self.button_clear = ctk.CTkButton(self.bts_frame, text="Clear 'N Paste",
+                                          width=40,
+                                          command=self.clear_and_paste
                                           )
         self.button_clear.pack(side="left", padx=6, pady=10)
 
