@@ -81,11 +81,10 @@ After installing python3 and pip, the following commands entered in a Terminal w
 
 ### Highlight Group Optimal
 
-* **Highlight Group Optimal** identifies from the words in the current **Words Showing**, or in one of the vocabulary sources: **Small** or **Large**, that when used as a guess against the current word list will result in remaining choice lists containing the smallest number of choices ***when that guess is wrong***. In other words, any word you pick from a given list has an even chance of being the solution, but some picks leave you fewer remaining words to choose from, like only one word. It is possible for a word to leave only one word remaining for every which way that word was wrong. You would solve the Wordle in your next guess under that condition. **Highlight Group Optimal** identifies that word.
+* **Highlight Group Optimal** identifies from the words in the current **Words Showing**, or in one of the vocabulary sources: **Small** or **Large**, that when used as a guess against the current **Words Showing** word list will result in remaining choice lists containing the smallest number of choices ***when that guess is wrong***. In other words, any word you pick from a given list has an even chance of being the solution, but some picks leave you fewer remaining words to choose from, like only one word. It is possible for a word to leave only one word remaining for every which way that word was wrong. You would solve the Wordle in your next guess under that condition. **Highlight Group Optimal** identifies that word.
 * Groups are words that share a unique clue pattern. Thus, a group is an abstract that is both the clue pattern and the group of words. A separate window opens to report all the group pattern information when the **Verbose Report** checkbox is checked.
 * Assuming the various settings have not excluded the solution from the current words showing and considering the solution is a random list member, then dividing the list into many small choice groups will on average minimize the number of guess required to narrow down to the solution.
-* The group optimal score is the clue pattern group average size resulting from a guess considered as the solution to the current words showing. The guess word source is an option, but the guess is always applied to the current words showing.
-* The **Lqty/max** value is the maximum found displayed list quantity to guess word's maximum sized group ratio. Higher ratios correspond to smaller expected subsequent guesses for the candidate guess word. It can vary. **Lqty/max** values vary when guess words share the same average clue pattern group size but vary in their maximum clue pattern group size. Refer to the verbose output to see which optimal word has the maximum **Lqty/max** value.
+* The **Lqty/max** value is the maximum found displayed list quantity to guess word's maximum sized group ratio. Higher ratios correspond to smaller expected subsequent guesses for the candidate guess word. It can vary. **Lqty/max** values vary when guess words share the same average clue pattern group size but vary in their maximum clue pattern group size. Refer to the verbose output to see which optimal word has the maximum **Lqty/max** value. 
 * The maximum value the **Lqty/max** ratio can be is the list size. When the ratio is the list size the solution will be the guess after the candidate guess when the candidate guess is not of the list. When the candidate guess is of the list there will be some chance the candidate guess is the solution. The solution will be the guess after the candidate guess when otherwise.  
 * Optimal group analysis should be performed on the total selection list that contains multiple letters because the analysis is for selecting the solution versus guessing for letter discovery.
 
@@ -95,20 +94,19 @@ After installing python3 and pip, the following commands entered in a Terminal w
 
 !['Verbose Window Top Image'](InfoImages/PYWTVerboseGrpsTop.png)
 
-### Groupdrilling
+### Groups Driller
 
 !['Group Drilling Main Window Image'](InfoImages/PYWTGroupDrillingMain.png)
 
-* **Groupdrilling.py** is a utility that performs a groups analysis using the list, small and large vocabulary against any group of words. It is intended for investigating a word group's effective size, in other words how easily a word's group resolves to a single word.
-* Copy a word group from any **Verbose Report** (or a spreadsheet row) and paste it into the **Groupdrilling** entry field. Text that includes rank numbers copied from the Helper words list may also be pasted. Pasted text will be properly formatted into a list and analyzed when pressing the **Process** button. Pressing and releasing the **Return** keyboard key will instead clean and format the entry without starting the analyze process.
+* **Groups Driller** is a side utility that performs a groups analysis using the list, small and large vocabulary against any group of words. It is intended for investigating a word group's effective size, in other words how easily a word's group resolves to a single word.
+* Copy a word group from any **Verbose Report** (or a spreadsheet row) and paste it into the **Groups Driller** entry field. Text that includes rank numbers copied from the Helper words list may also be pasted. Pasted text will be properly formatted into a list and analyzed when pressing the **Process** button. Pressing and releasing the **Return** keyboard key will instead clean and format the entry without starting the analyze process.
 * **Clear 'N Paste** clears the current list entries and pastes the current **Clipboard** to be the entry. The entry is then cleaned up. Whatever words you have copied last get pasted. The **Clipboard** will then be empty. **Clear 'N Paste** will not clear the current entry if the **Clipboard** happens to be empty.
-* With **Groupdrilling.py** running, one leaves the Helper's **Verbose Report** open using its **Find** feature to show a guess's groups. Copy and Paste a group to be further analyzed into the **Groupdrilling.py** entry field. Then press the **Process** button. 
-* **Groupdrilling.py** summarizes the results and also opens a **Verbose Report** identical to the type shown by the Helper. The workflow allows one to leave the Helper's verbose groups window open to navigate to different guess word results that can be then investigated further by pastes into the **Groupdrilling.py**.
+* With **Groups Driller** running, one leaves the Helper's **Verbose Report** open using its **Find** feature to show a guess's groups. Copy and Paste a group to be further analyzed into the **Groups Driller** entry field. Then press the **Process** button. 
+* **Groups Driller** summarizes the results and also opens a **Verbose Report** identical to the type shown by the Helper. The workflow allows one to leave the Helper's verbose groups window open to navigate to different guess word results that can be then investigated further by pastes into the **Group Driller**.
 
 !['Group Drilling Result Window Image'](InfoImages/PYWTGroupDrillingResult.png)
 
-* The **Groupdrilling.py** verbose report window is not being shown in this **README**. It is identical in function and appearance to the **Helper's** verbose report window.  
-* The convenience script **start-groupdrilling.command** may be used to run **Groupdrilling.py**. **start-groupdrilling.command** will need to be made executable as described in **Installing the Wordle helper**.
+* The **Group Driller** verbose report window is not being shown in this **README**. It is identical in function and appearance to the **Helper's** verbose report window.  
 
 ### Wordle Play Strategies
 

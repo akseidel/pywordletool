@@ -427,11 +427,12 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, max_grp_prob
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict, msg1: str) -> dict:
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict, msg1: str, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
     and smaller groups are better guesses.
+    @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
     @param word_lst: possible guess words
     @param all_targets: vocabulary dictionary
@@ -441,7 +442,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
     guess_rank_dict = {}
     best_rank_dict = {}
     min_score = len(word_lst)
-    rptwnd = RptWnd()
+    rptwnd = RptWnd(context)
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
@@ -477,11 +478,12 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
     return best_rank_dict
 
 
-def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
+def best_groups_guess_dict(word_lst: list, reporting: bool, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
     and smaller groups are better guesses.
+    @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
     @param word_lst: possible guess words
     @return: dictionary of the best group ranked guesses where
@@ -491,9 +493,8 @@ def best_groups_guess_dict(word_lst: list, reporting: bool) -> dict:
     guess_rank_dict = {}
     best_rank_dict = {}
     min_score = len(word_lst)
-    rptwnd = RptWnd()
+    rptwnd = RptWnd(context)
     rptwnd.withdraw()
-
     if reporting:
         rptwnd.deiconify()
         reporting_header_to_window("Displayed", word_lst, rptwnd)
@@ -544,7 +545,7 @@ def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: c
 
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
-    rptl = "Pattern Groups For Guesses From The " + msg + " Words List (" + \
+    rptl = rptwnd.context + " - Pattern Groups For Guesses From The " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + ")"
     rptwnd.title(rptl)
     rptl = "> >  " + rptl + "  < <\n"
@@ -846,8 +847,9 @@ class RptWnd(ctk.CTkToplevel):
         self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
         self.msg1.remove_tag('grp')
 
-    def __init__(self):
+    def __init__(self, context=''):
         super().__init__()
+        self.context = context
         self.resizable(width=True, height=True)
         self.geometry('780x600')
 
