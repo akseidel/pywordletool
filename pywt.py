@@ -24,10 +24,9 @@ import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
 # namespace so that tk is preserved
 from tkinter import messagebox
 from typing import NoReturn
-
 import customtkinter as ctk
-
 import helpers
+import groupdrilling
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -188,10 +187,17 @@ class Pywordlemainwindow(ctk.CTk):
         self.pos_x = self.pos5.copy()
         self.sel_rando = False
         self.sel_grpoptimal = False
+        self.grpsdriller_window = None
 
         # configure style
         style = ttk.Style()
         style.theme_use()
+
+        def show_grps_driller() -> NoReturn:
+            if self.grpsdriller_window is None or not self.grpsdriller_window.winfo_exists():
+                self.grpsdriller_window = groupdrilling.GrpsDrillingMain()  # create window if its None or destroyed
+            else:
+                self.grpsdriller_window.focus()  # if window exists focus it
 
         def do_grep() -> NoReturn:
             """Runs a wordletool helper grep instance
@@ -287,10 +293,12 @@ class Pywordlemainwindow(ctk.CTk):
                 # This is allows the option to group rank from the entire guess list.
                 grps_guess_source = self.grps_guess_source.get()
                 optimal_group_guesses = {}
+                context = "Wordle Helper"
                 match grps_guess_source:
                     case 0:
                         optimal_group_guesses = helpers.best_groups_guess_dict(word_list,
-                                                                               self.verbose_grps.get())
+                                                                               self.verbose_grps.get(),
+                                                                               context)
 
                     case 1:
                         # get the entire possible solutions list
@@ -303,7 +311,8 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         all_targets,
-                                                                                        msg1)
+                                                                                        msg1,
+                                                                                        context)
                     case 2:
                         # get the entire possible guess list
                         all_targets = helpers.ToolResults(data_path, 'nyt_wordlist.txt', letter_rank_file, True, 0) \
@@ -312,7 +321,8 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         all_targets,
-                                                                                        msg1)
+                                                                                        msg1,
+                                                                                        context)
                     case _:
                         pass
 
@@ -1279,8 +1289,16 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_Q = ctk.CTkButton(self.admin_frame, text="Quit", width=100, command=self.destroy)
         self.bt_Q.pack(side=tk.BOTTOM, padx=4, pady=2, fill=tk.X)
 
-        self.bt_help = ctk.CTkButton(self.admin_frame, text="Information", width=40, command=self.show_help)
-        self.bt_help.pack(side=tk.BOTTOM, padx=4, pady=3, fill=tk.X)
+        # frame for Information and Grp drill buttons
+        self.bt_grpB_frame = ttk.Frame(self.admin_frame)
+        self.bt_grpB_frame.pack(side=tk.BOTTOM, padx=0, pady=3, fill=tk.X)
+
+        self.bt_help = ctk.CTkButton(self.bt_grpB_frame, text="Information", width=40, command=self.show_help)
+        self.bt_help.pack(side=tk.LEFT, padx=4, pady=3, fill=tk.X, expand=True)
+
+        self.bt_drill = ctk.CTkButton(self.bt_grpB_frame, text="Groups Driller",
+                                      width=40, command=show_grps_driller)
+        self.bt_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
 
         # frame for Clear and Random buttons
         self.bt_grpA_frame = ttk.Frame(self.admin_frame)

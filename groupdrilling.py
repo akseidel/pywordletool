@@ -23,10 +23,12 @@ def process_grp_list(self, g_word_lst: list) -> dict:
     # This is allows the option to group rank from the entire guess list.
     grps_guess_source = self.grps_guess_source.get()
     optimal_group_guesses = {}
+    context = 'Groups Drilling'
     match grps_guess_source:
         case 0:
             optimal_group_guesses = helpers.best_groups_guess_dict(g_word_lst,
-                                                                   self.verbose_grps.get()
+                                                                   self.d_verbose_grps.get(),
+                                                                   context
                                                                    )
 
         case 1:
@@ -38,9 +40,11 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               0).get_ranked_results_wrd_lst(True)
             msg1 = 'Small Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
-                                                                            self.verbose_grps.get(),
+                                                                            self.d_verbose_grps.get(),
                                                                             all_targets,
-                                                                            msg1)
+                                                                            msg1,
+                                                                            context
+                                                                            )
         case 2:
             # get the entire possible guess list
             all_targets = helpers.ToolResults(data_path,
@@ -49,16 +53,18 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               True, 0).get_ranked_results_wrd_lst(True)
             msg1 = 'Large Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
-                                                                            self.verbose_grps.get(),
+                                                                            self.d_verbose_grps.get(),
                                                                             all_targets,
-                                                                            msg1)
+                                                                            msg1,
+                                                                            context
+                                                                            )
         case _:
             pass
 
     return optimal_group_guesses
 
 
-class GrpsDrillingMain(ctk.CTk):
+class GrpsDrillingMain(ctk.CTkToplevel):
     common_msg = '\n> >  Highlighted words are common to both the entry words and the optimal group guess words.'
     def_msg = 'Paste or write in the words list into the above entry field.' + \
               '\n\nRaw pastes from the This Wordle Helper will be automatically cleaned and converted to ' + \
@@ -117,8 +123,8 @@ class GrpsDrillingMain(ctk.CTk):
         else:
             tkinter.messagebox.showerror(title='Will Not Proceed',
                                          message='Finding groups requires at least three words.'
-                                         '\nFor group of 2, E(G) is 1.5 when the guess is from the list.'
-                                         '\nOtherwise E(G) is 2.'
+                                                 '\nFor group of 2, E(G) is 1.5 when the guess is from the list.'
+                                                 '\nOtherwise E(G) is 2.'
                                          )
             return
 
@@ -221,7 +227,7 @@ class GrpsDrillingMain(ctk.CTk):
         # set the Vars
         self.grp_words_text = tk.StringVar()
         self.grps_guess_source = tk.IntVar(value=0)
-        self.verbose_grps = tk.BooleanVar(value=True)
+        self.d_verbose_grps = tk.BooleanVar(value=True)
 
         # configure style
         style = ttk.Style()
@@ -296,7 +302,7 @@ class GrpsDrillingMain(ctk.CTk):
         # Show Verbose Report checkbox
         self.chk_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
                                             text="Show Verbose Report",
-                                            variable=self.verbose_grps,
+                                            variable=self.d_verbose_grps,
                                             onvalue=True,
                                             offvalue=False
                                             )
@@ -336,11 +342,11 @@ class GrpsDrillingMain(ctk.CTk):
 # end GrpsDrillingMain class
 
 
-def main(args=None):
+def mainloop(args=None):
     drill_app: GrpsDrillingMain = GrpsDrillingMain()
     drill_app.mainloop()
 
 
 # ====================================== main ================================================
 if __name__ == '__main__':
-    main()
+    mainloop()
