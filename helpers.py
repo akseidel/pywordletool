@@ -427,7 +427,8 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, max_grp_prob
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict, msg1: str, context: str) -> dict:
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict,
+                                    msg1: str, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups

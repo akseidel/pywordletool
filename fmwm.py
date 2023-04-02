@@ -457,7 +457,7 @@ def query_output(loc_target_wrd):
 
 
 def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
-    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set
+    global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set, run_fname
 
     if record_run:
         print('Output being written to ' + run_fname)
@@ -578,7 +578,7 @@ def magic_word_monkey(loc_wrd_x: int) -> NoReturn:
     @param loc_wrd_x:
     """
     global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set, \
-        query_mode, target_wrd, magic_order
+        query_mode, target_wrd, magic_order, run_fname
 
     if record_run:
         print('Output being written to ' + run_fname)
@@ -725,6 +725,7 @@ record_run = False
 
 # ====================================== main ================================================
 def main(args=None):
+    global run_fname, resume, dur_sf, target_wrd
     try:
         # These command line arguments processed next will override all previously set variables.
         process_any_arguments()
