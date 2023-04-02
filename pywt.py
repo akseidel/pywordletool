@@ -617,20 +617,25 @@ class Pywordlemainwindow(ctk.CTk):
         # letter position frame
         self.criteria_frame = ctk.CTkFrame(self,
                                            corner_radius=10,
-                                           borderwidth=0)
+                                           border=0,
+                                           borderwidth=0,
+                                           highlightthickness=0
+                                           )
         self.criteria_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=0)
 
         # letter exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
                                                text='Letters To Be Excluded',
-                                               border=0
+                                               border=0,
+                                               borderwidth=0
                                                )
         self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=4, pady=1)
 
         # letter require frame - uses pack
         self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
                                                text='Letters To Be Required',
-                                               border=0
+                                               border=0,
+                                               borderwidth=0
                                                )
         self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=4, pady=1)
 
@@ -645,7 +650,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.criteria_frame_px = ttk.LabelFrame(self.criteria_frame_p,
                                                 text='Exclude From Position',
                                                 labelanchor='n',
-                                                border=0
+                                                border=0,
+                                                borderwidth=0
                                                 )
         self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
 
@@ -653,7 +659,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
                                                 text='Require At Position',
                                                 labelanchor='n',
-                                                border=0
+                                                border=0,
+                                                borderwidth=0
                                                 )
         self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
 
