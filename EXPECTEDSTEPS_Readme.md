@@ -95,12 +95,15 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 * **Singleton** refers to a group containing only one word.
   * All **singleton** groups, except if it a "perfect match", are E( )=1. In the context of the guess falling into that non-perfect match group the guess step is already made. There will be only one word remaining, the solution, to select. That guess's non-perfect match group's contribution to the expected number of steps is p(Gi)*(1 + 1). Falling into that condition results in 2 steps total.
   * The **singleton** "perfect match" group is E( )=0. In the context of the guess falling into that perfect match group the guess step is already made. That guess's "perfect match" group's contribution to the expected number of steps is p(Gi)*(1 + 0). Falling into that condition results in 1 step total.
-* **Hole-In-One** refers to a groups result where every group contains only one word. In other words a guess used on a list of N words results in N number groups and thus there is a **largest size 1** reporting.
+* **Hole-In-One (HIO)** refers to a groups result where every group contains only one word. In other words a guess used on a list of N words results in N number groups and thus there is a **largest size 1** reporting.
   * An **out-of-pool** **hole-in-one** guess is an E( )=2. The solution will be in 2 steps, always. The first guess being the **out-of-pool** **hole-in-one** guess. The next guess being the solution.
   * An **in-pool** **hole-in-one** guess is an E( )<2. The E( ) varies according to N starting at 1.667 for N=3.
 * **In-Pool** refers to a guess selected from the remaining possible solutions pool. The day's Wordle solution is one of those remaining possible solutions. Which word is the solution is unknown but it's "perfect match" group can have only that word in it. It is a **singleton** group. The **singleton** "perfect match" group's E( )=0. **In-pool** categorization is useful when examining a guess having a **hole-in-one** groups result where every group is **singleton**.  This condition means the group has an E()<2 and by what amount can be significant.
 * **Out-Of-Pool** refers to a guess selected that is not a member of the remaining solutions. That guess might have been selected from a pool of words that included the remaining possible solutions but was not one of them. Such a guess cannot have the **singleton** "perfect match". **Out-of-pool** categorization is useful when examining a guess having a **hole-in-one** groups result where every group is **singleton**.  This condition means the group can be resolved to an E()=2 and no further examination is necessary.
 * **Groups with two words** always are an E( )=1.5. This is because the choice type into that condition has to be **in-pool** only. If **out-of-pool** choices were allowed then every choice for this condition could result in the same remaining two words. The expected number of steps could be infinite.
+
+#### E( ) Table
+
 | Word Count | Group Qty | E() in-pool HIO | E() out-of-pool HIO | in-pool | out-of-pool |
 | :--------: | :-------: | :-------------: | :-----------------: | :-----: | :---------: |
 | 2 | 2 | 1.50 |  na  |  na  |  na  |
@@ -111,3 +114,16 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 | 5 | 5 | 1.80 | 2.00 |  na  |  na  |
 | 5 | 4 |  na  |  na  | 2.00 | 2.20 |
 | 6 | 6 | 1.83 | 2.00 |  na  |  na  |
+| 6 | 5 |  na  |  na  |      |      |
+| 7 | 7 | 1.86 | 2.00 |  na  |  na  |
+| 7 | 6 |  na  |  na  |      |      |
+| 8 | 8 | 1.88 | 2.00 |  na  |  na  |
+| 8 | 7 |  na  |  na  |      |      |
+| 9 | 9 | 1.89 | 2.00 |  na  |  na  |
+| 9 | 8 |  na  |  na  | 2.00 | 2.11 |
+| 10 | 10 | 1.90 | 2.00 |  na  |  na  |
+| 10 |  9 |  na  |  na  |      |      |
+| 11 | 11 | 1.91 | 2.00 |  na  |  na  |
+| 11 | 10 |  na  |  na  |      |      |
+| 12 | 12 | 1.92 | 2.00 |  na  |  na  |
+| 12 | 11 |  na  |  na  |      |      |
