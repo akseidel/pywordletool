@@ -15,7 +15,7 @@
 * Expect nothing more than a helper with a thorough vocabulary that presents words only matching the letters you specify.
 * The **Helper** was created for investigating Wordle word pick strategies. Using the **Helper** removes the task of thinking up five-letter words to allow one to focus only on play strategy.
 * The **Helper** "knows" the words but not which word is the solution. As such the Helper ruins the game for those where thinking up words is the attraction to Wordle.
-* A companion to the **Helper** is **groupdrilling.py**, a word groups analyzer separate from the **Helper's** groups analyzer. Its purpose is for examining groups properties in a manor independent of the **Helper**  and thus without disturbing the **Helper's** current state.
+* A companion to the **Helper** is **groupdrilling.py**, a word groups analyzer separate from the **Helper's** groups analyzer. Its purpose is for examining groups properties in a manor independent of the **Helper**  and thus without disturbing the **Helper's** current state. Groups identified can be used to calculate the expected number of steps associated with any guess word. See [EXPECTEDSTEPS_Readme.md](EXPECTEDSTEPS_Readme.md) for more information.
 * Another companion to the **Helper** is **fmwm.py**, the Finite Monkey Wordle Machine. With **fmwm.py** one can measure how many random guesses are required to solve Wordles. It can also find all the **Magic Words** present in the vocabulary for a given word. **Magic Words** reduce the selection guess pool to contain just the solution word. See [FMWM_Readme.md](FMWM_Readme.MD) for more information.
 
 ### Running the Wordle helper
