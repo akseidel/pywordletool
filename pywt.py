@@ -298,6 +298,7 @@ class Pywordlemainwindow(ctk.CTk):
                     case 0:
                         optimal_group_guesses = helpers.best_groups_guess_dict(word_list,
                                                                                self.verbose_grps.get(),
+                                                                               False,
                                                                                context)
 
                     case 1:
@@ -310,6 +311,7 @@ class Pywordlemainwindow(ctk.CTk):
                         msg1 = 'Small Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
+                                                                                        False,
                                                                                         all_targets,
                                                                                         msg1,
                                                                                         context)
@@ -320,6 +322,7 @@ class Pywordlemainwindow(ctk.CTk):
                         msg1 = 'Large Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
+                                                                                        False,
                                                                                         all_targets,
                                                                                         msg1,
                                                                                         context)
