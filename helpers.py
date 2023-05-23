@@ -398,7 +398,7 @@ def get_a_groups_stats(a_groups_dict: dict) -> tuple[int, int, int, float, float
         largest = max(largest, size)
         smallest = min(smallest, size)
         p += 1 / size
-    lmr = sums/largest
+    lmr = sums / largest
     return g_qty, smallest, largest, sums / g_qty, lmr
 
 
@@ -427,7 +427,7 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, max_grp_prob
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets: dict,
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, all_targets: dict,
                                     msg1: str, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
@@ -435,6 +435,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
     and smaller groups are better guesses.
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
+    @param cond_rpt: flag for condensed verbose printing to rptwnd
     @param word_lst: possible guess words
     @param all_targets: vocabulary dictionary
     @param msg1: text to pass to verbose window
@@ -447,7 +448,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window(msg1, all_targets, rptwnd)
+        reporting_header_to_window(msg1, all_targets, rptwnd, cond_rpt)
 
     for guess in all_targets:
         guess_groups_dict = groups_for_this_guess(guess, word_lst)
@@ -455,7 +456,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
-            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd)
+            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt)
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
@@ -479,13 +480,14 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, all_targets
     return best_rank_dict
 
 
-def best_groups_guess_dict(word_lst: list, reporting: bool, context: str) -> dict:
+def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
     and smaller groups are better guesses.
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
+    @param cond_rpt: flag for condensed verbose printing to rptwnd
     @param word_lst: possible guess words
     @return: dictionary of the best group ranked guesses where
     guess words are the keys, grp_stats tuples are the values
@@ -498,7 +500,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, context: str) -> dic
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window("Displayed", word_lst, rptwnd)
+        reporting_header_to_window("Displayed", word_lst, rptwnd, cond_rpt)
 
     for guess in word_lst:
         guess_groups_dict = groups_for_this_guess(guess, word_lst)
@@ -506,7 +508,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, context: str) -> dic
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
-            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd)
+            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt)
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
@@ -540,35 +542,50 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
 
 
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
-    rptl = "\n> >  Groups summary for the " + msg + " words list of " + \
+    rptl = "\n\n> >  Groups summary for the " + msg + " words list of " + \
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.msg1.insert(tk.END, rptl)
 
 
-def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
+def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt: bool) -> NoReturn:
     rptl = rptwnd.context + " - Pattern Groups For Guesses From The " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + ")"
     rptwnd.title(rptl)
-    rptl = "> >  " + rptl + "  < <\n"
+    rptl = "> >  " + rptl + "  < <"
     rptwnd.msg1.insert(tk.END, rptl)
+    if cond_rpt:
+        rptl = '\n\nguess' + '\tqty' + \
+               '\tmin' + \
+               '\tmax' + \
+               '\tave' + \
+               '\twrds/max'
+        rptwnd.msg1.insert(tk.END, rptl)
 
 
-def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict, rptwnd: ctk) -> NoReturn:
-    rptl = '\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
-    rptwnd.msg1.insert(tk.END, rptl)
+def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict,
+                                  rptwnd: ctk, cond_rpt: bool) -> NoReturn:
     (qty, smallest, largest, average, lmr) = grp_stats
-    rptl = '\n> qty ' + str(qty) + \
-           ', smallest size ' + str(smallest) + \
-           ', largest size ' + str(largest) + \
-           ', average size ' + '{0:.3f}'.format(average) + \
-           ', Lqty/largest ' + '{0:.2f}'.format(lmr)
-    rptwnd.msg1.insert(tk.END, rptl)
-    rptwnd.msg1.insert(tk.END, '\n')
-    for key in sorted(guess_groups_dict):
-        g = guess_groups_dict[key]
-        rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(g)
-        rptwnd.msg1.insert(tk.END, '\n' + rptl)
-    rptwnd.msg1.insert(tk.END, '\n')
+    if not cond_rpt:
+        rptl = '\n\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
+        rptwnd.msg1.insert(tk.END, rptl)
+        rptl = '\n> qty ' + str(qty) + \
+               ', smallest size ' + str(smallest) + \
+               ', largest size ' + str(largest) + \
+               ', average size ' + '{0:.3f}'.format(average) + \
+               ', Lqty/largest ' + '{0:.2f}'.format(lmr)
+        rptwnd.msg1.insert(tk.END, rptl)
+        rptwnd.msg1.insert(tk.END, '\n')
+        for key in sorted(guess_groups_dict):
+            g = guess_groups_dict[key]
+            rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(g)
+            rptwnd.msg1.insert(tk.END, '\n' + rptl)
+    else:
+        rptl = '\n' + guess + '\t' + str(qty) + \
+               '\t' + str(smallest) + \
+               '\t' + str(largest) + \
+               '\t' + '{0:.3f}'.format(average) + \
+               '\t' + '{0:.2f}'.format(lmr)
+        rptwnd.msg1.insert(tk.END, rptl)
 
 
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
