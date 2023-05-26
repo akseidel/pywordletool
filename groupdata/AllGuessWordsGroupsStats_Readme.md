@@ -8,4 +8,4 @@
 * This list is sorted according to the number of word groups generated (descending), then by the maximum group size (ascending) and then by the average group size (ascending).
 * The **Group Driller** **Condensed** verbose output created the content shown in this list.
 
-#### [AllGuessWordsGroupsStats.csv.txt](/AllGuessWordsGroupsStats.csv.txt)
+#### [AllGuessWordsGroupsStats.csv.txt](AllGuessWordsGroupsStats.csv.txt)
