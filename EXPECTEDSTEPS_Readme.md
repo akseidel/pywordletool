@@ -21,7 +21,6 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 ## Calculating E( )
 
 * Using the Wordle Helper's **Group Optimal** or **Groups Driller** components one can manually figure the expected number of steps E() of any “guess” because these components identify the groups associated with a guess. These Wordle Helper components operate using all the possible guesses available in whatever guess pool that is selected.
-*(to do: explain)
 
 ### Example
 
