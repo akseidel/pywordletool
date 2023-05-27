@@ -18,3 +18,7 @@
 * The **Group Driller** **Condensed** verbose output created the content shown in this list.
 
 #### [AllGuessWordsGroupsStats.csv.txt](AllGuessWordsGroupsStats.csv.txt)
+
+#### This Data Graphed
+
+!['All Guess Words Groups Graphed.png Image'](/InfoImages/GROUPS_AllGuessWordsGroupsGraphed.png)
