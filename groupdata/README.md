@@ -2,9 +2,9 @@
 
 #### Introduction
 
-* The **AllGuessWordsGroupsStats.csv.txt** is a comma separated value format text file summarizing the word grouping performance for every word in the Wordle allowed guess word list used as a guess for the starting state where every possible Wordle solution can be the days' Wordle solution. This is the resulting situation for every possible word used for the first Wordle guess word.
+* The **AllGuessWordsGroupsStats.csv.txt** is a comma separated value format text file summarizing the word grouping performance for every word in the Wordle allowed guess word list used as a guess ***for the starting state where every possible Wordle solution can be the days' Wordle solution***.
 
-* This file can help one evaluate the merit for a game's first word. The list of possible Wordle solutions changes to a list of remaining possible Wordle solutions after the first guess is played. **AllGuessWordsGroupsStats.csv.txt**, being strongly based upon the initial list, no longer applies.  
+* This file can help one evaluate the merit for a game's first word. After the first guess is played the list of possible Wordle solutions changes to a list of remaining possible Wordle solutions. **AllGuessWordsGroupsStats.csv.txt** no longer applies after the first guess.  
 
 * This list is sorted according to the number of word groups generated (descending), then by the maximum group size (ascending) and then by the average group size (ascending).
 
