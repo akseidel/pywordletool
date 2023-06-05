@@ -854,6 +854,12 @@ class RptWnd(ctk.CTkToplevel):
         self.destroy()
 
     def search_for_text(self):
+        self.find_the_text()
+
+    def entry_release_return(self, event):
+        self.find_the_text()
+
+    def find_the_text(self):
         search_text = ''
         regex: search_text = self.search_text.get().strip()
         if len(regex) > 4:
@@ -914,6 +920,8 @@ class RptWnd(ctk.CTkToplevel):
                                   textvariable=self.search_text
                                   )
         entry_find.pack(side=tk.LEFT, padx=10, pady=10)
+        entry_find.bind('<KeyRelease-Return>', self.search_for_text)
+        entry_find.bind('<KeyRelease-Return>', self.entry_release_return)
 
         button_f = ctk.CTkButton(self, text="Find",
                                  command=self.search_for_text
