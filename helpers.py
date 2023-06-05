@@ -10,8 +10,8 @@ import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own
 # ttk namespace so that tk is preserved
 from tkinter import messagebox
 from typing import NoReturn
-
 import customtkinter as ctk
+import groupdrilling
 
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -871,6 +871,12 @@ class RptWnd(ctk.CTkToplevel):
         self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
         self.msg1.remove_tag('grp')
 
+    def rpt_show_grps_driller(self) -> NoReturn:
+        if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
+            self.rpt_grpsdriller_window = groupdrilling.GrpsDrillingMain()  # create window if its None or destroyed
+        else:
+            self.rpt_grpsdriller_window.focus()  # if window exists focus it
+
     def __init__(self, context=''):
         super().__init__()
         self.context = context
@@ -880,6 +886,7 @@ class RptWnd(ctk.CTkToplevel):
         font_tuple_n = ("Courier", 14, "normal")
         self.search_text = tk.StringVar()
         self.search_text.set('for: ')
+        self.rpt_grpsdriller_window = None
 
         self.info_frame = ctk.CTkFrame(self,
                                        corner_radius=10,
@@ -927,6 +934,10 @@ class RptWnd(ctk.CTkToplevel):
                                  command=self.search_for_text
                                  )
         button_f.pack(side="left", padx=0, pady=10)
+
+        button_drill = ctk.CTkButton(self, text="Groups Driller",
+                                     width=40, command=self.rpt_show_grps_driller)
+        button_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
 
         button_b = ctk.CTkButton(self, text="Summary",
                                  command=self.back_to_summary
