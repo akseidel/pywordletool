@@ -77,17 +77,26 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.destroy()
 
     def clean_the_grp_list(self) -> tuple[bool, list[str], list[str]]:
+        """
+        Processes what was pasted into the word list entry into a proper looking list of
+        five letter words. The intent is to be able to paste raw text copied out of the Helper's
+        list window, raw text copied from a Groups Driller output and other copied text sources like
+        spreadsheet ranges. Numbers, spaces, punctuation, non-alphabet characters and line feeds
+        are to be removed.
+        @return: a tuple containing Status, the list of five letter words , the list of invalid words.
+        """
         this_grp = self.grp_words_text.get()
         # First strip out numbers, like those that are rankings from
-        # the wordle helper.
+        # the wordle helper and other characters.
         this_grp = re.sub('[-:;.0123456789()~!@#$%^&*+_|?><`/{}]', '', this_grp).lower()
         # Let spaces comma separate the words. Commas will be used in a
         # later strip function that operates on section split by comma.
         # Empty words will be culled later on.
         this_grp = this_grp.replace(' ', ',')
         # A paste from a spreadsheet row will be tab deliniated.
-        # Its newline character will be stripped later on.
         this_grp = this_grp.replace('\t', ',')
+        # Handling the newline characters.
+        this_grp = this_grp.replace('\n', ',')
         # Strip unwanted characters that might be.
         this_lst = [x.strip(' ,[]\"\'\n') for x in this_grp.split(',')]
         # Remove any empty strings from list.
