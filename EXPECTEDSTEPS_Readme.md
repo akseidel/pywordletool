@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The expected number of steps required to solve the unknown Wordle word can be determined for any "guess" one makes in Wordle . This seemingly impossible notion is possible because the list of possible Wordle words is known and the guess word is known. Therefore the ways the guess word relates to every possible Wordle can be examined, counted and assigned a probability. This number, called E( ) herein, shorthand for E(the guess word), is the average number of probable required steps that will arrive at the Wordle solution when each step is played in a consistent specific way to minimize the steps. E( ) is based upon probabilities associated with how guess words influence the list of possible solutions for a Wordle game.
+The expected number of steps required to solve the unknown Wordle word can be determined for any "guess" one makes in Wordle . This seemingly impossible notion is possible because the list of possible Wordle words is known and the guess word is known. Therefore the ways the guess word relates to every possible Wordle can be examined, counted and assigned a probability. This number, called E( ) herein, shorthand for E(the guess word), is the average number of probable required steps that will arrive at the Wordle solution. Each step is assumed played with the intent to minimize the steps. E( ) is based upon probabilities associated with how guess words influence the list of possible solutions for a Wordle game.
 
 Before getting into the weeds it must be noted that a visiting adult son Parker Seidel derived the general formula for E( ) after being requested to lend some brain power to the subject of "groups".
 
