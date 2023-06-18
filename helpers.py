@@ -475,7 +475,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
                 best_rank_dict[g] = s
 
     if reporting:
-        report_footer_wrapper("vocabulary", word_lst, best_rank_dict, rptwnd)
+        report_footer_wrapper(msg1, word_lst, best_rank_dict, rptwnd)
 
     return best_rank_dict
 
@@ -500,7 +500,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, cont
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window("Displayed", word_lst, rptwnd, cond_rpt)
+        reporting_header_to_window("Words Showing", word_lst, rptwnd, cond_rpt)
 
     for guess in word_lst:
         guess_groups_dict = groups_for_this_guess(guess, word_lst)
@@ -528,7 +528,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, cont
     # Reporting only the best ranking guesses. These were collected into the
     # best_rank_dict dictionary of words as keys, grp_stats as values.
     if reporting:
-        report_footer_wrapper("displayed", word_lst, best_rank_dict, rptwnd)
+        report_footer_wrapper("Words Showing", word_lst, best_rank_dict, rptwnd)
 
     return best_rank_dict
 
@@ -542,7 +542,7 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
 
 
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
-    rptl = "\n\n> >  Groups summary for the " + msg + " words list of " + \
+    rptl = "\n\n> >  Groups summary using the " + msg + " words for guesses on the " + \
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.msg1.insert(tk.END, rptl)
 
