@@ -34,6 +34,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 * Wordle Helper's **Group Optimal** performed on these 25 possible solution words using all acceptable words (Using the **Large Vocabulary** source option in the Wordle Helper's **Group Optimal**.), an operation that allows <a href="#out-of-pool">**out-of-pool**</a> words, shows two words UNLED and GILET as the optimal words. UNLED and GILET divide the 25 words into 18 groups. The maximum group sizes are 3 and 4 words.
   * The **Large Vocabulary** refers to the 14,855 Wordle allowed words vocabulary. Each of those words was match tested against the **Words Showing** for **groups** analysis. The **Large Vocabulary** includes the **Words Showing**. The words UNLED and GILET are the words leading to the most number of groups, surpassing GOLEM by 2 groups.
+ 
   !['EXPECT_unled_gilet_summary.png Image'](InfoImages/EXPECT_unled_gilet_summary.png)
 
 * Let us calculate the expected number of steps E( ) for each of these three guess words starting with the two 18 group generating words UNLED and GILET.
