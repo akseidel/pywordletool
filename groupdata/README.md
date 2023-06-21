@@ -2,7 +2,7 @@
 
 #### Introduction
 
-* The [AllGuessWordsGroupsStats.csv.txt](**AllGuessWordsGroupsStats.csv.txt**) is a comma separated value format text file summarizing the word grouping performance for every word in the Wordle allowed guess word list used as a guess ***for the starting state where every possible Wordle solution can be the days' Wordle solution***. Data is based upon using the classic 2,309 possible Wordle solutions.
+* The [AllGuessWordsGroupsStats.csv.txt](/groupdata/AllGuessWordsGroupsStats.csv.txt) is a comma separated value format text file summarizing the word grouping performance for every word in the Wordle allowed guess word list used as a guess ***for the starting state where every possible Wordle solution can be the days' Wordle solution***. Data is based upon using the classic 2,309 possible Wordle solutions.
 
 * The data can help one evaluate the merit for a game's first word only. After the first guess is played the list of possible Wordle solutions reduces to a list of remaining possible Wordle solutions. **AllGuessWordsGroupsStats.csv.txt** no longer applies after the first guess.  
 
@@ -22,7 +22,7 @@
 
 * The data is sorted first by group quantity and then by maximum group quantity. As such the better guess, measured by the maximum group quantity, amongst those words generating the same number of groups as a category are the words in that category having the most commonly used letters "AE,NOSTRIL". Such words would be the best guess within the quantity category. This characteristic is what results in the red stripes seen in the graphed data.
 
-#### [AllGuessWordsGroupsStats.csv.txt](AllGuessWordsGroupsStats.csv.txt)
+#### [AllGuessWordsGroupsStats.csv.txt](/groupdata/AllGuessWordsGroupsStats.csv.txt)
 
 #### This Data Graphed
 
