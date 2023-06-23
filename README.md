@@ -41,7 +41,10 @@
 * pip: (<https://pypi.org/project/pip/>)
 * customtkinter
 
-'tkinter' provides graphical user interface support for python applications. It comes with python. 'customtkinter' is an expansion to 'tkinter'. This Wordle game helper uses some customtkinter features and so it needs to be installed along with python3. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
+**'tkinter'** provides graphical user interface support for python applications. It usually comes installed with python and requires no concern. You will see an error message mentioning 'tkinter' if it is not installed yet. Install it using the Terminal command:
+`sudo apt install python3-tk`. This step requires an administration password.   
+
+'customtkinter' is an expansion to 'tkinter'. This Wordle game helper uses some customtkinter features and so it needs to be installed along with python3. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
 
 After installing python3 and pip, the following commands entered in a Terminal window will install the 4.6.3 version of 'customtkinter':
 `pip3 install --upgrade customtkinter==4.6.3`
