@@ -66,7 +66,7 @@ chk4customtkinter(){
       printf " for pywordletool to work. This package needs to be installed using\n"
       printf " pip. \n"
       printf "\n It can be installed using the command:\n"
-      printf "\n     pip3 install customtkinter\n"
+      printf "\n     pip3 install --upgrade customtkinter==4.6.3\n"
       printf "======================================================================\n"
       s=1
   else
