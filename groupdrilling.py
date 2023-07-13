@@ -39,7 +39,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               letter_rank_file,
                                               True,
                                               0).get_ranked_results_wrd_lst(True)
-            msg1 = 'Small Vocabulary'
+            msg1 = 'Classic Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
                                                                             self.d_verbose_grps_cond.get(),
@@ -48,6 +48,20 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                                                             context
                                                                             )
         case 2:
+            # get the entire possible guess list
+            all_targets = helpers.ToolResults(data_path,
+                                              'botadd_nyt_wordlist.txt',
+                                              letter_rank_file,
+                                              True, 0).get_ranked_results_wrd_lst(True)
+            msg1 = 'Classic+ Vocabulary'
+            optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
+                                                                            self.d_verbose_grps.get(),
+                                                                            self.d_verbose_grps_cond.get(),
+                                                                            all_targets,
+                                                                            msg1,
+                                                                            context
+                                                                            )
+        case 3:
             # get the entire possible guess list
             all_targets = helpers.ToolResults(data_path,
                                               'nyt_wordlist.txt',
@@ -201,8 +215,10 @@ class GrpsDrillingMain(ctk.CTkToplevel):
             case 0:
                 self.title("Groups Drilling Using The Words Entered List For Guesses")
             case 1:
-                self.title("Groups Drilling Using The Small Vocabulary For Guesses")
+                self.title("Groups Drilling Using The Classic Vocabulary For Guesses")
             case 2:
+                self.title("Groups Drilling Using The Classic+ Vocabulary For Guesses")
+            case 3:
                 self.title("Groups Drilling Using The Large Vocabulary For Guesses")
             case _:
                 pass
@@ -311,12 +327,16 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                     variable=self.grps_guess_source, value=0,
                                     command=self.title_status)
         self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
-        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Small Vocabulary",
+        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic",
                                     variable=self.grps_guess_source, value=1,
                                     command=self.title_status)
         self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
-        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large Vocabulary",
+        self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+",
                                     variable=self.grps_guess_source, value=2,
+                                    command=self.title_status)
+        self.rbrBB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large",
+                                    variable=self.grps_guess_source, value=3,
                                     command=self.title_status)
         self.rbrC.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
 

@@ -176,7 +176,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.grps_guess_source = tk.IntVar(value=0)
         self.allow_dup_state = tk.BooleanVar(value=False)
         self.verbose_grps = tk.BooleanVar(value=False)
-        self.vocab_var = tk.IntVar(value=1)
+        self.vocab_var = tk.IntVar(value=0)
         self.status = tk.StringVar()
         self.rank_mode = tk.IntVar()
         self.rank_mode.set(0)
@@ -212,8 +212,10 @@ class Pywordlemainwindow(ctk.CTk):
 
             allow_dups = self.allow_dup_state.get()
 
-            if self.vocab_var.get() == 1:
+            if self.vocab_var.get() == 0:
                 vocab_filename = 'wo_nyt_wordlist.txt'
+            elif self.vocab_var.get() == 1:
+                vocab_filename = 'botadd_nyt_wordlist.txt'
             else:
                 vocab_filename = 'nyt_wordlist.txt'
 
@@ -308,7 +310,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                           letter_rank_file,
                                                           True,
                                                           0).get_ranked_results_wrd_lst(True)
-                        msg1 = 'Small Vocabulary'
+                        msg1 = 'Classic Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         False,
@@ -316,6 +318,17 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                         msg1,
                                                                                         context)
                     case 2:
+                        # get the entire possible guess list
+                        all_targets = helpers.ToolResults(data_path, 'botadd_nyt_wordlist.txt', letter_rank_file, True, 0) \
+                            .get_ranked_results_wrd_lst(True)
+                        msg1 = 'Classic+ Vocabulary'
+                        optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
+                                                                                        self.verbose_grps.get(),
+                                                                                        False,
+                                                                                        all_targets,
+                                                                                        msg1,
+                                                                                        context)
+                    case 3:
                         # get the entire possible guess list
                         all_targets = helpers.ToolResults(data_path, 'nyt_wordlist.txt', letter_rank_file, True, 0) \
                             .get_ranked_results_wrd_lst(True)
@@ -1289,9 +1302,12 @@ class Pywordlemainwindow(ctk.CTk):
                                      )
         vocab_frame.pack(anchor='s', padx=6, fill=tk.X, expand=True)
         # Vocabulary radio buttons
-        rbv1 = ttk.Radiobutton(vocab_frame, text="Small Vocabulary", variable=self.vocab_var, value=1, command=do_grep)
+        rbv1 = ttk.Radiobutton(vocab_frame, text="Classic", variable=self.vocab_var, value=0, command=do_grep)
         rbv1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
-        rbv2 = ttk.Radiobutton(vocab_frame, text="Large Vocabulary", variable=self.vocab_var, value=2, command=do_grep)
+        rbv1B = ttk.Radiobutton(vocab_frame, text="Classic+", variable=self.vocab_var, value=1, command=do_grep)
+        rbv1B.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
+
+        rbv2 = ttk.Radiobutton(vocab_frame, text="Large", variable=self.vocab_var, value=2, command=do_grep)
         rbv2.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
         # === END OF ====== General Controls ==========
 
@@ -1352,12 +1368,14 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0
                                                 )
         self.grp_lst_ops_frame.pack(side=tk.TOP, padx=0, pady=4, fill=tk.X)
-        self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Words Showing", variable=self.grps_guess_source,
+        self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Showing", variable=self.grps_guess_source,
                                     value=0)
         self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2, expand=True)
-        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Small", variable=self.grps_guess_source, value=1)
+        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic", variable=self.grps_guess_source, value=1)
         self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
-        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large", variable=self.grps_guess_source, value=2)
+        self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+", variable=self.grps_guess_source, value=2)
+        self.rbrBB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large", variable=self.grps_guess_source, value=3)
         self.rbrC.pack(side=tk.RIGHT, fill=tk.X, padx=0, pady=2, expand=True)
         # end labelframe within groups frame for which list option
 
