@@ -332,8 +332,8 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                     command=self.title_status)
         self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
         self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+",
-                                    variable=self.grps_guess_source, value=2,
-                                    command=self.title_status)
+                                     variable=self.grps_guess_source, value=2,
+                                     command=self.title_status)
         self.rbrBB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
         self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large",
                                     variable=self.grps_guess_source, value=3,

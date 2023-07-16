@@ -89,6 +89,7 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * The **Lqty/max** value is the maximum found displayed list quantity to guess word's maximum sized group ratio. Higher ratios correspond to smaller expected subsequent guesses for the candidate guess word. It can vary. **Lqty/max** values vary when guess words share the same average clue pattern group size but vary in their maximum clue pattern group size. Refer to the verbose output to see which optimal word has the maximum **Lqty/max** value.
 * The maximum value the **Lqty/max** ratio can be is the list size. When the ratio is the list size the solution will be the guess after the candidate guess when the candidate guess is not of the list. When the candidate guess is of the list there will be some chance the candidate guess is the solution. The solution will be the guess after the candidate guess when otherwise.
 * The **Lqty/max** value has not been found to be useful for identifying a better guess word other than allowing one's eye to notice words having different group sizes amongst the collection of word candidates.
+* The **p2** value is the groups size population variance.
 * Optimal group analysis should be performed on the total selection list that contains multiple letters because the analysis is for selecting the solution versus guessing for letter discovery.
 
 !['Verbose Window Bottom Image'](InfoImages/PYWTVerboseGrpsBot.png)
