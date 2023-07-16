@@ -319,7 +319,8 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                         context)
                     case 2:
                         # get the entire possible guess list
-                        all_targets = helpers.ToolResults(data_path, 'botadd_nyt_wordlist.txt', letter_rank_file, True, 0) \
+                        all_targets = helpers.ToolResults(data_path, 'botadd_nyt_wordlist.txt', letter_rank_file, True,
+                                                          0) \
                             .get_ranked_results_wrd_lst(True)
                         msg1 = 'Classic+ Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
@@ -343,7 +344,7 @@ class Pywordlemainwindow(ctk.CTk):
                         pass
 
                 opt_group_guesses_as_list = list(optimal_group_guesses.keys())
-                (g_qty, g_min, g_max, g_ave, g_q) = helpers.groups_stat_summary(optimal_group_guesses)
+                (g_qty, g_min, g_max, g_ave, g_lmr, g_p2) = helpers.groups_stat_summary(optimal_group_guesses)
                 match grps_guess_source:
                     case 0:
                         regex: str = helpers.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
@@ -361,7 +362,8 @@ class Pywordlemainwindow(ctk.CTk):
                           ", sizes: min " + '{0:.0f}'.format(g_min) + \
                           ", max " + '{0:.0f}'.format(g_max) + \
                           ", ave " + '{0:.2f}'.format(g_ave) + \
-                          ", Lqty/max " + '{0:.3f}'.format(g_q) + ")"
+                          ", Lqty/max " + '{0:.3f}'.format(g_lmr) + \
+                          ", p2 " + "{0:.2f}".format(g_p2) + ")"
                 self.EnableOptimalControls(True)
 
             tx_result.configure(state='disabled')
