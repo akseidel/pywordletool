@@ -176,7 +176,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.grps_guess_source = tk.IntVar(value=0)
         self.allow_dup_state = tk.BooleanVar(value=False)
         self.verbose_grps = tk.BooleanVar(value=False)
-        self.vocab_var = tk.IntVar(value=0)
+        self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
         self.rank_mode = tk.IntVar()
         self.rank_mode.set(0)
