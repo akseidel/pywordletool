@@ -17,6 +17,7 @@
   * wrds/max    - The number of times larger the 2039 solution word is above the maximum group size. This value may have no bearing on the guess's merit, but it does provide a comparison means.
 
 * The **Group Driller** **Condensed** verbose output created the content shown in this list.
+* The concept of **Wordle Groups** is explained in an allegory here: [Groups Allegory](/groupsallegory/README.md)
 
 #### Observations
 

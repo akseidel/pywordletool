@@ -99,6 +99,8 @@ After installing python3 and pip, the following commands entered in a Terminal w
 
 !['Verbose Window Top Image'](InfoImages/PYWTVerboseGrpsTop.png)
 
+* The concept of **Wordle Groups** is explained in an allegory here: [Groups Allegory](/groupsallegory/README.md)
+  
 ### Groups Driller
 
 !['Group Drilling Main Window Image'](InfoImages/PYWTGroupDrillingMain.png)
