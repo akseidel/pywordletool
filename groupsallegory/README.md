@@ -18,7 +18,7 @@ Some laughing Wordlefish will result in many more schooling groups than other Wo
 
 Because the Wordlefish population is divided by the number of schooling groups it follows that the average number of Wordlefish in each schooling group will be smaller when a laughing Wordlefish results in more schooling groups than another laughing Wordlefish that produces fewer school groups. This means the fish carrying the gene spelling the day’s Wordle tends to be in a smaller school group when the laughing Wordlefish results in more schooling groups. Again, the day’s Wordle has nothing to do with it.
 
-Now comes the most magical aspect. An outside entity must judge the laughing Wordlefish’s Wordle gene against the actual day’s Wordle gene the way Wordle judges a game guess. If we clap our hands together five times in a row the outside entity makes the Wordlefish school groups not containing the Wordlefish carrying the day’s Wordle gene fly away out of the pond. Yes, Wordlefish can fly.
+Now comes the most magical aspect. An outside entity must judge the groups caused by the laughing Wordlefish’s Wordle gene against the actual day’s Wordle gene the way Wordle judges a game guess. If we clap our hands together five times in a row the outside entity makes the Wordlefish school groups not containing the Wordlefish carrying the day’s Wordle gene fly away out of the pond. Yes, Wordlefish can fly.
 
 Only the one school that contains the Wordlefish carrying the day’s Wordle gene remains in the pond. The number of remaining Wordlefish, one of which is carrying the day’s Wordle gene, is likely smaller when we clap our hands when there are the most number of schooling groups in the pond. We use this information to decide when to clap our hands.
 
@@ -30,6 +30,8 @@ There will not be an all-stripes-green school group after asking a flying Wordle
 
 The day’s Wordle is now selected without applying one iota of letter knowledge in words and without one iota of knowing what a word is or what that word’s use frequency is in a language. What we needed was access to lots of Wordlefish including a Wordlefish population that contains the unknown fish that carries the day’s Wordle gene.
 
-This solving method described in allegory is precisely what the Wordlebot shows when it analyses one’s submitted Wordle game. At every step in the procedure what we falsely consider is an answer guess based on letter clue knowledge in words, ie the Wordlefish that laugh tears, is actually a play to more likely reduce the remaining words. These plays have no basis on letter knowledge in words etc. and therefore appear illogical to us that do not understand the allegory. The plays defy conventional wisdom.
+How many times we perform the hand clapping to select the right Wordlefish depends upon how skillfully we discriminate between resulting school group results and then how lucky those choices turned out. Skill is selecting the laughing fish to most likely generate small school groups. Luck is whether or not the unknown right Wordlefish winds up in smaller school group sizes than expected.
 
-The Wordlefish story must end here. What naturally follows is a dive into weeds that would detract from the general concept.
+This solving method described in allegory is precisely what the Wordlebot shows when it analyses one’s submitted Wordle game. At every step in the procedure what we falsely consider an answer guess based on letter clue knowledge in words, ie the Wordlefish that laugh tears, is actually a play to more likely reduce the remaining words. These plays have no basis on letter knowledge in words etc. and therefore appear illogical to us that do not understand the allegory. The plays defy conventional wisdom. Skill and luck are unfathomable without understanding the Wordle groups parlor trick.
+
+The Wordlefish story must end here.
