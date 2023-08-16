@@ -458,7 +458,6 @@ lucre
 luger
 lured
 luted
-lycra
 malty
 mamba
 manna
@@ -849,7 +848,6 @@ yeesh
 yodel
 yoked
 yokel
-yowza
 yucca
 yucky
 yummy
