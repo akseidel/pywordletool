@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The expected number of steps required to solve the unknown Wordle word can be determined for any "guess" one makes in Wordle . This seemingly impossible notion is possible because the list of possible Wordle words is known and the guess word is known. Therefore the ways the guess word relates to every possible Wordle can be examined, counted and assigned a probability. This number, called E( ) herein, shorthand for E(the guess word), is the average number of probable required steps that will arrive at the Wordle solution. Each step is assumed played with the intent to minimize the steps. E( ) is based upon probabilities associated with how guess words influence the list of possible solutions for a Wordle game.
+The expected number of steps required to solve the unknown Wordle word can be determined for any "guess" one makes in Wordle . This seemingly impossible notion is possible because the list of possible Wordle words is known and the guess word is known. Therefore, the ways the guess word relates to every possible Wordle can be examined, counted and assigned a probability. This number, called E( ) herein, shorthand for E(the guess word), is the average number of probable required steps that will arrive at the Wordle solution. Each step is assumed played with the intent to minimize the steps. E( ) is based upon probabilities associated with how guess words influence the list of possible solutions for a Wordle game.
 
 In practice, working out the **Expected Number of Steps to Solve** for Wordle guesses is not necessary when considering different guesses based upon their <a href="#groups">**groups**</a> characteristics. One can judge a guess word's merits based upon its group summary information alone. Knowing the group mechanics and results learned through having worked out a few **Expected Number of Steps to Solve** is a useful, albeit arduous, exercise.
 
@@ -50,7 +50,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
   
 #### UNLED
 
-* These are the groups UNLED divides the 25 remaining possible solutions according to how UNLED matches to each of the 25 words. Note there is not a 22222 group. UNLED is not one of the 25 words and so UNLED is an <a href="#out-of-pool">**out-of-pool**</a> selection for this step. Therefore there cannot be a 22222 "perfect match" group. If one is still unsure about groups, understand that using UNLED for a guess into this 25 **remaining possible solutions** will result in one of these 18 groups as the **remaining possible solutions**. Which group that is depends on the actual unknown solution. What is known is that the solution is one of the 25 words and it is sitting in one of the 18 groups. The prior guesses, just CARGO in this case, established those 18 groups by the ways CARGO is not the solution. The way UNLED "matches", ie its **match clue** ***after playing UNLED***, reveals in which group the solution resides.
+* These are the groups UNLED divides the 25 remaining possible solutions according to how UNLED matches to each of the 25 words. Note there is not a 22222 group. UNLED is not one of the 25 words and so UNLED is an <a href="#out-of-pool">**out-of-pool**</a> selection for this step. Therefore, there cannot be a 22222 "perfect match" group. If one is still unsure about groups, understand that using UNLED for a guess into this 25 **remaining possible solutions** will result in one of these 18 groups as the **remaining possible solutions**. Which group that is depends on the actual unknown solution. What is known is that the solution is one of the 25 words, and it is sitting in one of the 18 groups. The prior guesses, just CARGO in this case, established those 18 groups by the ways CARGO is not the solution. The way UNLED "matches", ie its **match clue** ***after playing UNLED***, reveals in which group the solution resides.
 
   !['EXPECT_unled_groups.png Image'](InfoImages/EXPECT_unled_groups.png)
 
@@ -83,7 +83,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 #### GOLEM
 
-* Now lets examine the E( ) for the **in-pool** guess GOLEM.
+* Now let's examine the E( ) for the **in-pool** guess GOLEM.
 * These are the groups GOLEM divides the 25 remaining possible solutions according to how GOLEM matches to each of the 25 words.
 
   !['EXPECT_golem_groups.png Image'](InfoImages/EXPECT_golem_groups.png)
@@ -92,8 +92,8 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
   
   !['EXPECT_golem_expected.png Image'](InfoImages/EXPECT_golem_expected.png)
 
-* GOLEM is an **in-pool** guess. Therefore it has a 22222 "perfect match" group. That group has an E(Gi)=0. Notice that the chance GOLEM is the solution makes a tiny difference to the expected number of steps. The small difference is due to the number possible words being 25.
-* GOLEM's 5 word group does have **in-pool**, **hole-in-one** guesses and thus it has E(Gi)=1.8.
+* GOLEM is an **in-pool** guess. Therefore, it has a 22222 "perfect match" group. That group has an E(Gi)=0. Notice that the chance GOLEM is the solution makes a tiny difference to the expected number of steps. The small difference is due to the number possible words being 25.
+* GOLEM's 5 word group does have **in-pool**, **hole-in-one** guesses, and thus it has E(Gi)=1.8.
 
 #### Note
 
@@ -123,7 +123,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 <a id="singleton"></a>
 
 * **Singleton** refers to a group containing only one word.
-  * All **singleton** groups, except if it a "perfect match", are E( )=1. In the **context** of the guess falling into that non-perfect match group the guess step is already made. There will be only one word, the solution, remaining to select. The **singleton** guess's non-perfect match group's contribution to the expected number of steps is **p(Gi)*(1 + 1)**. Falling into that condition results in 2 steps total. The first step, being the first 'guess' results in one remaining word to 'guess'. The second step is 'guessing' that last remaining word.
+  * All **singleton** groups, except if it is a "perfect match", are E( )=1. In the **context** of the guess falling into that non-perfect match group the guess step is already made. There will be only one word, the solution, remaining to select. The **singleton** guess's non-perfect match group's contribution to the expected number of steps is **p(Gi)*(1 + 1)**. Falling into that condition results in 2 steps total. The first step, being the first 'guess' results in one remaining word to 'guess'. The second step is 'guessing' that last remaining word.
   * The **singleton** "perfect match" group is E( )=0. In the **context** of the guess falling into that perfect match group the guess step is already made. That guess's "perfect match" group's contribution to the expected number of steps is **p(Gi)*(1 + 0)**. Falling into that condition results in 1 step total.
 
 <a id="in-pool"></a>
@@ -150,7 +150,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 * This table shows the E( ) values for word count and group quantity sizes up to 12 words.
 * Notice that E( ) values for **in-pool**, **hole-in-one** guess situation approaches 2.00 as the number of words in a group gets larger and that the **out-of-pool**, **hole-in-one** guess situation is always 2.00 regardless of the word group size. The **in-pool** guess being the solution drops off in significance compared to the **out-of-pool** guess.
-* **out-of-pool**, **hole-in-one** guess situations are always 2 step situations regardless of word group size. They have an expected number of steps E( )=2. In fact only 2 step possibilities exist. An **in-pool** guess for an N word count list that results in N-1 groups, in other words there is one 2 word group in the N-1 groups, also has an E( )=2. There is a difference. The **out-of-pool**, **hole-in-one** guess results in only 2 step possibilities. The **in-pool** latter guess situation can result in a 1 step possibility and a 3 step possibility. The average expected steps is 2 steps.
+* **out-of-pool**, **hole-in-one** guess situations are always 2 step situations regardless of word group size. They have an expected number of steps E( )=2. In fact only 2-step possibilities exist. An **in-pool** guess for an N word count list that results in N-1 groups, in other words there is one 2 word group in the N-1 groups, also has an E( )=2. There is a difference. The **out-of-pool**, **hole-in-one** guess results in only 2-step possibilities. The **in-pool** latter guess situation can result in a 1-step possibility and a 3-step possibility. The average expected steps is 2 steps.
 
 | Word Count | Group Qty | E() in-pool HIO | E() out-of-pool HIO | in-pool | out-of-pool |
 | :--------: | :-------: | :-------------: | :-----------------: | :-----: | :---------: |

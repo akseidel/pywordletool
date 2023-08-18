@@ -33,7 +33,8 @@ ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dar
 
 # globals
 data_path = 'worddata/'  # path from here to data folder
-letter_rank_file = 'letter_ranks.txt'
+# letter_rank_file = 'letter_ranks.txt'
+letter_rank_file = 'letter_ranks_bot.txt'
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
@@ -175,6 +176,7 @@ class Pywordlemainwindow(ctk.CTk):
         # set the Vars
         self.grps_guess_source = tk.IntVar(value=0)
         self.allow_dup_state = tk.BooleanVar(value=False)
+        self.use_classic_frequency = tk.BooleanVar(value=False)
         self.verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
@@ -198,6 +200,14 @@ class Pywordlemainwindow(ctk.CTk):
                 self.grpsdriller_window = groupdrilling.GrpsDrillingMain()  # create window if its None or destroyed
             else:
                 self.grpsdriller_window.focus()  # if window exists focus it
+
+        def do_freq_type() -> NoReturn:
+            global letter_rank_file
+            if self.use_classic_frequency.get():
+                letter_rank_file = 'letter_ranks.txt'
+            else:
+                letter_rank_file = 'letter_ranks_bot.txt'
+            do_grep()
 
         def do_grep() -> NoReturn:
             """Runs a wordletool helper grep instance
@@ -319,9 +329,11 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                         context)
                     case 2:
                         # get the entire possible guess list
-                        all_targets = helpers.ToolResults(data_path, 'botadd_nyt_wordlist.txt', letter_rank_file, True,
-                                                          0) \
-                            .get_ranked_results_wrd_lst(True)
+                        all_targets = helpers.ToolResults(data_path,
+                                                          'botadd_nyt_wordlist.txt',
+                                                          letter_rank_file,
+                                                          True,
+                                                          0).get_ranked_results_wrd_lst(True)
                         msg1 = 'Classic+ Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
@@ -1272,14 +1284,29 @@ class Pywordlemainwindow(ctk.CTk):
         # === END OF ========= Require Letters =============
 
         # === START OF ====== General Controls ==========
-        chk_allow_dups = ttk.Checkbutton(self.actions_frame,
+        # the_top_frame
+        the_top_frame = ttk.Frame(self.actions_frame,
+                                  border=0
+                                  )
+        the_top_frame.pack(padx=6, fill=tk.X, expand=True)
+
+        chk_allow_dups = ttk.Checkbutton(the_top_frame,
                                          text="Allow Duplicate Letters",
                                          variable=self.allow_dup_state,
                                          onvalue=True,
                                          offvalue=False,
                                          padding=0,
                                          command=do_grep)
-        chk_allow_dups.pack(side=tk.TOP, padx=6, pady=0, anchor='w')
+        chk_allow_dups.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+
+        chk_ltr_freq_typ = ttk.Checkbutton(the_top_frame,
+                                           text="Classic Ranking",
+                                           variable=self.use_classic_frequency,
+                                           onvalue=True,
+                                           offvalue=False,
+                                           padding=0,
+                                           command=do_freq_type)
+        chk_ltr_freq_typ.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         # Ranking selection frame
         rank_frame = ttk.LabelFrame(self.actions_frame,
@@ -1287,7 +1314,7 @@ class Pywordlemainwindow(ctk.CTk):
                                     labelanchor='n',
                                     border=0
                                     )
-        rank_frame.pack(anchor='s', padx=6, fill=tk.X, expand=True)
+        rank_frame.pack(padx=6, fill=tk.X, expand=True)
         # Vocabulary radio buttons
         rbr1 = ttk.Radiobutton(rank_frame, text="Occurrence", variable=self.rank_mode, value=0, command=do_grep)
         rbr1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
@@ -1302,7 +1329,7 @@ class Pywordlemainwindow(ctk.CTk):
                                      labelanchor='n',
                                      border=0
                                      )
-        vocab_frame.pack(anchor='s', padx=6, fill=tk.X, expand=True)
+        vocab_frame.pack(padx=6, fill=tk.X, expand=True)
         # Vocabulary radio buttons
         rbv1 = ttk.Radiobutton(vocab_frame, text="Classic", variable=self.vocab_var, value=0, command=do_grep)
         rbv1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
@@ -1406,7 +1433,8 @@ class Pywordlemainwindow(ctk.CTk):
             return f
 
         def get_rank_data() -> str:
-            full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'letter_ranks.txt')
+            # full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'letter_ranks.txt')
+            full_path_name = os.path.join(os.path.dirname(__file__), data_path, letter_rank_file)
             if os.path.exists(full_path_name):
                 f = open(full_path_name, "r", encoding="UTF8").read()
             else:
@@ -1424,6 +1452,7 @@ class Pywordlemainwindow(ctk.CTk):
             msg1.delete(1.0, tk.END)
             raw_rank_data = get_rank_data()
             f = raw_rank_data.replace(":", "\t")
+            msg1.insert(tk.END, "Using file: " + letter_rank_file + "\n")
             msg1.insert(tk.END, "RNK = Rank for any occurrence\n")
             msg1.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
             msg1.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
