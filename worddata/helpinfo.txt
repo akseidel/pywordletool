@@ -2,7 +2,9 @@ The Wordle helper shows five-letter words from which you can select for playing 
 
 - Word Ranking Method:
 
-The five-letter words are assigned a rank according to how common the letters are in the English Wordle words. The 'Occurrence' method does not consider where letters occur in the word. The 'Position' method considers the letter's position. The 'Both' method adds the other two rank values. This helper presents the ranked words from the lowest rank to the highest rank. The word list always shows scrolled to the highest ranking words at its bottom. Scroll the list upwards to see the lower ranking words.
+The five-letter words are assigned a rank according to how common the letters are in the Wordle possible solution words. The 'Occurrence' method does not consider where letters occur in the word. The 'Position' method considers the letter's position. The 'Both' method adds the other two rank values. This helper presents the ranked words from the lowest rank to the highest rank. The word list always shows scrolled to the highest ranking words at its bottom. Scroll the list upwards to see the lower ranking words.
+
+Checking the 'Classic Ranking' option ranks according to the Classic 2309 Wordle solutions letter frequency. When 'Classic Ranking' is not checked ranks are assigned according to the Classic+ solutions letter frequency.
 
 Word rank represents relative occurrence probability; however, any word matching the filter could be the Wordle word regardless of its rank.
 
@@ -14,7 +16,7 @@ Checking 'Letters To Be Excluded' letter check boxes results in words not contai
 
 Checking 'Letters To Be Required' letter check boxes results in words containing those letters. No words will show when six or more letters are required for the word.
 
-The Clear All button in the check box lineups clears all the check boxes in that lineup. The letter check boxes are ordered according to letter use frequency. The vertical lines indicate a jump in letter use frequency and are useful to describe letter rank group types. The group descriptions in turn provide a language useful for discussing game strategy and game results.
+The Clear All button in the checkbox lineups clears all the checkboxes in that lineup. The letter check boxes are ordered according to letter use frequency. The vertical lines indicate a jump in letter use frequency and are useful to describe letter rank group types. The group descriptions in turn provide a language useful for discussing game strategy and game results.
 
 'Letter Positioning' is where letters may be excluded or required for one of the five possible Wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. The Z buttons clear the entire position list.
 
@@ -22,7 +24,7 @@ In the puzzle game context a letter indicated not at its correct position is a l
 
 'Special Pattern' allows one to quickly introduce a custom require or exclude filter pattern that can operate on letter position. 'Special Pattern' was initially intended for adjacent letter patterns such as TT, ITE, GHT or SS. One might use this to compare the number of words having a SS pattern versus S.S or S..S patterns where the period character, ".", means 'any letter'. The pattern S..S shows words having any two letters between S letters like the words SMUSH and TSARS. 'Special Pattern' is the only way to require multiple instances of the same letter, like TT.
 
-'Special Pattern' turns out to be especially useful for spotting words groups in part because its setting is independent of the Exclude and Require Position controls. Thus you can very quickly set and then clear 'Special Pattern' without affecting one's thought train. 
+'Special Pattern' turns out to be especially useful for spotting words groups in part because its setting is independent of the Exclude and Require Position controls. Thus, you can very quickly set and then clear 'Special Pattern' without affecting one's thought train.
 
 'Pick A Random' highlights a random word in the current showing word list. There is a point when narrowing down the list of possible words where the higher ranking words are biased against words containing low ranking letters. Any one of the words shown could be the Wordle word. This feature is intended for use when the list has become small where you can surmise the correct word would be a random selection.
 

@@ -46,7 +46,7 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
                 ltr.pop(0)
                 ltr_rank_dict[k] = [float(d) for d in ltr]  # want as floats
     else:
-        msg = f'Letter ranking file {local_path_rank_file} not found. Switching to built in letter ranking.'
+        msg = f'Letter ranking file {local_path_rank_file} not found. Switching to built in Classic letter ranking.'
         print(msg)
         messagebox.showwarning('Warning', message=msg)
         ltr_rank_dict = {
