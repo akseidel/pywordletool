@@ -69,6 +69,8 @@ After installing python3 and pip, the following commands entered in a Terminal w
 
 ### Word Ranking
 
+* Word ranking based on letter occurrence frequency is part of what this Wordle **Helper** was initially developed to automate. This is why the word lists are shown ranked this way and why these instructions appear to emphasize **Word Ranking** even though the **Helper** has evolved to perform the more effective **Groups** analysis method.
+
 * **Letter Ranking Information Window:**
 !['PYWTRanking.png Image'](InfoImages/PYWTRanking.png)
 
@@ -179,6 +181,8 @@ The Wordle helper shows five-letter words from which you can select for playing 
 * **Exclude From Position** in the **Letter Positioning** options applies letter requirements for letters you indicate for position exclusion. This is actually two separate filter commands. The letter is **required** in the word, but not at the position indicated. **Wordle** uses **Yellow** color blocks for such letters. In subsequent guesses, **Wordle** marks that same previously marked **Yellow** color letter as **Grey** color when that letter is not in the correct position ***and when the guess has erroneous multiple instances of that same letter***. **Exclude From Position** such letters. Do not apply the broad brush **Excluding** for such letters. An empty list results if you do as just previously explained.
 
 * Conversely, to what was just explained above, **Exclude From Position** when applied for a known multiple letter instance in the wrong indicated position does not specifically limit the filtered list to words having that multiple instance. Beware the filtered list might contain more words than it should. If you know the duplicate letter must be adjacent then apply that adjacency pattern in the **Special Pattern** control.
+
+* However, there can be a situation where a clue indicates a letter is in the correct position and that another clue indicates there are no other instances of that letter elsewhere in the solution. That letter needs to be excluded from all the positions other than the correct position using **Exclude From Position**, not just excluded from the position the second clue indicated. Otherwise the list could show more words than there should be. This is a rare situation that is more likely to happen when the letter is question is a common letter such as E. For example, if in the word CARET the E is yellow and if in the subsequent word LEONE the last letter E is green and the first E is grey, then E occurs only once. An entry for E in **Exclude From Position** should be marked for all letter positions except the 5th position. EDUCE and PIECE will show up in the list if those multiple entries for E in **Exclude From Position** are omitted.
 
 ### Word Vocabularies
 
