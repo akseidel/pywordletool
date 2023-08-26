@@ -27,7 +27,7 @@
 
 ### Running the Wordle Helper with **start-pywt.command**
 
-* **start-pywt.command** is a shell script intended for launching the Wordle helper from a computer's file browser. It should run the helper with a double-click after being properly setup.
+* **start-pywt.command** is a shell script intended for launching the Wordle helper from a computer's file browser. It should run the helper with a double click after being properly setup.
 * Setting up **start-pywt.command** requires marking it an executable file. This is later described in **Installing the Wordle Helper**
 * **start-pywt.command** checks for required components before launching the Wordle helper. It reports what components are missing and will not launch the Wordle helper when critical components are missing.
 * **start-pywt.command** output looks like this when it is launching the Wordle helper:
@@ -92,8 +92,8 @@ After installing python3 and pip, the following commands entered in a Terminal w
 * The play word yielding the largest group quantity is not necessarily the play having the least expected number of steps to solve. However, it very often does have the least expected number of steps to solve.
 * The **Lqty/max** value is ratio of the displayed list words count to the guess word's maximum size group. Higher ratios correspond to smaller expected subsequent remaining guesses for the candidate guess word. It can vary. **Lqty/max** values vary when guess words share the same average clue pattern group size but vary in their maximum clue pattern group size. Refer to the verbose output to see which optimal word has the maximum **Lqty/max** value.
 * The **Lqty/max** value has not been found to be useful for identifying a better guess word other than allowing one's eye to notice words having different group sizes amongst the collection of word candidates.
-* The **p2** value is the groups size population variance. This value is useful. It is a measure of how variable the group sizes are resulting from a guess candidate. When candidates have the same number of groups, select the candidate that has the smallest **p2**. Doing so removes the chance the solution will be a member of the larger groups because the group sizes vary less in size. 
-* Optimal group analysis should always be performed on the total selection list that contains multiple letters. The analysis is for selecting words that puts the solution into smaller remaining word sets. The larger candidate selection pool provides more grouping opportunities. 
+* The **p2** value is the groups size population variance. This value is useful. It is a measure of how variable the group sizes are resulting from a guess candidate. When candidates have the same number of groups, select the candidate that has the smallest **p2**. Doing so removes the chance the solution will be a member of the larger groups because the group sizes vary less in size.
+* Optimal group analysis should always be performed on the total selection list that contains multiple letters. The analysis is for selecting words that puts the solution into smaller remaining word sets. The larger candidate selection pool provides more grouping opportunities.
 
 !['Verbose Window Bottom Image'](InfoImages/PYWTVerboseGrpsBot.png)
 
@@ -108,7 +108,7 @@ After installing python3 and pip, the following commands entered in a Terminal w
 !['Group Drilling Main Window Image'](InfoImages/PYWTGroupDrillingMain.png)
 
 * **Groups Driller** is a side utility that performs a groups analysis using the **Words Entered**. **Classic**, **Classic+** and **Large** vocabulary against any group of **Words Entered** into its input field. It is intended for investigating a word group's effective size, in other words how easily a word's group resolves to a single word.
-* Copy a word group from any **Verbose Report** (or a spreadsheet row) and paste it into the **Groups Driller** entry field. Text that includes rank numbers copied from the Helper words list may also be pasted. Pasted text will be properly formatted into a list and analyzed when pressing the **Process** button. Pressing and releasing the **Return** keyboard key will instead clean and format the entry without starting the analyze process.
+* Copy a word group from any **Verbose Report** (or a spreadsheet row) and paste it into the **Groups Driller** entry field. Text that includes rank numbers copied from the Helper words list may also be pasted. Pasted text will be properly formatted into a list and analyzed when pressing the **Process** button. Pressing and releasing the **Return** keyboard key will instead clean and format the entry without starting the analysis process.
 * The word entry field appears limited in the number of words it can take, but you can paste the entire **Large** vocabulary, rankings in all, into the entry.  
 * **Clear 'N Paste** clears the current list entries and pastes the current **Clipboard** to be the entry. The entry is then cleaned up. Whatever words you have copied last get pasted. The **Clipboard** will then be empty. **Clear 'N Paste** will not clear the current entry if the **Clipboard** happens to be empty.
 * With **Groups Driller** running, one leaves the Helper's **Verbose Report** open using its **Find** feature to show a guess's groups. Copy and Paste a group to be further analyzed into the **Groups Driller** entry field. Then press the **Process** button.
@@ -118,7 +118,7 @@ After installing python3 and pip, the following commands entered in a Terminal w
 !['Group Drilling Result Window Image'](InfoImages/PYWTGroupDrillingResult.png)
 
 * The **Group Driller** verbose report window is not being shown in this **README**. It is identical in function and appearance to the **Helper's** verbose report window when not using the **Condensed** option.
-* The **Condensed** option verbose report omits showing the guess word groups. Instead only the guess word's group stats are output in a format intended for copy and pasting into a spreadsheet application for further investigation.
+* The **Condensed** option verbose report omits showing the guess word groups. Instead, only the guess word's group stats are output in a format intended for copy and pasting into a spreadsheet application for further investigation.
 
 !['Group Drilling Condensed Result Window Image'](InfoImages/PYWTGroupDrillingCond.png)
 
@@ -167,7 +167,7 @@ The Wordle helper shows five-letter words from which you can select for playing 
 
 * Using the **Classic+** vocabulary yields results essentially identical to what the NYT **WordleBot** shows. The transferred words are not published, but they can be inferred from **WordleBot** outputs.
 
-* Another change the NYT has made is to censure some **Classic** words. Thus some **Classic** words that were originally solution candidates have been removed from the possible solutions list. These words are still acceptable play words but will never be a solution and will never show up in a **WordleBot** remaining solutions list. These words will show up in **The Wordle Helper**. When using the **Classic+** word vocabulary for possible solution candidates, (Make sure **Allow Duplicate Letters** is checked.), the remaining words should equal what the **WordleBot** indicates. 
+* Another change the NYT has made is to censure some **Classic** words. Thus, some **Classic** words that were originally solution candidates have been removed from the possible solutions list. These words are still acceptable play words but will never be a solution and will never show up in a **WordleBot** remaining solutions list. These words will show up in **The Wordle Helper**. When using the **Classic+** word vocabulary for possible solution candidates, (Make sure **Allow Duplicate Letters** is checked.), the remaining words should equal what the **WordleBot** indicates. 
 * If **The Wordle Helper** shows more words than **WordleBot** by a word or so, then there is a censured word.
 * If **The Wordle Helper** shows fewer words than **WordleBot**, then **The Wordle Helper** is missing some transferred words.
 
@@ -183,7 +183,7 @@ The Wordle helper shows five-letter words from which you can select for playing 
 
 * Conversely, to what was just explained above, **Exclude From Position** when applied for a known multiple letter instance in the wrong indicated position does not specifically limit the filtered list to words having that multiple instance. Beware the filtered list might contain more words than it should. If you know the duplicate letter must be adjacent then apply that adjacency pattern in the **Special Pattern** control.
 
-* However, there can be a situation where a clue indicates a letter is in the correct position and that another clue indicates there are no other instances of that letter elsewhere in the solution. That letter needs to be excluded from all the positions other than the correct position using **Exclude From Position**, not just excluded from the position the second clue indicated. Otherwise the list could show more words than there should be. This is a rare situation that is more likely to happen when the letter in question is a common letter such as E. For example, if in the word CARET the E is yellow and if in the subsequent word LEONE the last letter E is green and the first E is grey, then E occurs only once. An entry for E in **Exclude From Position** should be marked for all letter positions except the 5th position. EDUCE and PIECE will show up in the list if those multiple entries for E in **Exclude From Position** are omitted.
+* However, there can be a situation where a clue indicates a letter is in the correct position and that another clue indicates there are no other instances of that letter elsewhere in the solution. That letter needs to be excluded from all the positions other than the correct position using **Exclude From Position**, not just excluded from the position the second clue indicated. Otherwise, the list could show more words than there should be. This is a rare situation that is more likely to happen when the letter in question is a common letter such as E. For example, if in the word CARET the E is yellow and if in the subsequent word LEONE the last letter E is green and the first E is grey, then E occurs only once. An entry for E in **Exclude From Position** should be marked for all letter positions except the 5th position. EDUCE and PIECE will show up in the list if those multiple entries for E in **Exclude From Position** are omitted.
 
 ### Word Vocabularies
 

@@ -79,7 +79,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
   
   !['EXPECT_gilet_expected.png Image'](InfoImages/EXPECT_gilet_expected.png)
   
-* GILET's E( ) equals to UNLET's E( ) because GILET's 4 word group does have two **in-pool**, **hole-in-one** guesses. Thus this 4 word group's E(Gi) can be 1.75.
+* GILET's E( ) equals to UNLET's E( ) because GILET's 4 word group does have two **in-pool**, **hole-in-one** guesses. Thus, this 4 word group's E(Gi) can be 1.75.
 
 #### GOLEM
 
@@ -106,7 +106,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 <a id="match-clue"></a>
 
-* **Match Clue** is the five character code equivalent of Wordle's Grey, Yellow and Green letter color code for guess word to target word letter matching. The character 0 corresponds to Grey. The character 1 corresponds to Yellow. The character 2 corresponds to Green. Each of the five character code positions corresponds to the letter positions in a five letter guess word. **Match Clue** 22222 means all the letters match. **Match Clue** 00000 means no letters match.
+* **Match Clue** is the five character code equivalent of the Wordle Grey, Yellow and Green letter color code for guess word to target word letter matching. The character 0 corresponds to Grey. The character 1 corresponds to Yellow. The character 2 corresponds to Green. Each of the five character code positions corresponds to the letter positions in a five letter guess word. **Match Clue** 22222 means all the letters match. **Match Clue** 00000 means no letters match.
   * For example, the guess word CARGO for the solution word GHOUL has 00011 for the **match clue**. The '000' represent the letters CAR, which are not in GHOUL. The '11' represent the letters GO, which are letters present in GHOUL, but not in the last two letter positions.
 
 <a id="remainders"></a>
@@ -128,7 +128,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 <a id="in-pool"></a>
 
-* **In-Pool** refers to a guess word selected ***from the remaining possible solutions pool***. The day's Wordle solution is one of those remaining possible solutions. Which word is the solution is unknown but it's "perfect match" group can have only that word in it. It is a **singleton** group. The **singleton** "perfect match" group's E( )=0. **In-pool** categorization is useful when examining a guess having a **hole-in-one** groups result where every group is **singleton**.  This condition means the group has an E()<2 and by what amount can be significant.
+* **In-Pool** refers to a guess word selected ***from the remaining possible solutions pool***. The day's Wordle solution is one of those remaining possible solutions. Which word is the solution is unknown, but it's "perfect match" group can have only that word in it. It is a **singleton** group. The **singleton** "perfect match" group's E( )=0. **In-pool** categorization is useful when examining a guess having a **hole-in-one** groups result where every group is **singleton**.  This condition means the group has an E()<2 and by what amount can be significant.
 
 <a id="out-of-pool"></a>
 
@@ -136,7 +136,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 <a id="hole-in-one"></a>
 
-* **Hole-In-One (HIO)** refers to a group's result ***where every group contains only one word***. Every group is a **singleton**. In other words a ***hole-in-one** is when a guess used on a **remaining possible solution** list of N words results in N number of **groups**. Thus there is a **largest size 1** reporting because the guess divided the N **remaining possible solutions** N ways. Remember, no word can be in more than one **group**.
+* **Hole-In-One (HIO)** refers to a group's result ***where every group contains only one word***. Every group is a **singleton**. In other words a ***hole-in-one** is when a guess used on a **remaining possible solution** list of N words results in N number of **groups**. Thus, there is a **largest size 1** reporting because the guess divided the N **remaining possible solutions** N ways. Remember, no word can be in more than one **group**.
   * An **out-of-pool**, **hole-in-one** guess is an E( )=2. The solution will be in 2 steps, ***always***. The first guess, being **out-of-pool** and therefore cannot be the solution, is **hole-in-one**. It results in one **remaining possible solution** regardless of what the solution actually is. It eliminates all other solution candidates when any candidate is the solution. The second guess can only be the solution. Contrary to conventional wisdom, **out-of-pool**, **hole-in-one** guesses for seemingly large **remaining possible solution** lists, like nine words or more in size, are possible. Using the largest vocabulary guess pool provides more **out-of-pool**, **hole-in-one** opportunities.
   * An **in-pool**, **hole-in-one** guess is an E( )<2. The E( ) value varies according to the **remaining possible solution** list size N starting at 1.667 for N=3. The **in-pool**, **hole-in-one** guess E( ) approaches the value 2 as the **remaining possible solution** list size N increases.
 
@@ -150,28 +150,28 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 * This table shows the E( ) values for word count and group quantity sizes up to 12 words.
 * Notice that E( ) values for **in-pool**, **hole-in-one** guess situation approaches 2.00 as the number of words in a group gets larger and that the **out-of-pool**, **hole-in-one** guess situation is always 2.00 regardless of the word group size. The **in-pool** guess being the solution drops off in significance compared to the **out-of-pool** guess.
-* **out-of-pool**, **hole-in-one** guess situations are always 2 step situations regardless of word group size. They have an expected number of steps E( )=2. In fact only 2-step possibilities exist. An **in-pool** guess for an N word count list that results in N-1 groups, in other words there is one 2 word group in the N-1 groups, also has an E( )=2. There is a difference. The **out-of-pool**, **hole-in-one** guess results in only 2-step possibilities. The **in-pool** latter guess situation can result in a 1-step possibility and a 3-step possibility. The average expected steps is 2 steps.
+* **out-of-pool**, **hole-in-one** guess situations are always 2-step situations regardless of word group size. They have an expected number of steps E( )=2. In fact only 2-step possibilities exist. An **in-pool** guess for an N word count list that results in N-1 groups, in other words there is one 2 word group in the N-1 groups, also has an E( )=2. There is a difference. The **out-of-pool**, **hole-in-one** guess results in only 2-step possibilities. The **in-pool** latter guess situation can result in a 1-step possibility and a 3-step possibility. The average expected steps is 2 steps.
 
 | Word Count | Group Qty | E() in-pool HIO | E() out-of-pool HIO | in-pool | out-of-pool |
-| :--------: | :-------: | :-------------: | :-----------------: | :-----: | :---------: |
-| 2 | 2 | 1.50 |  na  |  na  |  na  |
-| 3 | 3 | 1.67 | 2.00 |  na  |  na  |
-| 3 | 2 |  na  |  na  | 2.00 | 2.33 |
-| 4 | 4 | 1.75 | 2.00 |  na  |  na  |
-| 4 | 3 |  na  |  na  | 2.00 | 2.25 |
-| 5 | 5 | 1.80 | 2.00 |  na  |  na  |
-| 5 | 4 |  na  |  na  | 2.00 | 2.20 |
-| 6 | 6 | 1.83 | 2.00 |  na  |  na  |
-| 6 | 5 |  na  |  na  | 2.00 | 2.17 |
-| 7 | 7 | 1.86 | 2.00 |  na  |  na  |
-| 7 | 6 |  na  |  na  | 2.00 | 2.14 |
-| 8 | 8 | 1.88 | 2.00 |  na  |  na  |
-| 8 | 7 |  na  |  na  | 2.00 | 2.13 |
-| 9 | 9 | 1.89 | 2.00 |  na  |  na  |
-| 9 | 8 |  na  |  na  | 2.00 | 2.11 |
-| 10 | 10 | 1.90 | 2.00 |  na  |  na  |
-| 10 |  9 |  na  |  na  | 2.00 | 2.10 |
-| 11 | 11 | 1.91 | 2.00 |  na  |  na  |
-| 11 | 10 |  na  |  na  | 2.00 | 2.09 |
-| 12 | 12 | 1.92 | 2.00 |  na  |  na  |
-| 12 | 11 |  na  |  na  | 2.00 | 2.08 |
+|:----------:|:---------:|:---------------:|:-------------------:|:-------:|:-----------:|
+|     2      |     2     |      1.50       |         na          |   na    |     na      |
+|     3      |     3     |      1.67       |        2.00         |   na    |     na      |
+|     3      |     2     |       na        |         na          |  2.00   |    2.33     |
+|     4      |     4     |      1.75       |        2.00         |   na    |     na      |
+|     4      |     3     |       na        |         na          |  2.00   |    2.25     |
+|     5      |     5     |      1.80       |        2.00         |   na    |     na      |
+|     5      |     4     |       na        |         na          |  2.00   |    2.20     |
+|     6      |     6     |      1.83       |        2.00         |   na    |     na      |
+|     6      |     5     |       na        |         na          |  2.00   |    2.17     |
+|     7      |     7     |      1.86       |        2.00         |   na    |     na      |
+|     7      |     6     |       na        |         na          |  2.00   |    2.14     |
+|     8      |     8     |      1.88       |        2.00         |   na    |     na      |
+|     8      |     7     |       na        |         na          |  2.00   |    2.13     |
+|     9      |     9     |      1.89       |        2.00         |   na    |     na      |
+|     9      |     8     |       na        |         na          |  2.00   |    2.11     |
+|     10     |    10     |      1.90       |        2.00         |   na    |     na      |
+|     10     |     9     |       na        |         na          |  2.00   |    2.10     |
+|     11     |    11     |      1.91       |        2.00         |   na    |     na      |
+|     11     |    10     |       na        |         na          |  2.00   |    2.09     |
+|     12     |    12     |      1.92       |        2.00         |   na    |     na      |
+|     12     |    11     |       na        |         na          |  2.00   |    2.08     |

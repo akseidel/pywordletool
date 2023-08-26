@@ -18,7 +18,7 @@
 
 ### Requirements To Run FMWN
 
-* **FMWM** is a **python** program and it relies on utilities that are typically present in UNIX, Apple OSX and Linux operating systems. Therefore, a recent **python** installation on any UNIX, Apple OSX or Linux operating system computer is the requirement. For Windows based computers a Linux subsystem would need to be installed with **python** installed within it. **FMWM** would need to be run within that Linux subsystem.
+* **FMWM** is a **python** program, and it relies on utilities that are typically present in UNIX, Apple OSX and Linux operating systems. Therefore, a recent **python** installation on any UNIX, Apple OSX or Linux operating system computer is the requirement. For Windows based computers a Linux subsystem would need to be installed with **python** installed within it. **FMWM** would need to be run within that Linux subsystem.
 
 ### How to run fmwm
 
@@ -90,7 +90,7 @@ A use example:
 
 ```text
 python3 fmwm.py -l -n -t feast -r 0 -x 4
-1 word: Average guesses to solve Wordle by sampling 4 trys.
+1 word: Average guesses to solve Wordle by sampling 4 tries.
 target_wrd: feast, 4 samples, random guesses, initial duplicates:True, wo_nyt_wordlist.txt
 [1, 3, 'feast', 'shown', 122, 'flask', 1]
 [2, 3, 'feast', 'mafia', 33, 'fecal', 1]
@@ -157,6 +157,6 @@ story,4.11,random guesses,True,least,wo_nyt_wordlist.txt,400,23.28290557442233
 
 #### Random Mode versus Ranked Mode Inner Workings
 
-**Random** mode Wordle solving is intended to be the benchmark against which all other Wordle solving methods are to be compared. As such **Random** mode needs to a base level of play lacking any sophistication. Therefore, **Random** mode makes all its guesses random words and it makes all guesses without regard to when the guess occurs in the play or whether the guess contains multiple occurring letters.
+**Random** mode Wordle solving is intended to be the benchmark against which all other Wordle solving methods are to be compared. As such **Random** mode needs to a base level of play lacking any sophistication. Therefore, **Random** mode makes all its guesses random words, and it makes all guesses without regard to when the guess occurs in the play or whether the guess contains multiple occurring letters.
 
 **Ranked** mode on the other hand is intended to model some level of play sophistication. Most reasonable Wordle play does not allow guesses having multiple occurring letters until the third guess. This is what **FMWM** does. If Wordle solutions never had multiple occurring letters then multiple occurring letters would always be excluded. But for **FMWM** to work properly the solution word must be present in the selection pool. For speed purposes **FMWM** lacks code for noticing the dwindling selection pool might or does lack the solution to effect the inclusion change. Often the number of words containing multiple occurring letters is small after the second guess. Therefore, allowing multiple occurring letters by the third guess is a reasonable compromise.
