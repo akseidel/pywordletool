@@ -16,6 +16,8 @@ Checking 'Letters To Be Excluded' letter check boxes results in words not contai
 
 Checking 'Letters To Be Required' letter check boxes results in words containing those letters. No words will show when six or more letters are required for the word.
 
+The checkboxed 'Exclude' and 'Required' letters are arranged in order of use frequency based on the 'Classic Ranking'. The checkboxed letters do not rearrange to 'Classis+ Ranking' when that ranking is in use. 'Classis+ Ranking' is the default ranking. The actual ranking order currently in use is seen when freshly selecting the 'Letter Ranking' button in the 'Information' window. 
+
 The Clear All button in the checkbox lineups clears all the checkboxes in that lineup. The letter check boxes are ordered according to letter use frequency. The vertical lines indicate a jump in letter use frequency and are useful to describe letter rank group types. The group descriptions in turn provide a language useful for discussing game strategy and game results.
 
 'Letter Positioning' is where letters may be excluded or required for one of the five possible Wordle word letter positions. For each requirement, select the letter and position. The plus (+) and minus (-) buttons add or remove the respective position requirement. The Z buttons clear the entire position list.
