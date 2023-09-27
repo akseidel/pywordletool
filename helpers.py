@@ -422,23 +422,38 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     [5]:population variance,
     all as a tuple
     """
-    # grp_stats in best_rank_dict are: [0]:qty, [1]:smallest, [2]:largest, [3]:average as a tuple
-    # Each has same optimal_rank and grps_qty as [0]
+    # The grp_stats for each best_rank_dict member are:
+    # [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:list qty/max and [5]:population variance as tuple parts
+    # Each member is 'best' because they have the maximum found grps_qty as the [0]:qty.
+    # The 'best' are equal in grps_qty and average but could have varying
+    # [2]:largest values and thus varying [5]:population variance values.
+    # BTW, optimal_rank ([3]:average) in this function is an old name. It is not always optimal.
+    #
+    # This function's purpose, groups_stat_summary, it to summarize the group stats in all the found
+    # best words that have their group stats contained by the best_rank_dictionary for reporting group
+    # optimal words. The summary report is for noticing when better word selections exist. Because a groups stat
+    # largest group count ([2]:largest) identifies a better selection within the best_rank_dictionary the
+    # max_grp_size this function reports will actually be the minimum of the [3]:largest present in the
+    # best_rank_dictionary. This is where we get the minimum of the maximums (min_max) idea. This is a subtlety
+    # noticed occasionally where some word selections among words all having the same grps_qty could be better
+    # because they have more balanced word group sizes, ie smaller population variance. Perhaps they also happen
+    # to be from the list showing. These selections would be harder to spot when the summmary reports the max group
+    # size instead of the min_max group size.
     g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
     optimal_rank = g_stats[3]
     grps_qty = g_stats[0]
-    # But not always max_grp_size, max_grp_size and max_grp_prob
     min_grp_size = grps_qty
-    max_grp_size = 0
+    max_grp_size = grps_qty  # The min_max is desired.
     max_grp_lmr = 0.0
     min_grp_p2 = grps_qty
     for g_stats in best_rank_dict.values():
         (_, min_stat, max_stat, _, lmr_stat, p2_stat) = g_stats
         min_grp_size = min(min_stat, min_grp_size)
-        max_grp_size = max(max_stat, max_grp_size)
+        max_grp_size = min(max_stat, max_grp_size)   # The min_max is desired.
         max_grp_lmr = max(lmr_stat, max_grp_lmr)
         min_grp_p2 = min(p2_stat, min_grp_p2)
-        # groups_stat_summary are: [0]:qty,
+        # groups_stat_summary are:
+        # [0]:qty,
         # [1]:smallest,
         # [2]:largest,
         # [3]:average ,
@@ -649,7 +664,7 @@ def groups_stats_summary_line(best_rank_dict: dict) -> str:
     (g_qty, g_min, g_max, g_ave, g_lmr, g_p2) = groups_stat_summary(best_rank_dict)
     rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(g_qty) + \
            ", sizes: min " + '{0:.0f}'.format(g_min) + \
-           ", max " + '{0:.0f}'.format(g_max) + \
+           ", min-max " + '{0:.0f}'.format(g_max) + \
            ", ave " + '{0:.3f}'.format(g_ave) + \
            ", Lqty/max " + '{0:.2f}'.format(g_lmr) + \
            ", p2 " + '{0:.2f}'.format(g_p2)

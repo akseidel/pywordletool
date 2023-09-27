@@ -372,7 +372,7 @@ class Pywordlemainwindow(ctk.CTk):
                 comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
                           ", grp qty " + '{0:.0f}'.format(g_qty) + \
                           ", sizes: min " + '{0:.0f}'.format(g_min) + \
-                          ", max " + '{0:.0f}'.format(g_max) + \
+                          ", min-max " + '{0:.0f}'.format(g_max) + \
                           ", ave " + '{0:.2f}'.format(g_ave) + \
                           ", Lqty/max " + '{0:.3f}'.format(g_lmr) + \
                           ", p2 " + "{0:.2f}".format(g_p2) + ")"
