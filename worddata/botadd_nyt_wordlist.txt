@@ -276,7 +276,6 @@ bigot
 biked
 biker
 bilge
-bilgy
 billy
 binge
 bingo
@@ -1436,7 +1435,6 @@ ivied
 ivory
 jaded
 janky
-japed
 jaunt
 jawed
 jazzy
@@ -1447,7 +1445,6 @@ jetty
 jewel
 jibed
 jiffy
-jihad
 jimmy
 joint
 joist
@@ -1572,7 +1569,6 @@ liked
 liken
 lilac
 limbo
-limey
 limit
 lined
 linen
@@ -1703,7 +1699,6 @@ metre
 metro
 mewed
 mezzo
-miasm
 micro
 midge
 midst
@@ -1787,7 +1782,6 @@ mused
 mushy
 music
 musky
-mussy
 musty
 muted
 myrrh
@@ -2096,7 +2090,6 @@ pshaw
 psych
 psyop
 pubic
-pubis
 pudge
 pudgy
 puffy

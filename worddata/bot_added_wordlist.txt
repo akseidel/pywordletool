@@ -81,7 +81,6 @@ bided
 bidet
 biked
 biker
-bilgy
 biped
 bipod
 biter
@@ -389,11 +388,9 @@ irked
 ivied
 jaded
 janky
-japed
 jawed
 jerry
 jibed
-jihad
 jimmy
 joked
 jokey
@@ -440,7 +437,6 @@ levee
 lexis
 lifer
 liked
-limey
 lined
 lippy
 liter
@@ -479,7 +475,6 @@ meted
 metre
 mewed
 mezzo
-miasm
 miked
 miler
 mimed
@@ -508,7 +503,6 @@ mowed
 moxie
 muggy
 mused
-mussy
 muted
 nabob
 nacho
@@ -610,7 +604,6 @@ proto
 pshaw
 psych
 psyop
-pubis
 pudge
 puked
 punky
