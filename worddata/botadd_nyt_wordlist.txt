@@ -959,7 +959,6 @@ fakir
 false
 famed
 fancy
-fanny
 farce
 fared
 fatal
@@ -1160,7 +1159,6 @@ giant
 gibed
 giddy
 gimme
-gipsy
 girly
 girth
 given
@@ -1276,7 +1274,6 @@ gusto
 gusty
 gutsy
 gutty
-gypsy
 habit
 hacky
 haiku
@@ -1648,7 +1645,6 @@ malty
 mamba
 mambo
 mamma
-mammy
 manga
 mange
 mango
@@ -1917,7 +1913,6 @@ palsy
 panda
 panel
 panic
-pansy
 panty
 papal
 paper
@@ -2369,7 +2364,6 @@ sedge
 seedy
 segue
 seize
-semen
 sense
 sepia
 serif
@@ -3066,7 +3060,6 @@ weedy
 weepy
 weigh
 weird
-welch
 whack
 whale
 wharf
