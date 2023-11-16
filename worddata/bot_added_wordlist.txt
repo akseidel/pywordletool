@@ -37,6 +37,7 @@ amuck
 ancho
 anise
 annal
+anole
 antsy
 apace
 arced
@@ -74,6 +75,7 @@ befog
 begot
 beige
 bendy
+beryl
 besot
 bided
 bidet
@@ -129,6 +131,7 @@ capri
 cared
 caret
 carny
+carob
 carom
 carte
 cased
@@ -151,6 +154,7 @@ clade
 clime
 clomp
 clunk
+coati
 cocky
 coded
 coder
@@ -244,6 +248,7 @@ emote
 ended
 erred
 ethyl
+evert
 expat
 exude
 exurb
@@ -565,6 +570,7 @@ peppy
 peter
 petit
 petri
+phage
 phish
 piked
 piker
@@ -638,6 +644,7 @@ reify
 reiki
 remap
 remix
+repot
 reran
 resaw
 resod
@@ -655,6 +662,7 @@ roman
 roped
 roper
 rosin
+roust
 roved
 rowed
 ruble
@@ -725,6 +733,7 @@ squid
 staph
 steno
 stent
+stile
 strep
 strew
 strum
@@ -827,6 +836,7 @@ wanly
 waved
 waxed
 weepy
+whelk
 whizz
 whomp
 whorl
