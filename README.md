@@ -38,6 +38,7 @@
 * Linux, Apple OSX or Microsoft Windows running a Linux subsystem
   * It should be possible to have the **Helper** running in a Linux subsystem running in Microsoft Windows, but these instructions do not explain how. The Linux subsystem would need to have OS components, like 'cat', 'grep' and 'bash' typically present on any Apple OSX or Linux system in addition to the python3, pip and customtkinter installs.  
 * python3: (<https://www.python.org/downloads/>)
+  * As of this writing Python 3.10 will do. Customtkinter will have a problem with Python 3.12.
 * pip: (<https://pypi.org/project/pip/>)
 * customtkinter
 
