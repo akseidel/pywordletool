@@ -39,14 +39,14 @@ help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 exclude = []  # exclude list used by monkey sampler
-font_tuple_n = ("Courier", 14, "normal")
+font_tuple_n = ("CourierNew", 14, "normal")
 
 
 def set_n_col(self):
     if self.winfo_screenwidth() > 1280:  # to do
         return 9
     else:
-        return 6
+        return 7
 
 
 def str_wrd_list_hrd(ln_col: int) -> str:
@@ -164,10 +164,20 @@ class Pywordlemainwindow(ctk.CTk):
         super().__init__()
         self.wnd_help = None
         self.title("This Wordle Helper")
+
+        # To Do - Setup width and height according to current screen
+        # dimensions.
         # print(self.winfo_screenheight())
         # print(self.winfo_screenwidth())
-        w_width = 1120  # 1036
-        w_height = 668  # to do, set according to screen height
+
+        # Screen width.
+        # w_width = 1120  # 1036
+        w_width = 1200  # 1036
+
+        # Screen height.
+        # w_height = 668  # to do, set according to screen height
+        w_height = 672  # to do, set according to screen height
+
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))

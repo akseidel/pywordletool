@@ -958,7 +958,7 @@ class RptWnd(ctk.CTkToplevel):
         self.resizable(width=True, height=True)
         self.geometry('780x600')
 
-        font_tuple_n = ("Courier", 14, "normal")
+        font_tuple_n = ("CourierNew", 14, "normal")
         self.search_text = tk.StringVar()
         self.search_text.set('for: ')
         self.rpt_grpsdriller_window = None
