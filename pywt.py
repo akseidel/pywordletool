@@ -39,7 +39,7 @@ help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 exclude = []  # exclude list used by monkey sampler
-font_tuple_n = ("CourierNew", 14, "normal")
+font_tuple_n = ("Courier", 14, "normal")
 
 
 def set_n_col(self):
