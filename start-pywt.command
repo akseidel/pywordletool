@@ -1,3 +1,4 @@
+  file='./worddata/letter_ranks.txt'
 #!/bin/bash
 # akseidel 06/08/22
 # https://github.com/akseidel/
@@ -94,7 +95,6 @@ chk4parts(){
   fi
 
   printf " Checking for ./worddata/letter_ranks.txt"
-  file='./worddata/letter_ranks.txt'
   if [ ! -f "$file" ]
   then
       notfound $file 0

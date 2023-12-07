@@ -37,17 +37,22 @@
 
 * Linux, Apple OSX or Microsoft Windows running a Linux subsystem
   * It should be possible to have the **Helper** running in a Linux subsystem running in Microsoft Windows, but these instructions do not explain how. The Linux subsystem would need to have OS components, like 'cat', 'grep' and 'bash' typically present on any Apple OSX or Linux system in addition to the python3, pip and customtkinter installs.  
-* python3: (<https://www.python.org/downloads/>)
-  * As of this writing Python 3.10 will do. Customtkinter will have a problem with Python 3.12.
-* pip: (<https://pypi.org/project/pip/>)
-* customtkinter
+* **python3**: (<https://www.python.org/downloads/>)
+  * As of this writing Python 3.10 is recommended.
+    * **Customtkinter** will have a problem with Python 3.12.
+    * There is an annoying graphical user interface focus bug when using Python 3.12 where the controls on the **Helper** window do not activate unless the window background is first touched. Using Python 3.10 avoids the problem. Using the command ```python3.10 pywt.py``` runs the **Helper** in Python 3.10 when other Python3 versions are present on your system.
+* **pip**: **pip** is a package installer for **python3**.
+* **customtkinter**
 
-'tkinter' provides graphical user interface support for python applications. It should automatically install with python, but be aware you might need to manually install it. 'customtkinter' is an expansion to 'tkinter'. This Wordle game helper uses some customtkinter features and so it needs to be installed along with python3. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
+'tkinter' provides graphical user interface support for python applications. It should automatically install with python, but be aware you might need to manually install it. 'customtkinter' is an expansion to 'tkinter'. This Wordle game helper uses some **customtkinter** features and so it needs to be installed along with **python3**. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
 
-After installing python3 and pip, the following commands entered in a Terminal window will install the 4.6.3 version of 'customtkinter':
-`pip3 install --upgrade customtkinter==4.6.3`
+#### Installing **python3**, **pip** and **customtkinter**
 
-* Note: As of this writing customtkinter is higher than version 4.6.3. Some prior to 4.6.3 versions and post 4.6.3 versions do not function properly. The result will be the Wordle **Helper** not running at all with no feedback.  Version 4.6.3 works with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
+* First, install **python3** by using the standard install package provided at <https://www.python.org/downloads/>. Be aware **Python3** can be installed by using many different methods. Each method may install **python3** and its versions at different locations on your system. This can cause complications for you if you are not aware of it. Each of the next two requirements **pip** and **customtkinter** will be installed at the specific **python3** version and location that corresponds to the **python3** version used to install them. For this reason using the standard install package provided at <https://www.python.org/downloads/> is recommended.
+* Second, install **pip** by using the command `python3 -m ensurepip --upgrade` entered in a Terminal window.
+* Lastly, install the 4.6.3 version of **customtkinter** by using the command `pip3 install --upgrade customtkinter==4.6.3` entered in a Terminal window.
+
+* Note: As of this writing **customtkinter** has higher versions than version 4.6.3. Some versions prior to 4.6.3 versions and versions after 4.6.3 do not function properly. When using the convenience script **start-groupdrilling.command** for running the Wordle **Helper** the result will be the **Helper** not running at and no feedback as to what has gone wrong.  Version 4.6.3 works with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
 
 ### Installing the Wordle Helper
 
