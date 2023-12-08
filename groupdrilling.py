@@ -20,7 +20,7 @@ letter_rank_file = 'letter_ranks.txt'
 
 def process_grp_list(self, g_word_lst: list) -> dict:
     # Flag to use various solutions as guesses instead of the current displayed word list.
-    # This is allows the option to group rank from the entire guess list.
+    # This allows the option to group rank from the entire guess list.
     grps_guess_source = self.grps_guess_source.get()
     optimal_group_guesses = {}
     context = 'Groups Drilling'
