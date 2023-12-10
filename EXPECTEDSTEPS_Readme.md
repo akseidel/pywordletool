@@ -60,11 +60,11 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 * In the above table every <a href="#singleton">**singleton**</a> group, like 11000 or 02000, has E(Gi)=1. Because the group leaves only 1 word to guess, there is 1 more step required in the **context** of the group. Had UNLED been an **in-pool** selection there would be one **singleton** "perfect match" group 22222 in this table that would have an E(Gi)=0.
 * Every 2 word group has an E(Gi)=1.5. It is assumed an **in-pool** guess will always be made when faced with a choice of 2 words. That assumption underlies why every 2 word group has an E(Gi)=1.5.
-* In this example it happens that every 3 word group resulting from UNLED has at least one possible <a href="#hole-in-one">**in-pool**, **hole-in-one**</a> guess. Such 3 word groups have an E(Gi)=1.667. All the words in group 00000 are **in-pool**, **hole-in-one** guesses. Two of the words in group 01000 are **in-pool**, **hole-in-one** guesses. It is assumed one figures that out and would use those **in-pool**, **hole-in-one** guesses later on if the leading guess, UNLED in this case, reveals the solution is in one of these groups.
+* In this example it happens that each 3 word group resulting from UNLED has at least one possible <a href="#hole-in-one">**in-pool**, **hole-in-one**</a> guess. Such 3 word groups have an E(Gi)=1.667. Each of the 3 words [goofy, bigot, ghost] in the group 00000 are **in-pool**, **hole-in-one** guesses. The two words [owing, going]in group 01000 [owing, going, thong] are **in-pool**, **hole-in-one** guesses. It is assumed one figures that out and would use those **in-pool**, **hole-in-one** guesses later on if the leading guess, UNLED in this case, reveals the solution is in one of these groups.
 
 ##### Drilling Into The 3 Word Groups To See If They Are In-Pool Hole-In-One
 
-* Submitting the 3 word group to its own group optimal operation as shown using **Groups Driller** in these two images shows the possible **in-pool**, **hole-in-one** guesses.
+* Submitting the 3 word groups to its own group optimal operation in the **Groups Driller** is shown here. The **min-max 1** indicates each set of word groups resulting from the highlighted quess word contains only one word and therefore is a **hole-in-one** guesses. Being **in-pool** guesses, these are **in-pool**, **hole-in-one** guesses. Thus both 3 word groups have a 1.667 E(Gi).
   
   !['EXPECT_3word_grps_inpool_hio3.png Image'](InfoImages/EXPECT_3word_grps_inpool_hio3.png)
   !['EXPECT_3word_grps_inpool_hio3.png Image'](InfoImages/EXPECT_3word_grps_inpool_hio2.png)
