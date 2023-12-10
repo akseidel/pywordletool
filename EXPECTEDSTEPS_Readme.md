@@ -26,7 +26,7 @@ Jargon words and fundamental ideas are used here to avoid cluttering this writin
 
 ### Example
 
-* (The images shown here are prior to when the group's **p2** value was included in the summary data. The **p2** value is the groups size population variance.)
+* (The table images shown here were created prior to when the group's **p2** value was included in the summary data and when the list quantity to largest group ratio was included in summary data. Furthermore, the Classic+ guess vocabulary is not used and **p2** is not mentioned. The **p2** value is the groups size population variance.)
 * In this example the word CARGO is the first play. The <a href="#match-clue">**match clue**</a> is 00011 (grey,grey,grey,yellow,yellow). As it happens, the word CARGO results in 25 <a href="#remainders">**remaining possible solutions**</a> words. This example compares two different kinds of guesses after the first CARGO guess.
 * Later on this example will show the 25 <a href="#remainders">**remaining possible solutions**</a> words.
 
