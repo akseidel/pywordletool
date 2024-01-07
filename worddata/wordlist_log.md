@@ -12,20 +12,20 @@ The full 14,855 word list is the file **nyt_wordlist.txt**.
 
 The following tracks some of the word changes:
 
-fanny, NYT unsuitable. It was an original 2,309 possible solution.
-gipsy, NYT unsuitable. It was an original 2,309 possible solution.
-gypsy, NYT unsuitable. It was an original 2,309 possible solution.
-lycra, Was a Wordlebot added word, but then later removed. Edited here 8/16/23
-mammy, NYT unsuitable. It was an original 2,309 possible solution.
-pansy, NYT unsuitable. It was an original 2,309 possible solution.
-semen, NYT unsuitable. It was an original 2,309 possible solution.
-welch, NYT unsuitable. It was an original 2,309 possible solution.
-welsh, NYT unsuitable. It was an original 2,309 possible solution.
-yowza, Was a Wordlebot added word, but then later removed. Edited here 8/16/23
-bilgy, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
-japed, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
-jihad, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
-limey, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
-miasm, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
-mussy, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
-pubis, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* fanny, NYT unsuitable. It was an original 2,309 possible solution.
+* gipsy, NYT unsuitable. It was an original 2,309 possible solution.
+* gypsy, NYT unsuitable. It was an original 2,309 possible solution.
+* lycra, Was a Wordlebot added word, but then later removed. Edited here 8/16/23
+* mammy, NYT unsuitable. It was an original 2,309 possible solution.
+* pansy, NYT unsuitable. It was an original 2,309 possible solution.
+* semen, NYT unsuitable. It was an original 2,309 possible solution.
+* welch, NYT unsuitable. It was an original 2,309 possible solution.
+* welsh, NYT unsuitable. It was an original 2,309 possible solution.
+* yowza, Was a Wordlebot added word, but then later removed. Edited here 8/16/23
+* bilgy, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* japed, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* jihad, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* limey, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* miasm, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* mussy, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* pubis, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
