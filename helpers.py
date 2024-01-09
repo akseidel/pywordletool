@@ -435,14 +435,14 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     # best_rank_dictionary. This is where we get the minimum of the maximums (min_max) idea. This is a subtlety
     # noticed occasionally where some word selections among words all having the same grps_qty could be better
     # because they have more balanced word group sizes, ie smaller population variance. Perhaps they also happen
-    # to be from the list showing. These selections would be harder to spot when the summmary reports the max group
+    # to be from the list showing. These selections would be harder to spot when the summary reports the max group
     # size instead of the min_max group size.
     g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
     optimal_rank = g_stats[3]
     grps_qty = g_stats[0]
     min_grp_size = grps_qty
     max_grp_size = grps_qty  # The min_max is desired.
-    min_grp_p2 = grps_qty
+    min_grp_p2 = g_stats[4]  # Seed with member's variance
     for g_stats in best_rank_dict.values():
         (_, min_stat, max_stat, _, p2_stat) = g_stats
         min_grp_size = min(min_stat, min_grp_size)
