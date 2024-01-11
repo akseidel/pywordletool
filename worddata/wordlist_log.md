@@ -29,6 +29,8 @@ The following tracks some of the word changes:
 * miasm, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
 * mussy, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
 * pubis, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
+* airer, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* chaat, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * doxed, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * fogie, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * hiree, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
@@ -38,5 +40,6 @@ The following tracks some of the word changes:
 * resod, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * rewon, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * shlub, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* unbag, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * yeesh, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * zowie, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
