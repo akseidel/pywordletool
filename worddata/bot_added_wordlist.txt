@@ -55,6 +55,7 @@ atria
 auger
 aural
 avast
+axing
 babka
 baked
 baldy
@@ -74,6 +75,7 @@ bebop
 befog
 begot
 beige
+belay
 bendy
 bento
 beryl
@@ -155,9 +157,11 @@ chive
 chomp
 choux
 churl
+cilia
 cited
 civet
 clade
+clave
 clime
 clomp
 clunk
@@ -219,7 +223,6 @@ doggo
 doggy
 doily
 doled
-dolma
 domed
 doozy
 doped
@@ -396,9 +399,9 @@ inure
 irked
 ivied
 jaded
+jammy
 janky
 jawed
-jerry
 jibed
 jimmy
 joked
@@ -470,6 +473,7 @@ lucre
 luger
 lured
 luted
+malic
 malty
 mamba
 manna
@@ -526,6 +530,7 @@ naggy
 naked
 named
 nappy
+natty
 nervy
 newsy
 nexus
@@ -534,6 +539,7 @@ nimby
 nippy
 nitro
 nixed
+nodal
 nosed
 noted
 nuked
@@ -575,6 +581,7 @@ passe
 paved
 paver
 pawed
+peaty
 peeve
 peony
 peppy
@@ -595,6 +602,7 @@ piped
 pipet
 piste
 plasm
+playa
 plebe
 plink
 plonk
@@ -658,7 +666,6 @@ reran
 resaw
 retag
 retie
-rewax
 rheum
 ricin
 riled
@@ -879,3 +886,4 @@ yummy
 zilch
 zippy
 zoned
+

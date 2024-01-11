@@ -192,6 +192,7 @@ awash
 awful
 awoke
 axial
+axing
 axiom
 axion
 azure
@@ -251,6 +252,7 @@ begot
 begun
 beige
 being
+belay
 belch
 belie
 belle
@@ -545,6 +547,7 @@ churn
 chute
 cider
 cigar
+cilia
 cinch
 circa
 cited
@@ -560,6 +563,7 @@ clank
 clash
 clasp
 class
+clave
 clean
 clear
 cleat
@@ -789,7 +793,6 @@ doily
 doing
 doled
 dolly
-dolma
 domed
 donor
 donut
@@ -1440,13 +1443,13 @@ itchy
 ivied
 ivory
 jaded
+jammy
 janky
 jaunt
 jawed
 jazzy
 jelly
 jerky
-jerry
 jetty
 jewel
 jibed
@@ -1652,6 +1655,7 @@ magma
 maize
 major
 maker
+malic
 malty
 mamba
 mambo
@@ -1809,6 +1813,7 @@ nappy
 nasal
 nasty
 natal
+natty
 naval
 navel
 needy
@@ -1835,6 +1840,7 @@ nitro
 nixed
 noble
 nobly
+nodal
 noise
 noisy
 nomad
@@ -1957,6 +1963,7 @@ payer
 peace
 peach
 pearl
+peaty
 pecan
 pedal
 peeve
@@ -2020,6 +2027,7 @@ plank
 plant
 plasm
 plate
+playa
 plaza
 plead
 pleat
@@ -2235,7 +2243,6 @@ retry
 reuse
 revel
 revue
-rewax
 rheum
 rhino
 rhyme

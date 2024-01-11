@@ -31,13 +31,16 @@ The following tracks some of the word changes:
 * pubis, Was a Wordlebot added word, but then later removed. Edited here 11/16/23
 * airer, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * chaat, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* dolma, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * doxed, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * fogie, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * hiree, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* jerry, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * odeum, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * psyop, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * pwned, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * resod, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* rewax  Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * rewon, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * shlub, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * unbag, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
