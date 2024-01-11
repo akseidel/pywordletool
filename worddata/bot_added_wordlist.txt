@@ -65,6 +65,7 @@ balsa
 bandy
 bared
 barer
+barre
 based
 bated
 batik
@@ -75,6 +76,7 @@ befog
 begot
 beige
 bendy
+bento
 beryl
 besot
 bided
@@ -87,6 +89,7 @@ biter
 bitsy
 blase
 bling
+bloop
 bocce
 boded
 boffo
@@ -101,12 +104,14 @@ boner
 bonny
 booed
 bored
+boric
 boron
 boson
 bowed
 bower
 boxed
 brava
+bream
 brier
 bronc
 brusk
@@ -126,8 +131,10 @@ calve
 campy
 caned
 caped
+capon
 capri
 cared
+carer
 caret
 carny
 carob
@@ -143,10 +150,13 @@ chary
 cheep
 chemo
 chewy
+chile
 chimp
 chino
 chive
 chomp
+choux
+churl
 cited
 civet
 clade
@@ -200,6 +210,7 @@ diked
 dined
 dinky
 dippy
+dishy
 ditsy
 ditzy
 divan
@@ -222,9 +233,9 @@ dotty
 doula
 douse
 dowse
-doxed
 dozed
 dozer
+dreck
 droid
 ducat
 ducky
@@ -277,11 +288,11 @@ flowy
 fluky
 flyby
 fogey
-fogie
 folic
 folky
 fount
 frack
+franc
 frise
 frizz
 frosh
@@ -349,7 +360,6 @@ hiked
 hiker
 hinky
 hired
-hiree
 hirer
 hissy
 hived
@@ -359,6 +369,7 @@ hocus
 hokey
 hokum
 holed
+holey
 homed
 homey
 honed
@@ -435,6 +446,7 @@ lemma
 letup
 levee
 lexis
+licit
 lifer
 liked
 lined
@@ -453,6 +465,7 @@ loped
 lordy
 lotto
 lotus
+loupe
 loved
 lubed
 lucre
@@ -469,6 +482,7 @@ matzo
 maven
 maxed
 mensa
+merch
 meshy
 messy
 meted
@@ -480,7 +494,9 @@ miler
 mimed
 mined
 mired
+mirin
 misty
+miter
 mixed
 mixer
 mixup
@@ -491,10 +507,12 @@ momma
 mommy
 mooch
 mooed
+moony
 moped
 moper
 mopey
 moray
+morel
 mosey
 mould
 mousy
@@ -524,8 +542,8 @@ nuked
 nutso
 oared
 oasis
+ocher
 ochre
-odeum
 offed
 ogled
 ogler
@@ -551,6 +569,7 @@ paged
 pager
 paled
 panda
+panko
 panty
 parch
 pared
@@ -603,13 +622,11 @@ promo
 proto
 pshaw
 psych
-psyop
 pudge
 puked
 punky
 punny
 pupae
-pwned
 pylon
 quaff
 quant
@@ -635,16 +652,15 @@ redux
 refry
 reify
 reiki
+relit
 remap
 remix
 repot
 reran
 resaw
-resod
 retag
 retie
 rewax
-rewon
 rheum
 ricin
 riled
@@ -675,9 +691,11 @@ saved
 saver
 sawed
 scape
+scarp
 schmo
 schwa
 scoot
+scrim
 scrip
 scrod
 scuff
@@ -690,7 +708,6 @@ sheaf
 shill
 shiva
 shlep
-shlub
 shoed
 shred
 sided
@@ -720,10 +737,12 @@ sowed
 spate
 spiff
 splay
+spork
 spume
 squab
 squid
 staph
+stele
 steno
 stent
 stile
@@ -739,6 +758,7 @@ swang
 swank
 swipe
 synch
+synth
 talky
 talus
 tamed
@@ -791,6 +811,7 @@ twerp
 twill
 typed
 ulnar
+umami
 umber
 unarm
 unbag
@@ -812,9 +833,11 @@ vaped
 veiny
 veldt
 venal
+venti
 vexed
 vined
 vitro
+voile
 voted
 vowed
 vroom
@@ -830,11 +853,14 @@ waved
 waxed
 weepy
 whelk
+whirr
+whist
 whizz
 whomp
 whorl
 wiled
 wined
+winey
 wiped
 wiper
 wired
@@ -847,7 +873,6 @@ xenon
 xerox
 yahoo
 yappy
-yeesh
 yodel
 yoked
 yokel
@@ -857,4 +882,3 @@ yummy
 zilch
 zippy
 zoned
-zowie
