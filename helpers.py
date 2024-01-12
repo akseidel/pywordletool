@@ -50,32 +50,32 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
         print(msg)
         messagebox.showwarning('Warning', message=msg)
         ltr_rank_dict = {
-            "e": [39.0, 2.28, 7.64, 5.61, 10.08, 13.38],
-            "a": [33.6, 4.82, 10.46, 10.46, 10.53, 5.58, 2.17],
-            "r": [30.9, 3.62, 9.21, 9.21, 5.62, 5.17, 7.31],
-            "o": [24.9, 1.36, 9.22, 9.22, 8.03, 4.36, 1.92],
-            "t": [24.7, 5.05, 2.61, 2.61, 3.76, 4.71, 8.57],
-            "i": [23.9, 1.21, 7.18, 7.18, 9.50, 5.64, 0.39],
-            "l": [23.9, 2.90, 6.67, 6.67, 3.74, 5.41, 5.17],
-            "s": [22.9, 12.49, 0.55, 0.55, 2.74, 5.85, 1.23],
-            "n": [20.3, 1.31, 3.08, 3.08, 4.85, 6.45, 4.60],
-            "u": [16.9, 1.20, 6.70, 6.70, 5.98, 2.97, 0.04],
-            "c": [16.5, 6.89, 1.39, 1.39, 1.95, 5.22, 1.08],
-            "y": [15.4, 0.22, 0.80, 0.80, 1.05, 0.11, 13.23],
-            "h": [14.0, 2.49, 5.20, 5.20, 0.32, 1.01, 4.94],
-            "d": [13.7, 3.87, 0.70, 0.70, 2.62, 2.41, 4.11],
-            "p": [12.8, 4.94, 2.14, 2.14, 2.00, 1.75, 1.96],
-            "g": [11.1, 4.11, 0.39, 0.39, 2.39, 2.71, 1.46],
-            "m": [11.0, 3.74, 1.33, 1.33, 2.13, 2.38, 1.47],
-            "b": [9.9, 6.13, 0.57, 0.57, 1.91, 0.85, 0.39],
-            "f": [7.6, 4.50, 0.27, 0.27, 0.83, 1.17, 0.87],
-            "k": [7.5, 0.71, 0.36, 0.36, 0.43, 1.96, 4.03],
-            "w": [7.1, 3.02, 1.62, 1.62, 0.96, 0.92, 0.63],
-            "v": [5.5, 1.55, 0.54, 0.54, 1.77, 1.62, 0.00],
-            "x": [1.4, 0.00, 0.52, 0.52, 0.44, 0.11, 0.30],
-            "z": [1.3, 0.10, 0.06, 0.06, 0.36, 0.65, 0.13],
-            "q": [1.1, 0.85, 0.19, 0.19, 0.04, 0.00, 0.00],
-            "j": [1.0, 0.74, 0.07, 0.07, 0.11, 0.07, 0.00],
+            "e": [44.7, 2.30, 8.09, 5.27, 16.48, 12.51],
+            "a": [35.1, 5.25, 12.47, 9.39, 5.41, 2.63],
+            "r": [31.2, 4.03, 8.22, 6.28, 5.06, 7.61],
+            "o": [27.3, 1.57, 11.41, 7.53, 4.44, 2.36],
+            "i": [25.3, 1.27, 8.87, 8.98, 5.56, 0.61],
+            "t": [24.6, 5.24, 2.31, 4.77, 4.58, 7.70],
+            "l": [23.3, 3.38, 6.00, 4.29, 4.99, 4.63],
+            "s": [22.5, 11.72, 0.69, 3.02, 5.48, 1.59],
+            "n": [20.5, 1.55, 3.16, 5.43, 5.95, 4.36],
+            "d": [19.9, 4.17, 0.82, 3.17, 2.19, 9.57],
+            "u": [17.8, 1.39, 7.60, 5.57, 3.09, 0.14],
+            "y": [16.8, 0.39, 0.78, 1.01, 0.17, 14.48],
+            "c": [16.7, 7.30, 1.54, 2.33, 4.52, 1.03],
+            "p": [14.5, 5.55, 1.86, 2.68, 2.02, 2.34],
+            "h": [13.8, 3.07, 4.80, 0.56, 1.03, 4.35],
+            "m": [12.2, 4.18, 1.41, 2.58, 2.58, 1.44],
+            "g": [11.3, 4.14, 0.46, 2.62, 2.64, 1.44],
+            "b": [10.9, 6.49, 0.57, 2.34, 0.94, 0.54],
+            "k": [8.6, 1.05, 0.39, 1.28, 2.39, 3.52],
+            "f": [7.8, 4.56, 0.26, 0.95, 1.18, 0.85],
+            "w": [7.4, 3.06, 1.59, 1.30, 0.85, 0.60],
+            "v": [5.6, 1.56, 0.56, 2.01, 1.50, 0.00],
+            "z": [1.9, 0.15, 0.05, 0.64, 0.81, 0.24],
+            "x": [1.9, 0.06, 0.53, 0.79, 0.08, 0.42],
+            "j": [1.3, 0.97, 0.06, 0.14, 0.11, 0.00],
+            "q": [1.0, 0.77, 0.20, 0.03, 0.00, 0.00]
         }
     return ltr_rank_dict
 
@@ -282,7 +282,7 @@ def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
     return pat
 
 
-# The filter builder. filter arguments for each type are addedto the grep command argumentlist
+# The filter builder. filter arguments for each type are added to the grep command argument list
 def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict):
     pipe = "|"
     pipe2 = "| "
@@ -392,13 +392,13 @@ def get_a_groups_stats(a_groups_dict: dict) -> tuple[int, int, int, float, float
     smallest = g_qty  # smallest group size
     largest = 0  # largest group size
     sums = 0  # group size sums, this is the number of words
-    mean = 0.0  # group average size
     p2 = 0.0  # group population variance
     for k, v in a_groups_dict.items():
         size = len(v)
         sums = sums + size
         largest = max(largest, size)
         smallest = min(smallest, size)
+    # mean = group average size
     mean = sums / g_qty
     for k, v in a_groups_dict.items():
         size = len(v)
@@ -446,7 +446,7 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     for g_stats in best_rank_dict.values():
         (_, min_stat, max_stat, _, p2_stat) = g_stats
         min_grp_size = min(min_stat, min_grp_size)
-        max_grp_size = min(max_stat, max_grp_size)   # The min_max is desired.
+        max_grp_size = min(max_stat, max_grp_size)  # The min_max is desired.
         min_grp_p2 = min(p2_stat, min_grp_p2)
         # groups_stat_summary are:
         # [0]:qty,

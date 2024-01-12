@@ -59,7 +59,7 @@ chk4python3(){
 # check for python package customtkinter on this system
 chk4customtkinter(){
   printf " Checking for customtkinter"
-  test="$(pip3 list | grep 'customtkinter')"
+  test="$(pip3 list | grep 'customtkinter' | xargs)"
   if ! [ "$test" ]> /dev/null;
   then
       printf "\n======================================================================\n"

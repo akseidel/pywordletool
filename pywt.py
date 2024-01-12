@@ -587,7 +587,8 @@ class Pywordlemainwindow(ctk.CTk):
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
                                          corner_radius=10,
-                                         borderwidth=0)
+                                         borderwidth=0
+                                         )
         self.result_frame.pack(padx=10, pady=2, fill=tk.X)
         self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         # the header line above the word list
