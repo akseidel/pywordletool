@@ -671,8 +671,10 @@ debug_mode = False  # prints out lists, guesses etc.
 reveal_mode = False  # reveals each solution run data
 data_path = 'worddata/'  # path from what will be helpers.py folder to data folder
 letter_rank_file = 'letter_ranks.txt'
-vocab_sol_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
-vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
+vocab_sol_filename = 'botadd_nyt_wordlist.txt'  # classic+ solutions vocabulary list only
+vocab_filename = 'botadd_nyt_wordlist.txt'  # classic+ solutions vocabulary list only
+# vocab_sol_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
+# vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 # loc_vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
 
 x_pos_dict = {}  # exclude position dictionary
