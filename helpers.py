@@ -9,7 +9,6 @@ import tkinter as tk  # assigns tkinter stuff to tk namespace
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own
 # ttk namespace so that tk is preserved
 from tkinter import messagebox
-from typing import NoReturn
 import customtkinter as ctk
 import groupdrilling
 
@@ -125,7 +124,7 @@ def wrd_has_duplicates(wrd) -> bool:
 
 
 # List out the ranked word list into n_col columns.
-def print_word_list_col_format(the_word_list, n_col) -> NoReturn:
+def print_word_list_col_format(the_word_list, n_col):
     n_items = len(the_word_list)
     h_txt = " Word : Rank "
     left_pad = ""
@@ -194,7 +193,7 @@ def get_results_word_list(this_sh_cmd_lst) -> list:
 
 
 # Clears the console window
-def clear_scrn() -> NoReturn:
+def clear_scrn():
     os.system("cls" if os.name == "nt" else "clear")
 
 
@@ -212,7 +211,7 @@ def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
 # Updates the exclude, exclude position and include position filtering according to
 # what a pick looks like against the solution word.
 def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dict,
-                             r_pos_dict: dict) -> NoReturn:
+                             r_pos_dict: dict):
     candidate_pos = 0
     for pl in pick:
         if sol.find(pl) < 0:
@@ -234,7 +233,7 @@ def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dic
         candidate_pos += 1
 
 
-def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str) -> NoReturn:
+def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
     """Builds the grep line for excluding positions
     """
     # example 'grep -vE \'..b..\'' for b,3
@@ -263,9 +262,11 @@ def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
     pos = 1
     if len(this_pos_dict) < 1:  # no grep required
         return pat
+
     # first make a dictionary of the dictionary sorted by the position number
     tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
     sorted_by_pos_dict = dict(tlist)
+
     for x in sorted_by_pos_dict:
         parts = sorted_by_pos_dict[x].split(',')
         ltr = parts[0].lower()
@@ -275,6 +276,7 @@ def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
             pos += 1
         pat = pat + ltr
         pos += 1
+
     # fill out the trailing undefined positions
     while len(pat) < 5:
         pat = pat + '.'
@@ -305,6 +307,7 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
     # Build exclude from position, but require
     rq_ltrs = "".join(requ_l)
     build_x_pos_grep(wordle_tool, x_pos_dict, rq_ltrs)
+
     # Build require at position
     build_r_pos_grep(wordle_tool, r_pos_dict)
 
@@ -580,7 +583,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, cont
     return best_rank_dict
 
 
-def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk):
     report_footer_summary_header_to_window(msg1, word_lst, rptwnd)
     report_footer_stats_summary_to_window(best_rank_dict, rptwnd)
     report_footer_opt_wrds_to_window(best_rank_dict, rptwnd)
@@ -588,13 +591,13 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
     rptwnd.back_to_summary()
 
 
-def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk) -> NoReturn:
+def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = "\n\n> >  Groups summary using the " + msg + " words for guesses on the " + \
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.msg1.insert(tk.END, rptl)
 
 
-def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt: bool) -> NoReturn:
+def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt: bool):
     rptl = rptwnd.context + " - Pattern Groups For Guesses From The " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + ")"
     rptwnd.title(rptl)
@@ -610,7 +613,7 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt
 
 
 def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict,
-                                  rptwnd: ctk, cond_rpt: bool) -> NoReturn:
+                                  rptwnd: ctk, cond_rpt: bool) -> None:
     (qty, smallest, largest, average, p2) = grp_stats
     if not cond_rpt:
         rptl = '\n\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
@@ -636,7 +639,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
         rptwnd.msg1.insert(tk.END, rptl)
 
 
-def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
     rptwnd.msg1.insert(tk.END, groups_stats_summary_line(best_rank_dict))
     rptwnd.msg1.see('end')
 
@@ -658,7 +661,7 @@ def groups_stats_summary_line(best_rank_dict: dict) -> str:
     return rptl
 
 
-def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk):
     rptwnd.msg1.insert(tk.END, opt_wrds_for_reporting(best_rank_dict))
 
 
@@ -668,7 +671,7 @@ def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
     return rptl
 
 
-def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk) -> NoReturn:
+def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk):
     # stats_summary
     # [0]:qty,
     # [1]:smallest,
@@ -703,7 +706,7 @@ class ShellCmdList:
         self.shCMDlist.append("cat " + list_file_name)
 
     # Adds string s to the command stack.
-    def add_cmd(self, s: str) -> NoReturn:
+    def add_cmd(self, s: str) -> None:
         if len(s) > 0:
             self.shCMDlist.append(s)
 
@@ -717,19 +720,19 @@ class ShellCmdList:
         return rand_frm_l
 
     # Adds command to stack to require letter ltr.
-    def add_require_cmd(self, ltr: str) -> NoReturn:
+    def add_require_cmd(self, ltr: str) -> None:
         if len(ltr) > 0:
             self.shCMDlist.append("grep -E '" + ltr + "'")
 
     # Adds command to stack to exclude the letter ltr.
-    def add_excl_cmd(self, ltr: str) -> NoReturn:
+    def add_excl_cmd(self, ltr: str) -> None:
         if len(ltr) > 0:
             self.shCMDlist.append("grep -vE '" + ltr + "'")
 
     # Adds command to stack to exclude letter from a position number.
     # Context is that letter is known, therefore is required but not
     # at the designated position.
-    def add_excl_pos_cmd(self, ltr: str, p: int, add_e: bool) -> NoReturn:
+    def add_excl_pos_cmd(self, ltr: str, p: int, add_e: bool) -> None:
         if len(ltr) > 0:
             # add_E a requirement argument, being managed
             # outside the shCMDList so that the shCMDList
@@ -743,7 +746,7 @@ class ShellCmdList:
             self.shCMDlist.append("grep -vE '" + dp + ltr + dpn + "'")
 
     # Adds command to stack to require letter at a position number.
-    def add_incl_pos_cmd(self, ltr: str, p: int) -> NoReturn:
+    def add_incl_pos_cmd(self, ltr: str, p: int) -> None:
         if len(ltr) > 0:
             # Have letter in this position
             c = 5
@@ -905,12 +908,12 @@ class CustomText(tk.Text):
 # The verbose information window
 class RptWnd(ctk.CTkToplevel):
 
-    def clear_msg1(self) -> NoReturn:
+    def clear_msg1(self) -> None:
         self.msg1.configure(state='normal')
         self.msg1.delete(1.0, tk.END)
         self.msg1.configure(state='disabled')
 
-    def close_rpt(self) -> NoReturn:
+    def close_rpt(self) -> None:
         self.destroy()
 
     def search_for_text(self):
@@ -931,7 +934,7 @@ class RptWnd(ctk.CTkToplevel):
         self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
         self.msg1.remove_tag('grp')
 
-    def rpt_show_grps_driller(self) -> NoReturn:
+    def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
             self.rpt_grpsdriller_window = groupdrilling.GrpsDrillingMain()  # create window if its None or destroyed
         else:
@@ -949,8 +952,7 @@ class RptWnd(ctk.CTkToplevel):
         self.rpt_grpsdriller_window = None
 
         self.info_frame = ctk.CTkFrame(self,
-                                       corner_radius=10,
-                                       borderwidth=0
+                                       corner_radius=10
                                        )
         self.info_frame.pack(fill='both',
                              padx=2,
@@ -979,6 +981,7 @@ class RptWnd(ctk.CTkToplevel):
         rpt_sb.config(command=self.msg1.yview)
 
         button_q = ctk.CTkButton(self, text="Close",
+                                 text_color="black",
                                  command=self.close_rpt)
         button_q.pack(side="right", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.close_rpt)  # assign to closing button [X]
@@ -991,15 +994,18 @@ class RptWnd(ctk.CTkToplevel):
         entry_find.bind('<KeyRelease-Return>', self.entry_release_return)
 
         button_f = ctk.CTkButton(self, text="Find",
+                                 text_color="black",
                                  command=self.search_for_text
                                  )
         button_f.pack(side="left", padx=0, pady=10)
 
         button_drill = ctk.CTkButton(self, text="Groups Driller",
+                                     text_color="black",
                                      width=40, command=self.rpt_show_grps_driller)
         button_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
 
         button_b = ctk.CTkButton(self, text="Summary",
+                                 text_color="black",
                                  command=self.back_to_summary
                                  )
         button_b.pack(side="left", padx=10, pady=10)

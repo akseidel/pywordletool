@@ -14,14 +14,13 @@
 import sys
 import datetime
 import time
-from typing import NoReturn
 import helpers
 import random
 import argparse
 import csv
 
 
-def process_any_arguments() -> NoReturn:
+def process_any_arguments() -> None:
     """
     Process any command line arguments
     """
@@ -157,7 +156,7 @@ def unranked_word_dict() -> dict:
     return helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst(True)
 
 
-def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> NoReturn:
+def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> None:
     """
     Clears all the objects used to hold the letter filtering information
     @param loc_excl_l: List of letters to exclude.
@@ -171,7 +170,7 @@ def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_
     loc_requ_l.clear()
 
 
-def set_late_timestamp_elements() -> NoReturn:
+def set_late_timestamp_elements() -> None:
     """
     Sometimes a .csv file is desired but not every run parameters is specified
     in the command line arguments. These parameters are set late outside the
@@ -188,7 +187,7 @@ def set_late_timestamp_elements() -> NoReturn:
     ts_prt = f'R{(rank_mode + 1)}_'  # rank mode timestamp element
 
 
-def confirm_resume_after_wrd() -> NoReturn:
+def confirm_resume_after_wrd() -> None:
     """
     If this is a resume run where process needs to resume after a certain word,
     that resume_after_wrd, which would have come in as a command line argument,
@@ -202,7 +201,7 @@ def confirm_resume_after_wrd() -> NoReturn:
         resume_after_wrd = input('Enter a valid Wordle word to resume after: ').lower()
 
 
-def get_set_target_word() -> NoReturn:
+def get_set_target_word() -> None:
     """
     Establish and verify the target word.
     Any already set target word is verified to be in the_word_list.
@@ -217,7 +216,7 @@ def get_set_target_word() -> NoReturn:
         target_wrd = input('Enter a valid Wordle target word: ').lower()
 
 
-def get_set_starting_guess() -> NoReturn:
+def get_set_starting_guess() -> None:
     """
     Ask for and set a given first guess word to be used in every session.
     """
@@ -232,7 +231,7 @@ def get_set_starting_guess() -> NoReturn:
             use_starting_wrd = 0
 
 
-def get_set_guess_mode() -> NoReturn:
+def get_set_guess_mode() -> None:
     """
     Gets and sets the general run type: random guess or ranked guess.
     If ranked guess then get and set the ranking type.
@@ -308,7 +307,7 @@ def fmwm_fname() -> str:
     return ts
 
 
-def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
+def output_msg(msg: any, also2file: bool, loc_fname: str) -> None:
     """
     Outputs content to console and to csv file.
     @param msg: The content to be output
@@ -334,7 +333,7 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> NoReturn:
 
 
 def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
-                   loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd) -> NoReturn:
+                   loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd) -> None:
     """
     Reports the conditions for the impending sample run
     @param loc_sample_number: total overall number of guesses
@@ -376,7 +375,7 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
                 output_msg(reveal_hdr, loc_record_run, loc_run_fname)
 
 
-def reveal_output(x, guesses, run_stats, loc_record_run, loc_run_fname) -> NoReturn:
+def reveal_output(x, guesses, run_stats, loc_record_run, loc_run_fname) -> None:
     """
     Reveal mode is the option to report the results for an xth sample run
     @param x: The xth sample attempt
@@ -393,7 +392,7 @@ def reveal_output(x, guesses, run_stats, loc_record_run, loc_run_fname) -> NoRet
 
 
 def prologue_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
-                    loc_target_wrd, loc_starting_wrd, tot, loc_vocab_filename, loc_dur_tw) -> NoReturn:
+                    loc_target_wrd, loc_starting_wrd, tot, loc_vocab_filename, loc_dur_tw) -> None:
     """
     Reports the results of a sample run
     @param loc_sample_number: total overall number of guesses
@@ -570,7 +569,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     sys.stdout.write('\n')
 
 
-def magic_word_monkey(loc_wrd_x: int) -> NoReturn:
+def magic_word_monkey(loc_wrd_x: int) -> None:
     """
     Intended to find only the first guess words that reduce the vocabulary selection,
     pool to the magic_order word count. Magic_order 1 means the target word only. Magic_order

@@ -49,10 +49,10 @@
 #### Installing **python3**, **pip** and **customtkinter**
 
 * First, install **python3** by using the standard install package provided at <https://www.python.org/downloads/>. Be aware **Python3** can be installed by using many different methods. Each method may install **python3** and its versions at different locations on your system. This can cause complications for you if you are not aware of it. Each of the next two requirements **pip** and **customtkinter** will be installed at the specific **python3** version and location that corresponds to the **python3** version used to install them. For this reason using the standard install package provided at <https://www.python.org/downloads/> is recommended.
-* Second, install **pip** by using the command `python3 -m ensurepip --upgrade` entered in a Terminal window.
-* Lastly, install the 4.6.3 version of **customtkinter** by using the command `pip3 install --upgrade customtkinter==4.6.3` entered in a Terminal window.
+* Second, install **pip** by using the command `python3 -m ensurepip --upgrade` entered in a Terminal window. Not all **python3** installations are equal. It is possible for the **ensurepip** feature to not exist, in which case you will need to search the web for the method that works for your situation to install **pip**.  
+* Lastly, install **customtkinter** by using the command `pip3 install --upgrade customtkinter==5.2.2` entered in a Terminal window.
 
-* Note: As of this writing **customtkinter** has higher versions than version 4.6.3. Some versions prior to 4.6.3 versions and versions after 4.6.3 do not function properly. When using the convenience script **start-groupdrilling.command** for running the Wordle **Helper** the result will be the **Helper** not running at and no feedback as to what has gone wrong.  Version 4.6.3 works with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
+* Note: **customtkinter** is in active development. Changes to it might cause Wordle **Helper** to fail running. When using the convenience script **start-pywt.command** to start the Wordle **Helper** there is no failure feedback other than not seeing the **Helper**. As of this writing the **Helper** runs with **customtkinter** versions 4.6.3 and 5.2.2.  Version 4.6.3 and 5.2.2 with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
 
 ### Installing the Wordle Helper
 

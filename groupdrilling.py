@@ -6,7 +6,6 @@ import tkinter as tk  # assigns tkinter stuff to tk namespace so that
 import tkinter.messagebox
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
 # namespace so that tk is preserved
-from typing import NoReturn
 import customtkinter as ctk
 import helpers
 import re
@@ -87,7 +86,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
               '\n\nRaw pastes from the This Wordle Helper will be automatically cleaned and converted to ' + \
               'a valid word list entry.'
 
-    def close_rpt(self) -> NoReturn:
+    def close_rpt(self) -> None:
         self.destroy()
 
     def clean_the_grp_list(self) -> tuple[bool, list[str], list[str]]:
@@ -139,6 +138,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
             self.button_process.configure(state='disabled')
             self.update()
             optimal_group_guesses = process_grp_list(self, this_lst)
+
             # Report the results
             self.report_results(this_lst, optimal_group_guesses)
             self.title("Groups Drilling")
@@ -154,7 +154,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                          )
             return
 
-    def report_results(self, this_lst: list, optimal_group_guesses: dict) -> NoReturn:
+    def report_results(self, this_lst: list, optimal_group_guesses: dict) -> None:
         # The words in common will be highlighted.
         words_in_common = list(set(this_lst) & set(optimal_group_guesses))
         regex: str = '|'.join(words_in_common)
@@ -273,16 +273,14 @@ class GrpsDrillingMain(ctk.CTkToplevel):
 
         # controls frame
         self.cnt_frame = ctk.CTkFrame(self,
-                                      corner_radius=10,
-                                      borderwidth=0
+                                      corner_radius=10
                                       )
         self.cnt_frame.pack(fill=tk.X, padx=8, pady=2)
 
         # controls
 
         self.bts_frame = ctk.CTkFrame(self.cnt_frame,
-                                      corner_radius=10,
-                                      borderwidth=0
+                                      corner_radius=10
                                       )
         self.bts_frame.pack(fill=tk.X, padx=0, pady=2)
 
@@ -293,25 +291,25 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.entry_find.bind("<KeyRelease-Return>", self.on_list_entry_return_release)
 
         self.button_close = ctk.CTkButton(self.bts_frame, text="Close",
-                                          width=80,
+                                          width=80, text_color="black",
                                           command=self.destroy)
         self.button_close.pack(side="right", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.destroy)  # assign to closing button [X]
 
         self.button_process = ctk.CTkButton(self.bts_frame, text="Process",
-                                            width=80,
+                                            width=80, text_color="black",
                                             command=self.process_entry_list
                                             )
         self.button_process.pack(side="left", padx=10, pady=10)
 
         self.button_clear = ctk.CTkButton(self.bts_frame, text="Clear",
-                                          width=40,
+                                          width=40, text_color="black",
                                           command=self.clear_list
                                           )
         self.button_clear.pack(side="left", padx=6, pady=10)
 
         self.button_clear = ctk.CTkButton(self.bts_frame, text="Clear 'N Paste",
-                                          width=40,
+                                          width=40, text_color="black",
                                           command=self.clear_and_paste
                                           )
         self.button_clear.pack(side="left", padx=6, pady=10)
@@ -364,8 +362,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
 
         # status frame
         self.stat_frame = ctk.CTkFrame(self,
-                                       corner_radius=10,
-                                       borderwidth=0
+                                       corner_radius=10
                                        )
         self.stat_frame.pack(fill=tk.BOTH, padx=8, pady=2, expand=True)
 
