@@ -1,4 +1,4 @@
-# Pied Piper and Mouse That lays Golden Eggs Allegory
+# Pied Piper and Mouse That Lays Golden Eggs Allegory
 
 You are the Pied Piper wanting to catch the mouse that lays golden eggs. This mouse looks like any other mouse. When hearing a tune mice, group up to dance in circles according to how they like the tune. When you march away playing the tune the one dancing mice group with the special mouse follows you. The other mice groups stay behind. 
 
