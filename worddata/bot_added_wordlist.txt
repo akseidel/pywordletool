@@ -348,6 +348,7 @@ gutty
 hacky
 haiku
 halal
+hammy
 hanky
 hated
 hazed
@@ -364,7 +365,6 @@ hired
 hirer
 hissy
 hived
-hoagy
 hoary
 hocus
 hokey

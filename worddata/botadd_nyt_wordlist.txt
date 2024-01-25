@@ -1292,6 +1292,7 @@ haiku
 hairy
 halal
 halve
+hammy
 handy
 hanky
 happy
@@ -1342,7 +1343,6 @@ hirer
 hissy
 hitch
 hived
-hoagy
 hoard
 hoary
 hobby

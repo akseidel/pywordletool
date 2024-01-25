@@ -35,6 +35,7 @@ The following tracks some of the word changes:
 * doxed, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * fogie, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * hiree, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* hoagy, Was a Wordlebot added word, but then later removed. Edited here 01/25/24
 * jerry, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * odeum, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * psyop, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
