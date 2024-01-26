@@ -990,7 +990,6 @@ class RptWnd(ctk.CTkToplevel):
                                   textvariable=self.search_text
                                   )
         entry_find.pack(side=tk.LEFT, padx=10, pady=10)
-        entry_find.bind('<KeyRelease-Return>', self.search_for_text)
         entry_find.bind('<KeyRelease-Return>', self.entry_release_return)
 
         button_f = ctk.CTkButton(self, text="Find",
