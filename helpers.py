@@ -444,7 +444,7 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     optimal_rank = g_stats[3]
     grps_qty = g_stats[0]
     min_grp_size = g_stats[2]  # Seed with a member's largest
-    max_grp_size = grps_qty  # The min_max is desired.
+    max_grp_size = g_stats[2]  # The min_max is desired. Seed with a member's largest
     min_grp_p2 = g_stats[4]  # Seed with member's variance
     for g_stats in best_rank_dict.values():
         (_, min_stat, max_stat, _, p2_stat) = g_stats
