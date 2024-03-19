@@ -1008,3 +1008,98 @@ class RptWnd(ctk.CTkToplevel):
                                  command=self.back_to_summary
                                  )
         button_b.pack(side="left", padx=10, pady=10)
+
+
+class HelpWindow(ctk.CTkToplevel):
+
+    def close_help(self) -> None:
+        self.destroy()
+
+    # Returns string that is the information
+    def get_rank_data(self) -> str:
+        full_path_name = os.path.join(os.path.dirname(__file__), self.data_path, self.letter_rank_file)
+        if os.path.exists(full_path_name):
+            f = open(full_path_name, "r", encoding="UTF8").read()
+        else:
+            f = 'Could not find. ' + self.full_path_name
+        return f
+
+    def get_info(self) -> str:
+        full_path_name = os.path.join(os.path.dirname(__file__), self.data_path, 'helpinfo.txt')
+        if os.path.exists(full_path_name):
+            f = open(full_path_name, "r", encoding="UTF8").read()
+        else:
+            f = 'This is all the help you get because file helpinfo.txt has gone missing.'
+        return f
+
+    def show_info(self) -> None:
+        self.msg1.configure(state='normal')
+        self.msg1.delete(1.0, tk.END)
+        self.msg1.insert(tk.END, self.get_info())
+        self.msg1.configure(state='disabled')
+
+    def show_rank_info(self) -> None:
+        self.msg1.configure(state='normal')
+        self.msg1.delete(1.0, tk.END)
+        raw_rank_data = self.get_rank_data()
+        f = raw_rank_data.replace(":", "\t")
+        self.msg1.insert(tk.END, "Using file: " + self.letter_rank_file + "\n")
+        self.msg1.insert(tk.END, "RNK = Rank for any occurrence\n")
+        self.msg1.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
+        self.msg1.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
+        self.msg1.insert(tk.END, "---\t---\t-----\t-----\t-----\t-----\t-----\n")
+        self.msg1.insert(tk.END, f)
+        self.msg1.configure(state='disabled')
+
+    def __init__(self, data_path, letter_rank_file):
+        super().__init__()
+        self.data_path = data_path
+        self.letter_rank_file = letter_rank_file
+        self.wm_title('Some Information For You')
+        self.resizable(width=False, height=False)
+        self.title('Some Information For You')
+
+        # configure style
+        style = ttk.Style()
+        style.theme_use()
+        help_font_tuple_n = ("Courier", 14, "normal")
+
+        self.info_frame = ttk.LabelFrame(self,
+                                         borderwidth=0,
+                                         )
+        self.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=0, expand=True)
+
+        self.msg1 = tk.Text(self.info_frame,
+                            wrap='word',
+                            padx=10,
+                            pady=8,
+                            background='#dedede',
+                            borderwidth=0,
+                            highlightthickness=0,
+                            )
+        self.msg1.grid(row=0, column=0, padx=6, pady=0)
+        self.msg1.configure(font=help_font_tuple_n)
+        # scrollbar for help
+        help_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
+        help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
+        self.msg1.config(yscrollcommand=help_sb.set)
+        help_sb.config(command=self.msg1.yview)
+        self.show_info()
+
+        button_q = ctk.CTkButton(self, text="Close",
+                                 text_color="black",
+                                 command=self.close_help)
+        button_q.pack(side="right", padx=10, pady=10)
+        self.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
+
+        button_r = ctk.CTkButton(self, text="Letter Ranking",
+                                 text_color="black",
+                                 command=self.show_rank_info
+                                 )
+        button_r.pack(side="left", padx=10, pady=10)
+
+        button_i = ctk.CTkButton(self, text="Information",
+                                 text_color="black",
+                                 command=self.show_info
+                                 )
+        button_i.pack(side="left", padx=10, pady=10)

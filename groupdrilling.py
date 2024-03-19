@@ -92,11 +92,11 @@ class GrpsDrillingMain(ctk.CTkToplevel):
     def clean_the_grp_list(self) -> tuple[bool, list[str], list[str]]:
         """
         Processes what was pasted into the word list entry into a proper looking list of
-        five letter words. The intent is to be able to paste raw text copied out of the Helper's
+        five-letter words. The intent is to be able to paste raw text copied out of the Helper's
         list window, raw text copied from a Groups Driller output and other copied text sources like
         spreadsheet ranges. Numbers, spaces, punctuation, non-alphabet characters and line feeds
         are to be removed.
-        @return: a tuple containing Status, the list of five letter words , the list of invalid words.
+        @return: a tuple containing Status, the list of five-letter words , the list of invalid words.
         """
         this_grp = self.grp_words_text.get()
         # First strip out numbers, like those that are rankings from
@@ -106,7 +106,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         # later strip function that operates on section split by comma.
         # Empty words will be culled later on.
         this_grp = this_grp.replace(' ', ',')
-        # A paste from a spreadsheet row will be tab deliniated.
+        # A paste from a spreadsheet row will be tab delineated.
         this_grp = this_grp.replace('\t', ',')
         # Handling the newline characters.
         this_grp = this_grp.replace('\n', ',')

@@ -16,7 +16,6 @@
 # if already  present, you may need to upgrade it -> pip3 install customtkinter --upgrade
 # Hopefully the upgrade does not break this code.
 #
-import os
 import random
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that
 # it may be separate from ttk
@@ -115,19 +114,12 @@ class Pywordlemainwindow(ctk.CTk):
     global x_pos_dict
     global r_pos_dict
 
-    def close_help(self) -> None:
-        global help_showing
-        self.wnd_help.destroy()
-        help_showing = False
-
     def show_help(self) -> None:
-        global help_showing
-        if help_showing is False:
-            help_showing = True
-            self.create_wnd_help()
+        if self.wnd_help is None or not self.wnd_help.winfo_exists():
+            self.wnd_help = helpers.HelpWindow(data_path, letter_rank_file)  # create window if its None or destroyed
         else:
-            self.wnd_help.destroy()
-            self.create_wnd_help()
+            self.wnd_help.deiconify()  # unhide possible hidden window
+            self.wnd_help.focus()  # if window exists focus it
 
     # ======== set exclude cboxes to treeview selection
     def x_pos_tree_view_click(self, event) -> None:
@@ -217,6 +209,15 @@ class Pywordlemainwindow(ctk.CTk):
             else:
                 letter_rank_file = 'letter_ranks_bot.txt'
             do_grep()
+            update_help_wind(letter_rank_file)
+
+        def update_help_wind(letter_rank_file) -> None:
+            if self.wnd_help is None:
+                return
+            else:
+                self.wnd_help.letter_rank_file = letter_rank_file
+                self.wnd_help.show_rank_info()
+                self.wnd_help.deiconify()
 
         def do_grep() -> None:
             """Runs a wordletool helper grep instance
@@ -311,7 +312,7 @@ class Pywordlemainwindow(ctk.CTk):
                 # current displayed word list
                 word_list = list(the_word_list.keys())
                 # Flag to use various solutions as guesses instead of the current displayed word list.
-                # This is allows the option to group rank from the entire guess list.
+                # This allows the option to group rank from the entire guess list.
                 grps_guess_source = self.grps_guess_source.get()
                 optimal_group_guesses = {}
                 context = "Wordle Helper"
@@ -1371,7 +1372,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_grpB_frame = ttk.Frame(self.admin_frame)
         self.bt_grpB_frame.pack(side=tk.BOTTOM, padx=0, pady=3, fill=tk.X)
 
-        self.bt_help = ctk.CTkButton(self.bt_grpB_frame, text="Information", width=40, text_color="black", command=self.show_help)
+        self.bt_help = ctk.CTkButton(self.bt_grpB_frame, text="Information", width=40, text_color="black",
+                                     command=self.show_help)
         self.bt_help.pack(side=tk.LEFT, padx=4, pady=3, fill=tk.X, expand=True)
 
         self.bt_drill = ctk.CTkButton(self.bt_grpB_frame, text="Groups Driller",
@@ -1382,10 +1384,12 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_grpA_frame = ttk.Frame(self.admin_frame)
         self.bt_grpA_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
 
-        self.bt_zap = ctk.CTkButton(self.bt_grpA_frame, text="Clear All Settings", width=40, text_color="black", command=clear_all)
+        self.bt_zap = ctk.CTkButton(self.bt_grpA_frame, text="Clear All Settings", width=40, text_color="black",
+                                    command=clear_all)
         self.bt_zap.pack(side=tk.RIGHT, padx=4, pady=1, fill=tk.X, expand=True)
 
-        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Pick A Random", width=40, text_color="black", command=pick_rando)
+        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Pick A Random", width=40, text_color="black",
+                                      command=pick_rando)
         self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
         # end frame for Clear and Random buttons
 
@@ -1430,90 +1434,106 @@ class Pywordlemainwindow(ctk.CTk):
         # run the initial grep
         do_grep()
 
-    # The help information window
-    def create_wnd_help(self) -> None:
-        global data_path
-        self.wnd_help = ctk.CTkToplevel(self)
-        self.wnd_help.wm_title('Some Information For You')
-        self.wnd_help.resizable(width=False, height=False)
-        self.state = 0  # 0 = info 1 = ranking
 
-        # Returns string that is the information
-        def get_info() -> str:
-            full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
-            if os.path.exists(full_path_name):
-                f = open(full_path_name, "r", encoding="UTF8").read()
-            else:
-                f = 'This is all the help you get because file helpinfo.txt has gone missing.'
-            return f
-
-        def get_rank_data() -> str:
-            # full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'letter_ranks.txt')
-            full_path_name = os.path.join(os.path.dirname(__file__), data_path, letter_rank_file)
-            if os.path.exists(full_path_name):
-                f = open(full_path_name, "r", encoding="UTF8").read()
-            else:
-                f = 'Could not find. ' + full_path_name
-            return f
-
-        def show_info() -> None:
-            msg1.configure(state='normal')
-            msg1.delete(1.0, tk.END)
-            msg1.insert(tk.END, get_info())
-            msg1.configure(state='disabled')
-
-        def show_rank_info() -> None:
-            msg1.configure(state='normal')
-            msg1.delete(1.0, tk.END)
-            raw_rank_data = get_rank_data()
-            f = raw_rank_data.replace(":", "\t")
-            msg1.insert(tk.END, "Using file: " + letter_rank_file + "\n")
-            msg1.insert(tk.END, "RNK = Rank for any occurrence\n")
-            msg1.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
-            msg1.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
-            msg1.insert(tk.END, "---\t---\t-----\t-----\t-----\t-----\t-----\n")
-            msg1.insert(tk.END, f)
-            msg1.configure(state='disabled')
-
-        self.wnd_help.info_frame = ttk.LabelFrame(self.wnd_help,
-                                                  borderwidth=0,
-                                                  )
-        self.wnd_help.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=0, expand=True)
-
-        msg1 = tk.Text(self.wnd_help.info_frame,
-                       wrap='word',
-                       padx=10,
-                       pady=8,
-                       background='#dedede',
-                       borderwidth=0,
-                       highlightthickness=0,
-                       )
-        msg1.grid(row=0, column=0, padx=6, pady=0)
-        msg1.configure(font=font_tuple_n)
-        # scrollbar for help
-        help_sb = ttk.Scrollbar(self.wnd_help.info_frame, orient='vertical')
-        help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
-        msg1.config(yscrollcommand=help_sb.set)
-        help_sb.config(command=msg1.yview)
-        show_info()
-
-        button_q = ctk.CTkButton(self.wnd_help, text="Close",
-                                 text_color="black",
-                                 command=self.close_help)
-        button_q.pack(side="right", padx=10, pady=10)
-        self.wnd_help.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
-
-        button_r = ctk.CTkButton(self.wnd_help, text="Letter Ranking",
-                                 text_color="black",
-                                 command=show_rank_info
-                                 )
-        button_r.pack(side="left", padx=10, pady=10)
-
-        button_i = ctk.CTkButton(self.wnd_help, text="Information",
-                                 text_color="black",
-                                 command=show_info
-                                 )
-        button_i.pack(side="left", padx=10, pady=10)
+# class HelpWindow(ctk.CTkToplevel):
+#     global data_path
+#
+#     def close_help(self) -> None:
+#         self.destroy()
+#
+#     # Returns string that is the information
+#     @staticmethod
+#     def get_rank_data() -> str:
+#         # full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'letter_ranks.txt')
+#         full_path_name = os.path.join(os.path.dirname(__file__), data_path, letter_rank_file)
+#         if os.path.exists(full_path_name):
+#             f = open(full_path_name, "r", encoding="UTF8").read()
+#         else:
+#             f = 'Could not find. ' + full_path_name
+#         return f
+#
+#     def get_info(self) -> str:
+#         full_path_name = os.path.join(os.path.dirname(__file__), data_path, 'helpinfo.txt')
+#         if os.path.exists(full_path_name):
+#             f = open(full_path_name, "r", encoding="UTF8").read()
+#         else:
+#             f = 'This is all the help you get because file helpinfo.txt has gone missing.'
+#         return f
+#
+#     def show_info(self) -> None:
+#         self.msg1.configure(state='normal')
+#         self.msg1.delete(1.0, tk.END)
+#         self.msg1.insert(tk.END, self.get_info())
+#         self.msg1.configure(state='disabled')
+#
+#     def show_rank_info(self) -> None:
+#         self.msg1.configure(state='normal')
+#         self.msg1.delete(1.0, tk.END)
+#         raw_rank_data = self.get_rank_data()
+#         f = raw_rank_data.replace(":", "\t")
+#         self.msg1.insert(tk.END, "Using file: " + letter_rank_file + "\n")
+#         self.msg1.insert(tk.END, "RNK = Rank for any occurrence\n")
+#         self.msg1.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
+#         self.msg1.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
+#         self.msg1.insert(tk.END, "---\t---\t-----\t-----\t-----\t-----\t-----\n")
+#         self.msg1.insert(tk.END, f)
+#         self.msg1.configure(state='disabled')
+#
+#     def __init__(self):
+#         super().__init__()
+#         self.wm_title('Some Information For You')
+#         self.resizable(width=False, height=False)
+#         self.title('Some Information For You')
+#         # w_width = 1120
+#         # w_height = 200
+#         # pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
+#         # pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
+#         # self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
+#
+#         # configure style
+#         style = ttk.Style()
+#         style.theme_use()
+#         help_font_tuple_n = ("Courier", 14, "normal")
+#
+#         self.info_frame = ttk.LabelFrame(self,
+#                                          borderwidth=0,
+#                                          )
+#         self.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=0, expand=True)
+#
+#         self.msg1 = tk.Text(self.info_frame,
+#                             wrap='word',
+#                             padx=10,
+#                             pady=8,
+#                             background='#dedede',
+#                             borderwidth=0,
+#                             highlightthickness=0,
+#                             )
+#         self.msg1.grid(row=0, column=0, padx=6, pady=0)
+#         self.msg1.configure(font=help_font_tuple_n)
+#         # scrollbar for help
+#         help_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
+#         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
+#         self.msg1.config(yscrollcommand=help_sb.set)
+#         help_sb.config(command=self.msg1.yview)
+#         self.show_info()
+#
+#         button_q = ctk.CTkButton(self, text="Close",
+#                                  text_color="black",
+#                                  command=self.close_help)
+#         button_q.pack(side="right", padx=10, pady=10)
+#         self.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
+#
+#         button_r = ctk.CTkButton(self, text="Letter Ranking",
+#                                  text_color="black",
+#                                  command=self.show_rank_info
+#                                  )
+#         button_r.pack(side="left", padx=10, pady=10)
+#
+#         button_i = ctk.CTkButton(self, text="Information",
+#                                  text_color="black",
+#                                  command=self.show_info
+#                                  )
+#         button_i.pack(side="left", padx=10, pady=10)
 
 
 # end Pywordlemainwindow class
