@@ -86,7 +86,8 @@ options:
 * **-m M** Finds words from the vocabulary that are order **M** magic word's for the target word. Order 1 magic words reduce the selection pool to contain only the target word. A magic word first guess forces the second guess to be the solution. Order 2 magic words reduce the selection pool to two words where there would be a 50% chance to guess the solution. Order **M** magic words reduce the selection pool to **M** words. By default, **fmwm.py** selects first word guesses from the **Classic+**, ie possible solutions word list. Use the additional **-v** argument to also select from the larger non-solutions list.
 * **-p P** Picks up, i.e. restarts, a vocabulary process after the word **P**. Depending on the process type and its settings, a vocabulary process can take over a day to complete. If for some reason such a process was terminated early after yielding valid data, that process can be restarted after the last valid word data in the previously terminated process. You provide that word as the **P** argument. If .csv files were being made, the restarted run will be a new .csv file with the **P** argument as part of the filename. 
 * **-z** Applies only for the **magic word** process. **-z** sets the entire allowed Wordle guess list to be a possible solution when finding **magic words**. Its use is limited to being a puzzle exercise for understanding why **magic words** discovered this way do not overlap with those **magic words** discovered for the solution list that we know is a subset of the larger list.  
-A use example:
+
+Command line use example:
 
 ```text
 python3 fmwm.py -l -n -t feast -r 0 -x 4
