@@ -24,9 +24,9 @@ def process_any_arguments() -> None:
     """
     Process any command line arguments
     """
-    global debug_mode, reveal_mode, vocab_filename, target_wrd, use_starting_wrd, \
+    global debug_mode, reveal_mode, vocab_filename, vocab_sol_filename, target_wrd, use_starting_wrd, \
         starting_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
-        sample_number, vocab_filename, record_run, do_every_wrd, query_guess, \
+        sample_number, record_run, do_every_wrd, query_guess, \
         query_mode, magic_mode, magic_order, ts_ptw, ts_psw, ts_pmo, ts_pqm, ts_ptw, \
         ts_prt, ts_psn, ts_ppw, resume, resume_after_wrd
 
@@ -41,6 +41,8 @@ def process_any_arguments() -> None:
     parser.add_argument('-x', action='store', type=int,
                         help='Override the number of sampling runs to be this number X.')
     parser.add_argument('-v', action='store_true', help='For guessing, use the Wordle vocabulary that'
+                                                        ' includes non-solution words.')
+    parser.add_argument('-z', action='store_true', help='For magic word targets, use the Wordle vocabulary that'
                                                         ' includes non-solution words.')
     parser.add_argument('-w', action='store_true', help='Writes output to CSV file having a timestamp filename.')
     parser.add_argument('-a', action='store_true', help='Process every vocabulary word as a target word.')
@@ -87,6 +89,9 @@ def process_any_arguments() -> None:
     if args.v:
         # Use the Wordle vocabulary that includes non-solution words
         vocab_filename = 'nyt_wordlist.txt'  # total vocabulary list
+
+    if args.z:
+        vocab_sol_filename = 'nyt_wordlist.txt'
 
     if args.n:
         # no starting word, skip asking about it
@@ -333,7 +338,7 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> None:
 
 
 def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
-                   loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd) -> None:
+                   loc_starting_wrd, loc_vocab_filename, loc_do_every_wrd, loc_sol_filename=None) -> None:
     """
     Reports the conditions for the impending sample run
     @param loc_sample_number: total overall number of guesses
@@ -342,8 +347,9 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
     @param loc_record_run: save to a file bool
     @param loc_run_fname: filename to save to
     @param loc_starting_wrd: the starting word for this run, could be blank
-    @param loc_vocab_filename: the vocabulary being used
+    @param loc_vocab_filename: the vocabulary being used for guesses
     @param loc_do_every_wrd: bool indicates all words in vocabulary are being examined
+    @param loc_sol_filename: the solutions vocabulary being used for magic words
     """
     global conditions, magic_mode, magic_order, first_run
 
@@ -364,7 +370,8 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
                               'G5R', 'G6', 'G6R', 'G7', 'G7R', 'G8', 'G8R', 'G9', 'G9R', 'G10', 'G10R']
                 output_msg(reveal_hdr, loc_record_run, loc_run_fname)
     else:
-        output_msg(f'Order {magic_order} magic words for: {target_wrd} from {loc_vocab_filename}', False,
+        output_msg(f'Order {magic_order} magic words for: {target_wrd}.\nThe guesses are from {loc_vocab_filename}'
+                   f' list for solutions in {loc_sol_filename} list.', False,
                    loc_run_fname)
         if loc_record_run:
             if first_run:
@@ -537,13 +544,18 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
             run_stats.append(len(loc_the_word_list))
             guesses += 1
+        # end while
 
         # The ending guess is the second to last guess, except when it happens by chance
         # to be the target word. The next guess being the target word can only happen if the
         # loc_allow_dups allows for that word to be in the list. Otherwise, we get a wrong count.
-        # This is a problem.
+        # This is a tricky problem.
+        # Reviewed a year later. This is still the way.
         if not word == target_wrd:
             guesses += 1
+            # reveal_mode output is very confusing without adding the target word to run_stats.
+            # Otherwise the word count does not appear to agree with the guess count.
+            run_stats.append(target_wrd)
         tot = tot + guesses
 
         r = x + 1
@@ -583,8 +595,9 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         print('Output being written to ' + run_fname)
     print(f'{loc_wrd_x}  Finding #{magic_order} order magic words for: {target_wrd}')
 
+    guess_vocabulary = vocab_filename
     # Need to iterate through all unranked words in the specified vocabulary
-    candidate_list = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0) \
+    candidate_list = helpers.ToolResults(data_path, guess_vocabulary, letter_rank_file, True, 0) \
         .get_ranked_results_wrd_lst(True)
     r = 0
     mw_qty = 0
@@ -595,12 +608,13 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
     query_set.clear()
     loc_n = len(candidate_list)
     prelude_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
-                   vocab_filename, do_every_wrd)
+                   guess_vocabulary, do_every_wrd, vocab_sol_filename)
     # Iterate through each word in the candidates list
     start_mt = time.perf_counter()  # record monkey start time
     for loc_key in candidate_list:
         # initialize a fresh wordletool instance, loc_allow_dups must be true
-        wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0)
+        # wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0)
+        wordletool = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0)
         guesses = 1
         run_stats = list([])
         run_stats.append(target_wrd)
