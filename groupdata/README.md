@@ -23,7 +23,7 @@
 
 * The data is sorted first by group quantity and then by maximum group quantity. As such the better guess, measured by the maximum group quantity, amongst those words generating the same number of groups as a category are the words in that category having the most commonly used letters "AE,NOSTRIL". Such words would be the best guess within the quantity category. This characteristic is what results in the red stripes seen in the graphed data.
 
-#### [AllGuessWordsGroupsStats.csv.txt](/groupdata/AllGuessWordsGroupsStats.csv.txt)
+### [AllGuessWordsGroupsStats.csv.txt](/groupdata/AllGuessWordsGroupsStats.csv.txt)
 
 ## This Data Graphed
 
