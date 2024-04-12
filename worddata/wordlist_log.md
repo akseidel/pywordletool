@@ -10,7 +10,7 @@ The Classic+ word list is the word list Wordlebot considers possible solutions. 
 
 The full 14,855 word list is the file **nyt_wordlist.txt**.
 
-The following tracks some of the word changes:
+The following tracks some of the word changes. Removed means removed from being a possible solution. Removed words are still allowed guesses:
 
 * fanny, NYT unsuitable. It was an original 2,309 possible solution.
 * gipsy, NYT unsuitable. It was an original 2,309 possible solution.
