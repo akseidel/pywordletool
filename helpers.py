@@ -155,7 +155,7 @@ def print_word_list_col_format(the_word_list, n_col):
 # Ranking and filtering the words into a dictionary.
 # Returns that dictionary sorted by the word rank.
 def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool,
-                                           rank_mode: int, no_rank=False) -> dict:
+                                           rank_mode: int, no_ordr: bool, no_rank=False) -> dict:
     wrds_dict = {}
     for w in wrds:
         # currently, the wrd_rank function can handle only 5-letter words
@@ -181,7 +181,10 @@ def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allo
     # sorting the ranked word list into a dictionary
     # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
     if not no_rank:
-        return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
+        if no_ordr:
+            return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[0]))
+        else:
+            return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
     else:
         return wrds_dict
 
@@ -768,13 +771,13 @@ class ShellCmdList:
 # The wordle tool all wrapped up into one being, including the grep command list.
 class ToolResults:
 
-    def __init__(self, data_path, vocabulary, letter_ranks, allow_dups, rank_mode):
+    def __init__(self, data_path, vocabulary, letter_ranks, allow_dups, rank_mode, ordr_by_rank):
         self.data_path = data_path
         self.vocab = vocabulary  # vocabulary is the words list textfile
         self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
         self.allow_dups = allow_dups  # loc_allow_dups is the-allow-duplicate-letters flag
         self.rank_mode = rank_mode
-
+        self.no_ordr = not ordr_by_rank
         wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
         rank_file = self.data_path + self.ltr_ranks
 
@@ -804,7 +807,8 @@ class ToolResults:
         # Exclude all empty string. This can happen at the file end.
         wrds = list(filter(None, self.get_results_wrd_lst()))
         self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.allow_dups,
-                                                                       self.rank_mode, no_rank)
+                                                                       self.rank_mode, self.no_ordr, no_rank)
+
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 

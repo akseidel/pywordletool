@@ -158,7 +158,8 @@ def unranked_word_dict() -> dict:
     no_rank argument is True.
     @return: dict
     """
-    return helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0).get_ranked_results_wrd_lst(True)
+    return helpers.ToolResults(data_path,
+                               vocab_filename, letter_rank_file, True, True, 0).get_ranked_results_wrd_lst(True)
 
 
 def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> None:
@@ -483,7 +484,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     start_mt = time.perf_counter()  # record monkey start time
     for x in range(loc_sample_number):
         # initialize a fresh wordletool instance
-        wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode)
+        wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode, True)
         guesses = 0
         run_stats = list([])
         run_stats.append(target_wrd)
@@ -524,7 +525,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
             if guesses > 0 and not allow_dups:  # need a new wordletool allowing dups
                 del wordletool
-                wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode)
+                wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode, True)
                 allow_dups = True
 
             # Now load in the filter criteria
@@ -538,7 +539,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             # duplicates.
             if len(loc_the_word_list) < 1:
                 del wordletool
-                wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode)
+                wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode, True)
                 helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
                 loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
 
@@ -597,7 +598,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
 
     guess_vocabulary = vocab_filename
     # Need to iterate through all unranked words in the specified vocabulary
-    candidate_list = helpers.ToolResults(data_path, guess_vocabulary, letter_rank_file, True, 0) \
+    candidate_list = helpers.ToolResults(data_path, guess_vocabulary, letter_rank_file, True, 0, True) \
         .get_ranked_results_wrd_lst(True)
     r = 0
     mw_qty = 0
@@ -614,7 +615,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
     for loc_key in candidate_list:
         # initialize a fresh wordletool instance, loc_allow_dups must be true
         # wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, 0)
-        wordletool = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0)
+        wordletool = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0, True)
         guesses = 1
         run_stats = list([])
         run_stats.append(target_wrd)
@@ -766,7 +767,7 @@ def main(args=None):
             # The targets are the words for which the monkey seeks guesses to solve.
             # Here only the words that can be a solution will be considered a target word.
             # The target pool is not the guess pool. The -v argument selects the guess pool.
-            targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0) \
+            targets = helpers.ToolResults(data_path, vocab_sol_filename, letter_rank_file, True, 0, True) \
                 .get_ranked_results_wrd_lst(True)
             n = len(targets)
             dsf = datetime.timedelta(0)

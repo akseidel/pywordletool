@@ -183,6 +183,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.grps_guess_source = tk.IntVar(value=0)
         self.allow_dup_state = tk.BooleanVar(value=False)
         self.use_classic_frequency = tk.BooleanVar(value=False)
+        self.ordr_by_rank = tk.BooleanVar(value=True)
         self.verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
@@ -216,6 +217,9 @@ class Pywordlemainwindow(ctk.CTk):
             do_grep()
             update_help_wind(letter_rank_file)
 
+        def do_list_by() -> None:
+            do_grep()
+
         def update_help_wind(letter_rank_file) -> None:
             if self.wnd_help is None:
                 return
@@ -245,7 +249,7 @@ class Pywordlemainwindow(ctk.CTk):
                 vocab_filename = 'nyt_wordlist.txt'
 
             wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups,
-                                             self.rank_mode.get())
+                                             self.rank_mode.get(), self.ordr_by_rank.get())
             # The filter builders. Each of these adds to the grep command argument list
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_require_these_grep(rq_ltrs))
@@ -334,7 +338,8 @@ class Pywordlemainwindow(ctk.CTk):
                                                           'wo_nyt_wordlist.txt',
                                                           letter_rank_file,
                                                           True,
-                                                          0).get_ranked_results_wrd_lst(True)
+                                                          0,
+                                                          True).get_ranked_results_wrd_lst(True)
                         msg1 = 'Classic Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
@@ -348,7 +353,8 @@ class Pywordlemainwindow(ctk.CTk):
                                                           'botadd_nyt_wordlist.txt',
                                                           letter_rank_file,
                                                           True,
-                                                          0).get_ranked_results_wrd_lst(True)
+                                                          0,
+                                                          True).get_ranked_results_wrd_lst(True)
                         msg1 = 'Classic+ Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
@@ -358,8 +364,12 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                         context)
                     case 3:
                         # get the entire possible guess list
-                        all_targets = helpers.ToolResults(data_path, 'nyt_wordlist.txt', letter_rank_file, True, 0) \
-                            .get_ranked_results_wrd_lst(True)
+                        all_targets = helpers.ToolResults(data_path,
+                                                          'nyt_wordlist.txt',
+                                                          letter_rank_file,
+                                                          True,
+                                                          0,
+                                                          True).get_ranked_results_wrd_lst(True)
                         msg1 = 'Large Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
@@ -1327,6 +1337,15 @@ class Pywordlemainwindow(ctk.CTk):
                                            padding=0,
                                            command=do_freq_type)
         chk_ltr_freq_typ.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+
+        chk_ordr_by_rank = ttk.Checkbutton(the_top_frame,
+                                           text="List By Rank",
+                                           variable=self.ordr_by_rank,
+                                           onvalue=True,
+                                           offvalue=False,
+                                           padding=0,
+                                           command=do_list_by)
+        chk_ordr_by_rank.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         # Ranking selection frame
         rank_frame = ttk.LabelFrame(self.actions_frame,
