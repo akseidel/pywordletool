@@ -37,7 +37,8 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               'wo_nyt_wordlist.txt',
                                               letter_rank_file,
                                               True,
-                                              0).get_ranked_results_wrd_lst(True)
+                                              0,
+                                              True).get_ranked_results_wrd_lst(True)
             msg1 = 'Classic Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
@@ -51,7 +52,9 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             all_targets = helpers.ToolResults(data_path,
                                               'botadd_nyt_wordlist.txt',
                                               letter_rank_file,
-                                              True, 0).get_ranked_results_wrd_lst(True)
+                                              True,
+                                              0,
+                                              True).get_ranked_results_wrd_lst(True)
             msg1 = 'Classic+ Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
@@ -65,7 +68,9 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             all_targets = helpers.ToolResults(data_path,
                                               'nyt_wordlist.txt',
                                               letter_rank_file,
-                                              True, 0).get_ranked_results_wrd_lst(True)
+                                              True,
+                                              0,
+                                              True).get_ranked_results_wrd_lst(True)
             msg1 = 'Large Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),

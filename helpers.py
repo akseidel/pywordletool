@@ -771,7 +771,21 @@ class ShellCmdList:
 # The wordle tool all wrapped up into one being, including the grep command list.
 class ToolResults:
 
-    def __init__(self, data_path, vocabulary, letter_ranks, allow_dups, rank_mode, ordr_by_rank):
+    def __init__(self,
+                 data_path: str,
+                 vocabulary: str,
+                 letter_ranks: str,
+                 allow_dups: bool,
+                 rank_mode: int,
+                 ordr_by_rank: bool) -> object:
+        """
+        @param data_path: words list folder name
+        @param vocabulary: words list file name less path
+        @param letter_ranks: letter ranking textfile name
+        @param allow_dups: allow multiple same letters bool flag
+        @param rank_mode: letter ranking mode integer
+        @param ordr_by_rank: order results by rank bool flag
+        """
         self.data_path = data_path
         self.vocab = vocabulary  # vocabulary is the words list textfile
         self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
