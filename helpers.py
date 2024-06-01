@@ -200,6 +200,81 @@ def clear_scrn():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+# Return a word's genetic code
+# example:woody
+# returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
+# translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
+# genetic rank applies in context of a list of words, so it is calculated later
+def get_gencode(word) -> list:
+    # gencode is the list of integers that will be returned
+    gencode = gc_z.copy()
+    # dups counts the number of times letters occur more than once
+    dups = 0
+    # loop through each letter in the word
+    for ltr in word:
+        idx = ord(ltr) - 97
+        # Increment dups if that letter has already been seen.
+        if gencode[idx] > 0:
+            dups += 1
+        # Mark that letter as having been seen.
+        gencode[idx] = 1
+    gencode[26] = dups
+    return gencode
+
+
+# returns genetic letter tally list for a gendictionary
+# this list is 26 members where each member corresponds
+# to the count for that letter position idx 0-25 where
+# idx 0=a and idx 25=z
+def get_gendict_tally(gendict) -> list:
+    gen_tally = []
+    for x in range(26):
+        gen_tally.append(0)
+    # loop through each gencode values list
+    for gencode in gendict.values():
+        # looking at just the list's a...z letter presence value,
+        # add them up
+        for idx in range(26):
+            if gencode[idx] > 0:
+                gen_tally[idx] = gen_tally[idx] + gencode[idx]
+    return gen_tally
+
+
+# Assigns the genetic rank to the gendict members and returns
+# the maximum genetic rank seen.
+def assign_genrank(gendict: dict, gen_tally: list) -> int:
+    """
+    Places the product sums of gendict values and the gen_tally vector. This value is
+    the genetic rank for the gendict words (the keys). The genetic rank is injected into
+    the gendict value vector as the 27th item of the 1 x 27 value vector. The maximum
+    genetic rank calculated is the integer being returned.
+    @param gendict: dictionary of words (keys) with values being 1 x 27 letter count vectors
+    @param gen_tally: 1 x 26 vector of letter tallies
+    @return: maximum genetic rank seen as integer
+    """
+    maxrank = 0
+    for w, g in gendict.items():
+        gr = 0
+        for idx in range(26):
+            gr = gr + g[idx] * gen_tally[idx]
+        gr = gr + g[26]
+        new_g = g
+        new_g[27] = gr
+        if gr > maxrank:
+            maxrank = gr
+        gendict.update({w: new_g})
+    return maxrank
+
+
+# returns list of the max genrankers in the gendict
+def get_maxgenrankers(gendict, maxrank) -> list:
+    max_rankers = []
+    for w, g in gendict.items():
+        if maxrank == g[27]:
+            max_rankers.append(w)
+    return max_rankers
+
+
 # returns a regex formatted pattern string for highlighting
 def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
     pat_list = []
@@ -777,7 +852,7 @@ class ToolResults:
                  letter_ranks: str,
                  allow_dups: bool,
                  rank_mode: int,
-                 ordr_by_rank: bool) -> object:
+                 ordr_by_rank: bool) -> None:
         """
         @param data_path: words list folder name
         @param vocabulary: words list file name less path

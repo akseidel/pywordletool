@@ -196,6 +196,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.pos_x = self.pos5.copy()
         self.sel_rando = False
         self.sel_grpoptimal = False
+        self.sel_genetic = False
         self.grpsdriller_window = None
 
         # configure style
@@ -303,13 +304,29 @@ class Pywordlemainwindow(ctk.CTk):
                     tx_result.insert(tk.END, l_msg + '\n')
 
             comment = ""
+            # Pick a random word
             if self.sel_rando and (n_items > 0):
                 word, rank = random.choice(list(the_word_list.items()))
                 rand_pick = word + mid_div + rank
                 # highlight the rand_pick, which also scrolls the widget
                 # to the rand_pick's line.
+                print(rand_pick)
                 tx_result.highlight_pattern(rand_pick, 'ran', remove_priors=False)
                 comment = " (1 random pick selected)"
+
+            # Genetic ranking
+            if self.sel_genetic and (n_items > 0):
+                gendict: dict[str, list] = {}
+                for w, r in the_word_list.items():
+                    gencode = helpers.get_gencode(w)
+                    gendict.update({w: gencode})
+                gen_tally: list = helpers.get_gendict_tally(gendict)
+                maxrank: int = helpers.assign_genrank(gendict, gen_tally)
+                max_rankers: list = helpers.get_maxgenrankers(gendict, maxrank)
+                regex: str = helpers.regex_maxgenrankers(max_rankers, the_word_list)
+                print(max_rankers)
+                tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
+                comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
 
             # group ranking
             if self.sel_grpoptimal and (n_items > 0):
@@ -403,8 +420,8 @@ class Pywordlemainwindow(ctk.CTk):
                 self.enable_optimal_controls(True)
 
             tx_result.configure(state='disabled')
-            if not self.sel_rando and not self.sel_grpoptimal:
-                # Do not scroll to end when a rando pick or optimal group is highlighted
+            if not self.sel_rando and not self.sel_grpoptimal and not self.sel_genetic:
+                # Do not scroll to end when a rando pick, genetic or optimal group is highlighted
                 tx_result.see('end')
             self.status.set(wordletool.get_status() + comment)
             tx_gr.configure(state='normal')
@@ -539,6 +556,12 @@ class Pywordlemainwindow(ctk.CTk):
             do_grep()
             self.sel_rando = False
 
+        # selected genetic ranking in the result
+        def pick_genetic() -> None:
+            self.sel_genetic = True
+            do_grep()
+            self.sel_genetic = False
+
         # selected optimal group ranking in the result
         def pick_optimals() -> None:
             self.sel_grpoptimal = True
@@ -629,6 +652,8 @@ class Pywordlemainwindow(ctk.CTk):
         tx_result.tag_configure('grp', background='#ffd700')
         # tag 'ran' is used to highlight random pick
         tx_result.tag_configure('ran', background='#7cfc00')
+        # tag 'gen' is used to highlight genetic pick
+        tx_result.tag_configure('gen', background='#ffb8f2')
         if self.winfo_screenheight() <= 800:
             tx_result.configure(height=10)  # to do, set according to screen height
         else:
@@ -1414,18 +1439,22 @@ class Pywordlemainwindow(ctk.CTk):
                                       width=40, text_color="black", command=show_grps_driller)
         self.bt_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
 
-        # frame for Clear and Random buttons
+        # frame for Clear, Random, Genetic buttons
         self.bt_grpA_frame = ttk.Frame(self.admin_frame)
         self.bt_grpA_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
 
-        self.bt_zap = ctk.CTkButton(self.bt_grpA_frame, text="Clear All Settings", width=40, text_color="black",
+        self.bt_zap = ctk.CTkButton(self.bt_grpA_frame, text="Clear Settings", width=40, text_color="black",
                                     command=clear_all)
         self.bt_zap.pack(side=tk.RIGHT, padx=4, pady=1, fill=tk.X, expand=True)
 
-        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Pick A Random", width=40, text_color="black",
+        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Show Genetic ", width=40, text_color="black",
+                                      command=pick_genetic)
+        self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
+
+        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Pick Random", width=40, text_color="black",
                                       command=pick_rando)
         self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
-        # end frame for Clear and Random buttons
+        # end frame for Clear, Random, Genetic buttons
 
         # frame for groups section
         self.grp_frame = ttk.Frame(self.admin_frame)
