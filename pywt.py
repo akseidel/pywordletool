@@ -310,7 +310,6 @@ class Pywordlemainwindow(ctk.CTk):
                 rand_pick = word + mid_div + rank
                 # highlight the rand_pick, which also scrolls the widget
                 # to the rand_pick's line.
-                print(rand_pick)
                 tx_result.highlight_pattern(rand_pick, 'ran', remove_priors=False)
                 comment = " (1 random pick selected)"
 
@@ -324,7 +323,6 @@ class Pywordlemainwindow(ctk.CTk):
                 maxrank: int = helpers.assign_genrank(gendict, gen_tally)
                 max_rankers: list = helpers.get_maxgenrankers(gendict, maxrank)
                 regex: str = helpers.regex_maxgenrankers(max_rankers, the_word_list)
-                print(max_rankers)
                 tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
 
