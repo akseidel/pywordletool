@@ -693,6 +693,7 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt
 def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict,
                                   rptwnd: ctk, cond_rpt: bool) -> None:
     (qty, smallest, largest, average, p2) = grp_stats
+    # report in full or condensed format according to cond_prt flag
     if not cond_rpt:
         rptl = '\n\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
         rptwnd.msg1.insert(tk.END, rptl)
@@ -706,7 +707,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
         rptwnd.msg1.insert(tk.END, '\n')
         for key in sorted(guess_groups_dict):
             g = guess_groups_dict[key]
-            rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(g)
+            rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             rptwnd.msg1.insert(tk.END, '\n' + rptl)
     else:
         rptl = '\n' + guess + '\t' + str(qty) + \
