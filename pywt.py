@@ -185,6 +185,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.use_classic_frequency = tk.BooleanVar(value=False)
         self.ordr_by_rank = tk.BooleanVar(value=True)
         self.verbose_grps = tk.BooleanVar(value=False)
+        self.keyed_verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
         self.rank_mode = tk.IntVar()
@@ -345,6 +346,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.best_groups_guess_dict(word_list,
                                                                                self.verbose_grps.get(),
                                                                                False,
+                                                                               self.keyed_verbose_grps.get(),
                                                                                context)
 
                     case 1:
@@ -359,6 +361,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         False,
+                                                                                        self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
                                                                                         context)
@@ -374,6 +377,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         False,
+                                                                                        self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
                                                                                         context)
@@ -389,6 +393,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         False,
+                                                                                        self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
                                                                                         context)
@@ -1464,12 +1469,19 @@ class Pywordlemainwindow(ctk.CTk):
                                        command=pick_optimals)
         self.bt_groups.pack(side=tk.LEFT, padx=4, pady=0, fill=tk.X)
         self.chk_grp_disp = ttk.Checkbutton(self.grp_frame,
-                                            text="Verbose Report",
+                                            text="Verbose",
                                             variable=self.verbose_grps,
                                             onvalue=True,
                                             offvalue=False
                                             )
         self.chk_grp_disp.pack(side=tk.LEFT, padx=0, pady=0)
+        self.chk_key_disp = ttk.Checkbutton(self.grp_frame,
+                                            text="Keyed",
+                                            variable=self.keyed_verbose_grps,
+                                            onvalue=True,
+                                            offvalue=False
+                                            )
+        self.chk_key_disp.pack(side=tk.LEFT, padx=4, pady=0)
         # labelframe within groups frame for which list option
         self.grp_lst_ops_frame = ttk.LabelFrame(self.admin_frame,
                                                 text='Vocabulary Source For Guess Group Words',

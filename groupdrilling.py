@@ -28,6 +28,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             optimal_group_guesses = helpers.best_groups_guess_dict(g_word_lst,
                                                                    self.d_verbose_grps.get(),
                                                                    self.d_verbose_grps_cond.get(),
+                                                                   self.d_keyed_verbose_grps.get(),
                                                                    context
                                                                    )
 
@@ -43,6 +44,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
                                                                             self.d_verbose_grps_cond.get(),
+                                                                            self.d_keyed_verbose_grps.get(),
                                                                             all_targets,
                                                                             msg1,
                                                                             context
@@ -59,6 +61,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
                                                                             self.d_verbose_grps_cond.get(),
+                                                                            self.d_keyed_verbose_grps.get(),
                                                                             all_targets,
                                                                             msg1,
                                                                             context
@@ -75,6 +78,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
                                                                             self.d_verbose_grps_cond.get(),
+                                                                            self.d_keyed_verbose_grps.get(),
                                                                             all_targets,
                                                                             msg1,
                                                                             context
@@ -231,11 +235,16 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.entry_find.focus()
 
     def verbose_chk(self):
-        if self.d_verbose_grps_cond.get() and not self.d_verbose_grps.get():
+        if not self.d_verbose_grps.get():
             self.d_verbose_grps_cond.set(False)
+            self.d_keyed_verbose_grps.set(False)
 
     def condensed_chk(self):
         if self.d_verbose_grps_cond.get():
+            self.d_verbose_grps.set(True)
+
+    def keyed_chk(self):
+        if self.d_keyed_verbose_grps.get():
             self.d_verbose_grps.set(True)
 
     def on_list_entry_return_release(self, _):
@@ -269,6 +278,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.grp_words_text = tk.StringVar()
         self.grps_guess_source = tk.IntVar(value=0)
         self.d_verbose_grps = tk.BooleanVar(value=True)
+        self.d_keyed_verbose_grps = tk.BooleanVar(value=False)
         self.d_verbose_grps_cond = tk.BooleanVar(value=False)
 
         # configure style
@@ -353,9 +363,19 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                                  )
         self.chk_grp_disp_cond.pack(side=tk.RIGHT, padx=10, pady=2)
 
+        # Show Keyed Report checkbox
+        self.chk_keyed_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
+                                            text="Keyed",
+                                            variable=self.d_keyed_verbose_grps,
+                                            onvalue=True,
+                                            offvalue=False,
+                                            command=self.keyed_chk
+                                            )
+        self.chk_keyed_grp_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+
         # Show Verbose Report checkbox
         self.chk_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
-                                            text="Show Verbose Report",
+                                            text="Verbose",
                                             variable=self.d_verbose_grps,
                                             onvalue=True,
                                             offvalue=False,

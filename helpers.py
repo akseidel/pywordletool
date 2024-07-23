@@ -539,7 +539,7 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, all_targets: dict,
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, keyed_rpt: bool, all_targets: dict,
                                     msg1: str, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
@@ -548,6 +548,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
     @param cond_rpt: flag for condensed verbose printing to rptwnd
+     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
     @param word_lst: possible guess words
     @param all_targets: vocabulary dictionary
     @param msg1: text to pass to verbose window
@@ -568,7 +569,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
-            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt)
+            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt, keyed_rpt)
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
@@ -598,7 +599,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
     return best_rank_dict
 
 
-def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, context: str) -> dict:
+def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, keyed_rpt: bool, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
@@ -606,6 +607,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, cont
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
     @param cond_rpt: flag for condensed verbose printing to rptwnd
+    @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
     @param word_lst: possible guess words
     @return: dictionary of the best group ranked guesses where
     guess words are the keys, grp_stats tuples are the values
@@ -636,7 +638,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, cont
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
-            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt)
+            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt, keyed_rpt)
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
@@ -691,7 +693,7 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt
 
 
 def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict,
-                                  rptwnd: ctk, cond_rpt: bool) -> None:
+                                  rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
     (qty, smallest, largest, average, p2) = grp_stats
     # report in full or condensed format according to cond_prt flag
     if not cond_rpt:
@@ -707,7 +709,10 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
         rptwnd.msg1.insert(tk.END, '\n')
         for key in sorted(guess_groups_dict):
             g = guess_groups_dict[key]
-            rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
+            if keyed_rpt:
+                rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
+            else:
+                rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             rptwnd.msg1.insert(tk.END, '\n' + rptl)
     else:
         rptl = '\n' + guess + '\t' + str(qty) + \
