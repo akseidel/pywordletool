@@ -123,7 +123,7 @@
 !['Group Drilling Result Window Image'](InfoImages/PYWTGroupDrillingResult.png)
 
 * The **Group Driller** verbose report window is not being shown in this **README**. It is identical in function and appearance to the **Helper's** verbose report window when not using the **Condensed** option.
-* The **Keyed** option includes the guess word for each group pattern. This option is useful for maintaining the guess word associations when exporting the groups data (copy and paste) for all guesses.
+* The **Keyed** option (These application images have yet to be updated to show this option.) includes the guess word for each group pattern. This option is useful for maintaining the guess word associations when exporting the groups data (copy and paste) for all guesses.
 * The **Condensed** option verbose report omits showing the guess word groups. Instead, only the guess word's group stats are output in a format intended for copy and pasting into a spreadsheet application for further investigation.
 
 !['Group Drilling Condensed Result Window Image'](InfoImages/PYWTGroupDrillingCond.png)
