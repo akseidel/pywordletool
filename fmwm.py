@@ -159,7 +159,7 @@ def unranked_word_dict() -> dict:
     @return: dict
     """
     return helpers.ToolResults(data_path,
-                               vocab_filename, letter_rank_file, True, True, 0).get_ranked_results_wrd_lst(True)
+                               vocab_filename, letter_rank_file, True, 0, True).get_ranked_results_wrd_lst(True)
 
 
 def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> None:
