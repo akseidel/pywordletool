@@ -568,6 +568,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
     guess_rank_dict = {}
     best_rank_dict = {}
     min_score = len(word_lst)
+    max_ent = 0.0
     rptwnd = RptWnd(context)
     rptwnd.withdraw()
     if reporting:
@@ -576,7 +577,8 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
 
     for guess in all_targets:
         guess_groups_dict = groups_for_this_guess(guess, word_lst)
-        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average as a tuple
+        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest,
+        # [3]:average , [4]:population variance , [5]:entropy as a tuple
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
@@ -591,16 +593,24 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
         # [2]:largest,
         # [3]:average,
         # [4]:population variance
+        # [5]:entropy
         # as a tuple
         guess_rank_dict[guess] = grp_stats
 
         # Record the smallest average pattern groups size.
         min_score = min(grp_stats[3], min_score)
+        # Record the maximum entropy seen
+        max_ent = max(grp_stats[5], max_ent)
 
     # Populate the best_rank_dict with the best guesses.
     # This dictionary's values are grp_stats tuples.
     for g, s in guess_rank_dict.items():
         if s[3] == min_score:
+            if g not in best_rank_dict:
+                best_rank_dict[g] = s
+        # Also collect the max_ent instances, these are not
+        # always the highest group makers.
+        if s[5] == max_ent:
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
 
@@ -700,7 +710,7 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt
                '\tmax' + \
                '\tave' + \
                '\tp2' + \
-               '\tent'
+               '\t\tent'
         rptwnd.msg1.insert(tk.END, rptl)
 
 
@@ -733,7 +743,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
                '\t' + str(largest) + \
                '\t' + '{0:.3f}'.format(average) + \
                '\t' + '{0:.2f}'.format(p2) + \
-               '\t' + '{0:.2f}'.format(ent)
+               '\t\t' + '{0:.2f}'.format(ent)
         rptwnd.msg1.insert(tk.END, rptl)
 
 
@@ -781,12 +791,13 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
     # [5]:entropy bits,
     # as a tuple
     stats_summary = groups_stat_summary(best_rank_dict)
-    rptl = '\n> >  Optimal guess word stats, each has group qty ' + '{0:.0f}'.format(stats_summary[0]) + ':'
+    rptl = '\n> >  Optimal guess stats, each has group qty ' + '{0:.0f}'.format(stats_summary[0]) + ' or is max entropy:'
     rptwnd.msg1.insert(tk.END, rptl)
     for w, s in best_rank_dict.items():
-        (_, g_min, g_max, g_ave, g_p2, g_ent) = s
+        (g_qty, g_min, g_max, g_ave, g_p2, g_ent) = s
         rptl = "\n" + w + " - sizes:" + \
-               " min " + '{0:.0f}'.format(g_min) + \
+               ", qty " + '{0:.0f}'.format(g_qty) + \
+               ", min " + '{0:.0f}'.format(g_min) + \
                ", max " + '{0:.0f}'.format(g_max) + \
                ", ave " + '{0:.3f}'.format(g_ave) + \
                ", p2 " + '{0:.3f}'.format(g_p2) + \
