@@ -419,7 +419,10 @@ class Pywordlemainwindow(ctk.CTk):
                         words_in_common = list(set(displayed_as_list) & set(opt_group_guesses_as_list))
                         regex: str = helpers.regex_maxgenrankers(words_in_common, the_word_list)
 
-                tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
+                if self.ent_grps.get():
+                    tx_result.highlight_pattern(regex, 'ent', remove_priors=False)
+                else:
+                    tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
                 comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
                           ", grp qty " + '{0:.0f}'.format(g_qty) + \
                           ", ent " + "{0:.2f}".format(g_e) + \
@@ -659,11 +662,14 @@ class Pywordlemainwindow(ctk.CTk):
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
         # tag 'grp' is used to highlight group ranker
-        tx_result.tag_configure('grp', background='#ffd700')
+        tx_result.tag_configure('grp', background='#fff69a')
+        # tx_result.tag_configure('grp', background='#91c790')
         # tag 'ran' is used to highlight random pick
         tx_result.tag_configure('ran', background='#7cfc00')
         # tag 'gen' is used to highlight genetic pick
         tx_result.tag_configure('gen', background='#ffb8f2')
+        # tag 'ent' is used to highlight entropy pick
+        tx_result.tag_configure('ent', background='#ffd700')
         if self.winfo_screenheight() <= 800:
             tx_result.configure(height=10)  # to do, set according to screen height
         else:

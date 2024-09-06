@@ -181,7 +181,10 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.tx_status.insert('end', helpers.groups_stats_summary_line(optimal_group_guesses))
         self.tx_status.insert('end', wrds)
         self.tx_status.see('1.0')
-        self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False, do_scroll=False)
+        if self.d_ent_grps.get():
+            self.tx_status.highlight_pattern(regex, 'ent', remove_priors=False, do_scroll=False)
+        else:
+            self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False, do_scroll=False)
         self.tx_status.configure(state='disabled')
 
     def clear_list(self):
@@ -418,7 +421,10 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
         # tag 'grp' is used to highlight group ranker
-        self.tx_status.tag_configure('grp', background='#ffd700')
+        self.tx_status.tag_configure('grp', background='#fff69a')
+        # tag 'ent' is used to highlight entropy pick
+        self.tx_status.tag_configure('ent', background='#ffd700')
+
         self.tx_status.insert('1.0', self.def_msg)
         # scrollbar for tx_status
         self.tx_status_sb = ttk.Scrollbar(self.stat_frame, orient='vertical')
@@ -428,11 +434,10 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         # Respond to initial state
         self.title_status()
 
-
 # end GrpsDrillingMain class
 
 
-def mainloop(args=None):
+def mainloop(_args=None):
     drill_app: GrpsDrillingMain = GrpsDrillingMain()
     drill_app.mainloop()
 
