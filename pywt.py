@@ -122,7 +122,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.wnd_help.focus()  # if window exists focus it
 
     # ======== set exclude cboxes to treeview selection
-    def x_pos_tree_view_click(self, event) -> None:
+    def x_pos_tree_view_click(self, _event) -> None:
         cur_item = self.treeview_px.focus()
         val_tup = self.treeview_px.item(cur_item).get('values')
         if val_tup != '':
@@ -130,7 +130,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.pos_px_p.set(val_tup[1])
 
     # ======== set require cboxes to treeview selection
-    def r_pos_tree_view_click(self, event) -> None:
+    def r_pos_tree_view_click(self, _event) -> None:
         cur_item = self.treeview_pr.focus()
         val_tup = self.treeview_pr.item(cur_item).get('values')
         if val_tup != '':
@@ -185,6 +185,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.use_classic_frequency = tk.BooleanVar(value=False)
         self.ordr_by_rank = tk.BooleanVar(value=True)
         self.verbose_grps = tk.BooleanVar(value=False)
+        self.ent_grps = tk.BooleanVar(value=False)
         self.keyed_verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
@@ -239,7 +240,7 @@ class Pywordlemainwindow(ctk.CTk):
 
             global data_path
             # a set to manage the letter requirements
-            rq_ltrs = get_rq_ltrs()
+            rq_ltrs = get_rq_ltrs(self)
 
             allow_dups = self.allow_dup_state.get()
 
@@ -343,14 +344,16 @@ class Pywordlemainwindow(ctk.CTk):
                 context = "Wordle Helper"
                 match grps_guess_source:
                     case 0:
+                        # using the showing words (remaining solutions) for guess candidates
                         optimal_group_guesses = helpers.best_groups_guess_dict(word_list,
                                                                                self.verbose_grps.get(),
+                                                                               self.ent_grps.get(),
                                                                                False,
                                                                                self.keyed_verbose_grps.get(),
                                                                                context)
 
                     case 1:
-                        # get the entire possible solutions list
+                        # using the classic (original possible solutions) words for guess candidates
                         all_targets = helpers.ToolResults(data_path,
                                                           'wo_nyt_wordlist.txt',
                                                           letter_rank_file,
@@ -360,13 +363,14 @@ class Pywordlemainwindow(ctk.CTk):
                         msg1 = 'Classic Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
+                                                                                        self.ent_grps.get(),
                                                                                         False,
                                                                                         self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
                                                                                         context)
                     case 2:
-                        # get the entire possible guess list
+                        # using the classic+ (entire possible solutions) for guess candidates
                         all_targets = helpers.ToolResults(data_path,
                                                           'botadd_nyt_wordlist.txt',
                                                           letter_rank_file,
@@ -376,13 +380,14 @@ class Pywordlemainwindow(ctk.CTk):
                         msg1 = 'Classic+ Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
+                                                                                        self.ent_grps.get(),
                                                                                         False,
                                                                                         self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
                                                                                         context)
                     case 3:
-                        # get the entire possible guess list
+                        # using the entire allowed guess list for guess candidates
                         all_targets = helpers.ToolResults(data_path,
                                                           'nyt_wordlist.txt',
                                                           letter_rank_file,
@@ -392,6 +397,7 @@ class Pywordlemainwindow(ctk.CTk):
                         msg1 = 'Large Vocabulary'
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
+                                                                                        self.ent_grps.get(),
                                                                                         False,
                                                                                         self.keyed_verbose_grps.get(),
                                                                                         all_targets,
@@ -407,7 +413,7 @@ class Pywordlemainwindow(ctk.CTk):
                         regex: str = helpers.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
                     case _:
                         # The displayed list may not have the words to highlight when the grps_guess_source
-                        # uses more words than what is in the current displayed list. Instead any common
+                        # uses more words than what is in the current displayed list. Instead, any common
                         # words will be highlighted.
                         displayed_as_list = list(the_word_list.keys())
                         words_in_common = list(set(displayed_as_list) & set(opt_group_guesses_as_list))
@@ -416,11 +422,11 @@ class Pywordlemainwindow(ctk.CTk):
                 tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
                 comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
                           ", grp qty " + '{0:.0f}'.format(g_qty) + \
+                          ", ent " + "{0:.2f}".format(g_e) + \
                           ", sizes: min " + '{0:.0f}'.format(g_min) + \
                           ", min-max " + '{0:.0f}'.format(g_max) + \
                           ", ave " + '{0:.2f}'.format(g_ave) + \
-                          ", p2 " + "{0:.2f}".format(g_p2) + \
-                          ", ent " + "{0:.2f}".format(g_e) + ")"
+                          ", p2 " + "{0:.2f}".format(g_p2) + ")"
                 self.enable_optimal_controls(True)
 
             tx_result.configure(state='disabled')
@@ -433,7 +439,7 @@ class Pywordlemainwindow(ctk.CTk):
             tx_gr.insert(tk.END, wordletool.get_cmd_less_filepath())
             tx_gr.configure(state='disabled')
 
-        def get_rq_ltrs() -> str:
+        def get_rq_ltrs(self) -> str:
             rq_l = ''
             for b in self.re_btn_vars:
                 ltr = b.get()
@@ -1465,10 +1471,17 @@ class Pywordlemainwindow(ctk.CTk):
         self.grp_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
 
         self.bt_groups = ctk.CTkButton(self.grp_frame,
-                                       text=" Highlight Group Optimal ",
+                                       text="Show Optimal",
                                        text_color="black",
                                        command=pick_optimals)
         self.bt_groups.pack(side=tk.LEFT, padx=4, pady=0, fill=tk.X)
+        self.chk_ent_disp = ttk.Checkbutton(self.grp_frame,
+                                            text="Entropy",
+                                            variable=self.ent_grps,
+                                            onvalue=True,
+                                            offvalue=False
+                                            )
+        self.chk_ent_disp.pack(side=tk.LEFT, padx=2, pady=0)
         self.chk_grp_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Verbose",
                                             variable=self.verbose_grps,

@@ -272,7 +272,7 @@ def get_set_guess_mode() -> None:
         allow_dups = True
     else:
         guess_mode = 'rank mode type ' + str(rank_mode + 1) + " guesses"
-        # In ranked mode the loc_allow_dups flag will be not be forced
+        # In ranked mode the loc_allow_dups flag will not be forced
         # so that its influence on the first and second guess can be observed.
 
 
@@ -289,7 +289,7 @@ def set_context_msg(loc_rand_mode, loc_rank_mode):
         allow_dups = True
     else:
         guess_mode = 'rank mode type ' + str(loc_rank_mode + 1) + " guesses"
-        # In ranked mode the loc_allow_dups flag will be not be forced
+        # In ranked mode the loc_allow_dups flag will not be forced
         # so that its influence on the first and second guess can be observed.
 
 
@@ -741,7 +741,7 @@ record_run = False
 
 
 # ====================================== main ================================================
-def main(args=None):
+def main(_args=None):
     global run_fname, resume, dur_sf, target_wrd
     try:
         # These command line arguments processed next will override all previously set variables.

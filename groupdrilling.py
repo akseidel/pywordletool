@@ -25,15 +25,17 @@ def process_grp_list(self, g_word_lst: list) -> dict:
     context = 'Groups Drilling'
     match grps_guess_source:
         case 0:
+            # using the showing words (remaining solutions) for guess candidates
             optimal_group_guesses = helpers.best_groups_guess_dict(g_word_lst,
                                                                    self.d_verbose_grps.get(),
+                                                                   self.d_ent_grps.get(),
                                                                    self.d_verbose_grps_cond.get(),
                                                                    self.d_keyed_verbose_grps.get(),
                                                                    context
                                                                    )
 
         case 1:
-            # get the entire possible solutions list
+            # using the classic (original possible solutions) words for guess candidates
             all_targets = helpers.ToolResults(data_path,
                                               'wo_nyt_wordlist.txt',
                                               letter_rank_file,
@@ -43,6 +45,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             msg1 = 'Classic Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
+                                                                            self.d_ent_grps.get(),
                                                                             self.d_verbose_grps_cond.get(),
                                                                             self.d_keyed_verbose_grps.get(),
                                                                             all_targets,
@@ -50,7 +53,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                                                             context
                                                                             )
         case 2:
-            # get the entire possible guess list
+            # using the classic+ (entire possible solutions) for guess candidates
             all_targets = helpers.ToolResults(data_path,
                                               'botadd_nyt_wordlist.txt',
                                               letter_rank_file,
@@ -60,6 +63,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             msg1 = 'Classic+ Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
+                                                                            self.d_ent_grps.get(),
                                                                             self.d_verbose_grps_cond.get(),
                                                                             self.d_keyed_verbose_grps.get(),
                                                                             all_targets,
@@ -67,7 +71,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                                                             context
                                                                             )
         case 3:
-            # get the entire possible guess list
+            # using the entire allowed guess list for guess candidates
             all_targets = helpers.ToolResults(data_path,
                                               'nyt_wordlist.txt',
                                               letter_rank_file,
@@ -77,6 +81,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
             msg1 = 'Large Vocabulary'
             optimal_group_guesses = helpers.extended_best_groups_guess_dict(g_word_lst,
                                                                             self.d_verbose_grps.get(),
+                                                                            self.d_ent_grps.get(),
                                                                             self.d_verbose_grps_cond.get(),
                                                                             self.d_keyed_verbose_grps.get(),
                                                                             all_targets,
@@ -277,7 +282,8 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         # set the Vars
         self.grp_words_text = tk.StringVar()
         self.grps_guess_source = tk.IntVar(value=0)
-        self.d_verbose_grps = tk.BooleanVar(value=True)
+        self.d_verbose_grps = tk.BooleanVar(value=False)
+        self.d_ent_grps = tk.BooleanVar(value=False)
         self.d_keyed_verbose_grps = tk.BooleanVar(value=False)
         self.d_verbose_grps_cond = tk.BooleanVar(value=False)
 
@@ -372,6 +378,15 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                             command=self.keyed_chk
                                             )
         self.chk_keyed_grp_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+
+        # Show Entropy Report checkbox
+        self.chk_ent_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
+                                            text="Entropy",
+                                            variable=self.d_ent_grps,
+                                            onvalue=True,
+                                            offvalue=False
+                                            )
+        self.chk_ent_disp.pack(side=tk.RIGHT, padx=10, pady=2)
 
         # Show Verbose Report checkbox
         self.chk_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,

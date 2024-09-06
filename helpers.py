@@ -205,7 +205,7 @@ def clear_scrn():
 # example:woody
 # returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
 # translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
-# genetic rank applies in context of a list of words, so it is calculated later
+# Rank applies in context of a list of words, so it is calculated later
 def get_gencode(word) -> list:
     # gencode is the list of integers that will be returned
     gencode = gc_z.copy()
@@ -532,7 +532,7 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     min_grp_size = g_stats[2]  # Seed with a member's largest
     max_grp_size = g_stats[2]  # The min_max is desired. Seed with a member's largest
     min_grp_p2 = g_stats[4]  # Seed with member's variance
-    max_grp_ent = g_stats[5]  # Seed with member's entropy
+    max_grp_ent = 0.0
     for g_stats in best_rank_dict.values():
         (_, min_stat, max_stat, _, p2_stat, e_stat) = g_stats
         min_grp_size = min(min_stat, min_grp_size)
@@ -550,7 +550,7 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2, max_grp_ent
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, keyed_rpt: bool, all_targets: dict,
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool, all_targets: dict,
                                     msg1: str, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
@@ -558,8 +558,9 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
     and smaller groups are better guesses.
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
+    @param byentonly: flag to return only the highest entropy guesses
     @param cond_rpt: flag for condensed verbose printing to rptwnd
-     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
+    @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
     @param word_lst: possible guess words
     @param all_targets: vocabulary dictionary
     @param msg1: text to pass to verbose window
@@ -605,12 +606,14 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
     # Populate the best_rank_dict with the best guesses.
     # This dictionary's values are grp_stats tuples.
     for g, s in guess_rank_dict.items():
-        if s[3] == min_score:
-            if g not in best_rank_dict:
-                best_rank_dict[g] = s
+        # if not only by entropy, then include all with max group size
+        if not byentonly:
+            if math.isclose(s[3], min_score):
+                if g not in best_rank_dict:
+                    best_rank_dict[g] = s
         # Also collect the max_ent instances, these are not
-        # always the highest group makers.
-        if s[5] == max_ent:
+        # always with max group size.
+        if math.isclose(s[5], max_ent):
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
 
@@ -620,13 +623,14 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: b
     return best_rank_dict
 
 
-def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, keyed_rpt: bool, context: str) -> dict:
+def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
     and smaller groups are better guesses.
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
+    @param byentonly: flag to return only the highest entropy guesses
     @param cond_rpt: flag for condensed verbose printing to rptwnd
     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
     @param word_lst: possible guess words
@@ -638,10 +642,12 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, keye
     [2]:largest,
     [3]:average,
     [4]:population variance
+    [5]:entropy
     """
     guess_rank_dict = {}
     best_rank_dict = {}
     min_score = len(word_lst)
+    max_ent = 0.0
     rptwnd = RptWnd(context)
     rptwnd.withdraw()
     if reporting:
@@ -655,6 +661,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, keye
         # [2]:largest,
         # [3]:average,
         # [4]:population variance
+        # [5]:entropy
         # all as a tuple
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
@@ -668,11 +675,20 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, cond_rpt: bool, keye
         guess_rank_dict[guess] = grp_stats
         # Record the smallest average pattern groups size.
         min_score = min(grp_stats[3], min_score)
+        # Record the maximum entropy seen
+        max_ent = max(grp_stats[5], max_ent)
 
     # Populate the best_rank_dict with the best guesses.
     # This dictionary's values are grp_stats tuples.
     for g, s in guess_rank_dict.items():
-        if s[3] == min_score:
+        # if not only by entropy, then include all with max group size
+        if not byentonly:
+            if math.isclose(s[3], min_score):
+                if g not in best_rank_dict:
+                    best_rank_dict[g] = s
+        # Also collect the max_ent instances, these are not
+        # always with max group size.
+        if math.isclose(s[5], max_ent):
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
 
@@ -706,11 +722,11 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt
     rptwnd.msg1.insert(tk.END, rptl)
     if cond_rpt:
         rptl = '\n\nguess' + '\tqty' + \
+               '\tent' + \
                '\tmin' + \
                '\tmax' + \
                '\tave' + \
-               '\tp2' + \
-               '\t\tent'
+               '\tp2'
         rptwnd.msg1.insert(tk.END, rptl)
 
 
@@ -722,11 +738,11 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
         rptl = '\n\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
         rptwnd.msg1.insert(tk.END, rptl)
         rptl = '\n> qty ' + str(qty) + \
+               ', ent ' + '{0:.2f}'.format(ent) + \
                ', smallest size ' + str(smallest) + \
                ', largest size ' + str(largest) + \
                ', average size ' + '{0:.3f}'.format(average) + \
-               ', p2 ' + '{0:.2f}'.format(p2) + \
-               ', ent ' + '{0:.2f}'.format(ent)
+               ', p2 ' + '{0:.2f}'.format(p2)
 
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.insert(tk.END, '\n')
@@ -739,11 +755,11 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
             rptwnd.msg1.insert(tk.END, '\n' + rptl)
     else:
         rptl = '\n' + guess + '\t' + str(qty) + \
+               '\t' + '{0:.2f}'.format(ent) + \
                '\t' + str(smallest) + \
                '\t' + str(largest) + \
                '\t' + '{0:.3f}'.format(average) + \
-               '\t' + '{0:.2f}'.format(p2) + \
-               '\t\t' + '{0:.2f}'.format(ent)
+               '\t' + '{0:.2f}'.format(p2)
         rptwnd.msg1.insert(tk.END, rptl)
 
 
@@ -763,11 +779,11 @@ def groups_stats_summary_line(best_rank_dict: dict) -> str:
     # as a tuple
     (g_qty, g_min, g_max, g_ave, g_p2, g_ent) = groups_stat_summary(best_rank_dict)
     rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(g_qty) + \
+           ", ent " + '{0:.2f}'.format(g_ent) + \
            ", sizes: min " + '{0:.0f}'.format(g_min) + \
            ", min-max " + '{0:.0f}'.format(g_max) + \
            ", ave " + '{0:.3f}'.format(g_ave) + \
-           ", p2 " + '{0:.2f}'.format(g_p2) + \
-           ", ent " + '{0:.2f}'.format(g_ent)
+           ", p2 " + '{0:.2f}'.format(g_p2)
     return rptl
 
 
@@ -797,16 +813,15 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
         (g_qty, g_min, g_max, g_ave, g_p2, g_ent) = s
         rptl = "\n" + w + " - sizes:" + \
                ", qty " + '{0:.0f}'.format(g_qty) + \
+               ", ent " + '{0:.2f}'.format(g_ent) + \
                ", min " + '{0:.0f}'.format(g_min) + \
                ", max " + '{0:.0f}'.format(g_max) + \
                ", ave " + '{0:.3f}'.format(g_ave) + \
-               ", p2 " + '{0:.3f}'.format(g_p2) + \
-               ", ent " + '{0:.2f}'.format(g_ent)
+               ", p2 " + '{0:.3f}'.format(g_p2)
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.see('end')
     # lock the text widget to prevent user editing
     rptwnd.msg1.configure(state='disabled')
-
 
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
@@ -1149,7 +1164,7 @@ class HelpWindow(ctk.CTkToplevel):
         if os.path.exists(full_path_name):
             f = open(full_path_name, "r", encoding="UTF8").read()
         else:
-            f = 'Could not find. ' + self.full_path_name
+            f = 'Could not find. ' + str(full_path_name)
         return f
 
     def get_info(self) -> str:
