@@ -738,7 +738,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
         rptl = '\n\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
         rptwnd.msg1.insert(tk.END, rptl)
         rptl = '\n> qty ' + str(qty) + \
-               ', ent ' + '{0:.2f}'.format(ent) + \
+               ', ent ' + '{0:.3f}'.format(ent) + \
                ', smallest size ' + str(smallest) + \
                ', largest size ' + str(largest) + \
                ', average size ' + '{0:.3f}'.format(average) + \
@@ -755,7 +755,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
             rptwnd.msg1.insert(tk.END, '\n' + rptl)
     else:
         rptl = '\n' + guess + '\t' + str(qty) + \
-               '\t' + '{0:.2f}'.format(ent) + \
+               '\t' + '{0:.3f}'.format(ent) + \
                '\t' + str(smallest) + \
                '\t' + str(largest) + \
                '\t' + '{0:.3f}'.format(average) + \
@@ -779,7 +779,7 @@ def groups_stats_summary_line(best_rank_dict: dict) -> str:
     # as a tuple
     (g_qty, g_min, g_max, g_ave, g_p2, g_ent) = groups_stat_summary(best_rank_dict)
     rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(g_qty) + \
-           ", ent " + '{0:.2f}'.format(g_ent) + \
+           ", ent " + '{0:.3f}'.format(g_ent) + \
            ", sizes: min " + '{0:.0f}'.format(g_min) + \
            ", min-max " + '{0:.0f}'.format(g_max) + \
            ", ave " + '{0:.3f}'.format(g_ave) + \
@@ -813,7 +813,7 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
         (g_qty, g_min, g_max, g_ave, g_p2, g_ent) = s
         rptl = "\n" + w + " - sizes:" + \
                ", qty " + '{0:.0f}'.format(g_qty) + \
-               ", ent " + '{0:.2f}'.format(g_ent) + \
+               ", ent " + '{0:.3f}'.format(g_ent) + \
                ", min " + '{0:.0f}'.format(g_min) + \
                ", max " + '{0:.0f}'.format(g_max) + \
                ", ave " + '{0:.3f}'.format(g_ave) + \
