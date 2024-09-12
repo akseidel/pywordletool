@@ -568,6 +568,7 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
     """
     guess_rank_dict = {}
     best_rank_dict = {}
+    inorder_best_rank_dict = {}
     min_score = len(word_lst)
     max_ent = 0.0
     rptwnd = RptWnd(context)
@@ -616,12 +617,13 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
         if math.isclose(s[5], max_ent):
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
-
+    # make a new dict that is best_rank_dict sorted by ent size
+    inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
+    # Reporting only the best ranking guesses.
     if reporting:
-        report_footer_wrapper(msg1, word_lst, best_rank_dict, rptwnd)
+        report_footer_wrapper(msg1, word_lst, inorder_best_rank_dict, rptwnd)
 
-    return best_rank_dict
-
+    return inorder_best_rank_dict
 
 def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool, context: str) -> dict:
     """
@@ -646,6 +648,7 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, con
     """
     guess_rank_dict = {}
     best_rank_dict = {}
+    inorder_best_rank_dict = {}
     min_score = len(word_lst)
     max_ent = 0.0
     rptwnd = RptWnd(context)
@@ -691,13 +694,13 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, con
         if math.isclose(s[5], max_ent):
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
-
-    # Reporting only the best ranking guesses. These were collected into the
-    # best_rank_dict dictionary of words as keys, grp_stats as values.
+    # make a new dict that is best_rank_dict sorted by ent size
+    inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
+    # Reporting only the best ranking guesses.
     if reporting:
-        report_footer_wrapper("Words Showing", word_lst, best_rank_dict, rptwnd)
+        report_footer_wrapper("Words Showing", word_lst, inorder_best_rank_dict, rptwnd)
 
-    return best_rank_dict
+    return inorder_best_rank_dict
 
 
 def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk):
