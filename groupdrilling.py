@@ -18,6 +18,13 @@ letter_rank_file = 'letter_ranks.txt'
 
 
 def process_grp_list(self, g_word_lst: list) -> dict:
+    """
+    Processes the words list for its groups. Uses the method options in the groups
+    driller for the processing arguments.
+    @param self:
+    @param g_word_lst: The words list to be examined for groups
+    @return: dictionary of the optimal words
+    """
     # Flag to use various solutions as guesses instead of the current displayed word list.
     # This allows the option to group rank from the entire guess list.
     grps_guess_source = self.grps_guess_source.get()
@@ -169,6 +176,12 @@ class GrpsDrillingMain(ctk.CTkToplevel):
             return
 
     def report_results(self, this_lst: list, optimal_group_guesses: dict) -> None:
+        """
+        Fills the results status CustomText with the results. And highlights the
+        words in the to-be-examined words list if they are optimal.
+        @param this_lst: The list of words that will be drilled for guess groups
+        @param optimal_group_guesses: The dictionary of optimal words.
+        """
         # The words in common will be highlighted.
         words_in_common = list(set(this_lst) & set(optimal_group_guesses))
         regex: str = '|'.join(words_in_common)

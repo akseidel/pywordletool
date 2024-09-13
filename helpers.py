@@ -501,13 +501,8 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     minimum and maximum group sizes
     @param best_rank_dict:
     @return: groups_stat_summary tuple:
-    [0]:qty,
-    [1]:smallest,
-    [2]:largest,
-    [3]:average,
-    [4]:population variance,
-    [5]:entropy bits,
-    all as a tuple
+    [0]:qty,[1]:smallest,[2]:largest,[3]:average,
+    [4]:population variance,[5]:entropy bits,all as a tuple
     """
     # The grp_stats for each best_rank_dict member are:
     # [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:population variance and [5]:entropy bits as tuple parts
@@ -539,14 +534,8 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
         max_grp_size = min(max_stat, max_grp_size)  # The min_max is desired.
         min_grp_p2 = min(p2_stat, min_grp_p2)
         max_grp_ent = max(max_grp_ent, e_stat)
-        # groups_stat_summary are:
-        # [0]:qty,
-        # [1]:smallest,
-        # [2]:largest,
-        # [3]:average,
-        # [4]:min p2
-        # [5]:max entropy bit
-        # as a tuple
+        # groups_stat_summary are:[0]:qty,[1]:smallest,[2]:largest,[3]:average,
+        # [4]:min p2,[5]:max entropy bit as a tuple
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2, max_grp_ent
 
 
@@ -568,14 +557,14 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
     """
     guess_rank_dict = {}
     best_rank_dict = {}
-    inorder_best_rank_dict = {}
+    cond_dict = {}
     min_score = len(word_lst)
     max_ent = 0.0
     rptwnd = RptWnd(context)
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window(msg1, all_targets, rptwnd, cond_rpt)
+        reporting_header_to_window(msg1, all_targets, rptwnd)
 
     for guess in all_targets:
         guess_groups_dict = groups_for_this_guess(guess, word_lst)
@@ -585,18 +574,15 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
 
         if reporting:
             clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt, keyed_rpt)
+            # saving the stats for later sorting
+            if cond_rpt:
+                cond_dict[guess] = grp_stats
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
         # slightly higher prob. than other guesses having the same average.
-        # grp_stats are:
-        # [0]:qty,
-        # [1]:smallest,
-        # [2]:largest,
-        # [3]:average,
-        # [4]:population variance
-        # [5]:entropy
-        # as a tuple
+        # grp_stats are: [0]:qty,[1]:smallest,[2]:largest,[3]:average,
+        # [4]:population variance, [5]:entropy as a tuple
         guess_rank_dict[guess] = grp_stats
 
         # Record the smallest average pattern groups size.
@@ -617,13 +603,17 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
         if math.isclose(s[5], max_ent):
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
+
     # make a new dict that is best_rank_dict sorted by ent size
     inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
     # Reporting only the best ranking guesses.
     if reporting:
-        report_footer_wrapper(msg1, word_lst, inorder_best_rank_dict, rptwnd)
+        report_footer_wrapper(msg1, word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
+        if cond_rpt:
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd)
 
     return inorder_best_rank_dict
+
 
 def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool, context: str) -> dict:
     """
@@ -639,37 +629,30 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, con
     @return: dictionary of the best group ranked guesses where
     guess words are the keys, grp_stats tuples are the values
     grp_stats tuples are:
-    [0]:qty,
-    [1]:smallest,
-    [2]:largest,
-    [3]:average,
-    [4]:population variance
-    [5]:entropy
+    [0]:qty,[1]:smallest,[2]:largest,[3]:average,[4]:population variance,[5]:entropy
     """
     guess_rank_dict = {}
     best_rank_dict = {}
-    inorder_best_rank_dict = {}
+    cond_dict = {}
     min_score = len(word_lst)
     max_ent = 0.0
     rptwnd = RptWnd(context)
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window("Words Showing", word_lst, rptwnd, cond_rpt)
+        reporting_header_to_window("Words Showing", word_lst, rptwnd)
 
     for guess in word_lst:
         guess_groups_dict = groups_for_this_guess(guess, word_lst)
-        # grp_stats are: [0]:qty,
-        # [1]:smallest,
-        # [2]:largest,
-        # [3]:average,
-        # [4]:population variance
-        # [5]:entropy
-        # all as a tuple
+        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
+        # [4]:population variance, [5]:entropy all as a tuple
         grp_stats = get_a_groups_stats(guess_groups_dict)
 
         if reporting:
             clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt, keyed_rpt)
+            # saving the stats for later sorting
+            if cond_rpt:
+                cond_dict[guess] = grp_stats
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
@@ -694,21 +677,26 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, con
         if math.isclose(s[5], max_ent):
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
+
     # make a new dict that is best_rank_dict sorted by ent size
     inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
     # Reporting only the best ranking guesses.
     if reporting:
-        report_footer_wrapper("Words Showing", word_lst, inorder_best_rank_dict, rptwnd)
+        report_footer_wrapper("Words Showing", word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
+        if cond_rpt:
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd)
 
     return inorder_best_rank_dict
 
 
-def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk):
+def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk, cond_rpt: bool):
     report_footer_summary_header_to_window(msg1, word_lst, rptwnd)
     report_footer_stats_summary_to_window(best_rank_dict, rptwnd)
     report_footer_opt_wrds_to_window(best_rank_dict, rptwnd)
-    report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
+    if not cond_rpt:
+        report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
     rptwnd.back_to_summary()
+    pass
 
 
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk):
@@ -716,21 +704,35 @@ def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: c
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.msg1.insert(tk.END, rptl)
 
+def prnt_guesses_header(rptwnd: ctk):
+    rptl = '\n\nguess' + '\tqty' + \
+           '\tent' + \
+           '\tmin' + \
+           '\tmax' + \
+           '\tave' + \
+           '\tp2'
+    rptwnd.msg1.insert(tk.END, rptl)
 
-def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk, cond_rpt: bool):
+def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = rptwnd.context + " - Pattern Groups For Guesses From The " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + ")"
     rptwnd.title(rptl)
     rptl = "> >  " + rptl + "  < <"
     rptwnd.msg1.insert(tk.END, rptl)
-    if cond_rpt:
-        rptl = '\n\nguess' + '\tqty' + \
-               '\tent' + \
-               '\tmin' + \
-               '\tmax' + \
-               '\tave' + \
-               '\tp2'
+
+def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk ) -> None:
+    inorder_cond_dict = dict(sorted(l_cond_dict.items(), key=lambda item: item[1][5], reverse=True))
+    prnt_guesses_header(rptwnd)
+    for g, s in inorder_cond_dict.items():
+        (qty, smallest, largest, average, p2, ent) = s
+        rptl = '\n' + g + '\t' + str(qty) + \
+               '\t' + '{0:.3f}'.format(ent) + \
+               '\t' + str(smallest) + \
+               '\t' + str(largest) + \
+               '\t' + '{0:.3f}'.format(average) + \
+               '\t' + '{0:.2f}'.format(p2)
         rptwnd.msg1.insert(tk.END, rptl)
+
 
 
 def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict,
@@ -757,13 +759,7 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
                 rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             rptwnd.msg1.insert(tk.END, '\n' + rptl)
     else:
-        rptl = '\n' + guess + '\t' + str(qty) + \
-               '\t' + '{0:.3f}'.format(ent) + \
-               '\t' + str(smallest) + \
-               '\t' + str(largest) + \
-               '\t' + '{0:.3f}'.format(average) + \
-               '\t' + '{0:.2f}'.format(p2)
-        rptwnd.msg1.insert(tk.END, rptl)
+        pass
 
 
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
@@ -772,14 +768,8 @@ def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
 
 
 def groups_stats_summary_line(best_rank_dict: dict) -> str:
-    # stats_summary
-    # [0]:qty,
-    # [1]:smallest,
-    # [2]:largest,
-    # [3]:average,
-    # [4]:population variance
-    # [5]:entropy bits
-    # as a tuple
+    # stats_summary [0]:qty,[1]:smallest,[2]:largest, [3]:average,
+    # [4]:population variance, [5]:entropy bits as a tuple
     (g_qty, g_min, g_max, g_ave, g_p2, g_ent) = groups_stat_summary(best_rank_dict)
     rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(g_qty) + \
            ", ent " + '{0:.3f}'.format(g_ent) + \
@@ -795,20 +785,21 @@ def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk):
 
 
 def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
+    """
+    Takes the dictionary of optimal words, which BTW is already sorted by entropy,
+    and then uses the dictionary keys, ie the words, to build a sentence for printing out
+    the optimal words list.
+    @param best_rank_dict: The dictionary of optimal words.
+    @return: The string used for printing out the optimal word list.
+    """
     wrds = list(best_rank_dict.keys())
     rptl = '\n> >  {0:.0f}'.format(len(wrds)) + ' Optimal group guess words:' + '\n' + ', '.join(wrds)
     return rptl
 
 
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk):
-    # stats_summary
-    # [0]:qty,
-    # [1]:smallest,
-    # [2]:largest,
-    # [3]:average,
-    # [4]:population variance,
-    # [5]:entropy bits,
-    # as a tuple
+    # stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
+    # [4]:population variance,[5]:entropy bits as a tuple
     stats_summary = groups_stat_summary(best_rank_dict)
     rptl = '\n> >  Optimal guess stats, each has group qty ' + '{0:.0f}'.format(stats_summary[0]) + ' or is max entropy:'
     rptwnd.msg1.insert(tk.END, rptl)
@@ -1075,6 +1066,11 @@ class RptWnd(ctk.CTkToplevel):
             self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
 
     def back_to_summary(self):
+        """
+        Scrolls the window to the part that says 'Groups summary'. It does
+        this by highlighting the text, which causes the scroll, and then removes
+        the highlight pattern.
+        """
         search_text = ''
         regex: search_text = 'Groups summary'
         self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
@@ -1090,7 +1086,7 @@ class RptWnd(ctk.CTkToplevel):
         super().__init__()
         self.context = context
         self.resizable(width=True, height=True)
-        self.geometry('780x600')
+        self.geometry('790x600')
 
         font_tuple_n = ("Courier", 14, "normal")
         self.search_text = tk.StringVar()
