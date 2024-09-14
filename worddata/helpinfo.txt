@@ -34,7 +34,11 @@ In the puzzle game context a letter indicated not at its correct position is a l
 
 'Show Optimal' highlights the word or words that result in the lowest average remaining words when that word is used as a guess. The score is the average of the guess's groups sizes. This analysis is performed on the current words 'Showing' or the entire 'Classic', 'Classic+' or 'Large' vocabularies. The group finding process is lengthy and may take extended time to finish. The group optimal guess word is likely to result in remaining smaller word groups, thus increasing chances to find the solution in fewer guesses. Optimal group analysis should be performed on the total selection list that contains multiple letters because the analysis is for selecting the solution versus guessing for letter discovery. A separate window opens to report all the group pattern information during the analysis when the 'Verbose Report' checkbox is checked. Group optimal words identified from guess word sources other than the showing words cannot be highlighted if the word is not in the shown list. Run the process in verbose mode to find out the words. When the candidate guess is of the list there will be some chance the candidate guess is the solution. The solution will be the guess after the candidate guess when otherwise.
 
-'Entropy' filters the optimal guess words to those that contain the highest gained entropy information. Many guess words can result in the same number of possible solution word groups, but the number of words in those groups can vary. There can be a technical information difference due to the word group sizes. The information can be quantified as entropy. 
+'Entropy' filters the optimal guess words to those that contain the highest gained entropy information bits (base 2). Many guess words can result in the same number of possible solution word groups, but the number of words in those groups can vary. There can be a technical information difference due to the word group sizes. The information can be quantified as entropy. 
+
+'Cond.' The verbose output will be a condensed format that lists the guess words in order of highest information entropy first.
+
+'Keyed' Results in each of the verbose data output lines keyed to the guess word to which that data applies. This format can be useful for copying and pasting the data to another application for further processing while maintaining to which guess word the data applies.
 
 - Word Vocabulary:
 

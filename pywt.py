@@ -23,6 +23,7 @@ import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
 # namespace so that tk is preserved
 from tkinter import messagebox
 import customtkinter as ctk
+
 import helpers
 import groupdrilling
 
@@ -186,6 +187,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.ordr_by_rank = tk.BooleanVar(value=True)
         self.verbose_grps = tk.BooleanVar(value=False)
         self.ent_grps = tk.BooleanVar(value=False)
+        self.cond_grps = tk.BooleanVar(value=False)
         self.keyed_verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.status = tk.StringVar()
@@ -348,7 +350,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.best_groups_guess_dict(word_list,
                                                                                self.verbose_grps.get(),
                                                                                self.ent_grps.get(),
-                                                                               False,
+                                                                               self.cond_grps.get(),
                                                                                self.keyed_verbose_grps.get(),
                                                                                context)
 
@@ -364,7 +366,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         self.ent_grps.get(),
-                                                                                        False,
+                                                                                        self.cond_grps.get(),
                                                                                         self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
@@ -381,7 +383,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         self.ent_grps.get(),
-                                                                                        False,
+                                                                                        self.cond_grps.get(),
                                                                                         self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
@@ -398,7 +400,7 @@ class Pywordlemainwindow(ctk.CTk):
                         optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
                                                                                         self.verbose_grps.get(),
                                                                                         self.ent_grps.get(),
-                                                                                        False,
+                                                                                        self.cond_grps.get(),
                                                                                         self.keyed_verbose_grps.get(),
                                                                                         all_targets,
                                                                                         msg1,
@@ -582,6 +584,10 @@ class Pywordlemainwindow(ctk.CTk):
             do_grep()
             self.title("This Wordle Helper")
             self.sel_grpoptimal = False
+
+        def cond_grps_chk() -> None:
+            if self.cond_grps.get():
+                self.verbose_grps.set(True)
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
@@ -1477,17 +1483,11 @@ class Pywordlemainwindow(ctk.CTk):
         self.grp_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
 
         self.bt_groups = ctk.CTkButton(self.grp_frame,
-                                       text="Show Optimal",
+                                       text="Optimals",
                                        text_color="black",
+                                       width=80,
                                        command=pick_optimals)
         self.bt_groups.pack(side=tk.LEFT, padx=4, pady=0, fill=tk.X)
-        self.chk_ent_disp = ttk.Checkbutton(self.grp_frame,
-                                            text="Entropy",
-                                            variable=self.ent_grps,
-                                            onvalue=True,
-                                            offvalue=False
-                                            )
-        self.chk_ent_disp.pack(side=tk.LEFT, padx=2, pady=0)
         self.chk_grp_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Verbose",
                                             variable=self.verbose_grps,
@@ -1495,6 +1495,21 @@ class Pywordlemainwindow(ctk.CTk):
                                             offvalue=False
                                             )
         self.chk_grp_disp.pack(side=tk.LEFT, padx=0, pady=0)
+        self.chk_ent_disp = ttk.Checkbutton(self.grp_frame,
+                                            text="Entropy",
+                                            variable=self.ent_grps,
+                                            onvalue=True,
+                                            offvalue=False
+                                            )
+        self.chk_ent_disp.pack(side=tk.LEFT, padx=2, pady=0)
+        self.chk_cond_disp = ttk.Checkbutton(self.grp_frame,
+                                            text="Cond.",
+                                            variable=self.cond_grps,
+                                            onvalue=True,
+                                            offvalue=False,
+                                            command = cond_grps_chk
+                                            )
+        self.chk_cond_disp.pack(side=tk.LEFT, padx=2, pady=0)
         self.chk_key_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Keyed",
                                             variable=self.keyed_verbose_grps,
