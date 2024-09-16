@@ -20,8 +20,11 @@ import random
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that
 # it may be separate from ttk
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
+from pickle import FALSE
 # namespace so that tk is preserved
 from tkinter import messagebox
+from token import ENDMARKER
+
 import customtkinter as ctk
 
 import helpers
@@ -766,21 +769,30 @@ class Pywordlemainwindow(ctk.CTk):
         self.actions_outer_frame = tk.Frame(self.criteria_frame,
 
                                             )
-        self.actions_outer_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=4, pady=2, expand=True)
+        self.actions_outer_frame.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2, expand=False)
 
-        # =======  START OF ============ include special pattern control
+        # =======  START OF ============ include special patterns control
         # frame for special pattern regex - uses pack
         self.specialpatt_frame = ttk.LabelFrame(self.actions_outer_frame,
-                                                text='Special Pattern',
+                                                text='Special Patterns and Multiple Same Letters',
                                                 labelanchor='n'
                                                 )
-        self.specialpatt_frame.pack(side=tk.TOP, fill=tk.BOTH, padx=0, pady=0, expand=True)
+        self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=False)
+
+        self.specialpatt_subframeA = ttk.Frame(self.specialpatt_frame)
+        self.specialpatt_subframeA.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=True)
+
+        self.specialpatt_subframeB = ttk.Frame(self.specialpatt_frame)
+        self.specialpatt_subframeB.pack(side=tk.BOTTOM, fill=tk.X, padx=0, pady=0, expand=True)
 
         # special pattern control variables
         self.spec_pattern = tk.StringVar()
         self.sp_pat_mode_var = tk.IntVar(value=1)
 
-        # self.spec_pattern.set("this pattern")
+        # multiple letter control variables
+        self.mult_ltr_definition = tk.StringVar()
+        self.mult_ltr_mode_var = tk.IntVar(value=2)
+
 
         # Coordinate duplicates in special pattern with no dup setting
         def coordinate_special_pattern_dups() -> None:
@@ -800,39 +812,99 @@ class Pywordlemainwindow(ctk.CTk):
             self.spec_pattern.set('%.5s' % scrub_text(self.spec_pattern.get(), '', True, False).upper())
             do_grep()
 
+        def do_mult_ltr_def(*args) -> None:
+            # In this ui all text is shown in uppercase and the format must conform to:
+            # <number><letter>,<number><letter>
+            self.mult_ltr_definition.set(helpers.validate_mult_ltr_sets(self.mult_ltr_definition.get()))
+
+
+        # label
+        self.lb_sp_pat = ctk.CTkLabel(self.specialpatt_subframeA,
+                                      text='Pattern',
+                                      )
+        self.lb_sp_pat.pack(side=tk.LEFT, padx=4, pady=4)
+
+        # special pattern entry clear
+        def clear_spec_pattern() -> None:
+            self.spec_pattern.set('')
+
+        # The special pattern controls are in a sub frame and all but the text label are RIGHT positioned.
+        # Therefore, they are defined from last to first.
+        # special pattern mode radio buttons
+        rb_px = ttk.Radiobutton(self.specialpatt_subframeA, text="Exclude", variable=self.sp_pat_mode_var, value=2,
+                                command=do_spec_pat)
+        rb_px.pack(side=tk.RIGHT, padx=6, pady=0)
+        rb_pi = ttk.Radiobutton(self.specialpatt_subframeA, text="Require", variable=self.sp_pat_mode_var, value=1,
+                                command=do_spec_pat)
+        rb_pi.pack(side=tk.RIGHT, padx=6, pady=0)
+        # special pattern clear button
+        self.bt_pat_clr = ctk.CTkButton(self.specialpatt_subframeA,
+                                        text="Clear",
+                                        width=20,
+                                        text_color="black",
+                                        command=clear_spec_pattern
+                                        )
+        self.bt_pat_clr.pack(side=tk.RIGHT, padx=4, pady=0)
+
+        # binding a special pattern entry validator
         try:
             # python 3.6
             self.spec_pattern.trace_add('write', do_spec_pat)
         except AttributeError:
             # python < 3.6
             self.spec_pattern.trace('w', do_spec_pat)
-
-        self.lb_spec_pattern = ttk.Entry(self.specialpatt_frame,
+        # special pattern entry field
+        self.lb_spec_pattern = ttk.Entry(self.specialpatt_subframeA,
                                          textvariable=self.spec_pattern,
                                          width=8,
                                          justify='center')
-        self.lb_spec_pattern.pack(side=tk.LEFT, padx=4, pady=2)
+        self.lb_spec_pattern.pack(side=tk.RIGHT, padx=0, pady=4)
+        # ............ end special pattern
 
-        def clear_spec_pattern() -> None:
-            self.spec_pattern.set('')
+        # ............ multiple same letters section
+        # The multiple same letters controls are in a sub frame and all but the text label are RIGHT positioned.
+        # Therefore, they are defined from last to first.
+        # label
+        self.lb_mult_ltrs = ctk.CTkLabel(self.specialpatt_subframeB,
+                                      text='Same Ltrs.',
+                                      )
+        self.lb_mult_ltrs.pack(side=tk.LEFT, padx=4, pady=4)
 
-        self.bt_pat_clr = ctk.CTkButton(self.specialpatt_frame,
-                                        text="Clear",
-                                        width=20,
-                                        text_color="black",
-                                        command=clear_spec_pattern
-                                        )
-        self.bt_pat_clr.pack(side=tk.LEFT, padx=4, pady=2)
+        # multiple same letters clear
+        def clear_mult_ltr_def() -> None:
+            self.mult_ltr_definition.set('')
+        # multiple same letter radio buttons
+        rb_mult_x = ttk.Radiobutton(self.specialpatt_subframeB, text="Exclude", variable=self.mult_ltr_mode_var, value=2,
+                                command=do_mult_ltr_def)
+        rb_mult_x.pack(side=tk.RIGHT, padx=6, pady=0)
+        rb_mult_i = ttk.Radiobutton(self.specialpatt_subframeB, text="Require", variable=self.mult_ltr_mode_var,
+                                    value=1,
+                                    command=do_mult_ltr_def)
+        rb_mult_i.pack(side=tk.RIGHT, padx=6, pady=0)
+        # multiple same letter clear button
+        self.bt_mult_ltr_clr = ctk.CTkButton(self.specialpatt_subframeB,
+                                             text="Clear",
+                                             width=20,
+                                             text_color="black",
+                                             command=clear_mult_ltr_def
+                                             )
+        self.bt_mult_ltr_clr.pack(side=tk.RIGHT, padx=4, pady=0)
+        # multiple same letters entry validator
+        try:
+            # python 3.6
+            self.mult_ltr_definition.trace_add('write', do_mult_ltr_def)
+        except AttributeError:
+            # python < 3.6
+            self.mult_ltr_definition.trace('w', do_mult_ltr_def)
+        # multiple same letters entry field
+        self.entry_mult_ltr_def = ttk.Entry(self.specialpatt_subframeB,
+                                            textvariable=self.mult_ltr_definition,
+                                            width=8,
+                                            justify='center')
+        self.entry_mult_ltr_def.pack(side=tk.RIGHT, padx=0, pady=4)
 
-        # special pattern mode radio buttons
-        rb_pi = ttk.Radiobutton(self.specialpatt_frame, text="Require", variable=self.sp_pat_mode_var, value=1,
-                                command=do_spec_pat)
-        rb_pi.pack(side=tk.LEFT, padx=10, pady=2)
-        rb_px = ttk.Radiobutton(self.specialpatt_frame, text="Exclude", variable=self.sp_pat_mode_var, value=2,
-                                command=do_spec_pat)
-        rb_px.pack(side=tk.LEFT, padx=6, pady=2)
-
-        # =======  END OF ============ include special pattern control
+        # ............ end multiple same letter
+        # =======  END OF ======== include special pattern and mulitple letters control
 
         # actions frame general - uses pack
         self.actions_frame = ttk.LabelFrame(self.actions_outer_frame,
