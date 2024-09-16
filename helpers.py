@@ -577,6 +577,8 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
             # saving the stats for later sorting
             if cond_rpt:
                 cond_dict[guess] = grp_stats
+                # omit the 'For:' in the search control
+                rptwnd.search_text.set('')
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
@@ -653,6 +655,8 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, con
             # saving the stats for later sorting
             if cond_rpt:
                 cond_dict[guess] = grp_stats
+                # omit the 'For:' in the search control
+                rptwnd.search_text.set('')
 
         # The rank is calculated as the average of the group's sizes.
         # Guesses that have the same number of groups but have a larger largest group have a
