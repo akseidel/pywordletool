@@ -821,6 +821,66 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
     # lock the text widget to prevent user editing
     rptwnd.msg1.configure(state='disabled')
 
+
+# multiple letter specification
+
+def valid_mult_ltr(s: str) -> bool:
+    """
+    The format requires the letter placed after the number. The str
+    argument will already be converted to uppercase.
+    Returns True if the second character is an uppercase letter A - Z.
+    @param s: The string being checked.
+    """
+    if len(s) != 2:
+        return False
+    else:
+        valid = 'QWERTYUIOPASDFGHJKLZXCVBNM ,'
+        return valid.find(s[1]) > -1
+
+def valid_first_mult_number(s: str) -> bool:
+    """
+    The multiple letter requirement would apply to only
+    2 or 3 multiple instances for that letter. The format
+    requires the number placed before the letter.
+    @param s: True if the first character is a 2 or 3.
+    """
+    if len(s) > 0:
+        if s[0] == '2':
+            return True
+        if s[0] == '3':
+            return True
+    else:
+        return False
+
+def validate_mult_ltr_sets(str: str) -> str:
+    """
+    Most definitely very crude!
+    Validates the multiple letter specification to be in the
+    correct format <number><letter>,<number><letter>.
+    @param str: The multiple letter specification.
+    @return: The cleaned entries in a comma separated string
+    """
+    r = str
+    if len(str) > 0:
+        if str[-1] == ',':
+            return r
+        elif str[-1] == ' ':
+            return r.strip(' ') + ','
+        else:
+            my_list = str.upper().split(",")
+            valid = []
+            for s in my_list:
+                if len(s) > 0:
+                    if valid_first_mult_number(s):
+                        if valid_mult_ltr(s):
+                            valid.append(s[0] + s[1] + ',')
+                        else:
+                            valid.append(s[0])
+            r = ','.join(valid).replace(',,',',').strip(',')
+    return r
+
+
+
 # A class used for holding list stack of the shell commands
 # It has functions that build greps related to filtering wordle
 # letter conditions. Some functions are not used in the gui
