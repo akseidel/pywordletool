@@ -940,6 +940,23 @@ class ShellCmdList:
             dpn = ''.rjust(c - p, '.')
             self.shCMDlist.append("grep -E '" + dp + ltr + dpn + "'")
 
+    def add_type_mult_ltr(self, mult_ltr_definition: str, typ: int):
+        codes = mult_ltr_definition.split(',')
+        for code in codes:
+            if len(code) ==2:
+                c = code[0]
+                x = code[1]
+                g_code = ''
+                if c == '2':
+                    g_code = f"{x}{x}|{x}.{x}|{x}..{x}|{x}...{x}"
+                if c == '3':
+                    g_code = (f"{x}{x}{x}|{x}.{x}{x}|{x}..{x}{x}|{x}{x}..{x}|{x}.{x}.{x}")
+                if typ == 1:
+                    self.shCMDlist.append("grep -E '" + g_code + "'")
+                if typ == 2:
+                    self.shCMDlist.append("grep -vE '" + g_code + "'")
+
+
     # Returns the command stack assembled into one command line.
     def full_cmd(self) -> str:
         pipe = " | "
@@ -948,7 +965,6 @@ class ShellCmdList:
             this_cmd = this_cmd + w + pipe
         this_cmd = this_cmd + self.shCMDlist[-1]
         return this_cmd
-
 
 # ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
 # The wordle tool all wrapped up into one being, including the grep command list.

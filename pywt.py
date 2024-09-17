@@ -267,12 +267,20 @@ class Pywordlemainwindow(ctk.CTk):
             # needed to show the last user entry in context with the sanity question.
             self.update()
             if helpers.wrd_has_duplicates(pat) and (not self.allow_dup_state.get()):
-                sanity_question()
+                sanity_question(self.entry_spec_pattern)
 
             if self.sp_pat_mode_var.get() == 1:
                 wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
             else:
                 wordletool.tool_command_list.add_excl_cmd(self.spec_pattern.get().lower())
+
+            if len(self.mult_ltr_definition.get()) > 1 and (not self.allow_dup_state.get()):
+                sanity_question(self.entry_mult_ltr_def)
+
+            if  len(self.mult_ltr_definition.get()) > 1:
+                wordletool.tool_command_list.add_type_mult_ltr(self.mult_ltr_definition.get().lower(),
+                                                            self.mult_ltr_mode_var.get()
+                                                            )
 
             # Allow duplicates could have been changed by this point and also by this next
             # special pattern check. Thus, the wordletool.loc_allow_dups is reset accordingly before
@@ -566,7 +574,7 @@ class Pywordlemainwindow(ctk.CTk):
             clear_excl_chkbs()
             clear_reqr_ckbs()
             self.suppress_grep = False
-            clear_spec_pattern()
+            clear_specials()
 
         # selected a random word in the result
         def pick_rando() -> None:
@@ -780,10 +788,10 @@ class Pywordlemainwindow(ctk.CTk):
         self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=False)
 
         self.specialpatt_subframeA = ttk.Frame(self.specialpatt_frame)
-        self.specialpatt_subframeA.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=True)
+        self.specialpatt_subframeA.pack(side=tk.TOP, fill=tk.X, padx=4, pady=0, expand=True)
 
         self.specialpatt_subframeB = ttk.Frame(self.specialpatt_frame)
-        self.specialpatt_subframeB.pack(side=tk.BOTTOM, fill=tk.X, padx=0, pady=0, expand=True)
+        self.specialpatt_subframeB.pack(side=tk.BOTTOM, fill=tk.X, padx=4, pady=0, expand=True)
 
         # special pattern control variables
         self.spec_pattern = tk.StringVar()
@@ -798,14 +806,15 @@ class Pywordlemainwindow(ctk.CTk):
         def coordinate_special_pattern_dups() -> None:
             self.update()
             if helpers.wrd_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
-                sanity_question()
+                sanity_question(self.entry_spec_pattern)
 
-        def sanity_question() -> None:
+        def sanity_question(entry: ttk.Entry) -> None:
             res = tk.messagebox.askyesno(title='Sanity Check',
                                          message='Duplicate letters are being required but that option is not set. Do '
                                                  'you want duplicate letters allowed? Otherwise no words will show.')
             if res:
                 self.allow_dup_state.set(True)
+            self.after(200, lambda: self.focus_set())
 
         def do_spec_pat(*args) -> None:
             # In this ui all text is shown in uppercase and there can be only five letters
@@ -816,7 +825,7 @@ class Pywordlemainwindow(ctk.CTk):
             # In this ui all text is shown in uppercase and the format must conform to:
             # <number><letter>,<number><letter>
             self.mult_ltr_definition.set(helpers.validate_mult_ltr_sets(self.mult_ltr_definition.get()))
-
+            do_grep()
 
         # label
         self.lb_sp_pat = ctk.CTkLabel(self.specialpatt_subframeA,
@@ -825,8 +834,9 @@ class Pywordlemainwindow(ctk.CTk):
         self.lb_sp_pat.pack(side=tk.LEFT, padx=4, pady=4)
 
         # special pattern entry clear
-        def clear_spec_pattern() -> None:
+        def clear_specials() :
             self.spec_pattern.set('')
+            self.mult_ltr_definition.set('')
 
         # The special pattern controls are in a sub frame and all but the text label are RIGHT positioned.
         # Therefore, they are defined from last to first.
@@ -842,7 +852,7 @@ class Pywordlemainwindow(ctk.CTk):
                                         text="Clear",
                                         width=20,
                                         text_color="black",
-                                        command=clear_spec_pattern
+                                        command=clear_specials
                                         )
         self.bt_pat_clr.pack(side=tk.RIGHT, padx=4, pady=0)
 
@@ -854,11 +864,11 @@ class Pywordlemainwindow(ctk.CTk):
             # python < 3.6
             self.spec_pattern.trace('w', do_spec_pat)
         # special pattern entry field
-        self.lb_spec_pattern = ttk.Entry(self.specialpatt_subframeA,
-                                         textvariable=self.spec_pattern,
-                                         width=8,
-                                         justify='center')
-        self.lb_spec_pattern.pack(side=tk.RIGHT, padx=0, pady=4)
+        self.entry_spec_pattern = ttk.Entry(self.specialpatt_subframeA,
+                                            textvariable=self.spec_pattern,
+                                            width=8,
+                                            justify='center')
+        self.entry_spec_pattern.pack(side=tk.RIGHT, padx=0, pady=4)
         # ............ end special pattern
 
         # ............ multiple same letters section
@@ -866,7 +876,7 @@ class Pywordlemainwindow(ctk.CTk):
         # Therefore, they are defined from last to first.
         # label
         self.lb_mult_ltrs = ctk.CTkLabel(self.specialpatt_subframeB,
-                                      text='Same Ltrs.',
+                                      text='Multiples',
                                       )
         self.lb_mult_ltrs.pack(side=tk.LEFT, padx=4, pady=4)
 
