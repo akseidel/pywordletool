@@ -162,9 +162,10 @@ def unranked_word_dict() -> dict:
                                vocab_filename, letter_rank_file, True, 0, True).get_ranked_results_wrd_lst(True)
 
 
-def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict, loc_r_pos_dict: dict) -> None:
+def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict,
+                loc_r_pos_dict: dict) -> None:
     """
-    Clears all the objects used to hold the letter filtering information
+    DECLARES and clears all the objects used to hold the letter filtering information
     @param loc_excl_l: List of letters to exclude.
     @param loc_requ_l: List of letters to require
     @param loc_x_pos_dict: Dictionary of letter at positions to exclude
@@ -471,6 +472,12 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
     print(f'{loc_wrd_x} word:{target_wrd}  Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
 
+    x_pos_dict = {}  # exclude position dictionary
+    r_pos_dict = {}  # require position dictionary
+    excl_l = []  # exclude letters list
+    requ_l = []  # require letters list
+    multi_code = ''  # multiple same letters accounting
+
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
     if use_starting_wrd == 1 and not rand_mode:
@@ -521,7 +528,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             # on how many dups there are compared to the number of non dups.
 
             # analyze this new word against the target word and update the filter criteria
-            helpers.analyze_pick_to_solution(target_wrd, word, excl_l, x_pos_dict, r_pos_dict)
+            [excl_l, x_pos_dict, r_pos_dict, multi_code] = helpers.analyze_pick_to_solution(target_wrd, word, excl_l, x_pos_dict, r_pos_dict)
 
             if guesses > 0 and not allow_dups:  # need a new wordletool allowing dups
                 del wordletool
@@ -608,6 +615,13 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
     query_mode = True
     query_set.clear()
     loc_n = len(candidate_list)
+
+    x_pos_dict = {}  # exclude position dictionary
+    r_pos_dict = {}  # require position dictionary
+    excl_l = []  # exclude letters list
+    requ_l = []  # require letters list
+    multi_code = ''  # multiple same letters accounting
+
     prelude_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    guess_vocabulary, do_every_wrd, vocab_sol_filename)
     # Iterate through each word in the candidates list
@@ -630,8 +644,8 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
 
         # At this point the guess word is selected.
         # Analyze this new word against the target word and update the filter criteria
-        helpers.analyze_pick_to_solution(target_wrd, word, excl_l, x_pos_dict, r_pos_dict)
-
+        [excl_l, x_pos_dict, r_pos_dict, multi_code] = helpers.analyze_pick_to_solution(target_wrd, word, excl_l,
+                                                                                        x_pos_dict, r_pos_dict)
         # Now load in the resulting filter criteria
         helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
 
@@ -696,6 +710,7 @@ x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 excl_l = []  # exclude letters list
 requ_l = []  # require letters list
+multi_code = ''  # multiple same letters accounting
 # rank mode:
 # -1 = Random
 # 0 = Occurrence

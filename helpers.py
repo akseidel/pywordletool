@@ -287,11 +287,12 @@ def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
     return regex_str
 
 
-# Updates the exclude, exclude position and include position filtering according to
+# Updates the exclude, exclude position, include position and multi filtering according to
 # what a pick looks like against the solution word.
 def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dict,
                              r_pos_dict: dict):
     candidate_pos = 0
+    multi_clues = {}
     for pl in pick:
         if sol.find(pl) < 0:
             if not exclude.__contains__(pl):
@@ -309,8 +310,24 @@ def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dic
             # include at candidate position
             r_pos_dict[key] = value
 
+        # record number of clues for each letter
+        if pl in multi_clues:
+            multi_clues[pl] = multi_clues[pl] + 1
+        else:
+            multi_clues[pl] = 1
+
         candidate_pos += 1
 
+    lst = []
+    for ltr in multi_clues:
+        if multi_clues[ltr] > 1:
+            code = str(multi_clues[ltr]) + ltr
+            lst.append(code)
+
+    multi_code = ','.join(lst)
+    if len(multi_code) > 0:
+        print("pick: " + pick + " multi_code: " + multi_code)
+    return [exclude, x_pos_dict, r_pos_dict, multi_code]
 
 def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
     """Builds the grep line for excluding positions
@@ -476,7 +493,7 @@ def get_a_groups_stats(a_groups_dict: dict) -> tuple[int, int, int, float, float
     largest = 0  # largest group size
     sums = 0  # group size sums, this is the number of words
     p2 = 0.0  # group population variance
-    g_ent = 0.0 # group entropy
+    g_ent = 0.0  # group entropy
     for k, v in a_groups_dict.items():
         size = len(v)
         sums = sums + size
@@ -487,12 +504,11 @@ def get_a_groups_stats(a_groups_dict: dict) -> tuple[int, int, int, float, float
     for k, v in a_groups_dict.items():
         size = len(v)
         p2 += (size - mean) ** 2
-        i_p = size/sums
-        i_entropy = -(i_p * math.log(i_p,2))
+        i_p = size / sums
+        i_entropy = -(i_p * math.log(i_p, 2))
         g_ent = g_ent + i_entropy
     p2 /= g_qty
     return g_qty, smallest, largest, mean, p2, g_ent
-
 
 
 def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float]:
@@ -539,7 +555,8 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2, max_grp_ent
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool, all_targets: dict,
+def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool,
+                                    all_targets: dict,
                                     msg1: str, context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
@@ -617,7 +634,8 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
     return inorder_best_rank_dict
 
 
-def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool, context: str) -> dict:
+def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool,
+                           context: str) -> dict:
     """
     Wraps guess word group ranking to return the best
     group rank guesses. Guesses resulting in more groups
@@ -708,6 +726,7 @@ def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: c
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.msg1.insert(tk.END, rptl)
 
+
 def prnt_guesses_header(rptwnd: ctk):
     rptl = '\n\nguess' + '\tqty' + \
            '\tent' + \
@@ -717,6 +736,7 @@ def prnt_guesses_header(rptwnd: ctk):
            '\tp2'
     rptwnd.msg1.insert(tk.END, rptl)
 
+
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = rptwnd.context + " - Pattern Groups For Guesses From The " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + ")"
@@ -724,7 +744,8 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = "> >  " + rptl + "  < <"
     rptwnd.msg1.insert(tk.END, rptl)
 
-def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk ) -> None:
+
+def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk) -> None:
     inorder_cond_dict = dict(sorted(l_cond_dict.items(), key=lambda item: item[1][5], reverse=True))
     prnt_guesses_header(rptwnd)
     for g, s in inorder_cond_dict.items():
@@ -736,7 +757,6 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk ) ->
                '\t' + '{0:.3f}'.format(average) + \
                '\t' + '{0:.2f}'.format(p2)
         rptwnd.msg1.insert(tk.END, rptl)
-
 
 
 def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict,
@@ -805,7 +825,8 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
     # stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
     # [4]:population variance,[5]:entropy bits as a tuple
     stats_summary = groups_stat_summary(best_rank_dict)
-    rptl = '\n> >  Optimal guess stats, each has group qty ' + '{0:.0f}'.format(stats_summary[0]) + ' or is max entropy:'
+    rptl = '\n> >  Optimal guess stats, each has group qty ' + '{0:.0f}'.format(
+        stats_summary[0]) + ' or is max entropy:'
     rptwnd.msg1.insert(tk.END, rptl)
     for w, s in best_rank_dict.items():
         (g_qty, g_min, g_max, g_ave, g_p2, g_ent) = s
@@ -837,6 +858,7 @@ def valid_mult_ltr(s: str) -> bool:
         valid = 'QWERTYUIOPASDFGHJKLZXCVBNM ,'
         return valid.find(s[1]) > -1
 
+
 def valid_first_mult_number(s: str) -> bool:
     """
     The multiple letter requirement would apply to only
@@ -851,6 +873,7 @@ def valid_first_mult_number(s: str) -> bool:
             return True
     else:
         return False
+
 
 def validate_mult_ltr_sets(str: str) -> str:
     """
@@ -876,9 +899,8 @@ def validate_mult_ltr_sets(str: str) -> str:
                             valid.append(s[0] + s[1] + ',')
                         else:
                             valid.append(s[0])
-            r = ','.join(valid).replace(',,',',').strip(',')
+            r = ','.join(valid).replace(',,', ',').strip(',')
     return r
-
 
 
 # A class used for holding list stack of the shell commands
@@ -944,7 +966,7 @@ class ShellCmdList:
         codes = mult_ltr_definition.split(',')
         g_code = ''
         for code in codes:
-            if len(code) ==2:
+            if len(code) == 2:
                 c = code[0]
                 x = code[1]
                 if c == '2':
@@ -964,7 +986,6 @@ class ShellCmdList:
         if typ == 2:
             self.shCMDlist.append("grep -vE '" + g_code + "'")
 
-
     # Returns the command stack assembled into one command line.
     def full_cmd(self) -> str:
         pipe = " | "
@@ -973,6 +994,7 @@ class ShellCmdList:
             this_cmd = this_cmd + w + pipe
         this_cmd = this_cmd + self.shCMDlist[-1]
         return this_cmd
+
 
 # ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
 # The wordle tool all wrapped up into one being, including the grep command list.
