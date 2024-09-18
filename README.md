@@ -177,7 +177,7 @@ Special **Pattern** allows one to quickly introduce a custom require or exclude 
 
 **Pattern** turns out to be especially useful for spotting words groups in part because its setting is independent of the Exclude and Require Position controls. Thus, you can very quickly set and then clear **Pattern** without affecting one's thought train.
 
-**Multiples** allows one to specify "there must be two E letters" or "there cannot be two E letters, nor three E letters". The entry format is <number><letter><comma><number><letter> and so on. A space character also puts in the comma for you.
+**Multiples** allows one to specify "there must be two E letters" or "there cannot be two E letters, nor three E letters". The entry format is <number> <letter> <comma> <number> <letter> and so on. A space character also puts in the comma for you.
 
 **Multiples** is a concept that may be difficult to understand at first. If your guess word has multiple same letters and one of those letters is yellow or green then all words with two or more of those letters must be excluded via **Multiples**. You can ignore the idea when all of those guess same letters are grey. If your guess word has multiple same letters and both of those letters is yellow or green in any combination then all words with two or more of those letters must be included via **Multiples**. You might need to think about needing three of those letters included. **Multiples** operates as either include or exclude. Most complicated requirements can be achieved by combining **Multiples** inclusions with 'Exclude From Position ' exclusions. The Helper does not do thinking for you.
 
