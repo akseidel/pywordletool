@@ -942,19 +942,27 @@ class ShellCmdList:
 
     def add_type_mult_ltr(self, mult_ltr_definition: str, typ: int):
         codes = mult_ltr_definition.split(',')
+        g_code = ''
         for code in codes:
             if len(code) ==2:
                 c = code[0]
                 x = code[1]
-                g_code = ''
                 if c == '2':
-                    g_code = f"{x}{x}|{x}.{x}|{x}..{x}|{x}...{x}"
+                    g_c = f"{x}{x}|{x}.{x}|{x}..{x}|{x}...{x}"
+                    if len(g_code) < 1:
+                        g_code = g_c
+                    else:
+                        g_code = g_code + '|' + g_c
                 if c == '3':
-                    g_code = (f"{x}{x}{x}|{x}.{x}{x}|{x}..{x}{x}|{x}{x}..{x}|{x}.{x}.{x}")
-                if typ == 1:
-                    self.shCMDlist.append("grep -E '" + g_code + "'")
-                if typ == 2:
-                    self.shCMDlist.append("grep -vE '" + g_code + "'")
+                    g_c = f"{x}{x}{x}|{x}.{x}{x}|{x}..{x}{x}|{x}{x}..{x}|{x}.{x}.{x}"
+                    if len(g_code) < 1:
+                        g_code = g_c
+                    else:
+                        g_code = g_code + '|' + g_c
+        if typ == 1:
+            self.shCMDlist.append("grep -E '" + g_code + "'")
+        if typ == 2:
+            self.shCMDlist.append("grep -vE '" + g_code + "'")
 
 
     # Returns the command stack assembled into one command line.
