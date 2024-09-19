@@ -202,7 +202,7 @@ def clear_scrn():
 # Return a word's genetic code
 # example:woody
 # returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
-# translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank
+# translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank.
 # Rank applies in context of a list of words, so it is calculated later
 def get_gencode(word) -> list:
     # gencode is the list of integers that will be returned
@@ -379,12 +379,21 @@ def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
     return pat
 
 
-def build_multi_code_grep(lself, this_multi_code: str) -> str:
+def build_multi_code_grep(lself, this_multi_code: str) -> None:
     lself.tool_command_list.add_type_mult_ltr_cmd(this_multi_code.lower(), 1)
 
 
-# The filter builder. filter arguments for each type are added to the grep command argument list
-def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict, multi_code: str):
+def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict, multi_code: str):
+    """
+    The filter builder.
+    Filter arguments for each type are added to the grep command argument list
+    @param wordle_tool_cmd_lst: the shell command list object
+    @param excl_l: exclude letters list
+    @param requ_l: required letters list
+    @param x_pos_dict: excluded letter position dictionary
+    @param r_pos_dict: required letter position dictionary
+    @param multi_code: coded multiple same letters string
+    """
     pipe = "|"
     pipe2 = "| "
     # Builds the grep line for excluding letters
@@ -392,7 +401,7 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
     if len(excl_l) > 0:
         args = pipe.join(excl_l)
         grep_exclude = f"grep -vE \'{args}\'"
-        wordle_tool.tool_command_list.add_cmd(grep_exclude)
+        wordle_tool_cmd_lst.tool_command_list.add_cmd(grep_exclude)
 
     # Builds the grep line for requiring letters
     # Each letter gets its own grep
@@ -401,18 +410,18 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
         for ltr in requ_l:
             items.append(f"grep -E \'{ltr}\'")
         grep_require_these = pipe2.join(items)
-        wordle_tool.tool_command_list.add_cmd(grep_require_these)
+        wordle_tool_cmd_lst.tool_command_list.add_cmd(grep_require_these)
 
     # Build exclude from position, but require
     rq_ltrs = "".join(requ_l)
-    build_x_pos_grep(wordle_tool, x_pos_dict, rq_ltrs)
+    build_x_pos_grep(wordle_tool_cmd_lst, x_pos_dict, rq_ltrs)
 
     # Build require at position
-    build_r_pos_grep(wordle_tool, r_pos_dict)
+    build_r_pos_grep(wordle_tool_cmd_lst, r_pos_dict)
 
+    # build for the coded multiple letters
     if len(multi_code) > 0:
-        build_multi_code_grep(wordle_tool, multi_code.lower())
-
+        build_multi_code_grep(wordle_tool_cmd_lst, multi_code.lower())
 
 def get_genpattern(subject_word: str, target_word: str) -> str:
     """
@@ -849,14 +858,12 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
     rptwnd.msg1.configure(state='disabled')
 
 
-# multiple letter specification
-
 def valid_mult_ltr(s: str) -> bool:
     """
-    The format requires the letter placed after the number. The str
-    argument will already be converted to uppercase.
-    Returns True if the second character is an uppercase letter A - Z.
+    The format requires the letter placed after the number. The mltr_entry_str
+    argument will have already been converted to uppercase.
     @param s: The string being checked.
+    @return: Returns True if the second character is an uppercase letter A - Z.
     """
     if len(s) != 2:
         return False
@@ -881,22 +888,23 @@ def valid_first_mult_number(s: str) -> bool:
         return False
 
 
-def validate_mult_ltr_sets(str: str) -> str:
+def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
     """
     Most definitely very crude!
+    Used to conform the user's entry to a specific format.
     Validates the multiple letter specification to be in the
     correct format <number><letter>,<number><letter>.
-    @param str: The multiple letter specification.
+    @param mltr_entry_str: The multiple letter specification.
     @return: The cleaned entries in a comma separated string
     """
-    r = str
-    if len(str) > 0:
-        if str[-1] == ',':
+    r = mltr_entry_str
+    if len(mltr_entry_str) > 0:
+        if mltr_entry_str[-1] == ',':
             return r
-        elif str[-1] == ' ':
+        elif mltr_entry_str[-1] == ' ':
             return r.strip(' ') + ','
         else:
-            my_list = str.upper().split(",")
+            my_list = mltr_entry_str.upper().split(",")
             valid = []
             for s in my_list:
                 if len(s) > 0:
@@ -909,34 +917,51 @@ def validate_mult_ltr_sets(str: str) -> str:
     return r
 
 
-# A class used for holding list stack of the shell commands
-# It has functions that build greps related to filtering wordle
-# letter conditions. Some functions are not used in the gui
-# pywordletool.
 class ShellCmdList:
-    # The command list is by instance.
+    """
+    The class is a list holding the shell commands that operate a series of grep regex
+    functions on the word list text targeted as the solutions list file.
+    It has functions that build the grep regex arguments related to filtering wordle
+    letter conditions.
+    Some functions are not used in the gui pywordletool.
+    The command list is by instance.
+    @param list_file_name: The word list filename.
+    """
+
     def __init__(self, list_file_name: str) -> None:
+        """
+        The shCMDList is the shell command that lists o
+        @param list_file_name:
+        """
         self.shCMDlist = list()
         self.shCMDlist.append("cat " + list_file_name)
 
-    # Adds string s to the command stack.
     def add_cmd(self, s: str) -> None:
+        """
+        Adds string s to the command stack.
+        @param s: the string to add to the command stack
+        """
         if len(s) > 0:
             self.shCMDlist.append(s)
 
-    # Given a string of letters lst, adds to the command
-    # stack a grep filter requiring a letter picked at random
-    # from string lst. Returns that random picked letter for
-    # feedback purposes.
     def add_rand_incl_frm_cmd(self, lst: str) -> str:
+        """
+        Given a string of letters lst, adds to the command
+        stack a grep filter requiring a letter picked at random
+        from string lst.
+        @param lst: string of letters to randomly pick one.
+        @return: Returns that randomly picked letter for
+        feedback purposes.
+        """
         rand_frm_l = random.choice(lst)
         self.shCMDlist.append("grep -E '" + rand_frm_l + "'")
         return rand_frm_l
 
-    # Adds command to stack to require or exclude letter ltr.
     def add_type_cmd(self, ltr: str, require: bool) -> None:
         """
-        Appends str to CMDList either required (true) or
+        Adds command to command stack to require or exclude letter ltr.
+        Appends mltr_entry_str to CMDList as either:
+        required (true) or
         excluded (false)
         @param ltr: the grep string
         @param require: true=required, false=exclude
@@ -947,32 +972,41 @@ class ShellCmdList:
             else:
                 self.shCMDlist.append("grep -vE '" + ltr + "'")
 
-    # Adds command to stack to exclude letter from a position number.
-    # Context is that letter is known, therefore is required but not
-    # at the designated position.
     def add_excl_pos_cmd(self, ltr: str, p: int, add_e: bool) -> None:
+        """
+        Adds command to the command stack that excludes letters from a position number.
+        Context is that letter is known, therefore is required but not at the designated position.
+        These are the Wordle Yellow clues.
+        @param ltr: The letter.
+        @param p:  The letter's position, indexed 1 = first.
+        @param add_e: Add as requirement.
+        """
         if len(ltr) > 0:
             # add_E a requirement argument, being managed
             # outside the shCMDList so that the shCMDList
-            # does not duplicate the greg -E for any one letter.
+            # does not duplicate the grep -E for any one letter.
             if add_e:  # Require the letter if not already done
                 self.shCMDlist.append("grep -E '" + ltr + "'")
-            # but not in this position.
+            # Build the dots around the letter to specify the excluded letter position.
             c = 5
             dp = ''.rjust(p - 1, '.')
             dpn = ''.rjust(c - p, '.')
             self.shCMDlist.append("grep -vE '" + dp + ltr + dpn + "'")
 
-    # Adds command to stack to require letter at a position number.
     def add_incl_pos_cmd(self, ltr: str, p: int) -> None:
+        """
+        Adds command to command stack to require the letter at a position number.
+        @param ltr: The letter.
+        @param p: The letter's position, indexed 1 = first.
+        """
         if len(ltr) > 0:
-            # Have letter in this position
+            # Build the dots around the letter to specify the required letter position.
             c = 5
             dp = ''.rjust(p - 1, '.')
             dpn = ''.rjust(c - p, '.')
             self.shCMDlist.append("grep -E '" + dp + ltr + dpn + "'")
 
-    def add_type_mult_ltr_cmd(self, mult_ltr_definition: str, typ: int):
+    def add_type_mult_ltr_cmd(self, mult_ltr_definition: str, typ: int)-> None:
         """
         Converts the multiple letter code, like 2a,3a, to the required grep regex
         to affect that multiple letter requirement. The appends the command line to the
@@ -1003,8 +1037,12 @@ class ShellCmdList:
         if typ == 2:
             self.shCMDlist.append("grep -vE '" + g_code + "'")
 
-    # Returns the command stack assembled into one command line.
     def full_cmd(self) -> str:
+        """
+        Returns the command stack assembled into one single shell command line to
+        list only those words that satisfy the grep regex filters.
+        @return: string being the single shell command line.
+        """
         pipe = " | "
         this_cmd = ""
         for w in self.shCMDlist[:-1]:
@@ -1013,9 +1051,11 @@ class ShellCmdList:
         return this_cmd
 
 
-# ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
-# The wordle tool all wrapped up into one being, including the grep command list.
 class ToolResults:
+    """
+    ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
+    The wordle tool all wrapped up into one being, including the grep command list.
+    """
 
     def __init__(self,
                  data_path: str,
@@ -1052,45 +1092,63 @@ class ToolResults:
         self.raw_cnt = 0
         self.ranked_cnt = 0
 
-    # Return the results words list without any ranking or sorting.
     def get_results_wrd_lst(self) -> list:
+        """
+        @return: Return the results words list without any ranking or sorting.
+        """
         with Popen(self.tool_command_list.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
             return list(map(lambda i: i[: -1], proc.stdout.readlines()))
         # return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
 
-    # Returns ranked results words list as dictionary. The ranking function also
-    # sorts the dictionary. So result is sorted.
     def get_ranked_results_wrd_lst(self, no_rank=False) -> dict:
-        # Ranking and filtering the words into a dictionary
-        # Set loc_allow_dups to prevent letters from occurring more than once
-        # First pick should not use duplicates, later picks should consider them.
-        # Exclude all empty string. This can happen at the file end.
+        """
+        Ranking and filtering the words into a dictionary
+        Set loc_allow_dups to prevent letters from occurring more than once
+        First pick should not use duplicates, later picks should consider them.
+        Exclude all empty string. This can happen at the file end.
+        @param no_rank:
+        @return: Returns ranked results words list as sorted dictionary.
+        """
         wrds = list(filter(None, self.get_results_wrd_lst()))
-        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds, self.ltr_rank_dict, self.allow_dups,
-                                                                       self.rank_mode, self.no_ordr, no_rank)
+        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds,
+                                                                       self.ltr_rank_dict,
+                                                                       self.allow_dups,
+                                                                       self.rank_mode,
+                                                                       self.no_ordr,
+                                                                       no_rank)
 
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
-    # Return the grepped word count
     def get_results_raw_cnt(self) -> str:
+        """
+        @return: Return the grepped word count
+        """
         sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
         with Popen(sh_cmd_for_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
             return proc.stdout.readline().strip()
 
-    # Returns the status text line.
     def get_status(self) -> str:
+        """
+        @return: Returns the status text line.
+        """
         status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.get_results_raw_cnt())
         return status
 
-    # Returns the entire fully assembled grep command line. This line includes
-    # the full path names.
     def get_full_cmd(self) -> str:
+        """
+        Returns the entire fully assembled grep command line.
+        This line includes the full path names.
+        @return: fully assembled grep command line
+        """
         return self.tool_command_list.full_cmd()
 
-    # Returns the entire fully assembled grep command line. This line excluded
-    # the full path names and so is used in the GUI display.
     def get_cmd_less_filepath(self) -> str:
+        """
+        Returns the entire fully assembled grep command line. This line excluded
+        the full path names and so is used in the GUI display.
+        @return: Returns the entire fully assembled grep command line,less pathname
+        """
         full_cmd = self.tool_command_list.full_cmd()
         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)
         part_cmd = full_cmd.replace(full_path_name, '', 1)
@@ -1169,8 +1227,10 @@ class CustomText(tk.Text):
                 self.see(index)  # scroll widget to show the index's line
 
 
-# The verbose information window
 class RptWnd(ctk.CTkToplevel):
+    """
+    The verbose information window
+    """
 
     def clear_msg1(self) -> None:
         self.msg1.configure(state='normal')
@@ -1280,12 +1340,17 @@ class RptWnd(ctk.CTkToplevel):
 
 
 class HelpWindow(ctk.CTkToplevel):
+    """
+    The help information window
+    """
 
     def close_help(self) -> None:
         self.destroy()
 
-    # Returns string that is the information
     def get_rank_data(self) -> str:
+        """
+        @return: Returns string that is the information
+        """
         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path, self.letter_rank_file)
         if os.path.exists(full_path_name):
             f = open(full_path_name, "r", encoding="UTF8").read()
