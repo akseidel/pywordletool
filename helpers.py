@@ -21,7 +21,6 @@ gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 def get_word_list_path_name(local_path_file_name: str) -> str:
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_file_name)
     if os.path.exists(full_path_name):
-        # print("Using " + local_path_file_name)
         return full_path_name
     else:
         msg = f'The wordle word list file {local_path_file_name} was not found. Expected here: {full_path_name}'
@@ -37,7 +36,6 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_rank_file)
     ltr_rank_dict = {}  # ltr_rank_dict will be the rank dictionary
     if os.path.exists(full_path_name):
-        # print("Using " + local_path_rank_file)
         with open(full_path_name) as f:
             for ltr in f:
                 ltr = ltr.split(":")
@@ -325,9 +323,10 @@ def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dic
             lst.append(code)
 
     multi_code = ','.join(lst)
-    if len(multi_code) > 0:
-        print("pick: " + pick + " multi_code: " + multi_code)
+    # if len(multi_code) > 0:
+    # print("pick: " + pick + " multi_code: " + multi_code)
     return [exclude, x_pos_dict, r_pos_dict, multi_code]
+
 
 def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
     """Builds the grep line for excluding positions
@@ -376,12 +375,16 @@ def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
     # fill out the trailing undefined positions
     while len(pat) < 5:
         pat = pat + '.'
-    lself.tool_command_list.add_require_cmd(pat)
+    lself.tool_command_list.add_type_cmd(pat, True)
     return pat
 
 
+def build_multi_code_grep(lself, this_multi_code: str) -> str:
+    lself.tool_command_list.add_type_mult_ltr_cmd(this_multi_code.lower(), 1)
+
+
 # The filter builder. filter arguments for each type are added to the grep command argument list
-def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict):
+def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict, multi_code: str):
     pipe = "|"
     pipe2 = "| "
     # Builds the grep line for excluding letters
@@ -394,10 +397,10 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
     # Builds the grep line for requiring letters
     # Each letter gets its own grep
     if len(requ_l) > 0:
-        itms = []
+        items = []
         for ltr in requ_l:
-            itms.append(f"grep -E \'{ltr}\'")
-        grep_require_these = pipe2.join(itms)
+            items.append(f"grep -E \'{ltr}\'")
+        grep_require_these = pipe2.join(items)
         wordle_tool.tool_command_list.add_cmd(grep_require_these)
 
     # Build exclude from position, but require
@@ -406,6 +409,9 @@ def load_grep_arguments(wordle_tool, excl_l: list, requ_l: list, x_pos_dict: dic
 
     # Build require at position
     build_r_pos_grep(wordle_tool, r_pos_dict)
+
+    if len(multi_code) > 0:
+        build_multi_code_grep(wordle_tool, multi_code.lower())
 
 
 def get_genpattern(subject_word: str, target_word: str) -> str:
@@ -927,15 +933,19 @@ class ShellCmdList:
         self.shCMDlist.append("grep -E '" + rand_frm_l + "'")
         return rand_frm_l
 
-    # Adds command to stack to require letter ltr.
-    def add_require_cmd(self, ltr: str) -> None:
+    # Adds command to stack to require or exclude letter ltr.
+    def add_type_cmd(self, ltr: str, require: bool) -> None:
+        """
+        Appends str to CMDList either required (true) or
+        excluded (false)
+        @param ltr: the grep string
+        @param require: true=required, false=exclude
+        """
         if len(ltr) > 0:
-            self.shCMDlist.append("grep -E '" + ltr + "'")
-
-    # Adds command to stack to exclude the letter ltr.
-    def add_excl_cmd(self, ltr: str) -> None:
-        if len(ltr) > 0:
-            self.shCMDlist.append("grep -vE '" + ltr + "'")
+            if require:  # require
+                self.shCMDlist.append("grep -E '" + ltr + "'")
+            else:
+                self.shCMDlist.append("grep -vE '" + ltr + "'")
 
     # Adds command to stack to exclude letter from a position number.
     # Context is that letter is known, therefore is required but not
@@ -962,7 +972,14 @@ class ShellCmdList:
             dpn = ''.rjust(c - p, '.')
             self.shCMDlist.append("grep -E '" + dp + ltr + dpn + "'")
 
-    def add_type_mult_ltr(self, mult_ltr_definition: str, typ: int):
+    def add_type_mult_ltr_cmd(self, mult_ltr_definition: str, typ: int):
+        """
+        Converts the multiple letter code, like 2a,3a, to the required grep regex
+        to affect that multiple letter requirement. The appends the command line to the
+        self.shCMDlist
+        @param mult_ltr_definition: something like 2a,3s
+        @param typ: 1=require, 2=exclude
+        """
         codes = mult_ltr_definition.split(',')
         g_code = ''
         for code in codes:

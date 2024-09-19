@@ -20,10 +20,8 @@ import random
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that
 # it may be separate from ttk
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
-from pickle import FALSE
 # namespace so that tk is preserved
 from tkinter import messagebox
-from token import ENDMARKER
 
 import customtkinter as ctk
 
@@ -270,17 +268,17 @@ class Pywordlemainwindow(ctk.CTk):
                 sanity_question(self.entry_spec_pattern)
 
             if self.sp_pat_mode_var.get() == 1:
-                wordletool.tool_command_list.add_require_cmd(self.spec_pattern.get().lower())
+                wordletool.tool_command_list.add_type_cmd(self.spec_pattern.get().lower(), True)
             else:
-                wordletool.tool_command_list.add_excl_cmd(self.spec_pattern.get().lower())
+                wordletool.tool_command_list.add_type_cmd(self.spec_pattern.get().lower(), False)
 
             if len(self.mult_ltr_definition.get()) > 1 and (not self.allow_dup_state.get()):
                 sanity_question(self.entry_mult_ltr_def)
 
-            if  len(self.mult_ltr_definition.get()) > 1:
-                wordletool.tool_command_list.add_type_mult_ltr(self.mult_ltr_definition.get().lower(),
-                                                            self.mult_ltr_mode_var.get()
-                                                            )
+            if len(self.mult_ltr_definition.get()) > 1:
+                wordletool.tool_command_list.add_type_mult_ltr_cmd(self.mult_ltr_definition.get().lower(),
+                                                                   self.mult_ltr_mode_var.get()
+                                                                   )
 
             # Allow duplicates could have been changed by this point and also by this next
             # special pattern check. Thus, the wordletool.loc_allow_dups is reset accordingly before
@@ -801,7 +799,6 @@ class Pywordlemainwindow(ctk.CTk):
         self.mult_ltr_definition = tk.StringVar()
         self.mult_ltr_mode_var = tk.IntVar(value=2)
 
-
         # Coordinate duplicates in special pattern with no dup setting
         def coordinate_special_pattern_dups() -> None:
             self.update()
@@ -834,7 +831,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.lb_sp_pat.pack(side=tk.LEFT, padx=4, pady=4)
 
         # special pattern entry clear
-        def clear_specials() :
+        def clear_specials():
             self.spec_pattern.set('')
             self.mult_ltr_definition.set('')
 
@@ -876,16 +873,18 @@ class Pywordlemainwindow(ctk.CTk):
         # Therefore, they are defined from last to first.
         # label
         self.lb_mult_ltrs = ctk.CTkLabel(self.specialpatt_subframeB,
-                                      text='Multiples',
-                                      )
+                                         text='Multiples',
+                                         )
         self.lb_mult_ltrs.pack(side=tk.LEFT, padx=4, pady=4)
 
         # multiple same letters clear
         def clear_mult_ltr_def() -> None:
             self.mult_ltr_definition.set('')
+
         # multiple same letter radio buttons
-        rb_mult_x = ttk.Radiobutton(self.specialpatt_subframeB, text="Exclude", variable=self.mult_ltr_mode_var, value=2,
-                                command=do_mult_ltr_def)
+        rb_mult_x = ttk.Radiobutton(self.specialpatt_subframeB, text="Exclude", variable=self.mult_ltr_mode_var,
+                                    value=2,
+                                    command=do_mult_ltr_def)
         rb_mult_x.pack(side=tk.RIGHT, padx=6, pady=0)
         rb_mult_i = ttk.Radiobutton(self.specialpatt_subframeB, text="Require", variable=self.mult_ltr_mode_var,
                                     value=1,
@@ -1585,12 +1584,12 @@ class Pywordlemainwindow(ctk.CTk):
                                             )
         self.chk_ent_disp.pack(side=tk.LEFT, padx=2, pady=0)
         self.chk_cond_disp = ttk.Checkbutton(self.grp_frame,
-                                            text="Cond.",
-                                            variable=self.cond_grps,
-                                            onvalue=True,
-                                            offvalue=False,
-                                            command = cond_grps_chk
-                                            )
+                                             text="Cond.",
+                                             variable=self.cond_grps,
+                                             onvalue=True,
+                                             offvalue=False,
+                                             command=cond_grps_chk
+                                             )
         self.chk_cond_disp.pack(side=tk.LEFT, padx=2, pady=0)
         self.chk_key_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Keyed",

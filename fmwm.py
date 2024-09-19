@@ -472,11 +472,11 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
     print(f'{loc_wrd_x} word:{target_wrd}  Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
 
-    x_pos_dict = {}  # exclude position dictionary
-    r_pos_dict = {}  # require position dictionary
-    excl_l = []  # exclude letters list
-    requ_l = []  # require letters list
-    multi_code = ''  # multiple same letters accounting
+    std_x_pos_dict = {}  # exclude position dictionary
+    std_r_pos_dict = {}  # require position dictionary
+    std_excl_l = []  # exclude letters list
+    std_requ_l = []  # require letters list
+    std_multi_code = ''  # multiple same letters accounting
 
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
@@ -495,8 +495,8 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
         guesses = 0
         run_stats = list([])
         run_stats.append(target_wrd)
-        clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
-        helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+        clean_slate(std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict)
+        helpers.load_grep_arguments(wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
         # Get the word list using the optional no_rank argument with loc_rand_mode.
         # No ranking or sorting is needed when all guesses are random.
         loc_the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
@@ -528,7 +528,14 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             # on how many dups there are compared to the number of non dups.
 
             # analyze this new word against the target word and update the filter criteria
-            [excl_l, x_pos_dict, r_pos_dict, multi_code] = helpers.analyze_pick_to_solution(target_wrd, word, excl_l, x_pos_dict, r_pos_dict)
+            [std_excl_l,
+             std_x_pos_dict,
+             std_r_pos_dict,
+             std_multi_code] = helpers.analyze_pick_to_solution(target_wrd,
+                                                                word,
+                                                                std_excl_l,
+                                                                std_x_pos_dict,
+                                                                std_r_pos_dict)
 
             if guesses > 0 and not allow_dups:  # need a new wordletool allowing dups
                 del wordletool
@@ -536,7 +543,12 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                 allow_dups = True
 
             # Now load in the filter criteria
-            helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+            helpers.load_grep_arguments(wordletool,
+                                        std_excl_l,
+                                        std_requ_l,
+                                        std_x_pos_dict,
+                                        std_r_pos_dict,
+                                        std_multi_code)
             # Get the revised word list using the optional no_rank argument with loc_rand_mode
             # No ranking or sorting is needed when all guesses are random.
             loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
@@ -547,7 +559,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             if len(loc_the_word_list) < 1:
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode, True)
-                helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+                helpers.load_grep_arguments(wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
                 loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
 
             run_stats.append(len(loc_the_word_list))
@@ -562,7 +574,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
         if not word == target_wrd:
             guesses += 1
             # reveal_mode output is very confusing without adding the target word to run_stats.
-            # Otherwise the word count does not appear to agree with the guess count.
+            # Otherwise, the word count does not appear to agree with the guess count.
             run_stats.append(target_wrd)
         tot = tot + guesses
 
@@ -616,11 +628,11 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
     query_set.clear()
     loc_n = len(candidate_list)
 
-    x_pos_dict = {}  # exclude position dictionary
-    r_pos_dict = {}  # require position dictionary
-    excl_l = []  # exclude letters list
-    requ_l = []  # require letters list
-    multi_code = ''  # multiple same letters accounting
+    mag_x_pos_dict = {}  # exclude position dictionary
+    mag_r_pos_dict = {}  # require position dictionary
+    mag_excl_l = []  # exclude letters list
+    mag_requ_l = []  # require letters list
+    mag_multi_code = ''  # multiple same letters accounting
 
     prelude_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    guess_vocabulary, do_every_wrd, vocab_sol_filename)
@@ -633,7 +645,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         guesses = 1
         run_stats = list([])
         run_stats.append(target_wrd)
-        clean_slate(excl_l, requ_l, x_pos_dict, r_pos_dict)
+        clean_slate(mag_excl_l, mag_requ_l, mag_x_pos_dict, mag_r_pos_dict)
 
         # This loop ends when the last guess results in only one remaining word that fits the
         # pattern. That word, being the target word, will be the solving guess. The loop's last
@@ -644,10 +656,16 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
 
         # At this point the guess word is selected.
         # Analyze this new word against the target word and update the filter criteria
-        [excl_l, x_pos_dict, r_pos_dict, multi_code] = helpers.analyze_pick_to_solution(target_wrd, word, excl_l,
-                                                                                        x_pos_dict, r_pos_dict)
+        [mag_excl_l,
+         mag_x_pos_dict,
+         mag_r_pos_dict,
+         mag_multi_code] = helpers.analyze_pick_to_solution(target_wrd,
+                                                            word,
+                                                            mag_excl_l,
+                                                            mag_x_pos_dict,
+                                                            mag_r_pos_dict)
         # Now load in the resulting filter criteria
-        helpers.load_grep_arguments(wordletool, excl_l, requ_l, x_pos_dict, r_pos_dict)
+        helpers.load_grep_arguments(wordletool, mag_excl_l, mag_requ_l, mag_x_pos_dict, mag_r_pos_dict, mag_multi_code)
 
         # Get the word list using the optional no_rank argument with loc_rand_mode
         # No ranking or sorting is needed when all guesses are random.
