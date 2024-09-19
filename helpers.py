@@ -16,9 +16,14 @@ import groupdrilling
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 
-# Returns the wordle word list full pathname
-# Exits program if not found
+
 def get_word_list_path_name(local_path_file_name: str) -> str:
+    """
+    Returns the wordle word list full pathname
+    Exits program if not found
+    @param local_path_file_name:
+    @return: wordle word list full pathname
+    """
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_file_name)
     if os.path.exists(full_path_name):
         return full_path_name
@@ -30,9 +35,15 @@ def get_word_list_path_name(local_path_file_name: str) -> str:
         sys.exit()
 
 
-# ===== Start - Letter ranking functions for rank that includes by letter position method
-# Make and return the letter ranking dictionary
+"""
+Letter ranking functions for rank that includes by letter position method
+"""
 def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
+    """
+    Make and return the letter ranking dictionary
+    @param local_path_rank_file:
+    @return: the letter ranking dictionary
+    """
     full_path_name = os.path.join(os.path.dirname(__file__), local_path_rank_file)
     ltr_rank_dict = {}  # ltr_rank_dict will be the rank dictionary
     if os.path.exists(full_path_name):
@@ -78,10 +89,17 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
     return ltr_rank_dict
 
 
-# Returns a word's letter frequency ranking
-def wrd_rank(wrd, ltr_rank_dict, method) -> float:
+
+def wrd_rank(wrd: str, ltr_rank_dict: dict, method: int) -> float:
+    """
+    Returns a word's letter frequency ranking.
     # Any word longer than 5 letters has undefined rank.
-    # This allows for wordlist flexibility,
+    # This allows for wordlist flexibility.
+    @param wrd: subject word
+    @param ltr_rank_dict: ranking dictionary
+    @param method: int 0=occurrence, 1=position, 2=both occurrence and position
+    @return: Returns a word's letter frequency ranking.
+    """
     if len(wrd) > 5:
         return 0
     r = 0
@@ -110,11 +128,15 @@ def wrd_rank(wrd, ltr_rank_dict, method) -> float:
     return 0
 
 
-# Returns true if word has duplicate letters
 def wrd_has_duplicates(wrd) -> bool:
+    """
+    Checks is a word has duplicate letters.
+    This function is also used for the special pattern
+    where '.' is allowed. These would not be duplicates.
+    @param wrd: word in question
+    @return: true=has duplicate letters, false=no duplicate letters
+    """
     ltr_d = {}
-    # This function is also used for the special pattern
-    # where '.' is allowed. These would not be duplicates.
     wrd = wrd.replace('.', '')
     wrd = wrd.replace(' ', '')
     for ltr in wrd:
@@ -122,8 +144,12 @@ def wrd_has_duplicates(wrd) -> bool:
     return len(ltr_d) < len(wrd)
 
 
-# List out the ranked word list into n_col columns.
 def print_word_list_col_format(the_word_list, n_col):
+    """
+    List out the ranked word list into n_col columns.
+    @param the_word_list:
+    @param n_col: number of columns to fill.
+    """
     n_items = len(the_word_list)
     h_txt = " Word : Rank "
     left_pad = ""
@@ -151,10 +177,18 @@ def print_word_list_col_format(the_word_list, n_col):
             print(l_msg)
 
 
-# Ranking and filtering the words into a dictionary.
-# Returns that dictionary sorted by the word rank.
 def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool,
                                            rank_mode: int, no_ordr: bool, no_rank=False) -> dict:
+    """
+    Ranking and filtering the words into a dictionary.
+    @param wrds: The filtered words list
+    @param ltr_rank_dict: Letter ranking dictionary
+    @param allow_dups:  Allows duplicate letters bool
+    @param rank_mode: Letter ranking mode to use
+    @param no_ordr: Omit ordering bool
+    @param no_rank: Omit ranking bool
+    @return: dictionary sorted by the word rank
+    """
     wrds_dict = {}
     for w in wrds:
         # currently, the wrd_rank function can handle only 5-letter words
@@ -178,7 +212,6 @@ def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allo
                     wrds_dict[w] = '000'
 
     # sorting the ranked word list into a dictionary
-    # return dict(sorted(wrds_dict.items(), reverse=True,key= lambda x:x[1]))
     if not no_rank:
         if no_ordr:
             return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[0]))
@@ -188,23 +221,34 @@ def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allo
         return wrds_dict
 
 
-# Returns the list of words that pass the grep command list
 def get_results_word_list(this_sh_cmd_lst) -> list:
+    """
+    Returns the result for the grep command list.
+    @param this_sh_cmd_lst: the grep stack of command list
+    @return: Returns the list of words that pass the grep command list
+    """
     with Popen(this_sh_cmd_lst.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
         return list(map(lambda i: i[: -1], proc.stdout.readlines()))
 
 
-# Clears the console window
 def clear_scrn():
+    """
+    Clears the console window
+    """
     os.system("cls" if os.name == "nt" else "clear")
 
 
-# Return a word's genetic code
-# example:woody
-# returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
-# translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank.
-# Rank applies in context of a list of words, so it is calculated later
+
 def get_gencode(word) -> list:
+    """
+    Return a word's genetic code
+    example:woody
+    returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
+    translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank.
+    Rank applies in the context for a list of words, so it is calculated later
+    @param word: a word in question
+    @return: a special list of ints that encode the genetic code
+    """
     # gencode is the list of integers that will be returned
     gencode = gc_z.copy()
     # dups counts the number of times letters occur more than once
@@ -221,11 +265,15 @@ def get_gencode(word) -> list:
     return gencode
 
 
-# returns genetic letter tally list for a gendictionary
-# this list is 26 members where each member corresponds
-# to the count for that letter position idx 0-25 where
-# idx 0=a and idx 25=z
-def get_gendict_tally(gendict) -> list:
+
+def get_gendict_tally(gendict: dict[str, list]) -> list:
+    """
+    returns genetic letter tally list for a gendictionary, (dict[str, list])
+    this list is 26 members where each member corresponds to the count for
+    that letter position idx 0-25 where idx 0=a and idx 25=z
+    @param gendict:
+    @return:
+    """
     gen_tally = []
     for x in range(26):
         gen_tally.append(0)
@@ -239,9 +287,7 @@ def get_gendict_tally(gendict) -> list:
     return gen_tally
 
 
-# Assigns the genetic rank to the gendict members and returns
-# the maximum genetic rank seen.
-def assign_genrank(gendict: dict, gen_tally: list) -> int:
+def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
     """
     Places the product sums of gendict values and the gen_tally vector. This value is
     the genetic rank for the gendict words (the keys). The genetic rank is injected into
@@ -265,8 +311,13 @@ def assign_genrank(gendict: dict, gen_tally: list) -> int:
     return maxrank
 
 
-# returns list of the max genrankers in the gendict
-def get_maxgenrankers(gendict, maxrank) -> list:
+def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list:
+    """
+    returns list of the max genrankers in the gendict
+    @param gendict: dict[str, list]
+    @param maxrank: int
+    @return:
+    """
     max_rankers = []
     for w, g in gendict.items():
         if maxrank == g[27]:
@@ -274,8 +325,13 @@ def get_maxgenrankers(gendict, maxrank) -> list:
     return max_rankers
 
 
-# returns a regex formatted pattern string for highlighting
 def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
+    """
+    returns a regex formatted pattern string for highlighting
+    @param max_rankers:
+    @param wordsdict:
+    @return:
+    """
     pat_list = []
     mid_div = " : "
     for w in max_rankers:
@@ -285,23 +341,32 @@ def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
     return regex_str
 
 
-# Updates the exclude, exclude position, include position and multi filtering according to
-# what a pick looks like against the solution word.
-def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dict,
+def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict: dict,
                              r_pos_dict: dict):
+    """
+    todo - change this. It is flawed.
+    Updates the exclude, exclude position, include position and multi filtering according to
+    what a pick looks like against the solution word.
+    @param sol_wrd:
+    @param pick:
+    @param excl_lst:
+    @param x_pos_dict:
+    @param r_pos_dict:
+    @return:
+    """
     candidate_pos = 0
     multi_clues = {}
     for pl in pick:
-        if sol.find(pl) < 0:
-            if not exclude.__contains__(pl):
-                exclude.append(pl)
+        if sol_wrd.find(pl) < 0:
+            if not excl_lst.__contains__(pl):
+                excl_lst.append(pl)
             # done with this letter
             candidate_pos += 1
             continue
         # pl has instances
         key = pl + ',' + str(candidate_pos + 1)
         value = key
-        if candidate_pos != sol.find(pl, candidate_pos):
+        if candidate_pos != sol_wrd.find(pl, candidate_pos):
             # exclude from candidate position
             x_pos_dict[key] = value
         else:
@@ -325,7 +390,7 @@ def analyze_pick_to_solution(sol: str, pick: str, exclude: list, x_pos_dict: dic
     multi_code = ','.join(lst)
     # if len(multi_code) > 0:
     # print("pick: " + pick + " multi_code: " + multi_code)
-    return [exclude, x_pos_dict, r_pos_dict, multi_code]
+    return [excl_lst, x_pos_dict, r_pos_dict, multi_code]
 
 
 def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
