@@ -1095,7 +1095,7 @@ class ShellCmdList:
                     else:
                         g_code = g_code + '|' + g_c
                 if c == '3':
-                    g_c = f"{x}{x}{x}|{x}.{x}{x}|{x}..{x}{x}|{x}{x}..{x}|{x}.{x}.{x}"
+                    g_c = f"{x}{x}{x}|{x}.{x}{x}|.{x}{x}.{x}|{x}.{x}{x}.|{x}..{x}{x}|{x}{x}..{x}|{x}.{x}.{x}"
                     if len(g_code) < 1:
                         g_code = g_c
                     else:
