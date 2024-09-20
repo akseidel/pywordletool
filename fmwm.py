@@ -476,7 +476,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     std_r_pos_dict = {}  # require position dictionary
     std_excl_l = []  # exclude letters list
     std_requ_l = []  # require letters list
-    std_multi_code = ''  # multiple same letters accounting
+    std_multi_code = ''  # multiple same letters accounting code
 
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
@@ -489,14 +489,27 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     prelude_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    vocab_filename, do_every_wrd)
     start_mt = time.perf_counter()  # record monkey start time
+    # Running the standard monkey loc_sample_number times.
     for x in range(loc_sample_number):
         # initialize a fresh wordletool instance
         wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode, True)
+
         guesses = 0
         run_stats = list([])
         run_stats.append(target_wrd)
+
+        # For some reason, td_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, are maintained outside
+        # of ToolResults. So they must be cleared
         clean_slate(std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict)
-        helpers.load_grep_arguments(wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
+
+        std_multi_code.replace(std_multi_code,'')
+
+        # todo, not needed
+        # helpers.load_grep_arguments(wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
+        # print("--- + ---")
+        # print(wordletool.tool_command_list.shCMDlist)
+        # print("--- - ---")
+
         # Get the word list using the optional no_rank argument with loc_rand_mode.
         # No ranking or sorting is needed when all guesses are random.
         loc_the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
@@ -645,7 +658,10 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         guesses = 1
         run_stats = list([])
         run_stats.append(target_wrd)
+        # For some reason, mag_excl_l, mag_requ_l, mag_x_pos_dict, mag_r_pos_dict, are maintained outside
+        # of ToolResults. So they must be cleared
         clean_slate(mag_excl_l, mag_requ_l, mag_x_pos_dict, mag_r_pos_dict)
+        mag_multi_code.replace(mag_multi_code,'')
 
         # This loop ends when the last guess results in only one remaining word that fits the
         # pattern. That word, being the target word, will be the solving guess. The loop's last

@@ -389,7 +389,9 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
 
     multi_code = ','.join(lst)
     # if len(multi_code) > 0:
-    # print("pick: " + pick + " multi_code: " + multi_code)
+    #     print("\nhelpers.analyze_pick_to_solution pick: " + pick + " multi_code: " + multi_code)
+    # else:
+    #     print("\nhelpers.analyze_pick_to_solution pick: " + pick + " multi_code: " + multi_code)
     return [excl_lst, x_pos_dict, r_pos_dict, multi_code]
 
 
@@ -995,7 +997,8 @@ class ShellCmdList:
 
     def __init__(self, list_file_name: str) -> None:
         """
-        The shCMDList is the shell command that lists o
+        The shCMDList is the list of ready to pipe together grep arguments, including the
+        base cat filename wordlist command.
         @param list_file_name:
         """
         self.shCMDlist = list()
