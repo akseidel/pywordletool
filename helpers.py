@@ -344,55 +344,84 @@ def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
 def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict: dict,
                              r_pos_dict: dict):
     """
-    todo - change this. It is flawed.
+    This function is used by fmwm.py only. This function determines what and how a guess
+    matches against a target solution. The parameters returned are used to grep filter the
+    current remaining word list to be the next remaining word list according how the guess
+    compares to the solution.
+    
     Updates the exclude, exclude position, include position and multi filtering according to
     what a pick looks like against the solution word.
-    @param sol_wrd:
-    @param pick:
-    @param excl_lst:
-    @param x_pos_dict:
-    @param r_pos_dict:
-    @return:
+    @param sol_wrd: The target solution
+    @param pick: The guess word.
+    @param excl_lst: The letters to be excluded. (ie gray clues)
+    @param x_pos_dict: The letters excluded from a position (ie yellow clues)
+    @param r_pos_dict: The letters required at a position (ie green clues)
+    multi_code:str The multiple same letters and how many code (like 2A,3E)
+    @return: [excl_lst: list, x_pos_dict: dict, r_pos_dict:dict, multi_code:str]
     """
-    candidate_pos = 0
-    multi_clues = {}
+    pl_pos: int = 0 # Current letter position in the pick (pick letter)
+    # Multiple same letter accounting is required to filter for multiple same letter
+    # instances when they are called for. The user is expected to make that determination
+    # in the GUI pywt.py. That determination needs to be coded for fmwm.py.
+    multi_clues = MultiClues()  # class for multiple same letter accounting
     for pl in pick:
+        # First check for instance of self, p.
         if sol_wrd.find(pl) < 0:
+            # self, p has no matches
+            # ie GRAY clue
             if not excl_lst.__contains__(pl):
                 excl_lst.append(pl)
             # done with this letter
-            candidate_pos += 1
+            # keep track of index position
+            pl_pos += 1
             continue
-        # pl has instances
-        key = pl + ',' + str(candidate_pos + 1)
-        value = key
-        if candidate_pos != sol_wrd.find(pl, candidate_pos):
-            # exclude from candidate position
-            x_pos_dict[key] = value
+        # self, p has at least one instances
+        key = pl + ',' + str(pl_pos + 1)
+        # value = key in the position dictionaries
+        # Decide which dictionary: x-clude or r-equire to place this key/value pair,
+        # also make the multiple same letter accounting
+        if pl_pos == sol_wrd.find(pl, pl_pos):
+            # ie GREEN clue
+            # Add self, p, self, p position to the required dictionary.
+            r_pos_dict[key] = key
+            # Update number of clues for this letter.
+            multi_clues.add_multi_ltr_instance(pl)
         else:
-            # include at candidate position
-            r_pos_dict[key] = value
+            # ie YELLOW clue
+            # Add self, p, self, p position to the excluded dictionary.
+            x_pos_dict[key] = key
+            # Check if self, p is also elsewhere. If not, then this is only an exclusion clue.
+            # Otherwise, it is also a multiple same letter requirement.
+            if sol_wrd.count(pl) > 1:
+                # There are more self, p in the word.
+                # Increase the number of required instances for this letter.
+                multi_clues.add_multi_ltr_instance(pl)
+        # keep track of index position
+        pl_pos += 1
+    # end for
 
-        # record number of clues for each letter
-        if pl in multi_clues:
-            multi_clues[pl] = multi_clues[pl] + 1
+    return [excl_lst, x_pos_dict, r_pos_dict, multi_clues.as_code()]
+
+class MultiClues:
+    """
+    Multiple same letters accounting and functions
+    """
+    def __init__(self):
+        self.multi_clues: dict[str, int] = {}  # dict for multiple same letter accounting
+
+    def add_multi_ltr_instance(self,pl):
+        if pl in self.multi_clues:
+            self.multi_clues[pl] = self.multi_clues[pl] + 1
         else:
-            multi_clues[pl] = 1
+            self.multi_clues[pl] = 1
 
-        candidate_pos += 1
-
-    lst = []
-    for ltr in multi_clues:
-        if multi_clues[ltr] > 1:
-            code = str(multi_clues[ltr]) + ltr
-            lst.append(code)
-
-    multi_code = ','.join(lst)
-    # if len(multi_code) > 0:
-    #     print("\nhelpers.analyze_pick_to_solution pick: " + pick + " multi_code: " + multi_code)
-    # else:
-    #     print("\nhelpers.analyze_pick_to_solution pick: " + pick + " multi_code: " + multi_code)
-    return [excl_lst, x_pos_dict, r_pos_dict, multi_code]
+    def as_code(self) -> str:
+        lst = []
+        for ltr in self.multi_clues:
+            if self.multi_clues[ltr] > 1:
+                code = str(self.multi_clues[ltr]) + ltr
+                lst.append(code)
+        return ','.join(lst)
 
 
 def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
