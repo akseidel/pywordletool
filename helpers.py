@@ -359,45 +359,47 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
     multi_code:str The multiple same letters and how many code (like 2A,3E)
     @return: [excl_lst: list, x_pos_dict: dict, r_pos_dict:dict, multi_code:str]
     """
-    pl_pos: int = 0 # Current letter position in the pick (pick letter)
+    p_ltr_pos: int = 0 # Current letter position in the pick (pick letter)
     # Multiple same letter accounting is required to filter for multiple same letter
     # instances when they are called for. The user is expected to make that determination
     # in the GUI pywt.py. That determination needs to be coded for fmwm.py.
     multi_clues = MultiClues()  # class for multiple same letter accounting
-    for pl in pick:
-        # First check for instance of self, p.
-        if sol_wrd.find(pl) < 0:
-            # self, p has no matches
-            # ie GRAY clue
-            if not excl_lst.__contains__(pl):
-                excl_lst.append(pl)
+    for p_ltr in pick:
+        # First check for a p_ltr instance.
+        if sol_wrd.find(p_ltr) < 0:
+            # p_ltr has no matches
+            # This must be a GRAY letter.
+            if not excl_lst.__contains__(p_ltr):
+                excl_lst.append(p_ltr)
             # done with this letter
             # keep track of index position
-            pl_pos += 1
+            p_ltr_pos += 1
             continue
-        # self, p has at least one instances
-        key = pl + ',' + str(pl_pos + 1)
-        # value = key in the position dictionaries
-        # Decide which dictionary: x-clude or r-equire to place this key/value pair,
+        # If here, then p_ltr has at least one instance.
+        # value = key in the position dictionaries, so just make the key.
+        key = p_ltr + ',' + str(p_ltr_pos + 1)
+        # Decide into which dictionary: x-clude or r-equire to place this key/value pair,
         # also make the multiple same letter accounting
-        if pl_pos == sol_wrd.find(pl, pl_pos):
-            # ie GREEN clue
-            # Add self, p, self, p position to the required dictionary.
+        if p_ltr_pos == sol_wrd.find(p_ltr, p_ltr_pos):
+            # This must be a GREEN clue
+            # Add p_ltr and p_ltr's position to the required position dictionary.
             r_pos_dict[key] = key
             # Update number of clues for this letter.
-            multi_clues.add_multi_ltr_instance(pl)
+            multi_clues.add_multi_ltr_instance(p_ltr)
         else:
-            # ie YELLOW clue
-            # Add self, p, self, p position to the excluded dictionary.
+            # This must be a YELLOW clue
+            # Add p_ltr and p_ltr's position to the exclude position dictionary.
             x_pos_dict[key] = key
-            # Check if self, p is also elsewhere. If not, then this is only an exclusion clue.
-            # Otherwise, it is also a multiple same letter requirement.
-            if sol_wrd.count(pl) > 1:
-                # There are more self, p in the word.
-                # Increase the number of required instances for this letter.
-                multi_clues.add_multi_ltr_instance(pl)
+            # Check if p_ltr is also elsewhere. If not, then this is only an exclusion clue.
+            # Otherwise, there is also a multiple same letter requirement.
+            if sol_wrd.count(p_ltr) > 1:
+                # There are more p_ltr in the word.
+                # Increase the number of required instances for this letter. The grep command assembly
+                # will fill out the multiple same letter regex necessary for including the multiple
+                # same letter words.
+                multi_clues.add_multi_ltr_instance(p_ltr)
         # keep track of index position
-        pl_pos += 1
+        p_ltr_pos += 1
     # end for
 
     return [excl_lst, x_pos_dict, r_pos_dict, multi_clues.as_code()]
