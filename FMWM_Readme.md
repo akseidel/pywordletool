@@ -4,13 +4,13 @@
 
 * The **Finite Monkey Wordle Machine** (**FMWM**) makes guesses in a certain way to calculate the average number of guesses required to solve a known **Wordle** word. The machine’s initial purpose is for measuring how hard a word is compared to another word or whether a certain guessing mode works better than another guessing mode.
 
-* **FMWM** currently runs in console mode, ie without a GUI interface, and it relies on the **pywordletool** backend **helper** and **worddata** files.
+* **FMWM** currently runs in console mode, ie without a GUI interface, and it relies on the **pywordletool** backend **helper.py** and **worddata** files. Simple **FMWM** operations can be run in an interactive console mode. The more advanced **FMWM** operations run only in a command argument console mode. Use the **-h** help argument to keep the help messages handy.
+  
+* **FMWM** will calculate the average number of guesses required to solve a known **Wordle** word in interactive console mode where it prompts you for the target **Wordle** word. It can also automatically process every word in the **Wordle** word vocabulary by using a command line argument. The results may be written to a text file for further processing.
 
-* **FMWM** will calculate the average number of guesses required to solve a known **Wordle** word in interactive mode where it prompts you for the target **Wordle** word. It can also automatically process every word in the **Wordle** word vocabulary by using a command line argument. The results may be written to a text file for further processing.
+* **FMWM** runs in a 'dumb monkey' mode and a 'smart monkey' mode. Dumb mode, otherwise called full random mode, guesses a random word, *selected from the current remaining words list*, for every guess step towards solving the target **Wordle** word. After each guess the pool of words for guess selection gets smaller and smaller according to what was learned by each previous guess. Thus, **FMWM** makes all it guesses in what is known as **Wordle** 'strict hard mode' where every green, yellow and grey clues are followed. Actual 'hard mode' does not follow grey clues. The first pick can be any word from the entire **Wordle** ***solutions*** list. The second pick can be any word from the **Wordle** ***solutions*** list less any words ruled out by the first pick. Since **FMWM** knows the answer, it knows how to properly eliminate words. So proceeds **FMWM** until by chance it picks the solution out of what remains in the selection list or until only one word, the solution, remains. That process, referred as a 'run', ie a sample, is repeated many times to arrive at an average guesses. This full random mode provides the benchmark for word difficulty.
 
-* **FMWM** runs in a 'dumb monkey' mode and a 'smart monkey' mode. Dumb mode, otherwise called full random mode, guesses a random word in every guess step towards solving the target **Wordle** word. After each guess the pool of words for guess selection gets smaller and smaller according to what was learned by each previous guess. **FMWM** makes all it guesses in what is known as **Wordle** 'strict hard mode', but where following every green, yellow and grey clues is required. Actual 'hard mode' does not follow grey clues. The first pick can be any word from the entire **Wordle** ***solutions*** list. Their second pick can be any word from the **Wordle** ***solutions*** list less any words ruled out by the first pick. Since **FMWM** knows the answer, it knows how to properly eliminate words. And so on it goes until the **FMWM** by chance picks the solution out of what remains in the selection list or until only one word, the solution, remains. That process, referred as a 'run', ie a sample, is repeated many times to arrive at an average guesses. This full random mode provides the benchmark for word difficulty.
-
-* An **FMWM** 'smart monkey' does not make random guesses, except for the first guess. Starting with the second guess, the **FMWM** 'smart monkey' guesses the selection pool’s highest ranked word. The first guess was random. That random first guess makes the selection pool for the second guess different for every run. Otherwise, the **FMWM** would guess the same highest rank set of words in every run. The second guess is the top ranked word from the second guess pool. The selection pools are created in ranked order. The **FMWM** just picks the top word. The **FMWM** looks at that guess and rules out the right words to get the third guess selection pool. And so it goes just like before.
+* An **FMWM** 'smart monkey' does not make random guesses, except for the first guess. Starting with the second guess, the **FMWM** 'smart monkey' guesses the selection pool’s highest ranked word. The first guess was random. That random first guess makes the selection pool for the second guess different for every run. Otherwise, **FMWM** would guess the same highest rank set of words in every run. The second guess is the top ranked word from the second guess pool. The selection pools are created in ranked order. The **FMWM** just picks the top word. The **FMWM** looks at that guess and rules out the right words to get the third guess selection pool. And so it goes just like before.
 
 ### Magic Words Finder
 
@@ -34,13 +34,12 @@
 
 ```text
 python3 fmwm.py
-
-1 word: Average guesses to solve Wordle by sampling 100 tries.
 Enter a valid Wordle target word: covet
 Run using a given first guess? Enter y/n: n
 Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Enter 0,1,2 or 3: 1
-target_wrd: covet, 100 samples, rank mode type 1 guesses, initial duplicates:False, wo_nyt_wordlist.txt
-target_wrd: covet, averaged 4.480 guesses to solve, 100 samples, rank mode type 1 guesses, initial duplicates:False, wo_nyt_wordlist.txt, 4.4157 seconds
+1 word:covet  Average guesses to solve Wordle by sampling 100 tries.
+target wrd: covet, 100 samples, rank mode type 1 guesses, initial duplicates:False, botadd_nyt_wordlist.txt
+target wrd: covet, averaged 4.850 guesses to solve, 100 samples, rank mode type 1 guesses, initial duplicates:False, botadd_nyt_wordlist.txt, 7.9480 seconds
 ```
 
 * Verbose output revealing the guess data during each run is possible when running **FMWM** with command line arguments.
@@ -91,16 +90,16 @@ Command line use example:
 
 ```text
 python3 fmwm.py -l -n -t feast -r 0 -x 4
-1 word: Average guesses to solve Wordle by sampling 4 tries.
-target_wrd: feast, 4 samples, random guesses, initial duplicates:True, wo_nyt_wordlist.txt
-[1, 3, 'feast', 'shown', 122, 'flask', 1]
-[2, 3, 'feast', 'mafia', 33, 'fecal', 1]
-[3, 4, 'feast', 'wrack', 106, 'blaze', 8, 'heath', 3, 'feast', 1]
-[4, 5, 'feast', 'lodge', 256, 'teary', 4, 'meant', 2, 'beast', 1]
-target_wrd: feast, averaged 3.750 guesses to solve, 4 samples, random guesses, initial duplicates:True, wo_nyt_wordlist.txt, 0.1681 seconds
+1 word:feast  Average guesses to solve Wordle by sampling 4 tries.
+target wrd: feast, 4 samples, random guesses, initial duplicates:True, botadd_nyt_wordlist.txt
+[1, 5, 'feast', 'flung', 65, 'freed', 3, 'femme', 2, 'fetch', 1, 'feast']
+[2, 4, 'feast', 'divot', 118, 'chest', 4, 'beast', 3, 'feast', 1]
+[3, 5, 'feast', 'ebony', 743, 'stele', 10, 'reset', 3, 'heist', 1, 'feast']
+[4, 3, 'feast', 'timed', 133, 'chest', 4, 'feast', 1]
+target wrd: feast, averaged 4.250 guesses to solve, 4 samples, random guesses, initial duplicates:True, botadd_nyt_wordlist.txt, 0.2469 seconds
 ```
 
-In the above example the **-l** argument 'Lists each solution run data' during the **FMWM** operations in square brackets. 
+In the above example the **-l** argument 'Lists each solution run data' during the **FMWM** operations in square brackets. The **-x 4** argument specifies to run the process 4 times.
 
 * The first number is the run number.
 * The second number is the number of guesses required to solve in that run.
@@ -123,33 +122,33 @@ Runs #3 shows the outcome of a 1/3 chance of guessing the solution from a list o
 * This is a typical output to the Terminal window where the word **least** is designated as the first guess:
 
 ```text
-Duration so far: 0:00:11.452955, avg. 0.8810 s/wrd, last word 0.5527 s/wrd, ETF: 0:21:08.923988
-Output being written to R0_X20_S_least_2022-12-13_15_28_41.512153.csv
-14 word:gnome  Average guesses to solve Wordle by sampling 20 tries.
-target wrd: gnome, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
-target wrd: gnome, averaged 3.700 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.8255 seconds
+Duration so far: 0:00:01.803758, avg. 0.9019 s/wrd, last word 0.8587 s/wrd, ETF: 0:45:36.696644
+Output being written to R0_X20_S_least_2024-09-21_13_23_10.730536.csv
+3 word:abash  Average guesses to solve Wordle by sampling 20 tries.
+target wrd: abash, 20 samples, random guesses, initial duplicates:True , first guess:least, botadd_nyt_wordlist.txt
+target wrd: abash, averaged 3.900 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, botadd_nyt_wordlist.txt, 0.9217 seconds
 
-Duration so far: 0:00:12.278500, avg. 0.8770 s/wrd, last word 0.8255 s/wrd, ETF: 0:31:34.625034
-Output being written to R0_X20_S_least_2022-12-13_15_28_41.512153.csv
-15 word:snaky  Average guesses to solve Wordle by sampling 20 tries.
-target wrd: snaky, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt
-target wrd: snaky, averaged 3.600 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, wo_nyt_wordlist.txt, 0.7987 seconds
+Duration so far: 0:00:02.725501, avg. 0.9085 s/wrd, last word 0.9217 s/wrd, ETF: 0:48:56.672223
+Output being written to R0_X20_S_least_2024-09-21_13_23_10.730536.csv
+4 word:abate  Average guesses to solve Wordle by sampling 20 tries.
+target wrd: abate, 20 samples, random guesses, initial duplicates:True , first guess:least, botadd_nyt_wordlist.txt
+target wrd: abate, averaged 3.350 guesses to solve, 20 samples, random guesses, initial duplicates:True , first guess:least, botadd_nyt_wordlist.txt, 0.9479 seconds
 ```
 
 * The CSV output written to file for the first two words is this:
 
 ```text
 target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
-shorn,4.0,random guesses,True,least,wo_nyt_wordlist.txt,20,0.9372296719811857
-story,4.4,random guesses,True,least,wo_nyt_wordlist.txt,20,1.0770448269322515
+abash,3.9,random guesses,True,least,botadd_nyt_wordlist.txt,20,0.9217426939867437
+abate,3.35,random guesses,True,least,botadd_nyt_wordlist.txt,20,0.9478941340057645
 ```
 
 * In comparison, the CSV output written to file for the first two words using 400 tries shows different guess averages but the same general character:
 
 ```text
 target wrd,average,guess mode,initial duplicates,first guess,vocabulary,samples,seconds
-shorn,4.13,random guesses,True,least,wo_nyt_wordlist.txt,400,20.533432631287724
-story,4.11,random guesses,True,least,wo_nyt_wordlist.txt,400,23.28290557442233
+abash,4.015,random guesses,True,least,botadd_nyt_wordlist.txt,400,21.758871527999872
+abate,3.505,random guesses,True,least,botadd_nyt_wordlist.txt,400,22.562121423019562
 ```
 
 * 400 samples is not large enough to compare words with this measure at the 1/10th of a guess resolution.
