@@ -1,4 +1,4 @@
-guess	qty	min	max	ave	wrds/max
+guess	qty	min	max	ave	    wrds/max
 trace	150	1	246	15.39	9.39
 salet	148	1	221	15.60	10.45
 crate	148	1	246	15.60	9.39

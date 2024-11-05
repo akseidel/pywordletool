@@ -1,4 +1,4 @@
-guess	qty	min	max	ave	lw/max	p2
+guess	qty	min	max	    ave     lw/max	p2
 caret	155	1	0347	20.44	09.1	1,764
 slate	154	1	0329	20.57	09.6	2,006
 parse	152	1	0353	20.84	09.0	2,103
