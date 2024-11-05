@@ -1,6 +1,6 @@
 Pattern Groups For Guesses From The Large Vocabulary Wordslist (14855) Into Wordlebot’s Possible Solutions List  (11/05/2024)											
 							
-guess	qty	ent      min     max     ave     exp     p2
+guess	qty	ent     min     max     ave     exp     p2
 tarse	158	5.889	1	321	20.18	100.45	1,620.0
 tiare	150	5.857	1	276	21.26	92.80	1,520.98
 sater	151	5.850	1	321	21.12	96.63	1,594.73
