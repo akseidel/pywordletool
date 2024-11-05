@@ -1,4 +1,5 @@
-Pattern Groups For Guesses From The Large Vocabulary Wordslist (14855) Into Wordlebot’s Possible Solutions List  (11/05/2024)											
+11/05/2024	
+Pattern Groups For Guesses From The Large Vocabulary Wordslist (14,855 words) Into Wordlebot’s Possible Solutions List (3,189 words)										
 qty = qty of groups
 ent = groups entropy bits
 min, max = minimum and maximum group sizes
