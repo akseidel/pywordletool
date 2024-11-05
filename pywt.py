@@ -418,7 +418,7 @@ class Pywordlemainwindow(ctk.CTk):
                         pass
 
                 opt_group_guesses_as_list = list(optimal_group_guesses.keys())
-                (g_qty, g_min, g_max, g_ave, g_p2, g_e) = helpers.groups_stat_summary(optimal_group_guesses)
+                (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = helpers.groups_stat_summary(optimal_group_guesses)
                 match grps_guess_source:
                     case 0:
                         regex: str = helpers.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
