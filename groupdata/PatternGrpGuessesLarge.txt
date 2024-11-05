@@ -1,5 +1,13 @@
 Pattern Groups For Guesses From The Large Vocabulary Wordslist (14855) Into Wordlebot’s Possible Solutions List  (11/05/2024)											
-							
+qty = qty of groups
+ent = groups entropy bits
+min, max = minimum and maximum group sizes
+ave = average group size
+exp = expected group size
+p2 = group size population variance
+
+sorted by entropy
+
 guess	qty	ent     min     max     ave     exp     p2
 tarse	158	5.889	1	321	20.18	100.45	1,620.0
 tiare	150	5.857	1	276	21.26	92.80	1,520.98
