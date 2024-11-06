@@ -440,6 +440,7 @@ class Pywordlemainwindow(ctk.CTk):
                           ", sizes: min " + '{0:.0f}'.format(g_min) + \
                           ", min-max " + '{0:.0f}'.format(g_max) + \
                           ", ave " + '{0:.2f}'.format(g_ave) + \
+                          ", exp " + '{0:.2f}'.format(g_xa) + \
                           ", p2 " + "{0:.2f}".format(g_p2) + ")"
                 self.enable_optimal_controls(True)
 
