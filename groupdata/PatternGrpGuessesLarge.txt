@@ -1,5 +1,5 @@
 11/05/2024	
-Pattern Groups For Guesses From The Large Vocabulary Wordslist (14,855 words) Into Wordlebot’s Possible Solutions List (3,189 words)										
+Pattern groups for guesses from the Large Vocabulary words list (14,855 words) into Wordlebot’s Possible Solutions list (3,189 words, ie the Classic+ words list)										
 qty = qty of possible remaining words groups, i.e. the number of different clue patterns for the guess
 ent = remaining words groups entropy in bits (powers of 2)
 min, max = minimum and maximum group sizes amongst the number of different clue patterns for the guess
