@@ -25,7 +25,7 @@
 
 ## Observations
 
-* The data when sorted in specific ways and then charted in a graph will produce interesting striped graphs from which one can draw observations. For example in the following chart the data is sorted by group quantity first (descending) and then maximum group size (ascending). The stripes correspond to guesses that produce the same number of word groups or outcomes. When judging "better" as producing more groups, which would tend to result in less remaining words, one can see that the "better end" of a stripe groups tends to be words having the most commonly used letters "AE,NOSTRIL". This observation supports the idea of letter frequency strategy puzzle play.
+* The data when sorted in specific ways and then charted in a graph will produce interesting striped graphs from which one can draw observations. For example in the following chart the data is sorted by group quantity first (descending) and then maximum group size (ascending). The stripes correspond to guesses that produce the same number of word groups or outcomes. When judging "better" as producing more groups, which would tend to result in less remaining words, one can see by looking up that group in the data, that the "better end" of a stripe groups tends to be words having the most commonly used letters "AE,NOSTRIL". This observation supports the idea of letter frequency strategy puzzle play.
 * One can also observe that both the entropy values and the expected outcome size also chart as fuzzy stripes. Those characteristics are better predictors than groups quantity.
 
 ### [PatternGrpGuessesLarge.txt](/groupdata/PatternGrpGuessesLarge.txt)
