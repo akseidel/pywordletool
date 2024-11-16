@@ -2,37 +2,37 @@
 
 ## Introduction
 
-* The [AllGuessWordsGroupsStats.csv.txt](/groupdata/AllGuessWordsGroupsStats.csv.txt) is a comma separated value format text file summarizing the word grouping performance for every word in the Wordle allowed guess word list used as a guess ***for the starting state where every possible Wordle solution can be the days' Wordle solution***. Data is based upon using the classic 2,309 possible Wordle solutions.
+* The file, [PatternGrpGuessesLarge.txt](/groupdata/PatternGrpGuessesLarge.txt), is a text file summarizing the word grouping performance for every word in the Wordle allowed guess word list used as a guess ***for the starting state where every possible Wordle solution can be the days' Wordle solution***. Data is based upon using the Classic+ 3,189 possible Wordle solutions.
 
-* The data can help one evaluate the merit for a game's first word only. After the first guess is played the list of possible Wordle solutions reduces to a list of remaining possible Wordle solutions. **AllGuessWordsGroupsStats.csv.txt** no longer applies after the first guess.  
+* The data can help one evaluate the merit for a only game's first word. Words identified by **PatternGrpGuessesLarge.txt** no longer apply after the first guess.  
 
-* Data is sorted according to the number of word groups generated (descending), then by the maximum group size (ascending) and then by the average group size (ascending).
+* The Data is sorted first by word groups unbiased entropy (ent) value (descending), then by the number of word groups (qty) generated (descending) and then by the maximum group size (mxa) (ascending).
 
 * The list columns are:
   * guess - This is the guess word.
-  * qty   - The number of word groups the guess divides the possible Wordle solution words. As of this file there are 2309 solution words. The guess word identically matches or mismatches all the words in each word group.
+  * qty   - The number of word groups the guess divides the possible Wordle solution words. The guess word identically matches or mismatches all the words in each word group. Each group is a possible outcome for a guess. The qty is the number of possible remaining words outcomes that could result from the guess.
   * min   - The number of words in the smallest word group.
-  * max   - The number of words in the largest word group. The largest word group is often the words having nothing in common with the guess word.
-  * ave   - The average size of all the word groups.
-  * wrds/max    - The number of times larger the 2039 solution word is above the maximum group size. This value may have no bearing on the guess's merit, but it does provide a comparison means. (Newer **Group Driller** output no longer shows this statistic.)
-* The following list columns are present in more recent **Group Driller** versions:
-  * ent   - The word groups' unbiased entropy bit. The NYT Wordlebot refers to this as 'Information Bits'. 'Bits' means the entropy value is in powers of 2. Unbiased means every word in the word groups is considered equally likely to be a solution.
-  * exp   - The remaining words group size outcome expected for the guess.
+  * max   - The number of words in the largest word group. The largest word group often contains the words having nothing in common with the guess word, ie that guess resulting in all grey clues.
+  * ave   - The average size of all the word groups. This is simply the number of possible solutions divided by the number of groups.
+  * ent   - The word groups' unbiased entropy in bits. The NYT Wordlebot refers to this as 'Information Bits'. 'Bits' means the entropy value is in powers of 2. Unbiased means every word in the word groups is considered equally likely to be a solution. Entropy in Wordle groups context is simply a measure for how evenly the possible solution words are distributed into the groups or outcomes that result from a guess. Larger entropy means more evenly distributed solution words.
+  * exp   - The outcome words group size expected for the guess.
   * p2   - The word groups' size population variance.
+  * * wrds/max    - The number of times larger the 3,189 solution word is above the maximum group size. This value may have no bearing on the guess's merit, but it does provide a comparison means. (Newer **Group Driller** output no longer shows this statistic.)
 
-* The **Group Driller** **Condensed** verbose output created the content shown in this list. A more recent version for **Group Driller** **Condensed** verbose output includes groups entropy (ent), resulting group expected size (exp), groups size population variance (p2) and omits the wrds/max. These added groups characteristics are more informative for evaluating a first word's guess merit. The file, [ClassicPatternGrpGuessesLarge.txt](/groupdata/ClassicPatternGrpGuessesLarge.txt), is based upon the newer version output for guesses from the large vocabulary words list (14,855 words) into the Classic possible solutions list (2,309 words).
+* The **Group Driller** **Condensed** verbose output creates the content shown in this list.
 
 * The concept of **Wordle Groups** is explained in an allegory here: [Groups Allegory](/groupsallegory/README.md)
 
 ## Observations
 
-* The data is sorted first by group quantity and then by maximum group quantity. As such the better guess, measured by the maximum group quantity, amongst those words generating the same number of groups as a category are the words in that category having the most commonly used letters "AE,NOSTRIL". Such words would be the best guess within the quantity category. This characteristic is what results in the red stripes seen in the graphed data.
+* The data when sorted in specific ways and then charted in a graph will produce interesting striped graphs from which one can draw observations. For example in the following chart the data is sorted by group quantity first (descending) and then maximum group size (ascending). The stripes correspond to guesses that produce the same number of word groups or outcomes. When judging "better" as producing more groups, which would tend to result in less remaining words, one can see that the "better end" of a stripe groups tends to be words having the most commonly used letters "AE,NOSTRIL". This observation supports the idea of letter frequency strategy puzzle play.
+* One can also observe that both the entropy values and the expected outcome size also chart as fuzzy stripes. Those characteristics are better predictors than groups quantity.
 
-### [AllGuessWordsGroupsStats.csv.txt](/groupdata/AllGuessWordsGroupsStats.csv.txt)
+### [PatternGrpGuessesLarge.txt](/groupdata/PatternGrpGuessesLarge.txt)
 
 ## This Data Graphed
 
-!['All Guess Words Groups Graphed.png Image'](/InfoImages/GROUPS_AllGuessWordsGroupsGraphed.png)
+!['All Guess Words Groups Graphed.png Image'](/InfoImages/GROUPS_chart.png)
 
 ### Other Data
 
