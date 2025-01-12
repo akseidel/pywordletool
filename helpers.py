@@ -939,7 +939,7 @@ def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
     @return: The string used for printing out the optimal word list.
     """
     wrds = list(best_rank_dict.keys())
-    rptl = '\n> >  {0:.0f}'.format(len(wrds)) + ' Optimal group guess words:' + '\n' + ', '.join(wrds)
+    rptl = '\n> >  {0:.0f}'.format(len(wrds)) + ' optimal ent (1st) followed by highest group qty guess words:' + '\n' + ', '.join(wrds)
     return rptl
 
 
