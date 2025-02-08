@@ -222,6 +222,8 @@ Special **Pattern** allows one to quickly introduce a custom require or exclude 
   
 * Beware in general of any guess that contains multiple same letters. You are in the clear when all of those letters are gray. Otherwise, you have to stop and think. If only one is either a green or yellow clue then then you should take all possible measures to exclude extraneous words. If both letters are a clue, particularly two yellow clues or a green and yellow clue, then filtering for the multiple same letter is required. The **Special Patterns and Multiple Same Letters** control will help you with these situations.
 
+* A use method that mitigates the multiple same letter pitfall is to enter the letter clues only for the 1st word guess. Then use the **Groups Driller** feature for all subsequent words where you would be copy and pasting outcomes from **Verbose** reports into the **Groups Driller** for starting the process to select the next word guess. The outcomes you copy and paste would inherently be correct outcomes instead of an incorrect outcome shown in the **This Wordle Helper** that might result from not correctly entering clue information. Such an error would still be possible for that 1st word guess clue information.
+
 ### Word Vocabularies
 
 * The **Classic** and **Large** word vocabularies are current as of May 3, 2023. In the past year the vocabularies were seen to change once.
