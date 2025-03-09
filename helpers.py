@@ -565,9 +565,9 @@ def get_genpattern(subject_word: str, target_word: str) -> str:
     return genpat
 
 
-def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
+def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict:
     """
-    Returns a dictionary of the word groups the guess_word would result
+    Returns a dictionary of the word outcomes the guess_word would result
     from applying the guess_word on the word_list. The key values will be
     five-digit codes where 0 means letter is not present, 1 letter is present
     but at wrong position and 2 means letter is present and in correct position.
@@ -577,46 +577,44 @@ def groups_for_this_guess(guess_word: str, word_list: list) -> dict:
     not present, 1 letter is present but at wrong position and 2 means letter
     is present and in correct position. Values are the words categorized by that code.
     """
-    groups_dict = {}
+    outcomes_dict = {}
     for subject_word in word_list:
         # This appears to be the correct context.
         genpat = get_genpattern(guess_word, subject_word)
-        if genpat not in groups_dict:
-            groups_dict[genpat] = [subject_word]
+        if genpat not in outcomes_dict:
+            outcomes_dict[genpat] = [subject_word]
         else:
-            groups_dict[genpat].append(subject_word)
-    return groups_dict
+            outcomes_dict[genpat].append(subject_word)
+    return outcomes_dict
 
-
-def get_a_groups_stats(a_groups_dict: dict) -> tuple[int, int, int, float, float, float, float]:
+def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, float, float, float]:
     """
-    Given a single guess group's dictionary, returns stats:
-    pattern group quantity,
-    smallest pattern group size,
-    largest pattern group size,
-    average pattern group size
-    list size/ largest group ratio
-    group population variance
-    groups entropy
-    groups expected average
-    @param a_groups_dict: dictionary for a single guess group
-    @return: tuple - quantity, smallest, largest, average
+    Given a single guess's outcome dictionary, returns stats:
+    outcome pattern quantity,
+    smallest outcome pattern size,
+    largest outcome pattern size,
+    average outcome pattern size,
+    outcome population variance,
+    outcome entropy,
+    outcome expected size
+    @param the_outcomes_dict: dictionary for a single guess outcome
+    @return: tuple - [0] qty, [1] smallest, [2] largest, [3] ave, [4] var, [5] ent, [6] exp outcome size
     """
-    g_qty = len(a_groups_dict)  # number of groups
-    smallest = g_qty  # smallest group size
-    largest = 0  # largest group size
-    sums = 0  # group size sums, this is the number of words
-    p2 = 0.0  # group population variance
-    g_ent = 0.0  # groups entropy
-    g_xa = 0.0 # groups expected average
-    for k, v in a_groups_dict.items():
+    g_qty = len(the_outcomes_dict)  # number of outcomes
+    smallest = g_qty  # smallest outcome size
+    largest = 0  # largest outcome size
+    sums = 0  # outcome size sums, this is the number of words
+    p2 = 0.0  # outcome population variance
+    g_ent = 0.0  # outcomess entropy
+    g_xa = 0.0 # oiutcomes expected average
+    for k, v in the_outcomes_dict.items():
         size = len(v)
         sums = sums + size
         largest = max(largest, size)
         smallest = min(smallest, size)
     # mean = group average size
     mean = sums / g_qty
-    for k, v in a_groups_dict.items():
+    for k, v in the_outcomes_dict.items():
         size = len(v)
         p2 += (size - mean) ** 2
         i_p = size / sums
@@ -627,32 +625,32 @@ def get_a_groups_stats(a_groups_dict: dict) -> tuple[int, int, int, float, float
     return g_qty, smallest, largest, mean, p2, g_ent, g_xa
 
 
-def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
+def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
     """
-    Summarizes the groups best_rank_dictionary, mainly to extract the
+    Summarizes the outcomes best_rank_dictionary, mainly to extract the
     minimum and maximum group sizes
     @param best_rank_dict:
-    @return: groups_stat_summary tuple:
+    @return: outcomes_stat_summary tuple:
     [0]:qty,[1]:smallest,[2]:largest,[3]:average,
     [4]:population variance,[5]:entropy bits,all as a tuple
     """
-    # The grp_stats for each best_rank_dict member are:
+    # The outcome_stats for each best_rank_dict member are:
     # [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:population variance and [5]:entropy bits as tuple parts
     # Each member is 'best' because they have the maximum found grps_qty as the [0]:qty.
     # The 'best' are equal in grps_qty and average but could have varying
     # [2]:largest values and thus varying [4]:population variance values and [5] entropy bits
     # BTW, optimal_rank ([3]:average) in this function is an old name. It is not always optimal.
     #
-    # This function's purpose, groups_stat_summary, it to summarize the group stats in all the found
-    # best words that have their group stats contained by the best_rank_dictionary for reporting group
-    # optimal words. The summary report is for noticing when better word selections exist. Because a groups stat
-    # largest group count ([2]:largest) identifies a better selection within the best_rank_dictionary the
+    # This function's purpose, outcomes_stat_summary, it to summarize the outcome stats in all the found
+    # best words that have their outcome stats contained by the best_rank_dictionary for reporting outcome
+    # optimal words. The summary report is for noticing when better word selections exist. Because an outcome stat
+    # largest outcome count ([2]:largest) identifies a better selection within the best_rank_dictionary the
     # max_grp_size this function reports will actually be the minimum of the [3]:largest present in the
     # best_rank_dictionary. This is where we get the minimum of the maximums (min_max) idea. This is a subtlety
     # noticed occasionally where some word selections among words all having the same grps_qty could be better
-    # because they have more balanced word group sizes, ie smaller population variance. Perhaps they also happen
-    # to be from the list showing. These selections would be harder to spot when the summary reports the max group
-    # size instead of the min_max group size.
+    # because they have more balanced word outcome sizes, ie smaller population variance. Perhaps they also happen
+    # to be from the list showing. These selections would be harder to spot when the summary reports the max outcome
+    # size instead of the min_max outcome size.
     g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
     optimal_rank = g_stats[3]
     grps_qty = g_stats[0]
@@ -668,18 +666,18 @@ def groups_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, flo
         min_grp_p2 = min(p2_stat, min_grp_p2)
         max_grp_ent = max(max_grp_ent, e_stat)
         min_grp_xa = min(min_grp_xa, xa_stat)
-        # groups_stat_summary are:[0]:qty,[1]:smallest,[2]:largest,[3]:average,
+        # outcomes_stat_summary are:[0]:qty,[1]:smallest,[2]:largest,[3]:average,
         # [4]:min p2,[5]:max entropy bit as a tuple
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2, max_grp_ent, min_grp_xa
 
 
-def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool,
-                                    all_targets: dict,
-                                    msg1: str, context: str) -> dict:
+def extended_best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool,
+                                      all_targets: dict,
+                                      msg1: str, context: str) -> dict:
     """
-    Wraps guess word group ranking to return the best
-    group rank guesses. Guesses resulting in more groups
-    and smaller groups are better guesses.
+    Wraps guess word outcome ranking to return the best
+    outcome rank guesses. Guesses resulting in more outcomes
+    and smaller outcomes are better guesses.
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
     @param byentonly: flag to return only the highest entropy guesses
@@ -702,35 +700,46 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
         reporting_header_to_window(msg1, all_targets, rptwnd)
 
     for guess in all_targets:
-        guess_groups_dict = groups_for_this_guess(guess, word_lst)
-        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest,
+        guess_outcomes_dict = outcomes_for_this_guess(guess, word_lst)
+        # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest,
         # [3]:average , [4]:population variance , [5]:entropy as a tuple
-        grp_stats = get_a_groups_stats(guess_groups_dict)
+        outcome_stats = get_outcomes_stats(guess_outcomes_dict)
 
         if reporting:
-            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt, keyed_rpt)
+            clue_pattern_outcomes_to_window(guess, outcome_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
             # saving the stats for later sorting
             if cond_rpt:
-                cond_dict[guess] = grp_stats
+                cond_dict[guess] = outcome_stats
                 # omit the 'For:' in the search control
                 rptwnd.search_text.set('')
 
-        # The rank is calculated as the average of the group's sizes.
-        # Guesses that have the same number of groups but have a larger largest group have a
-        # slightly higher prob. than other guesses having the same average.
-        # grp_stats are: [0]:qty,[1]:smallest,[2]:largest,[3]:average,
-        # [4]:population variance, [5]:entropy as a tuple
-        guess_rank_dict[guess] = grp_stats
-
-        # Record the smallest average pattern groups size.
-        min_score = min(grp_stats[3], min_score)
+        # This function has changed over time. Its purpose is to return a best_stat_dict of guess
+        # words and their stats sorted by the best rank. Guesses having the most outcomes tend to
+        # result in smaller outcomes. However, within guesses having the same number of outcomes,
+        # the guesses with smaller maximum outcomes or guesses with more evenly distributed
+        # outcomes tend to be better than their brethren. Outcome entropy measures that quality.
+        #
+        # Here the guesses' average outcome size (essentially outcome qty) is used as the rank
+        # criteria while also keeping track of the guess having the maximum entropy. Then the
+        # ranked guess dictionary is sorted by entropy. This pulls the best equal outcome qty
+        # words to the top and, if there are actually lesser outcome qty guesses with the higher
+        # entropy, puts the single best word at the dictionary top.
+        #
+        # It is understood this function does not list all the best guesses in order, but does
+        # but the best at the top. It is also understood entropy only approximates the
+        # expected number of steps to solve.
+        #
+        guess_rank_dict[guess] = outcome_stats
+        # Record the smallest outcome pattern average size. (essentially max outcome qty)
+        min_score = min(outcome_stats[3], min_score)
         # Record the maximum entropy seen
-        max_ent = max(grp_stats[5], max_ent)
+        max_ent = max(outcome_stats[5], max_ent)
 
     # Populate the best_rank_dict with the best guesses.
-    # This dictionary's values are grp_stats tuples.
+    # This dictionary's values are outcome_stats tuples.
     for g, s in guess_rank_dict.items():
-        # if not only by entropy, then include all with max group size
+        # if not only by entropy, then include all with
+        # minimum average outcome size (max outcome size)
         if not byentonly:
             if math.isclose(s[3], min_score):
                 if g not in best_rank_dict:
@@ -752,27 +761,27 @@ def extended_best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: 
     return inorder_best_rank_dict
 
 
-def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool,
-                           context: str) -> dict:
+def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, cond_rpt: bool, keyed_rpt: bool,
+                             context: str) -> dict:
     """
-    Wraps guess word group ranking to return the best
-    group rank guesses. Guesses resulting in more groups
-    and smaller groups are better guesses.
+    Wraps guess word outcomes ranking to return the best
+    outcomes rank guesses. Guesses resulting in more outcomes
+    and smaller outcomes are better guesses.
     @param context: String used in title so indicate owner
     @param reporting: flag for verbose printing to rptwnd
     @param byentonly: flag to return only the highest entropy guesses
     @param cond_rpt: flag for condensed verbose printing to rptwnd
     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
     @param word_lst: possible guess words
-    @return: dictionary of the best group ranked guesses where
-    guess words are the keys, grp_stats tuples are the values
-    grp_stats tuples are:
+    @return: dictionary of the best outcomes ranked guesses where
+    guess words are the keys, outcome_stats tuples are the values
+    outcome_stats tuples are:
     [0]:qty,[1]:smallest,[2]:largest,[3]:average,[4]:population variance,[5]:entropy
     """
-    guess_rank_dict = {}
-    best_rank_dict = {}
+    guess_stat_dict = {}
+    best_stat_dict = {}
     cond_dict = {}
-    min_score = len(word_lst)
+    min_outcome_ave = len(word_lst)
     max_ent = 0.0
     rptwnd = RptWnd(context)
     rptwnd.withdraw()
@@ -781,45 +790,58 @@ def best_groups_guess_dict(word_lst: list, reporting: bool, byentonly: bool, con
         reporting_header_to_window("Words Showing", word_lst, rptwnd)
 
     for guess in word_lst:
-        guess_groups_dict = groups_for_this_guess(guess, word_lst)
-        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
-        # [4]:population variance, [5]:entropy all as a tuple
-        grp_stats = get_a_groups_stats(guess_groups_dict)
+        guess_outcomes_dict = outcomes_for_this_guess(guess, word_lst)
+        # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
+        # [4]:population variance, [5]:entropy, [6] expected outcome size all as a tuple
+        outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
 
         if reporting:
-            clue_pattern_groups_to_window(guess, grp_stats, guess_groups_dict, rptwnd, cond_rpt, keyed_rpt)
+            clue_pattern_outcomes_to_window(guess, outcomes_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
             # saving the stats for later sorting
             if cond_rpt:
-                cond_dict[guess] = grp_stats
+                cond_dict[guess] = outcomes_stats
                 # omit the 'For:' in the search control
                 rptwnd.search_text.set('')
 
-        # The rank is calculated as the average of the group's sizes.
-        # Guesses that have the same number of groups but have a larger largest group have a
-        # slightly higher prob. than other guesses having the same average.
-        # grp_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:grp qty population variance as a tuple
-        guess_rank_dict[guess] = grp_stats
-        # Record the smallest average pattern groups size.
-        min_score = min(grp_stats[3], min_score)
+        # This function has changed over time. Its purpose is to return a best_stat_dict of guess
+        # words and their stats sorted by the best rank. Guesses having the most outcomes tend to
+        # result in smaller outcomes. However, within guesses having the same number of outcomes,
+        # the guesses with smaller maximum outcomes or guesses with more evenly distributed
+        # outcomes tend to be better than their brethren. Outcome entropy measures that quality.
+        #
+        # Here the guesses' average outcome size (essentially outcome qty) is used as the rank
+        # criteria while also keeping track of the guess having the maximum entropy. Then the
+        # ranked guess dictionary is sorted by entropy. This pulls the best equal outcome qty
+        # words to the top and, if there are actually lesser outcome qty guesses with the higher
+        # entropy, puts the single best word at the dictionary top.
+        #
+        # It is understood this function does not list all the best guesses in order, but does
+        # but the best at the top. It is also understood entropy only approximates the
+        # expected number of steps to solve.
+        #
+        guess_stat_dict[guess] = outcomes_stats
+        # Record the smallest outcome pattern average size. (essentially max outcome qty)
+        min_outcome_ave = min(outcomes_stats[3], min_outcome_ave)
         # Record the maximum entropy seen
-        max_ent = max(grp_stats[5], max_ent)
+        max_ent = max(outcomes_stats[5], max_ent)
 
-    # Populate the best_rank_dict with the best guesses.
-    # This dictionary's values are grp_stats tuples.
-    for g, s in guess_rank_dict.items():
-        # if not only by entropy, then include all with max group size
+    # Populate the best_stat_dict with the best guesses.
+    # This dictionary's values are outcome_stats tuples.
+    for g, s in guess_stat_dict.items():
+        # if not only by entropy, then include all with
+        # minimum average outcome size (max outcome size)
         if not byentonly:
-            if math.isclose(s[3], min_score):
-                if g not in best_rank_dict:
-                    best_rank_dict[g] = s
+            if math.isclose(s[3], min_outcome_ave):
+                if g not in best_stat_dict:
+                    best_stat_dict[g] = s
         # Also collect the max_ent instances, these are not
         # always with max group size.
         if math.isclose(s[5], max_ent):
-            if g not in best_rank_dict:
-                best_rank_dict[g] = s
+            if g not in best_stat_dict:
+                best_stat_dict[g] = s
 
-    # make a new dict that is best_rank_dict sorted by ent size
-    inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
+    # make a new dict that is best_stat_dict sorted by ent size
+    inorder_best_rank_dict = dict(sorted(best_stat_dict.items(), key=lambda item: item[1][5], reverse=True))
     # Reporting only the best ranking guesses.
     if reporting:
         report_footer_wrapper("Words Showing", word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
@@ -879,12 +901,12 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk) -> 
         rptwnd.msg1.insert(tk.END, rptl)
 
 
-def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dict: dict,
-                                  rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
-    (qty, smallest, largest, average, p2, ent, g_xa) = grp_stats
+def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outcomes_dict: dict,
+                                    rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
+    (qty, smallest, largest, average, p2, ent, g_xa) = outcome_stats
     # report in full or condensed format according to cond_prt flag
     if not cond_rpt:
-        rptl = '\n\n> > > > Clue pattern groups for: ' + guess + ' < < < < '
+        rptl = '\n\n> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
         rptwnd.msg1.insert(tk.END, rptl)
         rptl = '\n> qty ' + str(qty) + \
                ', ent ' + '{0:.3f}'.format(ent) + \
@@ -896,8 +918,8 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
 
         rptwnd.msg1.insert(tk.END, rptl)
         rptwnd.msg1.insert(tk.END, '\n')
-        for key in sorted(guess_groups_dict):
-            g = guess_groups_dict[key]
+        for key in sorted(guess_outcomes_dict):
+            g = guess_outcomes_dict[key]
             if keyed_rpt:
                 rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             else:
@@ -908,14 +930,14 @@ def clue_pattern_groups_to_window(guess: any, grp_stats: tuple, guess_groups_dic
 
 
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
-    rptwnd.msg1.insert(tk.END, groups_stats_summary_line(best_rank_dict))
+    rptwnd.msg1.insert(tk.END, outcomes_stats_summary_line(best_rank_dict))
     rptwnd.msg1.see('end')
 
 
-def groups_stats_summary_line(best_rank_dict: dict) -> str:
+def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
     # stats_summary [0]:qty,[1]:smallest,[2]:largest, [3]:average,
     # [4]:population variance, [5]:entropy bits as a tuple
-    (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa) = groups_stat_summary(best_rank_dict)
+    (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa) = outcomes_stat_summary(best_rank_dict)
     rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(g_qty) + \
            ", ent " + '{0:.3f}'.format(g_ent) + \
            ", sizes: min " + '{0:.0f}'.format(g_min) + \
@@ -946,7 +968,7 @@ def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk):
     # stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
     # [4]:population variance,[5]:entropy bits as a tuple
-    stats_summary = groups_stat_summary(best_rank_dict)
+    stats_summary = outcomes_stat_summary(best_rank_dict)
     rptl = '\n> >  Optimal guess stats, each has group qty ' + '{0:.0f}'.format(
         stats_summary[0]) + ' or is max entropy:'
     rptwnd.msg1.insert(tk.END, rptl)
