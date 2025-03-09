@@ -28,9 +28,6 @@ import customtkinter as ctk
 import helpers
 import groupdrilling
 
-ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
-ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
-
 # globals
 data_path = 'worddata/'  # path from here to data folder
 # letter_rank_file = 'letter_ranks.txt'
@@ -41,12 +38,23 @@ r_pos_dict = {}  # require position dictionary
 exclude = []  # exclude list used by monkey sampler
 font_tuple_n = ("Courier", 14, "normal")
 
+ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
+ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 def set_n_col(self):
     if self.winfo_screenwidth() > 1280:  # to do
-        return 9
+        return 10
     else:
         return 7
+
+
+# def on_window_resize(event):
+#     width = event.width
+#     height = event.height
+#     if width == 250 and hasattr(event.widget, 'text'):
+#         print(event.widget.text)
+#         pass
+#         print(f"Window resized to {width}x{height}")
 
 
 def str_wrd_list_hrd(ln_col: int) -> str:
@@ -163,6 +171,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.wnd_help = None
         self.title("This Wordle Helper")
 
+        self.option_add("*Font", font_tuple_n)
+
         # To Do - Setup width and height according to current screen
         # dimensions.
         # print(self.winfo_screenheight())
@@ -170,7 +180,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # Screen width.
         # w_width = 1120  # 1036
-        w_width = 1200  # 1036
+        w_width = 1300  # 1036
 
         # Screen height.
         # w_height = 668  # to do, set according to screen height
@@ -180,7 +190,6 @@ class Pywordlemainwindow(ctk.CTk):
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
 
-        ln_col = set_n_col(self)
         # set the Vars
         self.grps_guess_source = tk.IntVar(value=0)
         self.allow_dup_state = tk.BooleanVar(value=False)
@@ -207,6 +216,8 @@ class Pywordlemainwindow(ctk.CTk):
         # configure style
         style = ttk.Style()
         style.theme_use()
+
+        # self.bind("<Configure>", on_window_resize)
 
         def show_grps_driller() -> None:
             if self.grpsdriller_window is None or not self.grpsdriller_window.winfo_exists():
@@ -309,7 +320,7 @@ class Pywordlemainwindow(ctk.CTk):
                 else:
                     l_msg = l_msg + mid_pad + msg
                 c = c + 1
-                if c == ln_col:
+                if c == set_n_col(self):
                     tx_result.insert(tk.END, l_msg + '\n')
                     c = 0
                     l_msg = ""
@@ -659,14 +670,13 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
-                                text=str_wrd_list_hrd(ln_col),
+                                text=str_wrd_list_hrd(set_n_col(self)),
                                 relief='sunken',
                                 background='#dedede',
                                 anchor='w',
                                 borderwidth=0,
                                 highlightthickness=0)
         lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='ew', padx=6, pady=2)
-        lb_result_hd.configure(font=font_tuple_n)
         # the word list resulting from grep on the main wordlist
         # tx_result = tk.Text(self.result_frame,
         tx_result = helpers.CustomText(self.result_frame,
@@ -690,7 +700,6 @@ class Pywordlemainwindow(ctk.CTk):
             tx_result.configure(height=10)  # to do, set according to screen height
         else:
             tx_result.configure(height=16)
-        tx_result.configure(font=font_tuple_n)
         # scrollbar for wordlist
         tx_results_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
         tx_results_sb.grid(row=1, column=5, sticky='ens')
@@ -703,7 +712,6 @@ class Pywordlemainwindow(ctk.CTk):
                              borderwidth=0,
                              highlightthickness=0)
         lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
-        lb_status.configure(font=font_tuple_n)
         self.status.set('No status yet.')
 
         # grep line being used
@@ -714,7 +722,6 @@ class Pywordlemainwindow(ctk.CTk):
                         borderwidth=0,
                         highlightthickness=0)
         tx_gr.grid(row=4, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
-        tx_gr.configure(font=font_tuple_n)
         tx_gr.delete(1.0, tk.END)
         # scrollbar for grep line
         tx_gr_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
@@ -729,7 +736,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.criteria_frame = ctk.CTkFrame(self,
                                            corner_radius=10
                                            )
-        self.criteria_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=0)
+        self.criteria_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=0, expand=True)
 
         # letter exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
@@ -776,7 +783,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.actions_outer_frame = tk.Frame(self.criteria_frame,
 
                                             )
-        self.actions_outer_frame.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2, expand=False)
+        self.actions_outer_frame.pack( side=tk.LEFT, fill=tk.X, padx=4, pady=2, expand=True)
 
         # =======  START OF ============ include special patterns control
         # frame for special pattern regex - uses pack
@@ -784,7 +791,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 text='Special Patterns and Multiple Same Letters',
                                                 labelanchor='n'
                                                 )
-        self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=False)
+        self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=True)
 
         self.specialpatt_subframeA = ttk.Frame(self.specialpatt_frame)
         self.specialpatt_subframeA.pack(side=tk.TOP, fill=tk.X, padx=4, pady=0, expand=True)
@@ -827,9 +834,9 @@ class Pywordlemainwindow(ctk.CTk):
 
         # label
         self.lb_sp_pat = ctk.CTkLabel(self.specialpatt_subframeA,
-                                      text='Pattern',
+                                      text='Pattern'
                                       )
-        self.lb_sp_pat.pack(side=tk.LEFT, padx=4, pady=4)
+        self.lb_sp_pat.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=4, expand=True)
 
         # special pattern entry clear
         def clear_specials():
@@ -841,10 +848,10 @@ class Pywordlemainwindow(ctk.CTk):
         # special pattern mode radio buttons
         rb_px = ttk.Radiobutton(self.specialpatt_subframeA, text="Exclude", variable=self.sp_pat_mode_var, value=2,
                                 command=do_spec_pat)
-        rb_px.pack(side=tk.RIGHT, padx=6, pady=0)
+        rb_px.pack(side=tk.RIGHT, padx=2, pady=0)
         rb_pi = ttk.Radiobutton(self.specialpatt_subframeA, text="Require", variable=self.sp_pat_mode_var, value=1,
                                 command=do_spec_pat)
-        rb_pi.pack(side=tk.RIGHT, padx=6, pady=0)
+        rb_pi.pack(side=tk.RIGHT, padx=2, pady=0)
         # special pattern clear button
         self.bt_pat_clr = ctk.CTkButton(self.specialpatt_subframeA,
                                         text="Clear",
@@ -852,7 +859,7 @@ class Pywordlemainwindow(ctk.CTk):
                                         text_color="black",
                                         command=clear_specials
                                         )
-        self.bt_pat_clr.pack(side=tk.RIGHT, padx=4, pady=0)
+        self.bt_pat_clr.pack(side=tk.RIGHT, padx=2, pady=0)
 
         # binding a special pattern entry validator
         try:
@@ -876,7 +883,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.lb_mult_ltrs = ctk.CTkLabel(self.specialpatt_subframeB,
                                          text='Multiples',
                                          )
-        self.lb_mult_ltrs.pack(side=tk.LEFT, padx=4, pady=4)
+        self.lb_mult_ltrs.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=4, expand=True)
 
         # multiple same letters clear
         def clear_mult_ltr_def() -> None:
@@ -886,11 +893,11 @@ class Pywordlemainwindow(ctk.CTk):
         rb_mult_x = ttk.Radiobutton(self.specialpatt_subframeB, text="Exclude", variable=self.mult_ltr_mode_var,
                                     value=2,
                                     command=do_mult_ltr_def)
-        rb_mult_x.pack(side=tk.RIGHT, padx=6, pady=0)
+        rb_mult_x.pack(side=tk.RIGHT, padx=2, pady=0)
         rb_mult_i = ttk.Radiobutton(self.specialpatt_subframeB, text="Require", variable=self.mult_ltr_mode_var,
                                     value=1,
                                     command=do_mult_ltr_def)
-        rb_mult_i.pack(side=tk.RIGHT, padx=6, pady=0)
+        rb_mult_i.pack(side=tk.RIGHT, padx=2, pady=0)
         # multiple same letter clear button
         self.bt_mult_ltr_clr = ctk.CTkButton(self.specialpatt_subframeB,
                                              text="Clear",
@@ -898,7 +905,7 @@ class Pywordlemainwindow(ctk.CTk):
                                              text_color="black",
                                              command=clear_mult_ltr_def
                                              )
-        self.bt_mult_ltr_clr.pack(side=tk.RIGHT, padx=4, pady=0)
+        self.bt_mult_ltr_clr.pack(side=tk.RIGHT, padx=2, pady=0)
         # multiple same letters entry validator
         try:
             # python 3.6
@@ -1511,8 +1518,6 @@ class Pywordlemainwindow(ctk.CTk):
         # === START OF ====== Application Controls ==========
         # admin (Application) frame - uses pack
         self.admin_frame = ttk.LabelFrame(self.criteria_frame,
-                                          width=250,
-                                          height=100,
                                           text='Application',
                                           labelanchor='n'
                                           )
@@ -1560,14 +1565,14 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
         # end frame for Clear, Random, Genetic buttons
 
-        # frame for groups section
+        # frame for groups outcome options
         self.grp_frame = ttk.Frame(self.admin_frame)
-        self.grp_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
+        self.grp_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X, expand=True)
 
         self.bt_groups = ctk.CTkButton(self.grp_frame,
                                        text="Optimals",
                                        text_color="black",
-                                       width=80,
+                                       width= 20,
                                        command=pick_optimals)
         self.bt_groups.pack(side=tk.LEFT, padx=4, pady=0, fill=tk.X)
         self.chk_grp_disp = ttk.Checkbutton(self.grp_frame,
@@ -1576,29 +1581,29 @@ class Pywordlemainwindow(ctk.CTk):
                                             onvalue=True,
                                             offvalue=False
                                             )
-        self.chk_grp_disp.pack(side=tk.LEFT, padx=0, pady=0)
+        self.chk_grp_disp.pack(side=tk.LEFT, padx=0, pady=0, expand=True)
         self.chk_ent_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Entropy",
                                             variable=self.ent_grps,
                                             onvalue=True,
                                             offvalue=False
                                             )
-        self.chk_ent_disp.pack(side=tk.LEFT, padx=2, pady=0)
+        self.chk_ent_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
         self.chk_cond_disp = ttk.Checkbutton(self.grp_frame,
-                                             text="Cond.",
+                                             text="Cond",
                                              variable=self.cond_grps,
                                              onvalue=True,
                                              offvalue=False,
                                              command=cond_grps_chk
                                              )
-        self.chk_cond_disp.pack(side=tk.LEFT, padx=2, pady=0)
+        self.chk_cond_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
         self.chk_key_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Keyed",
                                             variable=self.keyed_verbose_grps,
                                             onvalue=True,
                                             offvalue=False
                                             )
-        self.chk_key_disp.pack(side=tk.LEFT, padx=4, pady=0)
+        self.chk_key_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
         # labelframe within groups frame for which list option
         self.grp_lst_ops_frame = ttk.LabelFrame(self.admin_frame,
                                                 text='Vocabulary Source For Guess Group Words',

@@ -307,6 +307,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         style = ttk.Style()
         style.theme_use()
         font_tuple_n = ("Courier", 14, "normal")
+        self.option_add("*Font", font_tuple_n)
 
         # controls frame
         self.cnt_frame = ctk.CTkFrame(self,
@@ -430,7 +431,6 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                             height=10,
                                             highlightthickness=0)
         self.tx_status.pack(side="left", anchor=tk.NW, padx=10, pady=4, expand=True, fill=tk.BOTH)
-        self.tx_status.configure(font=font_tuple_n)
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
         # tag 'grp' is used to highlight group ranker
