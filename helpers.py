@@ -1384,7 +1384,6 @@ class RptWnd(ctk.CTkToplevel):
         self.resizable(width=True, height=True)
         self.geometry('790x600')
 
-        font_tuple_n = ("Courier", 14, "normal")
         self.search_text = tk.StringVar()
         self.search_text.set('for: ')
         self.rpt_grpsdriller_window = None
@@ -1409,7 +1408,6 @@ class RptWnd(ctk.CTkToplevel):
                                highlightthickness=0
                                )
         self.msg1.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
-        self.msg1.configure(font=font_tuple_n)
         self.msg1.tag_configure('grp', background='#ffd700')
         # scrollbar for rpt
         rpt_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
@@ -1506,6 +1504,7 @@ class HelpWindow(ctk.CTkToplevel):
         style = ttk.Style()
         style.theme_use()
         help_font_tuple_n = ("Courier", 14, "normal")
+        self.option_add("*Font", help_font_tuple_n)
 
         self.info_frame = ttk.LabelFrame(self,
                                          borderwidth=0,
@@ -1521,7 +1520,6 @@ class HelpWindow(ctk.CTkToplevel):
                             highlightthickness=0,
                             )
         self.msg1.grid(row=0, column=0, padx=6, pady=0)
-        self.msg1.configure(font=help_font_tuple_n)
         # scrollbar for help
         help_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
