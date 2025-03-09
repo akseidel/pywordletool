@@ -208,7 +208,7 @@ def confirm_resume_after_wrd() -> None:
         resume_after_wrd = input('Enter a valid Wordle word to resume after: ').lower()
 
 
-def get_set_target_word() -> None:
+def ask_for_target_word() -> None:
     """
     Establish and verify the target word.
     Any already set target word is verified to be in the_word_list.
@@ -223,7 +223,7 @@ def get_set_target_word() -> None:
         target_wrd = input('Enter a valid Wordle target word: ').lower()
 
 
-def get_set_starting_guess() -> None:
+def ask_for_starting_guess() -> None:
     """
     Ask for and set a given first guess word to be used in every session.
     """
@@ -238,7 +238,7 @@ def get_set_starting_guess() -> None:
             use_starting_wrd = 0
 
 
-def get_set_guess_mode() -> None:
+def ask_for_guess_mode() -> None:
     """
     Gets and sets the general run type: random guess or ranked guess.
     If ranked guess then get and set the ranking type.
@@ -248,7 +248,7 @@ def get_set_guess_mode() -> None:
         return
     while run_type == -1:
         response: str = input(
-            'Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Enter 0,1,2 or 3: ')
+            'Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Best Entropy (4) Enter 0,1,2,3 or 4: ')
         if response == '0':
             rand_mode = True
             run_type = 0
@@ -264,16 +264,22 @@ def get_set_guess_mode() -> None:
             rand_mode = False
             run_type = 1
             rank_mode = 2
+        if response == '4':
+            rand_mode = True
+            run_type = 1
+            rank_mode = 3
 
     if rand_mode:
         guess_mode = 'random guesses'
         # For random mode to represent a base condition, duplicate letter
         # words show be allowed regardless of its previous setting.
+        # For entropy mode, 4, random selection will occur for equal
+        # entropy words.
         del allow_dups
         allow_dups = True
     else:
         guess_mode = 'rank mode type ' + str(rank_mode + 1) + " guesses"
-        # In ranked mode the loc_allow_dups flag will not be forced
+        # In ranked mode 1,2 & 3 the loc_allow_dups flag will not be forced
         # so that its influence on the first and second guess can be observed.
 
 
@@ -286,6 +292,8 @@ def set_context_msg(loc_rand_mode, loc_rank_mode):
         guess_mode = 'random guesses'
         # For random mode to represent a base condition, duplicate letter
         # words show be allowed regardless of its previous setting.
+        # For entropy mode, 4, random selection will occur for equal
+        # entropy words.
         del allow_dups
         allow_dups = True
     else:
@@ -474,12 +482,13 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
     std_x_pos_dict = {}  # exclude position dictionary
     std_r_pos_dict = {}  # require position dictionary
-    std_excl_l = []  # exclude letters list
-    std_requ_l = []  # require letters list
+    std_excl_l = []  # the exclude letters list
+    std_requ_l = []  # the require letters list
     std_multi_code = ''  # multiple same letters accounting code
 
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
+    # TO DO, SOMETHING NEEDS TO CHANGE HERE FOR ENTROPY CASE
     if use_starting_wrd == 1 and not rand_mode:
         loc_sample_number = 1
 
@@ -524,13 +533,17 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                 if rand_mode:
                     word, rank = random.choice(list(loc_the_word_list.items()))
                 else:
-                    if guesses == 0:
-                        # first pick has to be random in this sampling scheme
-                        word, rank = random.choice(list(loc_the_word_list.items()))
-                        # word, rank = list(loc_the_word_list.items())[-1]
+                    if rank_mode != 4:
+                        if guesses == 0:
+                            # first pick has to be random in this sampling scheme
+                            word, rank = random.choice(list(loc_the_word_list.items()))
+                            # word, rank = list(loc_the_word_list.items())[-1]
+                        else:
+                            # all other picks are top rank
+                            word, rank = list(loc_the_word_list.items())[-1]
                     else:
-                        # all other picks are top rank
-                        word, rank = list(loc_the_word_list.items())[-1]
+                        # Need to get the best entropy word from the word list.
+                        pass
 
             run_stats.append(word)
             # At this point the guess word has been selected from the results of the prior guess.
@@ -550,6 +563,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                                                                 std_x_pos_dict,
                                                                 std_r_pos_dict)
 
+            # TO DO - MAKE SURE ENTROPY MODE ALWAYS ALLOWS DUPS
             if guesses > 0 and not allow_dups:  # need a new wordletool allowing dups
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode, True)
@@ -577,7 +591,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
             run_stats.append(len(loc_the_word_list))
             guesses += 1
-        # end while
+        # end while at this point
 
         # The ending guess is the second to last guess, except when it happens by chance
         # to be the target word. The next guess being the target word can only happen if the
@@ -796,17 +810,17 @@ def main(_args=None):
         # These command line arguments processed next will override all previously set variables.
         process_any_arguments()
         if not magic_mode:
-            # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
+            # Confirm the target Wordle word the guessing sessions are trying to discover. Note: The monkey can
             # be started with the target word already set.
-            get_set_target_word()
+            ask_for_target_word()
             # Set the first guess if desired.
-            get_set_starting_guess()
+            ask_for_starting_guess()
             # Set the guess mode and rank mode.
-            get_set_guess_mode()
+            ask_for_guess_mode()
         else:
-            # Confirm the target Wordle word the guessing sessions is trying to discover. Note: The monkey can
+            # Confirm the target Wordle word the guessing sessions are trying to discover. Note: The monkey can
             # be started with the target word already set.
-            get_set_target_word()
+            ask_for_target_word()
         confirm_resume_after_wrd()
         set_late_timestamp_elements()
         # Timestamp like filename used for loc_record_run
