@@ -606,7 +606,7 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
     sums = 0  # outcome size sums, this is the number of words
     p2 = 0.0  # outcome population variance
     g_ent = 0.0  # outcomess entropy
-    g_xa = 0.0 # oiutcomes expected average
+    g_xa = 0.0 # outcomes expected average
     for k, v in the_outcomes_dict.items():
         size = len(v)
         sums = sums + size
