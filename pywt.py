@@ -367,12 +367,12 @@ class Pywordlemainwindow(ctk.CTk):
                 match grps_guess_source:
                     case 0:
                         # using the showing words (remaining solutions) for guess candidates
-                        optimal_group_guesses = helpers.best_groups_guess_dict(word_list,
-                                                                               self.verbose_grps.get(),
-                                                                               self.ent_grps.get(),
-                                                                               self.cond_grps.get(),
-                                                                               self.keyed_verbose_grps.get(),
-                                                                               context)
+                        optimal_group_guesses = helpers.best_outcomes_guess_dict(word_list,
+                                                                                 self.verbose_grps.get(),
+                                                                                 self.ent_grps.get(),
+                                                                                 self.cond_grps.get(),
+                                                                                 self.keyed_verbose_grps.get(),
+                                                                                 context)
 
                     case 1:
                         # using the classic (original possible solutions) words for guess candidates
@@ -383,14 +383,14 @@ class Pywordlemainwindow(ctk.CTk):
                                                           0,
                                                           True).get_ranked_results_wrd_lst(True)
                         msg1 = 'Classic Vocabulary'
-                        optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
-                                                                                        self.verbose_grps.get(),
-                                                                                        self.ent_grps.get(),
-                                                                                        self.cond_grps.get(),
-                                                                                        self.keyed_verbose_grps.get(),
-                                                                                        all_targets,
-                                                                                        msg1,
-                                                                                        context)
+                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
+                                                                                          self.verbose_grps.get(),
+                                                                                          self.ent_grps.get(),
+                                                                                          self.cond_grps.get(),
+                                                                                          self.keyed_verbose_grps.get(),
+                                                                                          all_targets,
+                                                                                          msg1,
+                                                                                          context)
                     case 2:
                         # using the classic+ (entire possible solutions) for guess candidates
                         all_targets = helpers.ToolResults(data_path,
@@ -400,14 +400,14 @@ class Pywordlemainwindow(ctk.CTk):
                                                           0,
                                                           True).get_ranked_results_wrd_lst(True)
                         msg1 = 'Classic+ Vocabulary'
-                        optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
-                                                                                        self.verbose_grps.get(),
-                                                                                        self.ent_grps.get(),
-                                                                                        self.cond_grps.get(),
-                                                                                        self.keyed_verbose_grps.get(),
-                                                                                        all_targets,
-                                                                                        msg1,
-                                                                                        context)
+                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
+                                                                                          self.verbose_grps.get(),
+                                                                                          self.ent_grps.get(),
+                                                                                          self.cond_grps.get(),
+                                                                                          self.keyed_verbose_grps.get(),
+                                                                                          all_targets,
+                                                                                          msg1,
+                                                                                          context)
                     case 3:
                         # using the entire allowed guess list for guess candidates
                         all_targets = helpers.ToolResults(data_path,
@@ -417,19 +417,19 @@ class Pywordlemainwindow(ctk.CTk):
                                                           0,
                                                           True).get_ranked_results_wrd_lst(True)
                         msg1 = 'Large Vocabulary'
-                        optimal_group_guesses = helpers.extended_best_groups_guess_dict(word_list,
-                                                                                        self.verbose_grps.get(),
-                                                                                        self.ent_grps.get(),
-                                                                                        self.cond_grps.get(),
-                                                                                        self.keyed_verbose_grps.get(),
-                                                                                        all_targets,
-                                                                                        msg1,
-                                                                                        context)
+                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
+                                                                                          self.verbose_grps.get(),
+                                                                                          self.ent_grps.get(),
+                                                                                          self.cond_grps.get(),
+                                                                                          self.keyed_verbose_grps.get(),
+                                                                                          all_targets,
+                                                                                          msg1,
+                                                                                          context)
                     case _:
                         pass
 
                 opt_group_guesses_as_list = list(optimal_group_guesses.keys())
-                (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = helpers.groups_stat_summary(optimal_group_guesses)
+                (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = helpers.outcomes_stat_summary(optimal_group_guesses)
                 match grps_guess_source:
                     case 0:
                         regex: str = helpers.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
