@@ -232,6 +232,7 @@ def ask_for_starting_guess() -> None:
         response = input('Run using a given first guess? Enter y/n: ').lower()
         if response == 'y':
             while starting_wrd not in unranked_word_dict():
+
                 starting_wrd = input('Enter a valid Wordle first guess word: ').lower()
                 use_starting_wrd = 1
         if response == 'n':
@@ -265,7 +266,7 @@ def ask_for_guess_mode() -> None:
             run_type = 1
             rank_mode = 2
         if response == '4':
-            rand_mode = True
+            rand_mode = False
             run_type = 1
             rank_mode = 3
 
@@ -513,36 +514,33 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
         std_multi_code.replace(std_multi_code,'')
 
-        # todo, not needed
-        # helpers.load_grep_arguments(wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
-        # print("--- + ---")
-        # print(wordletool.tool_command_list.shCMDlist)
-        # print("--- - ---")
-
         # Get the word list using the optional no_rank argument with loc_rand_mode.
         # No ranking or sorting is needed when all guesses are random.
-        loc_the_word_list = wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
+        loc_the_word_list_dict = wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
         # This loop ends when the last guess results in only one remaining word that fits the
         # pattern. That word, being the target word, will be the solving guess. The loop's last
         # guess is therefore the actual second to last guess, except when it happens by chance
         # to be the target word.
-        while len(loc_the_word_list) > 1:
+        while len(loc_the_word_list_dict) > 1:
             if guesses == 0 and use_starting_wrd == 1:
                 word = starting_wrd
             else:
+                the_word_tuples_list = list(loc_the_word_list_dict.items())
                 if rand_mode:
-                    word, rank = random.choice(list(loc_the_word_list.items()))
+                    word, rank = random.choice(the_word_tuples_list)
                 else:
-                    if rank_mode != 4:
+                    if rank_mode != 3:
                         if guesses == 0:
                             # first pick has to be random in this sampling scheme
-                            word, rank = random.choice(list(loc_the_word_list.items()))
-                            # word, rank = list(loc_the_word_list.items())[-1]
+                            word, rank = random.choice(the_word_tuples_list)
                         else:
                             # all other picks are top rank
-                            word, rank = list(loc_the_word_list.items())[-1]
+                            word, rank = the_word_tuples_list[-1]
                     else:
-                        # Need to get the best entropy word from the word list.
+                        # best entropy
+                        # TO DO Need to get the best entropy word from the word list.
+                        best_wrds_list = list(helpers.best_entropy_outcomes_guess_dict(list(loc_the_word_list_dict.keys())))
+                        word = best_wrds_list[0]
                         pass
 
             run_stats.append(word)
@@ -578,18 +576,18 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                                         std_multi_code)
             # Get the revised word list using the optional no_rank argument with loc_rand_mode
             # No ranking or sorting is needed when all guesses are random.
-            loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
-            # Because the target word is known to exist in the overall pool then loc_the_word_list can
+            loc_the_word_list_dict = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+            # Because the target word is known to exist in the overall pool then loc_the_word_list_dict can
             # only be less than 1 when the target had duplicate letters and the pool was not
             # allowing duplicates. Here that condition is checked and the pool revised to allow
             # duplicates.
-            if len(loc_the_word_list) < 1:
+            if len(loc_the_word_list_dict) < 1:
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode, True)
                 helpers.load_grep_arguments(wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
-                loc_the_word_list = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+                loc_the_word_list_dict = wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
 
-            run_stats.append(len(loc_the_word_list))
+            run_stats.append(len(loc_the_word_list_dict))
             guesses += 1
         # end while at this point
 
@@ -812,8 +810,7 @@ def main(_args=None):
         if not magic_mode:
             # Confirm the target Wordle word the guessing sessions are trying to discover. Note: The monkey can
             # be started with the target word already set.
-            ask_for_target_word()
-            # Set the first guess if desired.
+            ask_for_target_word()            # Set the first guess if desired.
             ask_for_starting_guess()
             # Set the guess mode and rank mode.
             ask_for_guess_mode()
