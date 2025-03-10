@@ -606,7 +606,7 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
     sums = 0  # outcome size sums, this is the number of words
     p2 = 0.0  # outcome population variance
     g_ent = 0.0  # outcomess entropy
-    g_xa = 0.0 # oiutcomes expected average
+    g_xa = 0.0 # outcomes expected average
     for k, v in the_outcomes_dict.items():
         size = len(v)
         sums = sums + size
@@ -707,7 +707,7 @@ def extended_best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly
 
         if reporting:
             clue_pattern_outcomes_to_window(guess, outcome_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
-            # saving the stats for later sorting
+            # saving the condensed stats for later sorting
             if cond_rpt:
                 cond_dict[guess] = outcome_stats
                 # omit the 'For:' in the search control
@@ -849,6 +849,53 @@ def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, c
             report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd)
 
     return inorder_best_rank_dict
+
+
+def best_entropy_outcomes_guess_dict(word_lst: list) -> dict:
+    """
+    Intended for finite moinkey use
+    Wraps guess word outcomes ranking to return the best
+    outcomes entropy ranked guesses.
+    @param byentonly: flag to return only the highest entropy guesses
+    @param word_lst: possible guess words
+    @return: dictionary of the best outcomes ranked guesses where
+    guess words are the keys, outcome_stats tuples are the values
+    outcome_stats tuples are:
+    [0]:qty,[1]:smallest,[2]:largest,[3]:average,[4]:population variance,[5]:entropy
+    """
+    guess_stat_dict = {}
+    best_desired_stat_dict = {}
+    max_ent = 0.0
+
+    for guess in word_lst:
+        guess_outcomes_dict = outcomes_for_this_guess(guess, word_lst)
+        outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
+        # outcome_stats tuple is: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
+        # [4]:population variance, [5]:entropy, [6] expected outcome size
+
+        guess_stat_dict[guess] = outcomes_stats
+
+        # Record the maximum entropy seen
+        max_ent = max(outcomes_stats[5], max_ent)
+        # print(guess) # TO DO
+
+    # At this point, all guesses were examined and the maximum entropy
+    # value recorded.
+
+    # Populate the best_desired_stat_dict with the best guesses.
+    # Initially, only those guesses with the same max_ent go into
+    # the dictionary.
+    # This dictionary's values are outcome_stats tuples.
+    # Iterate back through the guess_stat_dict to find the guesses
+    # with the max_ent. There could be more than 1.
+    for g, s in guess_stat_dict.items():
+        if math.isclose(s[5], max_ent):
+            if g not in best_desired_stat_dict:
+                best_desired_stat_dict[g] = s
+
+    # print(best_desired_stat_dict) # TO DO
+    return best_desired_stat_dict
+
 
 
 def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk, cond_rpt: bool):
