@@ -132,6 +132,9 @@ def process_any_arguments() -> None:
         if args.r == 3:
             # Rank by Both (3),
             rank_mode = 2
+        if args.r == 4:
+            # Rank by Entropy (4),
+            rank_mode = 3
 
         set_context_msg(rand_mode, rank_mode)
 
