@@ -562,7 +562,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                                                                 std_x_pos_dict,
                                                                 std_r_pos_dict)
 
-            # TO DO - MAKE SURE ENTROPY MODE ALWAYS ALLOWS DUPS
+
             if (guesses > 0 and not allow_dups) or (rank_mode > 2):  # need a new wordletool allowing dups
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode, True)
