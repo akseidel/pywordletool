@@ -37,7 +37,7 @@ def process_any_arguments() -> None:
     parser.add_argument('-t', action='store', help='Use this target word T.')
     parser.add_argument('-s', action='store', help='Use this first guess word S.')
     parser.add_argument('-r', action='store', type=int, choices=range(0, 4),
-                        help='Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)')
+                        help='Guess type: Random(0),Rank Occurrence (1),Rank Position (2), Both (3) or Entropy (4)')
     parser.add_argument('-x', action='store', type=int,
                         help='Override the number of sampling runs to be this number X.')
     parser.add_argument('-v', action='store_true', help='For guessing, use the Wordle vocabulary that'
@@ -489,9 +489,10 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
-    # TO DO, SOMETHING NEEDS TO CHANGE HERE FOR ENTROPY CASE
-    if use_starting_wrd == 1 and not rand_mode:
-        loc_sample_number = 1
+    # But not when using entropy. Entropy can return multiple choices.
+    if rank_mode < 3:
+        if use_starting_wrd == 1 and not rand_mode:
+            loc_sample_number = 1
 
     tot: int = 0  # total number of guesses
     word: str = ''  # the guess
@@ -499,7 +500,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     prelude_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    vocab_filename, do_every_wrd)
     start_mt = time.perf_counter()  # record monkey start time
-    # Running the standard monkey loc_sample_number times.
+    print(f'Running the standard monkey {loc_sample_number} times.')
     for x in range(loc_sample_number):
         # initialize a fresh wordletool instance
         wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups, rank_mode, True)
@@ -538,10 +539,9 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                             word, rank = the_word_tuples_list[-1]
                     else:
                         # best entropy
-                        # TO DO Need to get the best entropy word from the word list.
+                        # print(len(loc_the_word_list_dict)) # TO DO
                         best_wrds_list = list(helpers.best_entropy_outcomes_guess_dict(list(loc_the_word_list_dict.keys())))
-                        word = best_wrds_list[0]
-                        pass
+                        word = random.choice(best_wrds_list)
 
             run_stats.append(word)
             # At this point the guess word has been selected from the results of the prior guess.
@@ -562,7 +562,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                                                                 std_r_pos_dict)
 
             # TO DO - MAKE SURE ENTROPY MODE ALWAYS ALLOWS DUPS
-            if guesses > 0 and not allow_dups:  # need a new wordletool allowing dups
+            if (guesses > 0 and not allow_dups) or (rank_mode > 2):  # need a new wordletool allowing dups
                 del wordletool
                 wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, True, rank_mode, True)
                 allow_dups = True

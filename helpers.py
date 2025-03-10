@@ -877,6 +877,7 @@ def best_entropy_outcomes_guess_dict(word_lst: list) -> dict:
 
         # Record the maximum entropy seen
         max_ent = max(outcomes_stats[5], max_ent)
+        # print(guess) # TO DO
 
     # At this point, all guesses were examined and the maximum entropy
     # value recorded.
@@ -892,6 +893,7 @@ def best_entropy_outcomes_guess_dict(word_lst: list) -> dict:
             if g not in best_desired_stat_dict:
                 best_desired_stat_dict[g] = s
 
+    # print(best_desired_stat_dict) # TO DO
     return best_desired_stat_dict
 
 
