@@ -543,6 +543,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                         best_wrds_list = list(helpers.best_entropy_outcomes_guess_dict(list(loc_the_word_list_dict.keys())))
                         word = random.choice(best_wrds_list)
 
+
             run_stats.append(word)
             # At this point the guess word has been selected from the results of the prior guess.
             # Normal strategy for non loc_rand_mode, ie not picking anything random, is to not select
