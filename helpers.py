@@ -12,6 +12,7 @@ import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own
 from tkinter import messagebox
 import customtkinter as ctk
 import groupdrilling
+from fmwm import debug_mode
 
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -851,7 +852,7 @@ def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, c
     return inorder_best_rank_dict
 
 
-def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, reporting: bool) -> dict:
+def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, debug_mode: bool) -> dict:
     """
     Intended for finite moinkey use
     Wraps guess word outcomes ranking to return the best
@@ -868,7 +869,7 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     best_desired_stat_dict = {}
     max_ent = 0.0
 
-    if reporting:
+    if debug_mode:
         print(f'Working with {len(targets_word_lst)} remaining possibles. '
               f'Pulling guesses from a {len(guess_word_lst)} guess list.')
 
@@ -897,7 +898,7 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
         if math.isclose(s[5], max_ent):
             if g not in best_desired_stat_dict:
                 best_desired_stat_dict[g] = s
-                if reporting:
+                if debug_mode:
                     print(f'Added {g} having {s}')
 
     return best_desired_stat_dict

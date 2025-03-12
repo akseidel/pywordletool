@@ -26,9 +26,9 @@ def process_any_arguments() -> None:
     """
     Process any command line arguments
     """
-    global debug_mode, reveal_mode, botadd_sol_filename, full_vocab_filename,\
-        standard_target_vocab_filename, standard_guess_vocab_filename, \
-        magic_target_vocab_filename, magic_guess_vocab_filename, use_starting_wrd, \
+    global debug_mode, reveal_mode, botadd_sol_filename, vocab_full_filename,\
+        vocab_standard_target_filename, vocab_standard_guess_filename, \
+        vocab_magic_target_filename, vocab_magic_guess_filename, use_starting_wrd, \
         starting_wrd, target_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
         sample_number, record_run, do_every_wrd, query_guess, \
         query_mode, magic_mode, magic_order, ts_ptw, ts_psw, ts_pmo, ts_pqm, ts_ptw, \
@@ -92,17 +92,17 @@ def process_any_arguments() -> None:
 
     if args.v:
         # For guessing, use the Wordle vocabulary that includes non-solution words
-        standard_guess_vocab_filename = full_vocab_filename
+        vocab_standard_guess_filename = vocab_full_filename
     else:
-        standard_guess_vocab_filename = botadd_sol_filename
+        vocab_standard_guess_filename = botadd_sol_filename
 
     if args.z:
         # For word targets, use the Wordle vocabulary that includes non-solution words.
-        magic_target_vocab_filename = full_vocab_filename
-        standard_target_vocab_filename = full_vocab_filename
+        vocab_magic_target_filename = vocab_full_filename
+        vocab_standard_target_filename = vocab_full_filename
     else:
-        magic_target_vocab_filename = botadd_sol_filename
-        standard_target_vocab_filename = botadd_sol_filename
+        vocab_magic_target_filename = botadd_sol_filename
+        vocab_standard_target_filename = botadd_sol_filename
 
 
     if args.n:
@@ -174,7 +174,7 @@ def unranked_word_dict() -> dict:
     @return: dict
     """
     return helpers.ToolResults(data_path,
-                               standard_guess_vocab_filename, letter_rank_file, True, 0, True).get_ranked_grep_result_wrd_lst(True)
+                               vocab_standard_guess_filename, letter_rank_file, True, 0, True).get_ranked_grep_result_wrd_lst(True)
 
 def unranked_large_word_dict() -> dict:
     """
@@ -184,7 +184,7 @@ def unranked_large_word_dict() -> dict:
     @return: dict
     """
     return helpers.ToolResults(data_path,
-                               full_vocab_filename, letter_rank_file, True, 0, True).get_ranked_grep_result_wrd_lst(True)
+                               vocab_full_filename, letter_rank_file, True, 0, True).get_ranked_grep_result_wrd_lst(True)
 
 
 def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict,
@@ -507,7 +507,7 @@ def query_output(loc_target_wrd):
 
 def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set, run_fname, \
-    standard_guess_vocab_filename, standard_target_vocab_filename
+    vocab_standard_guess_filename, vocab_standard_target_filename
 
     if record_run:
         print('Output being written to ' + run_fname)
@@ -531,7 +531,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     guess_word: str = ''  # the guess
 
     prelude_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
-                   standard_target_vocab_filename, do_every_wrd)
+                   vocab_standard_target_filename, do_every_wrd)
     start_mt = time.perf_counter()  # record monkey start time
     if debug_mode:
         print(f'Running the standard monkey {loc_sample_number} times.')
@@ -540,11 +540,11 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     # is the number of times to solve the target word using the run mode.
     for x in range(loc_sample_number):
         # initialize a fresh targets_wordletool instance
-        targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file, allow_dups,
-                                         rank_mode, True)
+        targets_wordletool = helpers.ToolResults(data_path, vocab_standard_target_filename, letter_rank_file, allow_dups,
+                                                 rank_mode, True)
         # initialize a fresh guess_pool_wordletool instance
-        guess_pool_wordletool = helpers.ToolResults(data_path, standard_guess_vocab_filename, letter_rank_file, allow_dups,
-                                         rank_mode, True)
+        guess_pool_wordletool = helpers.ToolResults(data_path, vocab_standard_guess_filename, letter_rank_file, allow_dups,
+                                                    rank_mode, True)
 
         guesses = 0
         run_stats = list([])
@@ -579,10 +579,17 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                 # Recall, the guess pool dict would have been already ranked by now if ranking
                 # was called for.
                 # Note: Entropy ranking is not ranked by the wordletool.
-                guess_pool_word_tuples_list = list(loc_guess_pool_word_list_dict.items())
+
+                # The guess pool should be the dwindling targets pool.
+                guess_pool_word_tuples_list = list(loc_targets_word_list_dict.items())
+
+                # Use random choice if random mode (-r 0)
                 if rand_mode:
                     guess_word, guess_rank = random.choice(guess_pool_word_tuples_list)
                 else:
+                    # If not entropy mode (-r 4), then random on first pick.
+                    # Otherwise, make a ranked choice.
+                    # Having a starting word does not reach here.
                     if rank_mode != 3:
                         if guesses == 0:
                             # the first pick has to be random in this sampling scheme
@@ -591,11 +598,13 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                             # all other picks are the top ranked word
                             guess_word, guess_rank = guess_pool_word_tuples_list[-1]
                     else:
-                        # best entropy
+                        # This for best (highest) entropy selection mode.
                         targets_list = list(loc_targets_word_list_dict.keys())
                         best_ent_wrds_list = list(helpers.best_entropy_outcomes_guess_dict(targets_list,
                                                                                        special_guess_list,
-                                                                                       reveal_mode))
+                                                                                       debug_mode))
+                        # There could be multiple equal highest entropy words.
+                        # Make a random choice.
                         guess_word = random.choice(best_ent_wrds_list)
                         if debug_mode:
                             print(f'- Selected {guess_word} for the next round.')
@@ -625,7 +634,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             # If needed, get a new targets_wordletool allowing dups before applying the new filter criteria.
             if (guesses > 0 and not allow_dups) or (rank_mode > 2):
                 del targets_wordletool
-                targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file,
+                targets_wordletool = helpers.ToolResults(data_path, vocab_standard_target_filename, letter_rank_file,
                                                          True, rank_mode, True)
                 allow_dups = True
 
@@ -644,14 +653,17 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             # only be less than 1 when the target had duplicate letters and the pool was not
             # allowing duplicates. Here that condition is checked and the pool revised to allow
             # duplicates.
-            if len(loc_guess_pool_word_list_dict) < 1:
+            if len(loc_targets_word_list_dict) < 1:
                 del targets_wordletool
-                targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file, True,
-                                                 rank_mode, True)
-                helpers.load_grep_arguments(targets_wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
-                loc_guess_pool_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word, debug_mode, rand_mode)
-                loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word, debug_mode,
-                                                                                 rand_mode)
+                targets_wordletool = helpers.ToolResults(data_path, vocab_standard_target_filename,
+                                                         letter_rank_file, True,
+                                                         rank_mode, True)
+                helpers.load_grep_arguments(targets_wordletool,
+                                            std_excl_l, std_requ_l,
+                                            std_x_pos_dict, std_r_pos_dict,
+                                            std_multi_code)
+                loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word,
+                                                                              debug_mode, rand_mode)
 
             # this is reporting then new remaining solutions word count
             run_stats.append(len(loc_targets_word_list_dict))
@@ -688,7 +700,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
     dur_tw = time.perf_counter() - start_mt  # this word's process time
     prologue_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname,
-                    target_wrd, starting_wrd, tot, standard_target_vocab_filename, dur_tw)
+                    target_wrd, starting_wrd, tot, vocab_standard_target_filename, dur_tw)
 
 
     sys.stdout.write('\n')
@@ -708,7 +720,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         print('Output being written to ' + run_fname)
     print(f'{loc_wrd_x}  Finding #{magic_order} order magic words for: {target_wrd}')
 
-    guess_vocabulary = magic_guess_vocab_filename
+    guess_vocabulary = vocab_magic_guess_filename
     # Need to iterate through all unranked words in the specified vocabulary
     candidate_list = helpers.ToolResults(data_path, guess_vocabulary, letter_rank_file, True, 0, True) \
         .get_ranked_grep_result_wrd_lst(True)
@@ -728,13 +740,13 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
     mag_multi_code = ''  # multiple same letters accounting
 
     prelude_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
-                   guess_vocabulary, do_every_wrd, magic_target_vocab_filename)
+                   guess_vocabulary, do_every_wrd, vocab_magic_target_filename)
     # Iterate through each word in the candidates list
     start_mt = time.perf_counter()  # record monkey start time
     for loc_key in candidate_list:
         # initialize a fresh wordletool instance, loc_allow_dups must be true
         # wordletool = helpers.ToolResults(data_path, solutions_vocab_filename, letter_rank_file, True, 0)
-        wordletool = helpers.ToolResults(data_path, magic_target_vocab_filename, letter_rank_file, True, 0, True)
+        wordletool = helpers.ToolResults(data_path, vocab_magic_target_filename, letter_rank_file, True, 0, True)
         guesses = 1
         run_stats = list([])
         run_stats.append(target_wrd)
@@ -793,14 +805,14 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         # animated in progress showing
         r += 1
         mw_qty = len(query_set)
-        msg = f'\033[K> {r} Searching {loc_n} words in {magic_guess_vocab_filename} for {target_wrd} magic word ...  ' \
+        msg = f'\033[K> {r} Searching {loc_n} words in {vocab_magic_guess_filename} for {target_wrd} magic word ...  ' \
               f'finding: {mw_qty}\r '
         sys.stdout.write(msg)
         sys.stdout.flush()
 
     dur_tw = time.perf_counter() - start_mt  # this word's process time
     prologue_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname,
-                    target_wrd, starting_wrd, mw_qty, magic_target_vocab_filename, dur_tw)
+                    target_wrd, starting_wrd, mw_qty, vocab_magic_target_filename, dur_tw)
 
     sys.stdout.write('\n')
 
@@ -819,11 +831,11 @@ botadd_sol_filename = 'botadd_nyt_wordlist.txt'  # classic+ solutions vocabulary
 # vocab_pos_sol_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 # solutions_vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 # loc_vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
-full_vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
-standard_target_vocab_filename = ''
-standard_guess_vocab_filename = ''
-magic_target_vocab_filename = ''
-magic_guess_vocab_filename = ''
+vocab_full_filename = 'nyt_wordlist.txt'     # total vocabulary list
+vocab_standard_target_filename = ''
+vocab_standard_guess_filename = ''
+vocab_magic_target_filename = ''
+vocab_magic_guess_filename = ''
 
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
@@ -900,8 +912,8 @@ def main(_args=None):
             # The targets are the words for which the monkey seeks guesses to solve.
             # Here only the words that can be a solution will be considered a target word.
             # The target pool is not the guess pool. The -v argument selects the guess pool.
-            target_vocab_filename = standard_target_vocab_filename
-            targets = helpers.ToolResults(data_path, target_vocab_filename, letter_rank_file, True, 0, True) \
+            vocab_target_filename = vocab_standard_target_filename
+            targets = helpers.ToolResults(data_path, vocab_target_filename, letter_rank_file, True, 0, True) \
                 .get_ranked_grep_result_wrd_lst(True)
             n = len(targets)
             dsf = datetime.timedelta(0)
