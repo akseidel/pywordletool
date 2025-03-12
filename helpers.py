@@ -852,6 +852,10 @@ def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, c
     return inorder_best_rank_dict
 
 def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, debug_mode: bool) -> dict:
+    # TO DO
+    # This function should prioritize any target list words found to be in the best population.
+    # i.e., if any, then return only those.
+
     """
     Intended for finite moinkey use
     Wraps guess word outcomes ranking to return the best
@@ -865,7 +869,8 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     [0]:qty,[1]:smallest,[2]:largest,[3]:average,[4]:population variance,[5]:entropy
     """
     guess_stat_dict = {}
-    best_desired_stat_dict = {}
+    best_stats_found_dict = {}
+    best_desired_dict = {}
     max_ent = 0.0
 
     if debug_mode:
@@ -887,7 +892,7 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     # At this point, all guesses were examined and the maximum entropy
     # value recorded.
 
-    # Populate the best_desired_stat_dict with the best guesses.
+    # Populate the best_stats_found_dict with the best guesses.
     # Initially, only those guesses with the same max_ent go into
     # the dictionary.
     # This dictionary's values are outcome_stats tuples.
@@ -895,11 +900,25 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     # with the max_ent. There could be more than 1.
     for g, s in guess_stat_dict.items():
         if math.isclose(s[5], max_ent):
-            if g not in best_desired_stat_dict:
-                best_desired_stat_dict[g] = s
+            if g not in best_stats_found_dict:
+                best_stats_found_dict[g] = s
                 if debug_mode:
-                    print(f'Added {g} having {s}')
-    return best_desired_stat_dict
+                    print(f'Added {g} having {s} to best_stats_found_dict')
+
+    for w in targets_word_lst:
+        for g, s in best_stats_found_dict.items():
+            if w == g:
+                best_desired_dict[g] = s
+                if debug_mode:
+                    print(f'Added {g} having {s} to best_desired_dict')
+
+    if len(best_desired_dict) > 0:
+        del best_stats_found_dict
+        best_stats_found_dict =  best_desired_dict
+        if debug_mode:
+            print(f'Using only target best entropy words')
+
+    return best_stats_found_dict
 
 
 

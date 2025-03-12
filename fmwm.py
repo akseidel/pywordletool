@@ -512,7 +512,16 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     if record_run:
         print('Output being written to ' + run_fname)
 
-    print(f'{loc_wrd_x} word:{target_wrd}  Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
+    base_str = f'{loc_wrd_x} word: {target_wrd} '
+    if (use_starting_wrd == 1) and not (rank_mode > 2 or rank_mode == -1):
+        print(f'{base_str} '
+              f'Only one sample needed for guess type {rank_mode + 1} when a starting word is specified.')
+    else:
+        print(f'{base_str} '
+              f'Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
+        if rank_mode > 2:
+            print(f'-- The processing time duration varies exponentially with the starting word result size!')
+
 
     std_x_pos_dict = {}  # exclude position dictionary
     std_r_pos_dict = {}  # require position dictionary
