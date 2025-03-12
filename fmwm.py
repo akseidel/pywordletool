@@ -93,7 +93,6 @@ def process_any_arguments() -> None:
     if args.v:
         # For guessing, use the Wordle vocabulary that includes non-solution words
         standard_guess_vocab_filename = full_vocab_filename
-        # solutions_vocab_filename = 'nyt_wordlist.txt'  # total vocabulary list TO DO
     else:
         standard_guess_vocab_filename = botadd_sol_filename
 
@@ -101,7 +100,6 @@ def process_any_arguments() -> None:
         # For word targets, use the Wordle vocabulary that includes non-solution words.
         magic_target_vocab_filename = full_vocab_filename
         standard_target_vocab_filename = full_vocab_filename
-        # vocab_pos_sol_filename = 'nyt_wordlist.txt' # TO DO
     else:
         magic_target_vocab_filename = botadd_sol_filename
         standard_target_vocab_filename = botadd_sol_filename
@@ -530,17 +528,21 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             loc_sample_number = 1
 
     tot: int = 0  # total number of guesses
-    word: str = ''  # the guess
+    guess_word: str = ''  # the guess
 
     prelude_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    standard_target_vocab_filename, do_every_wrd)
     start_mt = time.perf_counter()  # record monkey start time
     if debug_mode:
         print(f'Running the standard monkey {loc_sample_number} times.')
+
+    # sample_number is the number of solving runs as controlled by the -x command line argument. It
+    # is the number of times to solve the target word using the run mode.
     for x in range(loc_sample_number):
         # initialize a fresh targets_wordletool instance
         targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file, allow_dups,
                                          rank_mode, True)
+        # initialize a fresh guess_pool_wordletool instance
         guess_pool_wordletool = helpers.ToolResults(data_path, standard_guess_vocab_filename, letter_rank_file, allow_dups,
                                          rank_mode, True)
 
@@ -554,66 +556,75 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
         std_multi_code.replace(std_multi_code,'')
 
-        # Get the word list using the optional no_rank argument with loc_rand_mode.
+        # Get the guess word list using the optional no_rank argument with loc_rand_mode.
         # No ranking or sorting is needed when all guesses are random as per rand_mode
-        # loc_word_list_dict = targets_wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode) # TO DO
+        loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
         loc_guess_pool_word_list_dict = guess_pool_wordletool.get_word_list(guesses + 1, '', debug_mode, rand_mode)
-        # This loop ends when the last guess results in only one remaining word that fits the
-        # pattern. That word, being the target word, will be the solving guess. The loop's last
-        # guess is therefore the actual second to last guess, except when it happens by chance
+
+        # When using entropy mode, the guess list should not be revised after every guess.
+        # Here a special guess list is made for use in entropy mode.
+        if rank_mode > 2:
+            loc_static_guess_pool_word_list_dict = guess_pool_wordletool.get_word_list(guesses + 1, '', debug_mode,
+                                                                                       rand_mode)
+            special_guess_list = list(loc_static_guess_pool_word_list_dict.keys())
+
+        # This loop ends when the previous guess results in only one remaining target word that fits the
+        # pattern.That word, being the target word will be the solving guess. The loop's previous
+        # guess is therefore the actual second to last guess, except when it happens by a chance
         # to be the target word.
-        while len(loc_guess_pool_word_list_dict) > 1:
+        while len(loc_targets_word_list_dict) > 1:
             if guesses == 0 and use_starting_wrd == 1:
-                word = starting_wrd
+                guess_word = starting_wrd
             else:
-                the_word_tuples_list = list(loc_guess_pool_word_list_dict.items())
+                # Recall, the guess pool dict would have been already ranked by now if ranking
+                # was called for.
+                # Note: Entropy ranking is not ranked by the wordletool.
+                guess_pool_word_tuples_list = list(loc_guess_pool_word_list_dict.items())
                 if rand_mode:
-                    word, rank = random.choice(the_word_tuples_list)
+                    guess_word, guess_rank = random.choice(guess_pool_word_tuples_list)
                 else:
                     if rank_mode != 3:
                         if guesses == 0:
                             # the first pick has to be random in this sampling scheme
-                            word, rank = random.choice(the_word_tuples_list)
+                            guess_word, guess_rank = random.choice(guess_pool_word_tuples_list)
                         else:
-                            # all other picks are top rank
-                            word, rank = the_word_tuples_list[-1]
+                            # all other picks are the top ranked word
+                            guess_word, guess_rank = guess_pool_word_tuples_list[-1]
                     else:
                         # best entropy
-                        guess_list = list(loc_guess_pool_word_list_dict.keys())
-                        loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 1, '', debug_mode,
-                                                                                            rand_mode)
                         targets_list = list(loc_targets_word_list_dict.keys())
-                        best_wrds_list = list(helpers.best_entropy_outcomes_guess_dict(targets_list,
-                                                                                       guess_list,
+                        best_ent_wrds_list = list(helpers.best_entropy_outcomes_guess_dict(targets_list,
+                                                                                       special_guess_list,
                                                                                        reveal_mode))
-                        word = random.choice(best_wrds_list)
+                        guess_word = random.choice(best_ent_wrds_list)
                         if debug_mode:
-                            print(f'- Selected {word} for the next round.')
+                            print(f'- Selected {guess_word} for the next round.')
 
+            # Adding just the guess to the stats.
+            # The remaining words result of this guess have yet to be determined.
+            run_stats.append(guess_word)
 
-            run_stats.append(word)
-            # At this point the guess word has been selected from the results of the prior guess.
+            # At this point, the guess word has been selected from the results of the prior guess.
             # Normal strategy for non loc_rand_mode, ie not picking anything random, is to not select
             # words having duplicate letters for at least the first two guesses. Allow_dups is
             # likely already false for the first selection pool, ie the first pick does not allow dups.
-            # Dups should be allowed for the third guess and beyond. Dups at the second guess depends
-            # on how many dups there are compared to the number of non dups.
+            # Dups should be allowed for the third guess and beyond.
 
-            # analyze this new word against the target word and update the filter criteria
+            # Analyze this new guess word against the target word and update the filter criteria.
+            # Note: This process does not apply the filter criteria.
+            # It only updates it.
             [std_excl_l,
              std_x_pos_dict,
              std_r_pos_dict,
              std_multi_code] = helpers.analyze_pick_to_solution(target_wrd,
-                                                                word,
+                                                                guess_word,
                                                                 std_excl_l,
                                                                 std_x_pos_dict,
                                                                 std_r_pos_dict)
 
-
-            if (guesses > 0 and not allow_dups) or (rank_mode > 2):  # need a new targets_wordletool allowing dups
+            # If needed, get a new targets_wordletool allowing dups before applying the new filter criteria.
+            if (guesses > 0 and not allow_dups) or (rank_mode > 2):
                 del targets_wordletool
-                # targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file, True,
-                #                                  rank_mode, True)
                 targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file,
                                                          True, rank_mode, True)
                 allow_dups = True
@@ -626,30 +637,24 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                                         std_r_pos_dict,
                                         std_multi_code)
 
-            # TO DO
-            # At this point there is now a problem with changes 3/2025 for entropy.The original code used the
-            # target list as the guess list. In a strict hard mode play fashion guesses came out of the ever
-            # decreasing target list. The list size served to control the while loop and indicate when the
-            # solution was reached. This now must be changed.
-
-            # Get the revised remaining word list using the optional no_rank argument with loc_rand_mode
+            # Get the revised remaining targets word list using the optional no_rank argument with loc_rand_mode
             # No ranking or sorting is needed when all guesses are random as per rand_mode argument.
-            loc_guess_pool_word_list_dict = targets_wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+            loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word, debug_mode, rand_mode)
             # Because the target word is known to exist in the overall pool then loc_guess_pool_word_list_dict can
             # only be less than 1 when the target had duplicate letters and the pool was not
             # allowing duplicates. Here that condition is checked and the pool revised to allow
             # duplicates.
             if len(loc_guess_pool_word_list_dict) < 1:
                 del targets_wordletool
-                # targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file, True,
-                #                                  rank_mode, True)
                 targets_wordletool = helpers.ToolResults(data_path, standard_target_vocab_filename, letter_rank_file, True,
                                                  rank_mode, True)
                 helpers.load_grep_arguments(targets_wordletool, std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict, std_multi_code)
-                loc_guess_pool_word_list_dict = targets_wordletool.get_word_list(guesses + 2, word, debug_mode, rand_mode)
+                loc_guess_pool_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word, debug_mode, rand_mode)
+                loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word, debug_mode,
+                                                                                 rand_mode)
 
-            # this is reporting then ew remaining solutions word count
-            run_stats.append(len(loc_guess_pool_word_list_dict))
+            # this is reporting then new remaining solutions word count
+            run_stats.append(len(loc_targets_word_list_dict))
             guesses += 1
         # end while at this point
 
@@ -658,7 +663,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
         # loc_allow_dups allows for that word to be in the list. Otherwise, we get a wrong count.
         # This is a tricky problem.
         # Reviewed a year later. This is still the way.
-        if not word == target_wrd:
+        if not guess_word == target_wrd:
             guesses += 1
             # reveal_mode output is very confusing without adding the target word to run_stats.
             # Otherwise, the word count does not appear to agree with the guess count.

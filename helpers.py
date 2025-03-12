@@ -869,8 +869,9 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     max_ent = 0.0
 
     if reporting:
-        print(f'Working with {len(targets_word_lst)} remaining possibles') # TO DO
-        print(f'Pulling guesses from the {len(guess_word_lst)} guess list')  # TO DO
+        print(f'Working with {len(targets_word_lst)} remaining possibles. '
+              f'Pulling guesses from a {len(guess_word_lst)} guess list.')
+
 
     for guess in guess_word_lst:
         guess_outcomes_dict = outcomes_for_this_guess(guess, targets_word_lst)
