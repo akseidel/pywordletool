@@ -851,7 +851,6 @@ def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, c
 
     return inorder_best_rank_dict
 
-
 def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, debug_mode: bool) -> dict:
     """
     Intended for finite moinkey use
@@ -900,7 +899,6 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
                 best_desired_stat_dict[g] = s
                 if debug_mode:
                     print(f'Added {g} having {s}')
-
     return best_desired_stat_dict
 
 
