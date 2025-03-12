@@ -36,7 +36,7 @@ def process_any_arguments() -> None:
     parser.add_argument('-n', action='store_true', help='Random first guess word, ie skip asking about it')
     parser.add_argument('-t', action='store', help='Use this target word T.')
     parser.add_argument('-s', action='store', help='Use this first guess word S.')
-    parser.add_argument('-r', action='store', type=int, choices=range(0, 4),
+    parser.add_argument('-r', action='store', type=int, choices=range(0, 5),
                         help='Guess type: Random(0),Rank Occurrence (1),Rank Position (2), Both (3) or Entropy (4)')
     parser.add_argument('-x', action='store', type=int,
                         help='Override the number of sampling runs to be this number X.')
