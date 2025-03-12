@@ -48,7 +48,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               letter_rank_file,
                                               True,
                                               0,
-                                              True).get_ranked_results_wrd_lst(True)
+                                              True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Classic Vocabulary'
             optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(g_word_lst,
                                                                               self.d_verbose_grps.get(),
@@ -66,7 +66,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               letter_rank_file,
                                               True,
                                               0,
-                                              True).get_ranked_results_wrd_lst(True)
+                                              True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Classic+ Vocabulary'
             optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(g_word_lst,
                                                                               self.d_verbose_grps.get(),
@@ -84,7 +84,7 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               letter_rank_file,
                                               True,
                                               0,
-                                              True).get_ranked_results_wrd_lst(True)
+                                              True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Large Vocabulary'
             optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(g_word_lst,
                                                                               self.d_verbose_grps.get(),

@@ -36,7 +36,7 @@
 python3 fmwm.py
 Enter a valid Wordle target word: covet
 Run using a given first guess? Enter y/n: n
-Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Enter 0,1,2 or 3: 1
+Guess Type? Random(0), or Rank by Occurrence (1), Position (2) or Both (3), Best Entropy (4) Enter 0,1,2,3 or 4: 1
 1 word:covet  Average guesses to solve Wordle by sampling 100 tries.
 target wrd: covet, 100 samples, rank mode type 1 guesses, initial duplicates:False, botadd_nyt_wordlist.txt
 target wrd: covet, averaged 4.850 guesses to solve, 100 samples, rank mode type 1 guesses, initial duplicates:False, botadd_nyt_wordlist.txt, 7.9480 seconds
@@ -60,9 +60,10 @@ options:
   -n            Random first guess word, ie skip asking about it
   -t T          Use this target word T.
   -s S          Use this first guess word S.
-  -r {0,1,2,3}  Guess type: Random(0),Rank Occurrence (1),Rank Position (2) or Both (3)
+  -r {0,1,2,3,4}  Guess type: Random(0),Rank Occurrence (1),Rank Position (2), Both (3) or Entropy (4)
   -x X          Override the number of sampling runs to be this number X.
   -v            For guessing, use the Wordle vocabulary that includes non-solution words.
+  -z            For word targets, use the Wordle vocabulary that includes non-solution words.
   -w            Writes output to CSV file having a timestamp filename.
   -a            Process every vocabulary word as a target word.
   -q Q          Show guesses that solve on the Qth guess.
@@ -76,9 +77,10 @@ options:
 * **-n** Skips asking for a specified first guess.
 * **-t T** Solve for a target word as in **-t happy**.
 * **-s S** Use this first guess word as in **-t stale**.
-* **-r {0,1,2,3}** Specify the guessing type. **-r 0** means random guesses for all guesses. **-r 1** means rank 1 type guesses and so on.
+* **-r {0,1,2,3,4}** Specify the guessing type. **-r 0** means random guesses for all guesses. **-r 1** means rank 1 type guesses and so on.
 * **-x X** Sets the number of sample runs other than the default 100. **-x 1000** would specify 1000 runs.
 * **-v** For guessing purposes only, use the Wordle vocabulary that includes non-solution words in addition to solution words. By default, the solutions only list is used. When processing all the words in the list, it is the solutions only list that is processed, but the pool from which guesses are selected can be either the default solutions list or the larger list that also includes words that would never be a solution. The solutions list is the original Wordle solution words, less some words removed by the New York Times, plus words added by the New York Times to accommodate the New York Time WordleBot.
+* **-z** For targeting purposes, use the entire Wordle vocabulary that includes non-solution words.
 * **-w** Writes the output to a CSV file in addition to showing in the Terminal. The CSV file is timestamp named, so it will always be unique, and it will reside at the directory that holds **fmwm.py**.
 * **-a** Processes every vocabulary word (originally 2309 words, now 3189 words) in the solutions list as each target word.
 * **-q Q** Lists out only the guess data for runs that result in **Q** guesses. For example **-q 2** outputs only the guess data for runs where the target word is solved in two guesses. In other words after the first guess, only the target word remains.
