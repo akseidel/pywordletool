@@ -683,7 +683,7 @@ def extended_best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly
     @param byentonly: flag to return only the highest entropy guesses
     @param cond_rpt: flag for condensed verbose printing to rptwnd
     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
-    @param word_lst: possible guess words
+    @param targets_word_lst: possible guess words
     @param all_targets: vocabulary dictionary
     @param msg1: text to pass to verbose window
     @return: dictionary of the best group ranked guesses
@@ -772,7 +772,7 @@ def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, c
     @param byentonly: flag to return only the highest entropy guesses
     @param cond_rpt: flag for condensed verbose printing to rptwnd
     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
-    @param word_lst: possible guess words
+    @param targets_word_lst: possible guess words
     @return: dictionary of the best outcomes ranked guesses where
     guess words are the keys, outcome_stats tuples are the values
     outcome_stats tuples are:
@@ -851,13 +851,14 @@ def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, c
     return inorder_best_rank_dict
 
 
-def best_entropy_outcomes_guess_dict(word_lst: list) -> dict:
+def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, reporting: bool) -> dict:
     """
     Intended for finite moinkey use
     Wraps guess word outcomes ranking to return the best
     outcomes entropy ranked guesses.
     @param byentonly: flag to return only the highest entropy guesses
-    @param word_lst: possible guess words
+    @param targets_word_lst: possible solution words
+    @param guess_word_lst: guess words to pull guesses from
     @return: dictionary of the best outcomes ranked guesses where
     guess words are the keys, outcome_stats tuples are the values
     outcome_stats tuples are:
@@ -867,8 +868,12 @@ def best_entropy_outcomes_guess_dict(word_lst: list) -> dict:
     best_desired_stat_dict = {}
     max_ent = 0.0
 
-    for guess in word_lst:
-        guess_outcomes_dict = outcomes_for_this_guess(guess, word_lst)
+    if reporting:
+        print(f'Working with {len(targets_word_lst)} remaining possibles') # TO DO
+        print(f'Pulling guesses from the {len(guess_word_lst)} guess list')  # TO DO
+
+    for guess in guess_word_lst:
+        guess_outcomes_dict = outcomes_for_this_guess(guess, targets_word_lst)
         outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
         # outcome_stats tuple is: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
         # [4]:population variance, [5]:entropy, [6] expected outcome size
@@ -877,7 +882,6 @@ def best_entropy_outcomes_guess_dict(word_lst: list) -> dict:
 
         # Record the maximum entropy seen
         max_ent = max(outcomes_stats[5], max_ent)
-        # print(guess) # TO DO
 
     # At this point, all guesses were examined and the maximum entropy
     # value recorded.
@@ -892,8 +896,9 @@ def best_entropy_outcomes_guess_dict(word_lst: list) -> dict:
         if math.isclose(s[5], max_ent):
             if g not in best_desired_stat_dict:
                 best_desired_stat_dict[g] = s
+                if reporting:
+                    print(f'Added {g} having {s}')
 
-    # print(best_desired_stat_dict) # TO DO
     return best_desired_stat_dict
 
 
@@ -1049,7 +1054,7 @@ def valid_mult_ltr(s: str) -> bool:
         return valid.find(s[1]) > -1
 
 
-def valid_first_mult_number(s: str) -> bool:
+def valid_first_mult_number(s: str) -> bool | None:
     """
     The multiple letter requirement would apply to only
     2 or 3 multiple instances for that letter. The format
@@ -1270,7 +1275,7 @@ class ToolResults:
         self.raw_cnt = 0
         self.ranked_cnt = 0
 
-    def get_results_wrd_lst(self) -> list:
+    def get_result_of_grep_wrd_lst(self) -> list:
         """
         @return: Return the results words list without any ranking or sorting.
         """
@@ -1278,7 +1283,7 @@ class ToolResults:
             return list(map(lambda i: i[: -1], proc.stdout.readlines()))
         # return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
 
-    def get_ranked_results_wrd_lst(self, no_rank=False) -> dict:
+    def get_ranked_grep_result_wrd_lst(self, no_rank=False) -> dict:
         """
         Ranking and filtering the words into a dictionary
         Set loc_allow_dups to prevent letters from occurring more than once
@@ -1287,7 +1292,7 @@ class ToolResults:
         @param no_rank:
         @return: Returns ranked results words list as sorted dictionary.
         """
-        wrds = list(filter(None, self.get_results_wrd_lst()))
+        wrds = list(filter(None, self.get_result_of_grep_wrd_lst()))
         self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds,
                                                                        self.ltr_rank_dict,
                                                                        self.allow_dups,
@@ -1298,7 +1303,7 @@ class ToolResults:
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
-    def get_results_raw_cnt(self) -> str:
+    def get_grep_results_raw_cnt(self) -> str:
         """
         @return: Return the grepped word count
         """
@@ -1310,10 +1315,10 @@ class ToolResults:
         """
         @return: Returns the status text line.
         """
-        status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.get_results_raw_cnt())
+        status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.get_grep_results_raw_cnt())
         return status
 
-    def get_full_cmd(self) -> str:
+    def get_grep_cmd_str(self) -> str:
         """
         Returns the entire fully assembled grep command line.
         This line includes the full path names.
@@ -1321,7 +1326,7 @@ class ToolResults:
         """
         return self.tool_command_list.full_cmd()
 
-    def get_cmd_less_filepath(self) -> str:
+    def get_grep_cmd_less_filepath(self) -> str:
         """
         Returns the entire fully assembled grep command line. This line excluded
         the full path names and so is used in the GUI display.
@@ -1345,7 +1350,7 @@ class ToolResults:
         @return: The ranked word list corresponding to the filtering
         arguments already passed to the wordletool device.
         """
-        the_word_list = self.get_ranked_results_wrd_lst(no_rank)
+        the_word_list = self.get_ranked_grep_result_wrd_lst(no_rank)
         if verbose:
             print()
             if guess_no > 1:
@@ -1354,7 +1359,7 @@ class ToolResults:
             else:
                 print('Selection pool for guess {}'.format(guess_no))
             print(self.get_status())
-            print(self.get_cmd_less_filepath())
+            print(self.get_grep_cmd_less_filepath())
             print_word_list_col_format(the_word_list, 6)
         return the_word_list
 

@@ -303,7 +303,7 @@ class Pywordlemainwindow(ctk.CTk):
 
             # Wordletool is now ready to filter the list and return the list ranked
             # according to the rank arguments.
-            the_word_list = wordletool.get_ranked_results_wrd_lst()
+            the_word_list = wordletool.get_ranked_grep_result_wrd_lst()
 
             n_items = len(the_word_list)
             left_pad = ""
@@ -381,7 +381,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                           letter_rank_file,
                                                           True,
                                                           0,
-                                                          True).get_ranked_results_wrd_lst(True)
+                                                          True).get_ranked_grep_result_wrd_lst(True)
                         msg1 = 'Classic Vocabulary'
                         optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
                                                                                           self.verbose_grps.get(),
@@ -398,7 +398,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                           letter_rank_file,
                                                           True,
                                                           0,
-                                                          True).get_ranked_results_wrd_lst(True)
+                                                          True).get_ranked_grep_result_wrd_lst(True)
                         msg1 = 'Classic+ Vocabulary'
                         optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
                                                                                           self.verbose_grps.get(),
@@ -415,7 +415,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                           letter_rank_file,
                                                           True,
                                                           0,
-                                                          True).get_ranked_results_wrd_lst(True)
+                                                          True).get_ranked_grep_result_wrd_lst(True)
                         msg1 = 'Large Vocabulary'
                         optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
                                                                                           self.verbose_grps.get(),
@@ -462,7 +462,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.status.set(wordletool.get_status() + comment)
             tx_gr.configure(state='normal')
             tx_gr.delete(1.0, tk.END)
-            tx_gr.insert(tk.END, wordletool.get_cmd_less_filepath())
+            tx_gr.insert(tk.END, wordletool.get_grep_cmd_less_filepath())
             tx_gr.configure(state='disabled')
 
         def get_rq_ltrs(self) -> str:
