@@ -852,10 +852,6 @@ def best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly: bool, c
     return inorder_best_rank_dict
 
 def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, debug_mode: bool) -> dict:
-    # TO DO
-    # This function should prioritize any target list words found to be in the best population.
-    # i.e., if any, then return only those.
-
     """
     Intended for finite moinkey use
     Wraps guess word outcomes ranking to return the best

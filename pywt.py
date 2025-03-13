@@ -36,7 +36,8 @@ help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 exclude = []  # exclude list used by monkey sampler
-font_tuple_n = ("Courier", 14, "normal")
+# font_tuple_n = ("Courier", 14, "normal")
+font_tuple_n = ("Helvetica", 14, "normal")
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -51,10 +52,7 @@ def set_n_col(self):
 # def on_window_resize(event):
 #     width = event.width
 #     height = event.height
-#     if width == 250 and hasattr(event.widget, 'text'):
-#         print(event.widget.text)
-#         pass
-#         print(f"Window resized to {width}x{height}")
+#     print(f"Window resized to {width}x{height}")
 
 
 def str_wrd_list_hrd(ln_col: int) -> str:
@@ -180,7 +178,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # Screen width.
         # w_width = 1120  # 1036
-        w_width = 1300  # 1036
+        w_width = 1240 #1300  # 1036
 
         # Screen height.
         # w_height = 668  # to do, set according to screen height
@@ -671,6 +669,7 @@ class Pywordlemainwindow(ctk.CTk):
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
                                 text=str_wrd_list_hrd(set_n_col(self)),
+                                font=('Courier', 14, 'bold'),
                                 relief='sunken',
                                 background='#dedede',
                                 anchor='w',
@@ -680,6 +679,7 @@ class Pywordlemainwindow(ctk.CTk):
         # the word list resulting from grep on the main wordlist
         # tx_result = tk.Text(self.result_frame,
         tx_result = helpers.CustomText(self.result_frame,
+                                       font=('Courier', 14, 'normal'),
                                        wrap='word',
                                        background='#dedede',
                                        borderwidth=0,
@@ -708,6 +708,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         lb_status = tk.Label(self.result_frame,
                              textvariable=self.status,
+                             font=('Courier', 14, 'normal'),
                              background='#dedede',
                              borderwidth=0,
                              highlightthickness=0)
@@ -717,6 +718,7 @@ class Pywordlemainwindow(ctk.CTk):
         # grep line being used
         tx_gr = tk.Text(self.result_frame,
                         wrap='word',
+                        font=('Courier', 14, 'normal'),
                         height=2,
                         background='#dedede',
                         borderwidth=0,
