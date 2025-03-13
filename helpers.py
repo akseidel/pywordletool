@@ -686,7 +686,7 @@ def extended_best_outcomes_guess_dict(word_lst: list, reporting: bool, byentonly
     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
     @param targets_word_lst: possible guess words
     @param all_targets: vocabulary dictionary
-    @param msg1: text to pass to verbose window
+    @param verbose_data: text to pass to verbose window
     @return: dictionary of the best group ranked guesses
     """
     guess_rank_dict = {}
@@ -931,7 +931,7 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = "\n\n> >  Groups summary using the " + msg + " words for guesses on the " + \
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
-    rptwnd.msg1.insert(tk.END, rptl)
+    rptwnd.verbose_data.insert(tk.END, rptl)
 
 
 def prnt_guesses_header(rptwnd: ctk):
@@ -942,7 +942,7 @@ def prnt_guesses_header(rptwnd: ctk):
            '\tave' + \
            '\texp' + \
            '\tp2'
-    rptwnd.msg1.insert(tk.END, rptl)
+    rptwnd.verbose_data.insert(tk.END, rptl)
 
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
@@ -950,7 +950,7 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
            '{0:.0f}'.format(len(source_list)) + ")"
     rptwnd.title(rptl)
     rptl = "> >  " + rptl + "  < <"
-    rptwnd.msg1.insert(tk.END, rptl)
+    rptwnd.verbose_data.insert(tk.END, rptl)
 
 
 def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk) -> None:
@@ -965,7 +965,7 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk) -> 
                '\t' + '{0:.3f}'.format(average) + \
                '\t' + '{0:.2f}'.format(g_xa) + \
                '\t' + '{0:.2f}'.format(p2)
-        rptwnd.msg1.insert(tk.END, rptl)
+        rptwnd.verbose_data.insert(tk.END, rptl)
 
 
 def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outcomes_dict: dict,
@@ -974,7 +974,7 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
     # report in full or condensed format according to cond_prt flag
     if not cond_rpt:
         rptl = '\n\n> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
-        rptwnd.msg1.insert(tk.END, rptl)
+        rptwnd.verbose_data.insert(tk.END, rptl)
         rptl = '\n> qty ' + str(qty) + \
                ', ent ' + '{0:.3f}'.format(ent) + \
                ", sizes: min " + str(smallest) + \
@@ -983,22 +983,22 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
                ', exp ' + '{0:.2f}'.format(g_xa) + \
                ', p2 ' + '{0:.2f}'.format(p2)
 
-        rptwnd.msg1.insert(tk.END, rptl)
-        rptwnd.msg1.insert(tk.END, '\n')
+        rptwnd.verbose_data.insert(tk.END, rptl)
+        rptwnd.verbose_data.insert(tk.END, '\n')
         for key in sorted(guess_outcomes_dict):
             g = guess_outcomes_dict[key]
             if keyed_rpt:
                 rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             else:
                 rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
-            rptwnd.msg1.insert(tk.END, '\n' + rptl)
+            rptwnd.verbose_data.insert(tk.END, '\n' + rptl)
     else:
         pass
 
 
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
-    rptwnd.msg1.insert(tk.END, outcomes_stats_summary_line(best_rank_dict))
-    rptwnd.msg1.see('end')
+    rptwnd.verbose_data.insert(tk.END, outcomes_stats_summary_line(best_rank_dict))
+    rptwnd.verbose_data.see('end')
 
 
 def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
@@ -1016,7 +1016,7 @@ def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
 
 
 def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk):
-    rptwnd.msg1.insert(tk.END, opt_wrds_for_reporting(best_rank_dict))
+    rptwnd.verbose_data.insert(tk.END, opt_wrds_for_reporting(best_rank_dict))
 
 
 def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
@@ -1038,7 +1038,7 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
     stats_summary = outcomes_stat_summary(best_rank_dict)
     rptl = '\n> >  Optimal guess stats, each has group qty ' + '{0:.0f}'.format(
         stats_summary[0]) + ' or is max entropy:'
-    rptwnd.msg1.insert(tk.END, rptl)
+    rptwnd.verbose_data.insert(tk.END, rptl)
     for w, s in best_rank_dict.items():
         (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa) = s
         rptl = "\n" + w + " - " + \
@@ -1049,10 +1049,10 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
                ", ave " + '{0:.3f}'.format(g_ave) + \
                ", exp " + '{0:.2f}'.format(g_xa) + \
                ", p2 " + '{0:.3f}'.format(g_p2)
-        rptwnd.msg1.insert(tk.END, rptl)
-        rptwnd.msg1.see('end')
+        rptwnd.verbose_data.insert(tk.END, rptl)
+        rptwnd.verbose_data.see('end')
     # lock the text widget to prevent user editing
-    rptwnd.msg1.configure(state='disabled')
+    rptwnd.verbose_data.configure(state='disabled')
 
 
 def valid_mult_ltr(s: str) -> bool:
@@ -1431,9 +1431,9 @@ class RptWnd(ctk.CTkToplevel):
     """
 
     def clear_msg1(self) -> None:
-        self.msg1.configure(state='normal')
-        self.msg1.delete(1.0, tk.END)
-        self.msg1.configure(state='disabled')
+        self.verbose_data.configure(state='normal')
+        self.verbose_data.delete(1.0, tk.END)
+        self.verbose_data.configure(state='disabled')
 
     def close_rpt(self) -> None:
         self.destroy()
@@ -1448,7 +1448,7 @@ class RptWnd(ctk.CTkToplevel):
         search_text = ''
         regex: search_text = self.search_text.get().strip()
         if len(regex) > 4:
-            self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
+            self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True)
 
     def back_to_summary(self):
         """
@@ -1458,8 +1458,8 @@ class RptWnd(ctk.CTkToplevel):
         """
         search_text = ''
         regex: search_text = 'Groups summary'
-        self.msg1.highlight_pattern(regex, 'grp', remove_priors=True)
-        self.msg1.remove_tag('grp')
+        self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True)
+        self.verbose_data.remove_tag('grp')
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
@@ -1472,6 +1472,9 @@ class RptWnd(ctk.CTkToplevel):
         self.context = context
         self.resizable(width=True, height=True)
         self.geometry('790x600')
+
+        verbose_font_tuple_n = ("Helvetica", 14, "normal")
+        self.option_add("*Font", verbose_font_tuple_n)
 
         self.search_text = tk.StringVar()
         self.search_text.set('for: ')
@@ -1488,22 +1491,23 @@ class RptWnd(ctk.CTkToplevel):
         self.info_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         self.info_frame.grid_rowconfigure(0, weight=1)  # non-zero weight allows grid to expand
 
-        self.msg1 = CustomText(self.info_frame,
-                               wrap='word',
-                               padx=6,
-                               pady=6,
-                               background='#dedede',
-                               borderwidth=0,
-                               highlightthickness=0
-                               )
-        self.msg1.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
-        self.msg1.tag_configure('grp', background='#ffd700')
+        self.verbose_data = CustomText(self.info_frame,
+                                       wrap='word',
+                                       font=("Courier", 14, "normal"),
+                                       padx=6,
+                                       pady=6,
+                                       background='#dedede',
+                                       borderwidth=0,
+                                       highlightthickness=0
+                                       )
+        self.verbose_data.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
+        self.verbose_data.tag_configure('grp', background='#ffd700')
         # scrollbar for rpt
         rpt_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
         rpt_sb.grid(row=0, column=1, sticky='ens')
 
-        self.msg1.config(yscrollcommand=rpt_sb.set)
-        rpt_sb.config(command=self.msg1.yview)
+        self.verbose_data.config(yscrollcommand=rpt_sb.set)
+        rpt_sb.config(command=self.verbose_data.yview)
 
         button_q = ctk.CTkButton(self, text="Close",
                                  text_color="black",
@@ -1585,8 +1589,7 @@ class HelpWindow(ctk.CTkToplevel):
         super().__init__()
         self.data_path = data_path
         self.letter_rank_file = letter_rank_file
-        self.wm_title('Some Information For You')
-        self.resizable(width=False, height=False)
+        self.resizable(width=False, height=True)
         self.title('Some Information For You')
 
         # configure style
@@ -1595,9 +1598,9 @@ class HelpWindow(ctk.CTkToplevel):
         help_font_tuple_n = ("Courier", 14, "normal")
         self.option_add("*Font", help_font_tuple_n)
 
-        self.info_frame = ttk.LabelFrame(self,
-                                         borderwidth=0,
-                                         )
+        self.info_frame = ttk.Frame(self,
+                                    borderwidth=0
+                                    )
         self.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=0, expand=True)
 
         self.msg1 = tk.Text(self.info_frame,
