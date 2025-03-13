@@ -1113,6 +1113,19 @@ def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
             r = ','.join(valid).replace(',,', ',').strip(',')
     return r
 
+def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: int,
+                                  offset_h: int, offset_w: int) -> None:
+    """
+    Sets desired window size and location on the screen
+    :param self: tk window
+    :param this_wnd_height: desired window height
+    :param this_wnd_width: desired window width
+    :param offset_w: left to right offset
+    :param offset_h: up down offset
+    """
+    pos_x = int((self.winfo_screenwidth() - this_wnd_width) / 2) + offset_w
+    pos_y = int((self.winfo_screenheight() - this_wnd_height) / 2) + offset_h
+    self.geometry("{}x{}+{}+{}".format(this_wnd_width, this_wnd_height, pos_x, pos_y))
 
 class ShellCmdList:
     """
@@ -1471,7 +1484,7 @@ class RptWnd(ctk.CTkToplevel):
         super().__init__()
         self.context = context
         self.resizable(width=True, height=True)
-        self.geometry('790x600')
+        size_and_position_this_window(self, 790, 600, 0, 0)
 
         verbose_font_tuple_n = ("Helvetica", 14, "normal")
         self.option_add("*Font", verbose_font_tuple_n)
@@ -1480,18 +1493,18 @@ class RptWnd(ctk.CTkToplevel):
         self.search_text.set('for: ')
         self.rpt_grpsdriller_window = None
 
-        self.info_frame = ctk.CTkFrame(self,
-                                       corner_radius=10
-                                       )
-        self.info_frame.pack(fill='both',
-                             padx=2,
-                             pady=0,
-                             expand=True
-                             )
-        self.info_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
-        self.info_frame.grid_rowconfigure(0, weight=1)  # non-zero weight allows grid to expand
+        self.verbose_info_frame = ctk.CTkFrame(self,
+                                               corner_radius=10
+                                               )
+        self.verbose_info_frame.pack(fill='both',
+                                     padx=2,
+                                     pady=0,
+                                     expand=True
+                                     )
+        self.verbose_info_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
+        self.verbose_info_frame.grid_rowconfigure(0, weight=1)  # non-zero weight allows grid to expand
 
-        self.verbose_data = CustomText(self.info_frame,
+        self.verbose_data = CustomText(self.verbose_info_frame,
                                        wrap='word',
                                        font=("Courier", 14, "normal"),
                                        padx=6,
@@ -1503,11 +1516,11 @@ class RptWnd(ctk.CTkToplevel):
         self.verbose_data.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
         self.verbose_data.tag_configure('grp', background='#ffd700')
         # scrollbar for rpt
-        rpt_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
-        rpt_sb.grid(row=0, column=1, sticky='ens')
+        verbose_rpt_sb = ttk.Scrollbar(self.verbose_info_frame, orient='vertical')
+        verbose_rpt_sb.grid(row=0, column=1, sticky='ens')
 
-        self.verbose_data.config(yscrollcommand=rpt_sb.set)
-        rpt_sb.config(command=self.verbose_data.yview)
+        self.verbose_data.config(yscrollcommand=verbose_rpt_sb.set)
+        verbose_rpt_sb.config(command=self.verbose_data.yview)
 
         button_q = ctk.CTkButton(self, text="Close",
                                  text_color="black",
@@ -1567,30 +1580,33 @@ class HelpWindow(ctk.CTkToplevel):
         return f
 
     def show_info(self) -> None:
-        self.msg1.configure(state='normal')
-        self.msg1.delete(1.0, tk.END)
-        self.msg1.insert(tk.END, self.get_info())
-        self.msg1.configure(state='disabled')
+        self.help_msg.configure(state='normal')
+        self.help_msg.delete(1.0, tk.END)
+        self.help_msg.insert(tk.END, self.get_info())
+        self.help_msg.configure(state='disabled')
 
     def show_rank_info(self) -> None:
-        self.msg1.configure(state='normal')
-        self.msg1.delete(1.0, tk.END)
+        self.help_msg.configure(state='normal')
+        self.help_msg.delete(1.0, tk.END)
         raw_rank_data = self.get_rank_data()
         f = raw_rank_data.replace(":", "\t")
-        self.msg1.insert(tk.END, "Using file: " + self.letter_rank_file + "\n")
-        self.msg1.insert(tk.END, "RNK = Rank for any occurrence\n")
-        self.msg1.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
-        self.msg1.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
-        self.msg1.insert(tk.END, "---\t---\t-----\t-----\t-----\t-----\t-----\n")
-        self.msg1.insert(tk.END, f)
-        self.msg1.configure(state='disabled')
+        self.help_msg.insert(tk.END, "Using file: " + self.letter_rank_file + "\n")
+        self.help_msg.insert(tk.END, "RNK = Rank for any occurrence\n")
+        self.help_msg.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
+        self.help_msg.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
+        self.help_msg.insert(tk.END, "---\t---\t-----\t-----\t-----\t-----\t-----\n")
+        self.help_msg.insert(tk.END, f)
+        self.help_msg.configure(state='disabled')
 
     def __init__(self, data_path, letter_rank_file):
         super().__init__()
         self.data_path = data_path
         self.letter_rank_file = letter_rank_file
-        self.resizable(width=False, height=True)
+        self.resizable(width=True, height=True)
         self.title('Some Information For You')
+        help_wd = 530
+        help_ht = 500
+        size_and_position_this_window(self, help_ht, help_wd, 0, 0)
 
         # configure style
         style = ttk.Style()
@@ -1598,25 +1614,29 @@ class HelpWindow(ctk.CTkToplevel):
         help_font_tuple_n = ("Courier", 14, "normal")
         self.option_add("*Font", help_font_tuple_n)
 
-        self.info_frame = ttk.Frame(self,
-                                    borderwidth=0
-                                    )
-        self.info_frame.pack(side=tk.TOP, fill=tk.X, padx=2, pady=0, expand=True)
+        self.help_info_frame = tk.Frame(self,
+                                        borderwidth=0
+                                        )
+        self.help_info_frame.pack(side=tk.TOP, fill='both', padx=2, pady=0, expand=True)
+        self.help_info_frame.grid_rowconfigure(0, weight=1)
+        self.help_info_frame.grid_columnconfigure(0, weight=1)
 
-        self.msg1 = tk.Text(self.info_frame,
-                            wrap='word',
-                            padx=10,
-                            pady=8,
-                            background='#dedede',
-                            borderwidth=0,
-                            highlightthickness=0,
-                            )
-        self.msg1.grid(row=0, column=0, padx=6, pady=0)
+        self.help_msg = tk.Text(self.help_info_frame,
+                                wrap='word',
+                                padx=10,
+                                pady=8,
+                                background='#dedede',
+                                borderwidth=0,
+                                highlightthickness=0
+                                )
+        self.help_msg.grid(row=0, column=0, padx=6, pady=0, sticky="nsew")
+
+
         # scrollbar for help
-        help_sb = ttk.Scrollbar(self.info_frame, orient='vertical')
+        help_sb = ttk.Scrollbar(self.help_info_frame, orient='vertical')
         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
-        self.msg1.config(yscrollcommand=help_sb.set)
-        help_sb.config(command=self.msg1.yview)
+        self.help_msg.config(yscrollcommand=help_sb.set)
+        help_sb.config(command=self.help_msg.yview)
         self.show_info()
 
         button_q = ctk.CTkButton(self, text="Close",

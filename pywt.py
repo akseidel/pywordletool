@@ -176,17 +176,11 @@ class Pywordlemainwindow(ctk.CTk):
         # print(self.winfo_screenheight())
         # print(self.winfo_screenwidth())
 
-        # Screen width.
-        # w_width = 1120  # 1036
+        # Screen height and width.
         w_width = 1240 #1300  # 1036
+        w_height = 672  # TO DO, set according to screen height
 
-        # Screen height.
-        # w_height = 668  # to do, set according to screen height
-        w_height = 672  # to do, set according to screen height
-
-        pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
-        pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
-        self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
+        helpers.size_and_position_this_window(self, w_width, w_height, 0, 0)
 
         # set the Vars
         self.grps_guess_source = tk.IntVar(value=0)
