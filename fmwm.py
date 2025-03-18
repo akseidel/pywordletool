@@ -93,8 +93,10 @@ def process_any_arguments() -> None:
     if args.v:
         # For guessing, use the Wordle vocabulary that includes non-solution words
         vocab_standard_guess_filename = vocab_full_filename
+        vocab_magic_guess_filename = vocab_full_filename
     else:
         vocab_standard_guess_filename = botadd_sol_filename
+        vocab_magic_guess_filename = botadd_sol_filename
 
     if args.z:
         # For word targets, use the Wordle vocabulary that includes non-solution words.
@@ -919,8 +921,11 @@ def main(_args=None):
         wrd_x = 1
         if do_every_wrd:
             # The targets are the words for which the monkey seeks guesses to solve.
-            # Here only the words that can be a solution will be considered a target word.
-            # The target pool is not the guess pool. The -v argument selects the guess pool.
+            # By default, only the words that can be a solution will be considered a target word.
+            # The -z sets the target pool to be all the allowed Wordle guess words.
+            # The target pool is not the guess pool.
+            # By default, only the words that can be a solution will be considered a guess word.
+            # The -v argument sets the guess pool to be all the allowed Wordle guess words.
             vocab_target_filename = vocab_standard_target_filename
             targets = helpers.ToolResults(data_path, vocab_target_filename, letter_rank_file, True, 0, True) \
                 .get_ranked_grep_result_wrd_lst(True)
