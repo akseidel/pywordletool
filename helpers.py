@@ -1,6 +1,7 @@
 # ----------------------------------------------------------------
 # helpers akseidel 5/2022
 # ----------------------------------------------------------------
+from logging import exception
 from subprocess import Popen, PIPE
 import sys
 import os
@@ -1422,20 +1423,23 @@ class CustomText(tk.Text):
         self.mark_set("matchStart", start)
         self.mark_set("matchEnd", start)
         self.mark_set("searchLimit", end)
+        index = ""
 
         count = tk.IntVar()
         while True:
-            index = self.search(pattern, "matchEnd", "searchLimit",
-                                count=count, regexp=regexp)
-            if index == "":
+            try:
+                index = self.search(pattern, "matchEnd", "searchLimit",
+                                    count=count, regexp=regexp)
+                if index == "":
+                    break
+                if count.get() == 0:
+                    break  # degenerate pattern which matches zero-length strings
+                self.mark_set("matchStart", index)
+                self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+                self.tag_add(tag, "matchStart", "matchEnd")
+            except Exception as e:
+                print(e)
                 break
-            if count.get() == 0:
-                break  # degenerate pattern which matches zero-length strings
-            self.mark_set("matchStart", index)
-            self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-            self.tag_add(tag, "matchStart", "matchEnd")
-
-
         if do_scroll and not index == "":
             self.see(index)  # scroll widget to show the index's line
 
@@ -1464,6 +1468,14 @@ class RptWnd(ctk.CTkToplevel):
         regex: search_text = self.search_text.get().strip()
         if len(regex) > 4:
             self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True)
+        else:
+            msg = (f"Search for \"{regex}\"?\n\nIn a verbose report one usually searches for a five letter guess word"
+                   f" preceded by \"for:\", which is then very quickly highlighted.\n\nThe same, but without \"for:\","
+                   f" is typical in the condensed verbose report.\n\nBut, search can accept any text, including a regex"
+                   f" pattern. A regex pattern can do most of the work required to find hard mode candidates in the condensed"
+                   f" list..\n\nFor example, \".t..p\" would indicate words where t and p are at those positions.")
+            if messagebox.askokcancel(title=None, message=msg):
+                self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True)
 
     def back_to_summary(self):
         """
