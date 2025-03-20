@@ -1,7 +1,6 @@
 # ----------------------------------------------------------------
 # helpers akseidel 5/2022
 # ----------------------------------------------------------------
-from logging import exception
 from subprocess import Popen, PIPE
 import sys
 import os
@@ -14,6 +13,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 import groupdrilling
 from fmwm import debug_mode
+from logging import exception
 
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -1410,7 +1410,7 @@ class CustomText(tk.Text):
         self.tag_remove(tag, "1.0", "end")
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=True, remove_priors=True, do_scroll=True):
+                          regexp=True, remove_priors=True, do_scroll=True, mode=0):
         """Apply the given tag to all text that matches the given pattern
         If 'regexp' is set to True, pattern will be treated as a regular
         expression according to Tcl's regular expression syntax.
@@ -1423,25 +1423,35 @@ class CustomText(tk.Text):
         self.mark_set("matchStart", start)
         self.mark_set("matchEnd", start)
         self.mark_set("searchLimit", end)
-        index = ""
-
+        is_first_pass = True
+        not_found = False
         count = tk.IntVar()
         while True:
             try:
                 index = self.search(pattern, "matchEnd", "searchLimit",
                                     count=count, regexp=regexp)
                 if index == "":
+                    if is_first_pass:
+                        not_found=True
                     break
+                else:
+                    is_first_pass=False
                 if count.get() == 0:
                     break  # degenerate pattern which matches zero-length strings
                 self.mark_set("matchStart", index)
                 self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.tag_add(tag, "matchStart", "matchEnd")
+                if do_scroll:
+                    self.see(index)  # scroll widget to show the index's line
             except Exception as e:
-                print(e)
+                msg = (f"Regex error: \"{e}\".")
+                messagebox.showinfo(title=None, message=msg)
                 break
-        if do_scroll and not index == "":
-            self.see(index)  # scroll widget to show the index's line
+
+        if not_found:
+            msg = (f"Did not find \"{pattern}\"."
+                   f"\n\nThe word that was searched is not in the vocabulary that was used for guesses.")
+            messagebox.showinfo(title=None, message=msg)
 
 
 class RptWnd(ctk.CTkToplevel):
@@ -1467,15 +1477,19 @@ class RptWnd(ctk.CTkToplevel):
         search_text = ''
         regex: search_text = self.search_text.get().strip()
         if len(regex) > 4:
-            self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True)
+            self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
         else:
             msg = (f"Search for \"{regex}\"?\n\nIn a verbose report one usually searches for a five letter guess word"
                    f" preceded by \"for:\", which is then very quickly highlighted.\n\nThe same, but without \"for:\","
-                   f" is typical in the condensed verbose report.\n\nBut, search can accept any text, including a regex"
+                   f" is typical in the condensed verbose report.\n\nSearch can accept any text, including a regex"
                    f" pattern. A regex pattern can do most of the work required to find hard mode candidates in the condensed"
-                   f" list..\n\nFor example, \".t..p\" would indicate words where t and p are at those positions.")
+                   f" list..\n\nFor example, \"^.t..p\" would indicate words where t and p are at those positions. The "
+                   f"\"^\" is important. It indicates the next character \".\", which means any character, must be at"
+                   f" the text beginning. Thus five letter words and not parts of larger words are highlighted."
+                   f"\n\nThe time it takes to highlight the search depends on the amount of text to search and the "
+                   f"number of items to be highlighted.")
             if messagebox.askokcancel(title=None, message=msg):
-                self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True)
+                self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
 
     def back_to_summary(self):
         """
@@ -1485,7 +1499,7 @@ class RptWnd(ctk.CTkToplevel):
         """
         search_text = ''
         regex: search_text = 'Groups summary'
-        self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True)
+        self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=1)
         self.verbose_data.remove_tag('grp')
 
     def rpt_show_grps_driller(self) -> None:
