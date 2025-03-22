@@ -926,7 +926,6 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
     if not cond_rpt:
         report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
     rptwnd.back_to_summary()
-    pass
 
 
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk):
@@ -993,8 +992,6 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
             else:
                 rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             rptwnd.verbose_data.insert(tk.END, '\n' + rptl)
-    else:
-        pass
 
 
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
@@ -1414,10 +1411,18 @@ class CustomText(tk.Text):
         """Apply the given tag to all text that matches the given pattern
         If 'regexp' is set to True, pattern will be treated as a regular
         expression according to Tcl's regular expression syntax.
+        mode=1 finds only first match
+        :param pattern: text to find, can be regex expression
+        :param tag: highlight color tag
+        :param start: start position
+        :param end: end position
+        :param regexp: use regex
+        :param remove_priors:  remove all prior highlighting
+        :param do_scroll: scroll text as it is found
+        :param mode: 0=scroll every, 1=scroll only to first found
         """
         if remove_priors:
             self.remove_tag(tag)
-
         start = self.index(start)
         end = self.index(end)
         self.mark_set("matchStart", start)
@@ -1432,12 +1437,27 @@ class CustomText(tk.Text):
                 index = self.search(pattern, "matchEnd", "searchLimit",
                                     count=count, regexp=regexp)
                 if index == "":
+                    # text not found
                     if is_first_pass:
+                        # if first pass then text cannot be found
+                        # so set not_found flag
                         not_found=True
+                    # stop searching
                     break
                 else:
-                    first_index = index
-                    is_first_pass=False
+                    # text was found
+                    if first_index == "":
+                        # text found must be the first found
+                        # save first found index so that it can be scrolled
+                        # to instead of scrolling to the last found.
+                        first_index = index
+                        # no longer in first pass
+                        is_first_pass=False
+                        if mode == 1:
+                            # only the first match is sought. This is specifically
+                            # used to return to the Groups Summary text for one of the
+                            # report types
+                            break
                 if count.get() == 0:
                     break  # degenerate pattern which matches zero-length strings
                 self.mark_set("matchStart", index)
@@ -1477,9 +1497,11 @@ class RptWnd(ctk.CTkToplevel):
         self.find_the_text()
 
     def find_the_text(self):
-        search_text = ''
-        regex: search_text = self.search_text.get().strip()
-        self.title(f"> > Busy on \"{search_text}\", Please Wait < <")
+        org_title =  self.title()
+        find_text = ''
+        regex: find_text = self.search_text.get().strip()
+        self.title(f"> > Busy on \"{regex}\", Please Wait < <")
+        self.update()
         if len(regex) > 4:
             self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
         else:
@@ -1494,6 +1516,8 @@ class RptWnd(ctk.CTkToplevel):
                    f"number of items to be highlighted.")
             if messagebox.askokcancel(title=None, message=msg):
                 self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+        self.title(org_title)
+        self.update()
 
     def back_to_summary(self):
         """
