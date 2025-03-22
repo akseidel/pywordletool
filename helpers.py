@@ -1425,6 +1425,7 @@ class CustomText(tk.Text):
         self.mark_set("searchLimit", end)
         is_first_pass = True
         not_found = False
+        first_index=""
         count = tk.IntVar()
         while True:
             try:
@@ -1435,6 +1436,7 @@ class CustomText(tk.Text):
                         not_found=True
                     break
                 else:
+                    first_index = index
                     is_first_pass=False
                 if count.get() == 0:
                     break  # degenerate pattern which matches zero-length strings
@@ -1452,7 +1454,8 @@ class CustomText(tk.Text):
             msg = (f"Did not find \"{pattern}\"."
                    f"\n\nThe word that was searched is not in the vocabulary that was used for guesses.")
             messagebox.showinfo(title=None, message=msg)
-
+        else:
+            self.see(first_index)
 
 class RptWnd(ctk.CTkToplevel):
     """
@@ -1476,6 +1479,7 @@ class RptWnd(ctk.CTkToplevel):
     def find_the_text(self):
         search_text = ''
         regex: search_text = self.search_text.get().strip()
+        self.title(f"> > Busy on \"{search_text}\", Please Wait < <")
         if len(regex) > 4:
             self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
         else:
