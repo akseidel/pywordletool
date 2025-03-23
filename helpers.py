@@ -1485,7 +1485,8 @@ class CustomText(tk.Text):
 
         if not_found:
             msg = (f"Did not find \"{pattern}\"."
-                   f"\n\nThe word that was searched is not in the vocabulary that was used for guesses.")
+                   f"\n\nThe word that was searched is not in the vocabulary that was used for guesses."
+                   f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
             messagebox.showinfo(title=None, message=msg)
         else:
             self.see(first_index)

@@ -358,7 +358,6 @@ class Pywordlemainwindow(ctk.CTk):
                 optimal_group_guesses = {}
                 context = "Wordle Helper"
 
-                # TO DO - convert guess_targets dict to be a dictionary of only hard mode guess targets
                 hm_grn_pat = ''
                 hm_yel_ltrs = []
                 if self.use_hard_mode.get():
