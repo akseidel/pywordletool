@@ -33,13 +33,13 @@ def process_grp_list(self, g_word_lst: list) -> dict:
     match grps_guess_source:
         case 0:
             # using the showing words (remaining solutions) for guess candidates
-            optimal_group_guesses = helpers.best_outcomes_guess_dict(g_word_lst,
-                                                                     self.d_verbose_grps.get(),
-                                                                     self.d_ent_grps.get(),
-                                                                     self.d_verbose_grps_cond.get(),
-                                                                     self.d_keyed_verbose_grps.get(),
-                                                                     context
-                                                                     )
+            optimal_group_guesses = helpers.best_outcomes_from_showing_as_guess_dict(g_word_lst,
+                                                                                     self.d_verbose_grps.get(),
+                                                                                     self.d_ent_grps.get(),
+                                                                                     self.d_verbose_grps_cond.get(),
+                                                                                     self.d_keyed_verbose_grps.get(),
+                                                                                     context
+                                                                                     )
 
         case 1:
             # using the classic (original possible solutions) words for guess candidates

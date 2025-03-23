@@ -186,6 +186,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.grps_guess_source = tk.IntVar(value=0)
         self.allow_dup_state = tk.BooleanVar(value=False)
         self.use_classic_frequency = tk.BooleanVar(value=False)
+        self.use_hard_mode = tk.BooleanVar(value=False)
         self.ordr_by_rank = tk.BooleanVar(value=True)
         self.verbose_grps = tk.BooleanVar(value=False)
         self.ent_grps = tk.BooleanVar(value=False)
@@ -263,11 +264,11 @@ class Pywordlemainwindow(ctk.CTk):
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_require_these_grep(rq_ltrs))
             helpers.build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
-            pat = helpers.build_r_pos_grep(wordletool, r_pos_dict)
+            req_pat = helpers.build_r_pos_grep(wordletool, r_pos_dict)
 
-            # needed to show the last user entry in context with the sanity question.
+            # needed to show the last user entry in title_context with the sanity question.
             self.update()
-            if helpers.wrd_has_duplicates(pat) and (not self.allow_dup_state.get()):
+            if helpers.wrd_has_duplicates(req_pat) and (not self.allow_dup_state.get()):
                 sanity_question(self.entry_spec_pattern)
 
             if self.sp_pat_mode_var.get() == 1:
@@ -350,72 +351,96 @@ class Pywordlemainwindow(ctk.CTk):
                 # This requires forcing TK to update the display now instead of later.
                 self.update()
                 # current displayed word list
-                word_list = list(the_word_list.keys())
+                remaining_word_list = list(the_word_list.keys())
                 # Flag to use various solutions as guesses instead of the current displayed word list.
                 # This allows the option to group rank from the entire guess list.
                 grps_guess_source = self.grps_guess_source.get()
                 optimal_group_guesses = {}
                 context = "Wordle Helper"
+
+                # TO DO - convert guess_targets dict to be a dictionary of only hard mode guess targets
+                hm_grn_pat = ''
+                hm_yel_ltrs = []
+                if self.use_hard_mode.get():
+                    # req_pat is the raw required letter pattern less the ^
+                    # hard mode hm_grn_pat to pass to hard mode guess filter
+                    hm_grn_pat = ''.join(('^', req_pat))
+                    # hard mode hm_yel_ltrs letters to pass to hard mode guess filter
+                    for key in x_pos_dict:
+                        hm_yel_ltrs.append(key[0].lower())
+
                 match grps_guess_source:
                     case 0:
                         # using the showing words (remaining solutions) for guess candidates
-                        optimal_group_guesses = helpers.best_outcomes_guess_dict(word_list,
-                                                                                 self.verbose_grps.get(),
-                                                                                 self.ent_grps.get(),
-                                                                                 self.cond_grps.get(),
-                                                                                 self.keyed_verbose_grps.get(),
-                                                                                 context)
+                        optimal_group_guesses = helpers.best_outcomes_from_showing_as_guess_dict(remaining_word_list,
+                                                                                                 self.verbose_grps.get(),
+                                                                                                 self.ent_grps.get(),
+                                                                                                 self.cond_grps.get(),
+                                                                                                 self.keyed_verbose_grps.get(),
+                                                                                                 context)
 
                     case 1:
                         # using the classic (original possible solutions) words for guess candidates
-                        all_targets = helpers.ToolResults(data_path,
+                        guess_targets = helpers.ToolResults(data_path,
                                                           'wo_nyt_wordlist.txt',
                                                           letter_rank_file,
                                                           True,
                                                           0,
                                                           True).get_ranked_grep_result_wrd_lst(True)
-                        msg1 = 'Classic Vocabulary'
-                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
+                        if self.use_hard_mode.get():
+                            guess_targets = helpers.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
+                            report_msg1 = 'Classic Vocabulary-HM'
+                        else:
+                            report_msg1 = 'Classic Vocabulary-DF'
+                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(remaining_word_list,
                                                                                           self.verbose_grps.get(),
                                                                                           self.ent_grps.get(),
                                                                                           self.cond_grps.get(),
                                                                                           self.keyed_verbose_grps.get(),
-                                                                                          all_targets,
-                                                                                          msg1,
+                                                                                          guess_targets,
+                                                                                          report_msg1,
                                                                                           context)
                     case 2:
                         # using the classic+ (entire possible solutions) for guess candidates
-                        all_targets = helpers.ToolResults(data_path,
+                        guess_targets = helpers.ToolResults(data_path,
                                                           'botadd_nyt_wordlist.txt',
                                                           letter_rank_file,
                                                           True,
                                                           0,
                                                           True).get_ranked_grep_result_wrd_lst(True)
-                        msg1 = 'Classic+ Vocabulary'
-                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
+                        if self.use_hard_mode.get():
+                            guess_targets = helpers.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
+                            report_msg1 = 'Classic+ Vocabulary-HM'
+                        else:
+                            report_msg1 = 'Classic+ Vocabulary-DF'
+                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(remaining_word_list,
                                                                                           self.verbose_grps.get(),
                                                                                           self.ent_grps.get(),
                                                                                           self.cond_grps.get(),
                                                                                           self.keyed_verbose_grps.get(),
-                                                                                          all_targets,
-                                                                                          msg1,
+                                                                                          guess_targets,
+                                                                                          report_msg1,
                                                                                           context)
                     case 3:
                         # using the entire allowed guess list for guess candidates
-                        all_targets = helpers.ToolResults(data_path,
+                        guess_targets = helpers.ToolResults(data_path,
                                                           'nyt_wordlist.txt',
                                                           letter_rank_file,
                                                           True,
                                                           0,
                                                           True).get_ranked_grep_result_wrd_lst(True)
-                        msg1 = 'Large Vocabulary'
-                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(word_list,
+                        if self.use_hard_mode.get():
+                            guess_targets = helpers.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
+                            report_msg1 = 'Large Vocabulary-HM'
+                        else:
+                            report_msg1 = 'Large Vocabulary-DF'
+                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(remaining_word_list,
                                                                                           self.verbose_grps.get(),
                                                                                           self.ent_grps.get(),
                                                                                           self.cond_grps.get(),
                                                                                           self.keyed_verbose_grps.get(),
-                                                                                          all_targets,
-                                                                                          msg1,
+                                                                                          guess_targets,
+                                                                                          report_msg1,
                                                                                           context)
                     case _:
                         pass
@@ -1461,14 +1486,13 @@ class Pywordlemainwindow(ctk.CTk):
                                          command=do_grep)
         chk_allow_dups.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
-        chk_ltr_freq_typ = ttk.Checkbutton(the_top_frame,
-                                           text="Classic Ranking",
-                                           variable=self.use_classic_frequency,
+        chk_hard_mode = ttk.Checkbutton(the_top_frame,
+                                           text="Hard Mode",
+                                           variable=self.use_hard_mode,
                                            onvalue=True,
                                            offvalue=False,
-                                           padding=0,
-                                           command=do_freq_type)
-        chk_ltr_freq_typ.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+                                           padding=0)
+        chk_hard_mode.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         chk_ordr_by_rank = ttk.Checkbutton(the_top_frame,
                                            text="List By Rank",
@@ -1493,6 +1517,14 @@ class Pywordlemainwindow(ctk.CTk):
         rbr2.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
         rbr3 = ttk.Radiobutton(rank_frame, text="Both", variable=self.rank_mode, value=2, command=do_grep)
         rbr3.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
+        chk_ltr_freq_typ = ttk.Checkbutton(rank_frame,
+                                           text="Classic Ranking",
+                                           variable=self.use_classic_frequency,
+                                           onvalue=True,
+                                           offvalue=False,
+                                           padding=0,
+                                           command=do_freq_type)
+        chk_ltr_freq_typ.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         # Vocabulary selection frame
         vocab_frame = ttk.LabelFrame(self.actions_frame,
