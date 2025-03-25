@@ -32,6 +32,10 @@ import groupdrilling
 data_path = 'worddata/'  # path from here to data folder
 # letter_rank_file = 'letter_ranks.txt'
 letter_rank_file = 'letter_ranks_bot.txt'
+full_wordle_wrd_list = 'nyt_wordlist.txt'
+bot_pos_sol_wrd_list = 'botadd_nyt_wordlist.txt'
+classic_pos_sol_wrd_list = 'wo_nyt_wordlist.txt'
+pu_sol_wrd_list = 'pu_wordlist.txt'
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
@@ -48,12 +52,10 @@ def set_n_col(self):
     else:
         return 7
 
-
 # def on_window_resize(event):
 #     width = event.width
 #     height = event.height
 #     print(f"Window resized to {width}x{height}")
-
 
 def str_wrd_list_hrd(ln_col: int) -> str:
     """Creates the word list header line.
@@ -67,7 +69,6 @@ def str_wrd_list_hrd(ln_col: int) -> str:
     for i in range(1, ln_col):
         h_line = h_line + mid_pad + h_txt
     return h_line
-
 
 # return a reformatted string with word wrapping
 def wrap_this(string: str, max_chars: int) -> str:
@@ -93,7 +94,6 @@ def wrap_this(string: str, max_chars: int) -> str:
         the_newline += '\n' + w
     return the_newline
 
-
 # Remove certain characters from loc_str string argument.
 def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) -> str:
     """
@@ -114,7 +114,6 @@ def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) ->
     for char in excludes:
         loc_str = loc_str.replace(char, '')
     return loc_str
-
 
 class Pywordlemainwindow(ctk.CTk):
     """The pywordletool application GUI window
@@ -193,6 +192,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.cond_grps = tk.BooleanVar(value=False)
         self.keyed_verbose_grps = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
+        self.cull_the_pu = tk.BooleanVar(value=False)
         self.status = tk.StringVar()
         self.rank_mode = tk.IntVar()
         self.rank_mode.set(0)
@@ -252,14 +252,23 @@ class Pywordlemainwindow(ctk.CTk):
             allow_dups = self.allow_dup_state.get()
 
             if self.vocab_var.get() == 0:
-                vocab_filename = 'wo_nyt_wordlist.txt'
+                vocab_filename = classic_pos_sol_wrd_list
             elif self.vocab_var.get() == 1:
-                vocab_filename = 'botadd_nyt_wordlist.txt'
+                vocab_filename = bot_pos_sol_wrd_list
             else:
-                vocab_filename = 'nyt_wordlist.txt'
+                vocab_filename = full_wordle_wrd_list
 
-            wordletool = helpers.ToolResults(data_path, vocab_filename, letter_rank_file, allow_dups,
-                                             self.rank_mode.get(), self.ordr_by_rank.get())
+            # create the wordletool instance
+            wordletool = helpers.ToolResults(data_path, # relative path to worddata
+                                             vocab_filename, # the vocabulary considered for solutions or guesses
+                                             letter_rank_file, # file that cointains letter rank data
+                                             allow_dups, # allow duplicate multiple letters
+                                             self.rank_mode.get(), # return ranked data
+                                             self.ordr_by_rank.get(),  # return data ordered by rank
+                                             self.cull_the_pu.get(), # cull the previously used words from the solutions
+                                             pu_sol_wrd_list # filename for the previously used words
+                                             )
+
             # The filter builders. Each of these adds to the grep command argument list
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_require_these_grep(rq_ltrs))
@@ -381,7 +390,7 @@ class Pywordlemainwindow(ctk.CTk):
                     case 1:
                         # using the classic (original possible solutions) words for guess candidates
                         guess_targets = helpers.ToolResults(data_path,
-                                                          'wo_nyt_wordlist.txt',
+                                                          classic_pos_sol_wrd_list,
                                                           letter_rank_file,
                                                           True,
                                                           0,
@@ -402,7 +411,7 @@ class Pywordlemainwindow(ctk.CTk):
                     case 2:
                         # using the classic+ (entire possible solutions) for guess candidates
                         guess_targets = helpers.ToolResults(data_path,
-                                                          'botadd_nyt_wordlist.txt',
+                                                          bot_pos_sol_wrd_list,
                                                           letter_rank_file,
                                                           True,
                                                           0,
@@ -423,7 +432,7 @@ class Pywordlemainwindow(ctk.CTk):
                     case 3:
                         # using the entire allowed guess list for guess candidates
                         guess_targets = helpers.ToolResults(data_path,
-                                                          'nyt_wordlist.txt',
+                                                          full_wordle_wrd_list,
                                                           letter_rank_file,
                                                           True,
                                                           0,
@@ -1537,9 +1546,15 @@ class Pywordlemainwindow(ctk.CTk):
         rbv1.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
         rbv1B = ttk.Radiobutton(vocab_frame, text="Classic+", variable=self.vocab_var, value=1, command=do_grep)
         rbv1B.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
-
         rbv2 = ttk.Radiobutton(vocab_frame, text="Large", variable=self.vocab_var, value=2, command=do_grep)
         rbv2.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
+        chk_cull_the_pu = ttk.Checkbutton(vocab_frame,
+                                          text="Remove PU Wrds",
+                                          variable=self.cull_the_pu,
+                                          onvalue=True,
+                                          offvalue=False,
+                                          command=do_grep)
+        chk_cull_the_pu.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=6, expand=True)
         # === END OF ====== General Controls ==========
 
         # === START OF ====== Application Controls ==========
@@ -1656,13 +1671,11 @@ class Pywordlemainwindow(ctk.CTk):
         # run the initial grep
         do_grep()
 
-
 # end Pywordlemainwindow class
 
 def main(args=None):
     this_app: Pywordlemainwindow = Pywordlemainwindow()
     this_app.mainloop()
-
 
 # ====================================== main ================================================
 if __name__ == '__main__':

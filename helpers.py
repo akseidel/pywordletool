@@ -18,9 +18,7 @@ from logging import exception
 
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-
-
-def get_word_list_path_name(local_path_file_name: str) -> str:
+def get_word_list_path_name(local_path_file_name: str, critical = True) -> str:
     """
     Returns the wordle word list full pathname
     Exits program if not found
@@ -31,11 +29,19 @@ def get_word_list_path_name(local_path_file_name: str) -> str:
     if os.path.exists(full_path_name):
         return full_path_name
     else:
-        msg = f'The wordle word list file {local_path_file_name} was not found. Expected here: {full_path_name}'
-        print(msg)
-        print()
-        messagebox.showerror(title='Stopping Here', message=msg)
-        sys.exit()
+        if critical:
+            msg = f'The wordle word list file {local_path_file_name} was not found. \n\nExpected here: {full_path_name}'
+            print(msg)
+            print()
+            messagebox.showerror(title='Stopping Here', message=msg)
+            sys.exit()
+        else:
+            msg = (f'The wordle word list file {local_path_file_name} was not found. \n\nExpected here: {full_path_name}'
+                   f'\n\nThe option using this file will not use it.')
+            print(msg)
+            print()
+            messagebox.showerror(title='Will Continue', message=msg)
+            return ''
 
 """
 Letter ranking functions for rank that includes by letter position method
@@ -225,6 +231,28 @@ def get_results_word_list(this_sh_cmd_lst) -> list:
     """
     with Popen(this_sh_cmd_lst.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
         return list(map(lambda i: i[: -1], proc.stdout.readlines()))
+
+def get_pu_wordlist(full_path_name) -> list:
+    pu_wrds = []
+    if os.path.exists(full_path_name):
+        with open(full_path_name, 'r') as file:
+            for line in file:
+                pu_wrds.append(line.split('\t', 1)[0])
+    return pu_wrds
+
+def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
+    """
+    Culls the p_wrds list from the s_wrds list. Intended
+    for removing the previously used words from thr
+    possible solutions word list.
+    :param sol_wrds: total solutions wordlist
+    :param pu_wrds:  previously used wordlist
+    """
+    for w in p_wrds:
+        try:
+            s_wrds.remove(w)
+        except ValueError:
+            pass
 
 def clear_scrn():
     """
@@ -742,7 +770,6 @@ def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool,
 
     return inorder_best_rank_dict
 
-
 def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
                                              cond_rpt: bool, keyed_rpt: bool,
                                              title_context: str) -> dict:
@@ -1091,7 +1118,6 @@ def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: in
     pos_y = int((self.winfo_screenheight() - this_wnd_height) / 2) + offset_h
     self.geometry("{}x{}+{}+{}".format(this_wnd_width, this_wnd_height, pos_x, pos_y))
 
-
 def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> dict:
     """
     Returns hard mode guess words from a dictionary of guess words that comply with
@@ -1135,8 +1161,6 @@ def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
         if not re.findall(l,key):
             return False
     return True
-
-
 
 class ShellCmdList:
     """
@@ -1272,7 +1296,6 @@ class ShellCmdList:
         this_cmd = this_cmd + self.shCMDlist[-1]
         return this_cmd
 
-
 class ToolResults:
     """
     ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
@@ -1285,7 +1308,9 @@ class ToolResults:
                  letter_ranks: str,
                  allow_dups: bool,
                  rank_mode: int,
-                 ordr_by_rank: bool) -> None:
+                 ordr_by_rank: bool,
+                 cull_pu = False,
+                 pu_vocab = '') -> None:
         """
         @param data_path: words list folder name
         @param vocabulary: words list file name less path
@@ -1298,6 +1323,8 @@ class ToolResults:
         self.vocab = vocabulary  # vocabulary is the words list textfile
         self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
         self.allow_dups = allow_dups  # loc_allow_dups is the-allow-duplicate-letters flag
+        self.cull_pu = cull_pu
+        self.pu_vocab = pu_vocab
         self.rank_mode = rank_mode
         self.no_ordr = not ordr_by_rank
         wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
@@ -1331,7 +1358,10 @@ class ToolResults:
         @param no_rank:
         @return: Returns ranked results words list as sorted dictionary.
         """
-        wrds = list(filter(None, self.get_result_of_grep_wrd_lst()))
+        wrds = self.get_result_of_grep_wrd_lst()
+        if self.cull_pu:
+            pu_wrds = get_pu_wordlist(get_word_list_path_name(self.data_path + self.pu_vocab, False))
+            cull_sol_list(wrds,pu_wrds)
         self.raw_cnt = len(wrds)
         self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds,
                                                                        self.ltr_rank_dict,
@@ -1339,23 +1369,14 @@ class ToolResults:
                                                                        self.rank_mode,
                                                                        self.no_ordr,
                                                                        no_rank)
-
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
-    # def get_grep_results_raw_cnt(self) -> str:
-    #     """
-    #     @return: Return the grepped word count
-    #     """
-    #     sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
-    #     with Popen(sh_cmd_for_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
-    #         return proc.stdout.readline().strip()
 
     def get_status(self) -> str:
         """
         @return: Returns the status text line.
         """
-        # status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.get_grep_results_raw_cnt())
         status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.raw_cnt)
         return status
 
@@ -1403,7 +1424,6 @@ class ToolResults:
             print(self.get_grep_cmd_less_filepath())
             print_word_list_col_format(the_word_list, 6)
         return the_word_list
-
 
 class CustomText(tk.Text):
     """A text widget with a new method, highlight_pattern()
@@ -1622,7 +1642,6 @@ class RptWnd(ctk.CTkToplevel):
                                  command=self.back_to_summary
                                  )
         button_b.pack(side="left", padx=10, pady=10)
-
 
 class HelpWindow(ctk.CTkToplevel):
     """
