@@ -1332,6 +1332,7 @@ class ToolResults:
         @return: Returns ranked results words list as sorted dictionary.
         """
         wrds = list(filter(None, self.get_result_of_grep_wrd_lst()))
+        self.raw_cnt = len(wrds)
         self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds,
                                                                        self.ltr_rank_dict,
                                                                        self.allow_dups,
@@ -1342,19 +1343,20 @@ class ToolResults:
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
 
-    def get_grep_results_raw_cnt(self) -> str:
-        """
-        @return: Return the grepped word count
-        """
-        sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
-        with Popen(sh_cmd_for_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
-            return proc.stdout.readline().strip()
+    # def get_grep_results_raw_cnt(self) -> str:
+    #     """
+    #     @return: Return the grepped word count
+    #     """
+    #     sh_cmd_for_cnt = self.tool_command_list.full_cmd() + " | wc -l"
+    #     with Popen(sh_cmd_for_cnt, shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
+    #         return proc.stdout.readline().strip()
 
     def get_status(self) -> str:
         """
         @return: Returns the status text line.
         """
-        status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.get_grep_results_raw_cnt())
+        # status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.get_grep_results_raw_cnt())
+        status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.raw_cnt)
         return status
 
     def get_grep_cmd_str(self) -> str:
