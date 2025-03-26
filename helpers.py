@@ -235,7 +235,7 @@ def get_pu_wordlist(full_path_name) -> list:
     if os.path.exists(full_path_name):
         with open(full_path_name, 'r') as file:
             for line in file:
-                pu_wrds.append(line.split('\t', 1)[0])
+                pu_wrds.append(line.split('\t', 1)[0].lower())
     return pu_wrds
 
 def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
