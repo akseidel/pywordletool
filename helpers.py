@@ -38,8 +38,6 @@ def get_word_list_path_name(local_path_file_name: str, critical = True) -> str:
         else:
             msg = (f'The wordle word list file {local_path_file_name} was not found. \n\nExpected here: {full_path_name}'
                    f'\n\nThe option using this file will not use it.')
-            print(msg)
-            print()
             messagebox.showerror(title='Will Continue', message=msg)
             return ''
 
