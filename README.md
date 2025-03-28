@@ -215,6 +215,8 @@ Special **Pattern** allows one to quickly introduce a custom require or exclude 
 
 * Another change the NYT has made is to censure some **Classic** words. Thus, some **Classic** words that were originally solution candidates have been removed from the possible solutions list. These words are still acceptable play words but will never be a solution and will never show up in a **WordleBot** remaining solutions list. These words will show up in **The Wordle Helper**. When using the **Classic+** word vocabulary for possible solution candidates, (Make sure **Allow Duplicate Letters** is checked.), the remaining words should equal what the **WordleBot** indicates.
 
+* The **Remove PU Words** option removes the previously used (PU) solutions from the solutions list. Doing so will result in at least a one guess advantage. The PU words list changes every day. This list will always be incomplete unless you update it daily. The PU words list is the file "pu_wordlist.txt" in the worddata folder.
+
 * If **The Wordle Helper** shows more words than **WordleBot** by a word or so, then there is a censured word or there is an issue with multiple same letters.
 * If **The Wordle Helper** shows fewer words than **WordleBot**, then **The Wordle Helper** is missing some transferred words or there is an issue with multiple same letters.
 
