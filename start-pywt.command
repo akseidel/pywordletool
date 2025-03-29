@@ -1,4 +1,3 @@
-  file='./worddata/letter_ranks.txt'
 #!/bin/bash
 # akseidel 06/08/22
 # https://github.com/akseidel/

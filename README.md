@@ -40,8 +40,10 @@
   * It should be possible to have the **Helper** running in a Linux subsystem running in Microsoft Windows, but these instructions do not explain how. The Linux subsystem would need to have OS components, like 'cat', 'grep' and 'bash' typically present on any Apple OSX or Linux system in addition to the python3, pip and customtkinter installs.  
 * **python3**: (<https://www.python.org/downloads/>)
   * As of this writing Python 3.10 is recommended.
-    * **Customtkinter** will have a problem with Python 3.12.
+    * **Customtkinter** can have a problem with Python 3.12.
     * There is an annoying graphical user interface focus bug when using Python 3.12 where the controls on the **Helper** window do not activate unless the window background is first touched. Using Python 3.10 avoids the problem. Using the command ```python3.10 pywt.py``` runs the **Helper** in Python 3.10 when other Python3 versions are present on your system.
+  * Python 3.12 can be used.
+    * 'distutils', a deprecated module used **Custimtkinter**, was removed from Python 3.12. Nevertheless, it will be installed using the command "pip3 install setuptools" entered in a Terminal window.
 * **pip**: **pip** is a package installer for **python3**.
 * **customtkinter**
 
@@ -51,7 +53,7 @@
 
 * First, install **python3** by using the standard install package provided at <https://www.python.org/downloads/>. Be aware **Python3** can be installed by using many different methods. Each method may install **python3** and its versions at different locations on your system. This can cause complications for you if you are not aware of it. Each of the next two requirements **pip** and **customtkinter** will be installed at the specific **python3** version and location that corresponds to the **python3** version used to install them. For this reason using the standard install package provided at <https://www.python.org/downloads/> is recommended.
 * Second, install **pip** by using the command `python3 -m ensurepip --upgrade` entered in a Terminal window. Not all **python3** installations are equal. It is possible for the **ensurepip** feature to not exist, in which case you will need to search the web for the method that works for your situation to install **pip**.  
-* Lastly, install **customtkinter** by using the command `pip3 install --upgrade customtkinter==5.2.2` entered in a Terminal window.
+* Lastly, install **customtkinter** by using the command `pip3 install --upgrade customtkinter==4.6.3` entered in a Terminal window.
 
 * Note: **customtkinter** is in active development. Changes to it might cause Wordle **Helper** to fail running. When using the convenience script **start-pywt.command** to start the Wordle **Helper** there is no failure feedback other than not seeing the **Helper**. As of this writing the **Helper** runs with **customtkinter** versions 4.6.3 and 5.2.2.  Version 4.6.3 and 5.2.2 with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
 
@@ -73,6 +75,7 @@
   * **letter_ranks.txt**    (letter ranking data file)
   * **nyt_wordlist.txt**    (wordlist - shuffled)
   * **wo_nyt_wordlist.txt** (wordlist - shuffled)
+  * **pu_wordlist.txt**     (previously used wordlist. You need to maintain this list if you intend to take advantage of previously used solutions.)
 
 ### Word Ranking
 
