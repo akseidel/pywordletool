@@ -144,19 +144,21 @@ class Pywordlemainwindow(ctk.CTk):
             self.pos_pr_l.set(val_tup[0])
             # Only the letter combobox is matched to the selection letter.
 
-    def enable_optimal_controls(self, yesno: bool) -> None:
-        if yesno:
-            self.bt_groups.configure(state='active')
-            self.chk_grp_disp.configure(state='active')
-            self.rbrA.configure(state='active')
-            self.rbrB.configure(state='active')
-            self.rbrC.configure(state='active')
-        else:
-            self.bt_groups.configure(state='disabled')
-            self.chk_grp_disp.configure(state='disabled')
-            self.rbrA.configure(state='disabled')
-            self.rbrB.configure(state='disabled')
-            self.rbrC.configure(state='disabled')
+    def enable_optimal_controls(self, look: str) -> None:
+        self.set_optimal_options_look(look)
+        self.set_opt_vocab_ckb_look(look)
+
+    def set_optimal_options_look(self, look: str) -> None:
+        self.bt_groups.configure(state=look)
+        self.chk_grp_disp.configure(state=look)
+        self.chk_ent_disp.configure(state=look)
+        self.chk_cond_disp.configure(state=look)
+        self.chk_key_disp.configure(state=look)
+    def set_opt_vocab_ckb_look(self, look: str) -> None:
+        self.rbrA.configure(state=look)
+        self.rbrB.configure(state=look)
+        self.rbrBB.configure(state=look)
+        self.rbrC.configure(state=look)
 
     def close_subs(self):
         for sub in self.winfo_children():
@@ -354,7 +356,7 @@ class Pywordlemainwindow(ctk.CTk):
 
             # group ranking
             if self.sel_grpoptimal and (n_items > 0):
-                self.enable_optimal_controls(False)
+                self.enable_optimal_controls('disabled')
                 # Clear any highlighting prior to what could be a long wait.
                 tx_result.remove_tag('grp')
                 # This requires forcing TK to update the display now instead of later.
@@ -478,7 +480,7 @@ class Pywordlemainwindow(ctk.CTk):
                           ", ave " + '{0:.2f}'.format(g_ave) + \
                           ", exp " + '{0:.2f}'.format(g_xa) + \
                           ", p2 " + "{0:.2f}".format(g_p2) + ")"
-                self.enable_optimal_controls(True)
+                self.enable_optimal_controls('active')
 
             tx_result.configure(state='disabled')
             if not self.sel_rando and not self.sel_grpoptimal and not self.sel_genetic:

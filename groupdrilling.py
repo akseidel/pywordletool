@@ -156,14 +156,14 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         if len(this_lst) > 2:
             self.title("> > > ... Busy, Please Wait ... < < <")
             self.set_busy_status_msg()
-            self.button_process.configure(state='disabled')
+            self.enable_controls('disabled')
             self.update()
             optimal_group_guesses = process_grp_list(self, this_lst)
 
             # Report the results
             self.report_results(this_lst, optimal_group_guesses)
             self.title("Groups Drilling")
-            self.button_process.configure(state='enabled')
+            self.enable_controls('enabled')
 
             self.deiconify()
 
@@ -174,6 +174,23 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                                  '\nOtherwise E(G) is 2.'
                                          )
             return
+
+    def enable_controls(self, look: str) -> None:
+        self.button_process.configure(look)
+        self.set_optimal_options_look(look)
+        self.set_vocab_look(look)
+
+    def set_optimal_options_look(self, look: str) -> None:
+        self.chk_grp_disp.configure(state=look)
+        self.chk_ent_disp.configure(state=look)
+        self.chk_grp_disp_cond.configure(state=look)
+        self.chk_keyed_grp_disp.configure(state=look)
+
+    def set_vocab_look(self, look: str) -> None:
+        self.rbrA.configure(state=look)
+        self.rbrB.configure(state=look)
+        self.rbrBB.configure(state=look)
+        self.rbrC.configure(state=look)
 
     def report_results(self, this_lst: list, optimal_group_guesses: dict) -> None:
         """
@@ -376,16 +393,6 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                     command=self.title_status)
         self.rbrC.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
 
-        # Show Condensed Report checkbox
-        self.chk_grp_disp_cond = ttk.Checkbutton(self.grp_lst_ops_frame,
-                                                 text="Condensed",
-                                                 variable=self.d_verbose_grps_cond,
-                                                 onvalue=True,
-                                                 offvalue=False,
-                                                 command=self.condensed_chk
-                                                 )
-        self.chk_grp_disp_cond.pack(side=tk.RIGHT, padx=10, pady=2)
-
         # Show Keyed Report checkbox
         self.chk_keyed_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
                                             text="Keyed",
@@ -395,6 +402,16 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                             command=self.keyed_chk
                                             )
         self.chk_keyed_grp_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+
+        # Show Condensed Report checkbox
+        self.chk_grp_disp_cond = ttk.Checkbutton(self.grp_lst_ops_frame,
+                                                 text="Cond",
+                                                 variable=self.d_verbose_grps_cond,
+                                                 onvalue=True,
+                                                 offvalue=False,
+                                                 command=self.condensed_chk
+                                                 )
+        self.chk_grp_disp_cond.pack(side=tk.RIGHT, padx=10, pady=2)
 
         # Show Entropy Report checkbox
         self.chk_ent_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
