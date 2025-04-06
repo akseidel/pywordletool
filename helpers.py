@@ -1510,7 +1510,7 @@ class CustomText(tk.Text):
                        f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
             else:
                 msg = (f"Did not find \"{pattern}\"."
-                       f"\n\n\"Find\" in this verbose mode includes \"for: \" in the                         search text because the main use"
+                       f"\n\n\"Find\" in this verbose mode includes \"for: \" in the search text because the main use"
                        f" is to find the outcomes for a particular word. Adding the \"for: \" does this."
                        f"\n\n\"Find\" operates a regex search on the entire text that includes the \"for: \""
                        f" Putting \"^\", which means \"starting with\", does not make sense when not the first"
