@@ -1504,9 +1504,17 @@ class CustomText(tk.Text):
                 break
 
         if not_found:
-            msg = (f"Did not find \"{pattern}\"."
-                   f"\n\nThe word that was searched is not in the vocabulary that was used for guesses."
-                   f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
+            if pattern.find("^") == -1:
+                msg = (f"Did not find \"{pattern}\"."
+                       f"\n\nThe word that was searched is not in the vocabulary that was used for guesses."
+                       f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
+            else:
+                msg = (f"Did not find \"{pattern}\"."
+                       f"\n\n\"Find\" in this verbose mode includes \"for: \" in the                         search text because the main use"
+                       f" is to find the outcomes for a particular word. Adding the \"for: \" does this."
+                       f"\n\n\"Find\" operates a regex search on the entire text that includes the \"for: \""
+                       f" Putting \"^\", which means \"starting with\", does not make sense when not the first"
+                       f" character in the search text.")
             messagebox.showinfo(title=None, message=msg)
         else:
             self.see(first_index)
@@ -1539,19 +1547,23 @@ class RptWnd(ctk.CTkToplevel):
         if len(regex) > 4:
             self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
         else:
-            msg = (f"Search for \"{regex}\"?\n\nIn a verbose report one usually searches for a five letter guess word"
+            msg = (f"Find \"{regex}\"?\n\nIn a verbose report one usually searches for a five letter guess word"
                    f" preceded by \"for:\", which is then very quickly highlighted.\n\nThe same, but without \"for:\","
-                   f" is typical in the condensed verbose report.\n\nSearch can accept any text, including a regex"
+                   f" is how one searches in the condensed verbose report.\n\nFind can accept any text, including a regex"
                    f" pattern. A regex pattern can do most of the work required to find hard mode candidates in the condensed"
                    f" list..\n\nFor example, \"^.t..p\" would indicate words where t and p are at those positions. The "
-                   f"\"^\" is important. It indicates the next character \".\", which means any character, must be at"
+                   f"\"^\" is important. The \"^\" indicates the next character \".\", which means any character, must be at"
                    f" the text beginning. Thus five letter words and not parts of larger words are highlighted."
+                   f"\n\nThe \"|\" character allows for multiple search criteria. For example, \"^..c..|^.ed..|^....h\""
+                   f" finds words matching any one of those three patterns."
                    f"\n\nThe time it takes to highlight the search depends on the amount of text to search and the "
-                   f"number of items to be highlighted.")
+                   f"number of items to be highlighted. The report scrolls to the first found instance.")
             if messagebox.askokcancel(title=None, message=msg):
-                self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+                if len(regex)> 0 and regex != "for:":
+                    self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
         self.title(org_title)
         self.update()
+
 
     def back_to_summary(self):
         """
