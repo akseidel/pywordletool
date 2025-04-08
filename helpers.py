@@ -1626,6 +1626,7 @@ class RptWnd(ctk.CTkToplevel):
 
         button_q = ctk.CTkButton(self, text="Close",
                                  text_color="black",
+                                 width = 100,
                                  command=self.close_rpt)
         button_q.pack(side="right", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.close_rpt)  # assign to closing button [X]
@@ -1633,25 +1634,27 @@ class RptWnd(ctk.CTkToplevel):
         entry_find = ctk.CTkEntry(self,
                                   textvariable=self.search_text
                                   )
-        entry_find.pack(side=tk.LEFT, padx=10, pady=10)
+        entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=True, fill=tk.X)
         entry_find.bind('<KeyRelease-Return>', self.entry_release_return)
 
         button_f = ctk.CTkButton(self, text="Find",
                                  text_color="black",
                                  command=self.search_for_text
                                  )
-        button_f.pack(side="left", padx=0, pady=10)
-
-        button_drill = ctk.CTkButton(self, text="Groups Driller",
-                                     text_color="black",
-                                     width=40, command=self.rpt_show_grps_driller)
-        button_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
+        button_f.pack(side=tk.LEFT, padx=0, pady=10)
 
         button_b = ctk.CTkButton(self, text="Summary",
                                  text_color="black",
                                  command=self.back_to_summary
                                  )
-        button_b.pack(side="left", padx=10, pady=10)
+        button_b.pack(side=tk.LEFT, padx=10, pady=10)
+
+        button_drill = ctk.CTkButton(self, text="Groups Driller",
+                                     text_color="black",
+                                     command=self.rpt_show_grps_driller)
+        button_drill.pack(side=tk.LEFT, padx=4, pady=3)
+
+
 
 class HelpWindow(ctk.CTkToplevel):
     """
