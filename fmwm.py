@@ -372,13 +372,13 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> None:
                     f.write(str(msg) + '\n')
                 if type(msg) is list:
                     csvwriter = csv.writer(f)
-                    csvwriter.writerow(msg)
+                    csvwriter.writerow([str(w).replace('\'','') for w in msg])
         except IOError:
             sys.stdout.write(f'\nIOError for file {fn_csv}\n')
             sys.stdout.write(f'trying to write {msg}\n')
             exit()
     else:
-        sys.stdout.write('\033[K' + str(msg) + '\n')
+        sys.stdout.write('\033[K' + str(msg).replace('\'','') + '\n')
     return
 
 
@@ -389,7 +389,7 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
     @param loc_sample_number: total overall number of guesses
     @param loc_guess_mode: guess mode description
     @param loc_allow_dups: allow duplicates bool
-    @param loc_record_run: save to a file bool
+    @param loc_record_this_run: save to a file bool
     @param loc_run_fname: filename to save to
     @param loc_starting_wrd: the starting word for this run, could be blank
     @param loc_vocab_filename: the vocabulary being used for guesses (target list, strict hard mode)
@@ -427,20 +427,35 @@ def prelude_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record
                 output_msg(reveal_hdr, loc_record_run, loc_run_fname)
 
 
-def reveal_output(x, guesses, run_stats, loc_record_run, loc_run_fname) -> None:
+def reveal_output(x: int,
+                  guesses: int,
+                  run_stats: list,
+                  loc_record_this_run: bool,
+                  loc_run_fname: str,
+                  run_word_dict= None
+                  ) -> None:
     """
     Reveal mode is the option to report the results for an xth sample run
     @param x: The xth sample attempt
     @param guesses: the number of guesses required
     @param run_stats: the guesses and their resulting pool sizes
+    @param run_word_dict: the current remaining words as dict
     @param loc_record_run: save to file bool
     @param loc_run_fname: filename for recording
+    :param x:
+    :param guesses:
+    :param run_stats:
+    :param run_word_list:
+    :param loc_record_this_run:
+    :param loc_run_fname:
     """
     reveal_stat = [x, guesses]
     reveal_stat.extend(run_stats)
+    if run_word_dict:
+        reveal_stat.extend([list(run_word_dict.keys()) ])
     output_msg(reveal_stat, False, loc_run_fname)
-    if loc_record_run:
-        output_msg(reveal_stat, loc_record_run, loc_run_fname)
+    if loc_record_this_run:
+        output_msg(reveal_stat, loc_record_this_run, loc_run_fname)
 
 
 def prologue_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_record_run, loc_run_fname,
@@ -450,7 +465,7 @@ def prologue_output(loc_sample_number, loc_guess_mode, loc_allow_dups, loc_recor
     @param loc_sample_number: total overall number of guesses
     @param loc_guess_mode: guess mode description
     @param loc_allow_dups: allow duplicates bool
-    @param loc_record_run: save to a file bool
+    @param loc_record_this_run: save to a file bool
     @param loc_run_fname: filename to save
     @param loc_target_wrd: the target word for this run
     @param loc_starting_wrd: the starting word for this run, could be blank
@@ -810,7 +825,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
                 query_set.add(run_stats[1])
                 # Reveal_mode is where output is desired to show the guesses and their pool impact
                 if reveal_mode:
-                    reveal_output(r, guesses, run_stats, record_run, run_fname)
+                    reveal_output(r, guesses, run_stats,  record_run, run_fname, loc_the_word_list)
 
         del wordletool
         # animated in progress showing
@@ -916,7 +931,7 @@ def main(_args=None):
             ask_for_target_word()
         confirm_resume_after_wrd()
         set_late_timestamp_elements()
-        # Timestamp like filename used for loc_record_run
+        # Timestamp like filename used for loc_record_this_run
         run_fname = fmwm_fname()
         wrd_x = 1
         if do_every_wrd:
