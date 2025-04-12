@@ -926,7 +926,7 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
 def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk, cond_rpt: bool):
     report_footer_summary_header_to_window(msg1, word_lst, rptwnd)
     report_footer_stats_summary_to_window(best_rank_dict, rptwnd)
-    report_footer_opt_wrds_to_window(best_rank_dict, rptwnd)
+    report_footer_opt_wrds_to_window(best_rank_dict, rptwnd, cond_rpt)
     if not cond_rpt:
         report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
     rptwnd.back_to_summary()
@@ -1000,19 +1000,19 @@ def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
     # stats_summary [0]:qty,[1]:smallest,[2]:largest, [3]:average,
     # [4]:population variance, [5]:entropy bits as a tuple
     (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa) = outcomes_stat_summary(best_rank_dict)
-    rptl = "\n> >  Maximum group qty " + '{0:.0f}'.format(g_qty) + \
-           ", ent " + '{0:.3f}'.format(g_ent) + \
-           ", sizes: min " + '{0:.0f}'.format(g_min) + \
-           ", min-max " + '{0:.0f}'.format(g_max) + \
-           ", ave " + '{0:.3f}'.format(g_ave) + \
-           ", exp " + '{0:.2f}'.format(g_xa) + \
-           ", p2 " + '{0:.2f}'.format(g_p2)
+    rptl = ("\n> >  Max ent " + '{0:.3f}'.format(g_ent) +
+            ", grp qty " + '{0:.0f}'.format(g_qty) +
+            ", sizes: min " + '{0:.0f}'.format(g_min) +
+            ", min-max " + '{0:.0f}'.format(g_max) +
+            ", ave " + '{0:.3f}'.format(g_ave) +
+            ", exp " + '{0:.2f}'.format(g_xa) +
+            ", p2 " + '{0:.2f}'.format(g_p2))
     return rptl
 
-def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk):
-    rptwnd.verbose_data.insert(tk.END, opt_wrds_for_reporting(best_rank_dict))
+def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk, cond_mode=False):
+    rptwnd.verbose_data.insert(tk.END, opt_wrds_for_reporting(best_rank_dict, cond_mode))
 
-def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
+def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode=False) -> str:
     """
     Takes the dictionary of optimal words, which BTW is already sorted by entropy,
     and then uses the dictionary keys, ie the words, to build a sentence for printing out
@@ -1021,7 +1021,14 @@ def opt_wrds_for_reporting(best_rank_dict: dict) -> str:
     @return: The string used for printing out the optimal word list.
     """
     wrds = list(best_rank_dict.keys())
-    rptl = '\n> >  {0:.0f}'.format(len(wrds)) + ' optimal ent (1st) followed by highest group qty guess words:' + '\n' + ', '.join(wrds)
+    if cond_mode:
+        rptl = ('\n> >  {0:.0f}'.format(
+            len(wrds)) + ' optimal. 1st is best ent. Any next share the same highest group qty:' + '\n'
+                + ', '.join(wrds)) + '\n\nSorted by highest ent:'
+    else:
+        rptl = ('\n> >  {0:.0f}'.format(
+            len(wrds)) + ' optimal. 1st is best ent. Any next share the same highest group qty:' + '\n'
+                + ', '.join(wrds))
     return rptl
 
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk):

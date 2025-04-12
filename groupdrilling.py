@@ -161,7 +161,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
             optimal_group_guesses = process_grp_list(self, this_lst)
 
             # Report the results
-            self.report_results(this_lst, optimal_group_guesses)
+            self.report_results(this_lst, optimal_group_guesses, self.d_verbose_grps_cond.get())
             self.title("Groups Drilling")
             self.enable_controls('enabled')
 
@@ -192,7 +192,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.rbrBB.configure(state=look)
         self.rbrC.configure(state=look)
 
-    def report_results(self, this_lst: list, optimal_group_guesses: dict) -> None:
+    def report_results(self, this_lst: list, optimal_group_guesses: dict, cond_mode=False) -> None:
         """
         Fills the results status CustomText with the results. And highlights the
         words in the to-be-examined words list if they are optimal.
@@ -202,7 +202,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         # The words in common will be highlighted.
         words_in_common = list(set(this_lst) & set(optimal_group_guesses))
         regex: str = '|'.join(words_in_common)
-        wrds = helpers.opt_wrds_for_reporting(optimal_group_guesses)
+        wrds = helpers.opt_wrds_for_reporting(optimal_group_guesses, cond_mode)
         self.tx_status.configure(state='normal')
         self.tx_status.delete("1.0", "end")
         self.tx_status.insert('end', '> >  {} submitted words'.format(len(this_lst)))
