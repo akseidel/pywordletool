@@ -519,7 +519,8 @@ def query_output(loc_target_wrd):
         stat_msg = f'Encountered {len(query_set)} order #{magic_order} magic word guesses ' \
                    f'that eliminate all but {magic_order} guesses:\n{query_list}'
     # print(stat_msg)
-    sys.stdout.write(f'\033[K{stat_msg}\n')
+    msg = stat_msg.replace('\'','')
+    sys.stdout.write(f'\033[K{msg}\n')
 
 
 def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
@@ -831,8 +832,8 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         # animated in progress showing
         r += 1
         mw_qty = len(query_set)
-        msg = f'\033[K> {r} Searching {loc_n} words in {vocab_magic_guess_filename} for {target_wrd} magic word ...  ' \
-              f'finding: {mw_qty}\r '
+        msg = (f'\033[K=> ... {r} Searching {loc_n} words in {vocab_magic_guess_filename}'
+               f' for {target_wrd}\'s order {magic_order} magic words. Finding: {mw_qty} \r')
         sys.stdout.write(msg)
         sys.stdout.flush()
 

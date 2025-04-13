@@ -153,12 +153,13 @@ def print_word_list_col_format(the_word_list, n_col):
     @param n_col: number of columns to fill.
     """
     n_items = len(the_word_list)
-    h_txt = " Word : Rank "
+    h_txt = " Word : Rank"
     left_pad = ""
     mid_pad = "   "
     h_line = left_pad + h_txt
     for i in range(1, n_col):
-        h_line = h_line + mid_pad + h_txt
+        mid = ' ' * (2)
+        h_line = h_line + mid + h_txt
     print(h_line)
     c = 0
     i = 0
