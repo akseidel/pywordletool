@@ -1021,14 +1021,11 @@ def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode=False) -> str:
     @return: The string used for printing out the optimal word list.
     """
     wrds = list(best_rank_dict.keys())
+    rptl = ('\n> >  {0:.0f}'.format(
+        len(wrds)) + ' optimal. 1st word is highest ent. Any next have the highest group qty:' + '\n'
+            + ', '.join(wrds))
     if cond_mode:
-        rptl = ('\n> >  {0:.0f}'.format(
-            len(wrds)) + ' optimal. 1st is best ent. Any next share the same highest group qty:' + '\n'
-                + ', '.join(wrds)) + '\n\nSorted by highest ent:'
-    else:
-        rptl = ('\n> >  {0:.0f}'.format(
-            len(wrds)) + ' optimal. 1st is best ent. Any next share the same highest group qty:' + '\n'
-                + ', '.join(wrds))
+         rptl += '\n\nSorted by highest ent:'
     return rptl
 
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk):
