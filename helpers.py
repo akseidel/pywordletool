@@ -1556,14 +1556,14 @@ class RptWnd(ctk.CTkToplevel):
                    f" preceded by \"for:\", which is then very quickly highlighted.\n\nThe same, but without \"for:\","
                    f" is how one searches in the condensed verbose report.\n\nFind can accept any text, including a regex"
                    f" pattern. A regex pattern can do most of the work required to find hard mode candidates in the condensed"
-                   f" list..\n\nFor example, \"^.t..p\" would indicate words where t and p are at those positions. The "
+                   f" list.\n\nFor example, \"^.t..p\" would indicate words where t and p are at those positions. The "
                    f"\"^\" is important. The \"^\" indicates the next character \".\", which means any character, must be at"
                    f" the text beginning. Thus five letter words and not parts of larger words are highlighted."
                    f"\n\nThe \"|\" character allows for multiple search criteria. For example, \"^..c..|^.ed..|^....h\""
                    f" finds words matching any one of those three patterns."
                    f"\n\nThe time it takes to highlight the search depends on the amount of text to search and the "
                    f"number of items to be highlighted. The report scrolls to the first found instance.")
-            if messagebox.askokcancel(title=None, message=msg):
+            if messagebox.showinfo(title=None, message=msg):
                 if len(regex)> 0 and regex != "for:":
                     self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
         self.title(org_title)
