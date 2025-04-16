@@ -118,7 +118,9 @@
 
 !['Condensed Result Window Image'](InfoImages/PYWTCondensedView.png)
 
-* The **Keyed** checkbox results in each of the verbose data output lines keyed to the guess word to which that data applies. This format can be useful for copying and pasting the data to another application for further processing while maintaining to which guess word the data applies.
+* The **Keyed** checkbox indexes the verbose data output lines. 
+* In the standard verbose mode, ie not the condensed mode, the data is keyed according to what guess word to which the data applies. This format can be useful for copying and pasting the data to another application for further processing while maintaining to which guess word the data applies.
+* In the verbose condensed mode, each guess is indexed according to which entropy rank slot it resides. The slot index is guess word's entropy rank order. A guess might share that rank order with other guess words. Thus a guess might appear as 4th down in the ranking but in fact might be sharing the 1st rank slot with the guesses listed above it.
 
 * The concept of **Wordle Groups** is explained in an allegory here: [Groups Allegory](/groupsallegory/README.md)
   

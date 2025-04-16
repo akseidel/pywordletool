@@ -354,7 +354,7 @@ class Pywordlemainwindow(ctk.CTk):
                 tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
 
-            # group ranking
+            # group optimals ranking
             if self.sel_grpoptimal and (n_items > 0):
                 self.enable_optimal_controls('disabled')
                 # Clear any highlighting prior to what could be a long wait.

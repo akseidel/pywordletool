@@ -158,7 +158,7 @@ def print_word_list_col_format(the_word_list, n_col):
     mid_pad = "   "
     h_line = left_pad + h_txt
     for i in range(1, n_col):
-        mid = ' ' * (2)
+        mid = ' ' * 2
         h_line = h_line + mid + h_txt
     print(h_line)
     c = 0
@@ -242,10 +242,10 @@ def get_pu_wordlist(full_path_name) -> list:
 def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
     """
     Culls the p_wrds list from the s_wrds list. Intended
-    for removing the previously used words from thr
+    for removing the previously used words from the
     possible solutions word list.
-    :param sol_wrds: total solutions wordlist
-    :param pu_wrds:  previously used wordlist
+    :param s_wrds: total solutions wordlist
+    :param p_wrds:  previously used wordlist
     """
     for w in p_wrds:
         try:
@@ -765,7 +765,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool,
     if reporting:
         report_footer_wrapper(report_header_msg1, remaining_word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
         if cond_rpt:
-            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd)
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt)
 
     return inorder_best_rank_dict
 
@@ -855,7 +855,7 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting
     if reporting:
         report_footer_wrapper("Words Showing", remaining_word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
         if cond_rpt:
-            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd)
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt)
 
     return inorder_best_rank_dict
 
@@ -937,14 +937,17 @@ def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: c
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.verbose_data.insert(tk.END, rptl)
 
-def prnt_guesses_header(rptwnd: ctk):
-    rptl = '\n\nguess' + '\tqty' + \
-           '\tent' + \
-           '\tmin' + \
-           '\tmax' + \
-           '\tave' + \
-           '\texp' + \
-           '\tp2'
+def prnt_guesses_header(rptwnd: ctk, keyed=False):
+    if not keyed:
+        rptl = '\n\nguess' + '\tqty'
+    else:
+        rptl = '\n\nslot' + '\tguess' + '\tqty'
+    rptl = rptl + '\tent' + \
+            '\tmin' + \
+            '\tmax' + \
+            '\tave' + \
+            '\texp' + \
+            '\tp2'
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
@@ -954,12 +957,32 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = "> >  " + rptl + "  < <"
     rptwnd.verbose_data.insert(tk.END, rptl)
 
-def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk) -> None:
+def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, keyed: bool) -> None:
+    """
+    Produces the condensed line by line guess outcome stats
+    :param l_cond_dict: Dictionary of the guesses and their outcome stats
+    :param rptwnd: The report window to show this.
+    :param keyed: Bool to index the guesses into slots where each slot has equal entropy guesses
+    """
     inorder_cond_dict = dict(sorted(l_cond_dict.items(), key=lambda item: item[1][5], reverse=True))
-    prnt_guesses_header(rptwnd)
+    indx = 1
+    cnt = 0
+    c_indx_ent = 0
+    prnt_guesses_header(rptwnd,keyed)
     for g, s in inorder_cond_dict.items():
         (qty, smallest, largest, average, p2, ent, g_xa) = s
-        rptl = '\n' + g + '\t' + str(qty) + \
+        if keyed:
+            cnt += 1
+            if cnt == 1:
+                c_indx_ent = ent
+            if not math.isclose(ent, c_indx_ent):
+                indx += 1
+                c_indx_ent = ent
+            rptl = '\n' + str(indx)  + \
+                   '\t' + g + '\t' + str(qty)
+        else:
+            rptl = '\n' + g + '\t' + str(qty)
+        rptl = rptl + \
                '\t' + '{0:.3f}'.format(ent) + \
                '\t' + str(smallest) + \
                '\t' + str(largest) + \
@@ -1504,7 +1527,7 @@ class CustomText(tk.Text):
                 if do_scroll:
                     self.see(index)  # scroll widget to show the index's line
             except Exception as e:
-                msg = (f"Regex error: \"{e}\".")
+                msg = f"Regex error: \"{e}\"."
                 messagebox.showinfo(title=None, message=msg)
                 break
 
