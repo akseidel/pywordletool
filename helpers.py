@@ -239,6 +239,14 @@ def get_pu_wordlist(full_path_name) -> list:
                 pu_wrds.append(line.split(',', 1)[0].lower())
     return pu_wrds
 
+def get_classic_wordlist(full_path_name) -> list:
+    classic_wrds = []
+    if os.path.exists(full_path_name):
+        with open(full_path_name, 'r') as file:
+            for line in file:
+                classic_wrds.append(line.split(',', 1)[0].lower().rstrip())
+    return classic_wrds
+
 def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
     """
     Culls the p_wrds list from the s_wrds list. Intended
@@ -933,7 +941,7 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
     rptwnd.back_to_summary()
 
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk):
-    rptl = "\n\n> >  Groups summary using the " + msg + " words for guesses on the " + \
+    rptl = "\n\n> >  Outcome summary using the " + msg + " words for guesses on the " + \
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.verbose_data.insert(tk.END, rptl)
 
@@ -951,7 +959,7 @@ def prnt_guesses_header(rptwnd: ctk, keyed=False):
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
-    rptl = rptwnd.context + " - Pattern Groups For Guesses From The " + msg + " Words List (" + \
+    rptl = rptwnd.context + " - Outcome Patterns For Guesses From The " + msg + " Words List (" + \
            '{0:.0f}'.format(len(source_list)) + ")"
     rptwnd.title(rptl)
     rptl = "> >  " + rptl + "  < <"
@@ -1516,7 +1524,7 @@ class CustomText(tk.Text):
                         is_first_pass=False
                         if mode == 1:
                             # only the first match is sought. This is specifically
-                            # used to return to the Groups Summary text for one of the
+                            # used to return to the Outcome Summary text for one of the
                             # report types
                             break
                 if count.get() == 0:
@@ -1595,12 +1603,12 @@ class RptWnd(ctk.CTkToplevel):
 
     def back_to_summary(self):
         """
-        Scrolls the window to the part that says 'Groups summary'. It does
+        Scrolls the window to the part that says 'Outcome summary'. It does
         this by highlighting the text, which causes the scroll, and then removes
         the highlight pattern.
         """
         search_text = ''
-        regex: search_text = 'Groups summary'
+        regex: search_text = 'Outcome summary'
         self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=1)
         self.verbose_data.remove_tag('grp')
 
@@ -1677,7 +1685,7 @@ class RptWnd(ctk.CTkToplevel):
                                  )
         button_b.pack(side=tk.LEFT, padx=10, pady=10)
 
-        button_drill = ctk.CTkButton(self, text="Groups Driller",
+        button_drill = ctk.CTkButton(self, text="Outcome Driller",
                                      text_color="black",
                                      command=self.rpt_show_grps_driller)
         button_drill.pack(side=tk.LEFT, padx=4, pady=3)

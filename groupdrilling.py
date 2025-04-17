@@ -7,7 +7,7 @@ import tkinter.messagebox
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
 # namespace so that tk is preserved
 import customtkinter as ctk
-import helpers
+import helpers as hlp
 import re
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
@@ -19,21 +19,21 @@ letter_rank_file = 'letter_ranks.txt'
 
 def process_grp_list(self, g_word_lst: list) -> dict:
     """
-    Processes the words list for its groups. Uses the method options in the groups
+    Processes the words list for its outcomes. Uses the method options in the outcomes
     driller for the processing arguments.
     @param self:
-    @param g_word_lst: The words list to be examined for groups
+    @param g_word_lst: The words list to be examined for outcomes
     @return: dictionary of the optimal words
     """
     # Flag to use various solutions as guesses instead of the current displayed word list.
-    # This allows the option to group rank from the entire guess list.
+    # This allows the option to outcome rank from the entire guess list.
     grps_guess_source = self.grps_guess_source.get()
-    optimal_group_guesses = {}
-    context = 'Groups Drilling'
+    optimal_outcome_guesses = {}
+    context = 'Outcome Drilling'
     match grps_guess_source:
         case 0:
             # using the showing words (remaining solutions) for guess candidates
-            optimal_group_guesses = helpers.best_outcomes_from_showing_as_guess_dict(g_word_lst,
+            optimal_outcome_guesses = hlp.best_outcomes_from_showing_as_guess_dict(g_word_lst,
                                                                                      self.d_verbose_grps.get(),
                                                                                      self.d_ent_grps.get(),
                                                                                      self.d_verbose_grps_cond.get(),
@@ -43,14 +43,14 @@ def process_grp_list(self, g_word_lst: list) -> dict:
 
         case 1:
             # using the classic (original possible solutions) words for guess candidates
-            all_targets = helpers.ToolResults(data_path,
+            all_targets = hlp.ToolResults(data_path,
                                               'wo_nyt_wordlist.txt',
                                               letter_rank_file,
                                               True,
                                               0,
                                               True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Classic Vocabulary'
-            optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(g_word_lst,
+            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(g_word_lst,
                                                                               self.d_verbose_grps.get(),
                                                                               self.d_ent_grps.get(),
                                                                               self.d_verbose_grps_cond.get(),
@@ -61,14 +61,14 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                                                               )
         case 2:
             # using the classic+ (entire possible solutions) for guess candidates
-            all_targets = helpers.ToolResults(data_path,
+            all_targets = hlp.ToolResults(data_path,
                                               'botadd_nyt_wordlist.txt',
                                               letter_rank_file,
                                               True,
                                               0,
                                               True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Classic+ Vocabulary'
-            optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(g_word_lst,
+            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(g_word_lst,
                                                                               self.d_verbose_grps.get(),
                                                                               self.d_ent_grps.get(),
                                                                               self.d_verbose_grps_cond.get(),
@@ -79,14 +79,14 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                                                               )
         case 3:
             # using the entire allowed guess list for guess candidates
-            all_targets = helpers.ToolResults(data_path,
+            all_targets = hlp.ToolResults(data_path,
                                               'nyt_wordlist.txt',
                                               letter_rank_file,
                                               True,
                                               0,
                                               True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Large Vocabulary'
-            optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(g_word_lst,
+            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(g_word_lst,
                                                                               self.d_verbose_grps.get(),
                                                                               self.d_ent_grps.get(),
                                                                               self.d_verbose_grps_cond.get(),
@@ -98,11 +98,11 @@ def process_grp_list(self, g_word_lst: list) -> dict:
         case _:
             pass
 
-    return optimal_group_guesses
+    return optimal_outcome_guesses
 
 
 class GrpsDrillingMain(ctk.CTkToplevel):
-    common_msg = '\n> >  Highlighted words are common to both the entry words and the optimal group guess words.'
+    common_msg = '\n> >  Highlighted words are common to both the entry words and the optimal outcome guess words.'
     def_msg = 'Paste or write in the words list into the above entry field.' + \
               '\n\nRaw pastes from the This Wordle Helper will be automatically cleaned and converted to ' + \
               'a valid word list entry.'
@@ -114,7 +114,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         """
         Processes what was pasted into the word list entry into a proper looking list of
         five-letter words. The intent is to be able to paste raw text copied out of the Helper's
-        list window, raw text copied from a Groups Driller output and other copied text sources like
+        list window, raw text copied from a Outcome Driller output and other copied text sources like
         spreadsheet ranges. Numbers, spaces, punctuation, non-alphabet characters and line feeds
         are to be removed.
         @return: a tuple containing Status, the list of five-letter words , the list of invalid words.
@@ -158,19 +158,19 @@ class GrpsDrillingMain(ctk.CTkToplevel):
             self.set_busy_status_msg()
             self.enable_controls('disabled')
             self.update()
-            optimal_group_guesses = process_grp_list(self, this_lst)
+            optimal_outcome_guesses = process_grp_list(self, this_lst)
 
             # Report the results
-            self.report_results(this_lst, optimal_group_guesses, self.d_verbose_grps_cond.get())
-            self.title("Groups Drilling")
+            self.report_results(this_lst, optimal_outcome_guesses, self.d_verbose_grps_cond.get())
+            self.title("Outcome Drilling")
             self.enable_controls('enabled')
 
             self.deiconify()
 
         else:
             tkinter.messagebox.showerror(title='Will Not Proceed',
-                                         message='Finding groups requires at least three words.'
-                                                 '\nFor group of 2, E(G) is 1.5 when the guess is from the list.'
+                                         message='Finding outcomes requires at least three words.'
+                                                 '\nFor outcome of 2, E(G) is 1.5 when the guess is from the list.'
                                                  '\nOtherwise E(G) is 2.'
                                          )
             return
@@ -192,23 +192,23 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.rbrBB.configure(state=look)
         self.rbrC.configure(state=look)
 
-    def report_results(self, this_lst: list, optimal_group_guesses: dict, cond_mode=False) -> None:
+    def report_results(self, this_lst: list, optimal_outcome_guesses: dict, cond_mode=False) -> None:
         """
         Fills the results status CustomText with the results. And highlights the
         words in the to-be-examined words list if they are optimal.
-        @param this_lst: The list of words that will be drilled for guess groups
-        @param optimal_group_guesses: The dictionary of optimal words.
+        @param this_lst: The list of words that will be drilled for guess outcomes
+        @param optimal_outcome_guesses: The dictionary of optimal words.
         """
         # The words in common will be highlighted.
-        words_in_common = list(set(this_lst) & set(optimal_group_guesses))
+        words_in_common = list(set(this_lst) & set(optimal_outcome_guesses))
         regex: str = '|'.join(words_in_common)
-        wrds = helpers.opt_wrds_for_reporting(optimal_group_guesses, cond_mode)
+        wrds = hlp.opt_wrds_for_reporting(optimal_outcome_guesses, cond_mode)
         self.tx_status.configure(state='normal')
         self.tx_status.delete("1.0", "end")
         self.tx_status.insert('end', '> >  {} submitted words'.format(len(this_lst)))
         if len(words_in_common) > 0:
             self.tx_status.insert('end', self.common_msg)
-        self.tx_status.insert('end', helpers.outcomes_stats_summary_line(optimal_group_guesses))
+        self.tx_status.insert('end', hlp.outcomes_stats_summary_line(optimal_outcome_guesses))
         self.tx_status.insert('end', wrds)
         self.tx_status.see('1.0')
         if self.d_ent_grps.get():
@@ -231,7 +231,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         except tkinter.TclError:
             tkinter.messagebox.showerror(title='Clipboard Is Empty',
                                          message='\nThere is nothing to paste.'
-                                                 '\nFirst copy a group. Then use this. The clipboard will '
+                                                 '\nFirst copy an outcome. Then use this. The clipboard will '
                                                  'be empty afterwards.'
                                          )
             return
@@ -260,13 +260,13 @@ class GrpsDrillingMain(ctk.CTkToplevel):
     def title_status(self):
         match self.grps_guess_source.get():
             case 0:
-                self.title("Groups Drilling Using The Words Entered List For Guesses")
+                self.title("Outcome Drilling Using The Words Entered List For Guesses")
             case 1:
-                self.title("Groups Drilling Using The Classic Vocabulary For Guesses")
+                self.title("Outcome Drilling Using The Classic Vocabulary For Guesses")
             case 2:
-                self.title("Groups Drilling Using The Classic+ Vocabulary For Guesses")
+                self.title("Outcome Drilling Using The Classic+ Vocabulary For Guesses")
             case 3:
-                self.title("Groups Drilling Using The Large Vocabulary For Guesses")
+                self.title("Outcome Drilling Using The Large Vocabulary For Guesses")
             case _:
                 pass
         # Focus is most likely best at the entry field.
@@ -280,6 +280,9 @@ class GrpsDrillingMain(ctk.CTkToplevel):
     def condensed_chk(self):
         if self.d_verbose_grps_cond.get():
             self.d_verbose_grps.set(True)
+            self.d_keyed_verbose_grps.set(True)
+        else:
+            self.d_keyed_verbose_grps.set(False)
 
     def keyed_chk(self):
         if self.d_keyed_verbose_grps.get():
@@ -305,7 +308,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
 
     def __init__(self):
         super().__init__()
-        self.title("Groups Drilling Using The Large Vocabulary")
+        self.title("Outcome Drilling Using The Large Vocabulary")
         w_width = 1120
         w_height = 200
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
@@ -369,9 +372,9 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                           )
         self.button_clear.pack(side="left", padx=6, pady=10)
 
-        # labelframe within groups frame for which list option
+        # labelframe within outcomes frame for which list option
         self.grp_lst_ops_frame = ttk.LabelFrame(self,
-                                                text='Vocabulary Source For Guess Group Words:',
+                                                text='Vocabulary Source For Guess Outcome Words:',
                                                 labelanchor='w',
                                                 borderwidth=0
                                                 )
@@ -432,7 +435,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                             )
         self.chk_grp_disp.pack(side=tk.RIGHT, padx=10, pady=2)
 
-        # end labelframe within groups frame for which list option
+        # end labelframe within outcomes frame for which list option
 
         # status frame
         self.stat_frame = ctk.CTkFrame(self,
@@ -441,7 +444,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.stat_frame.pack(fill=tk.BOTH, padx=8, pady=2, expand=True)
 
         # status line
-        self.tx_status = helpers.CustomText(self.stat_frame,
+        self.tx_status = hlp.CustomText(self.stat_frame,
                                             wrap='word',
                                             background='#dedede',
                                             borderwidth=0,
@@ -450,7 +453,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.tx_status.pack(side="left", anchor=tk.NW, padx=10, pady=4, expand=True, fill=tk.BOTH)
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
-        # tag 'grp' is used to highlight group ranker
+        # tag 'grp' is used to highlight outcome ranker
         self.tx_status.tag_configure('grp', background='#fff69a')
         # tag 'ent' is used to highlight entropy pick
         self.tx_status.tag_configure('ent', background='#ffd700')

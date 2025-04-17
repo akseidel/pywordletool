@@ -25,7 +25,7 @@ from tkinter import messagebox
 
 import customtkinter as ctk
 
-import helpers
+import helpers as hlp
 import groupdrilling
 
 # globals
@@ -123,7 +123,7 @@ class Pywordlemainwindow(ctk.CTk):
 
     def show_help(self) -> None:
         if self.wnd_help is None or not self.wnd_help.winfo_exists():
-            self.wnd_help = helpers.HelpWindow(data_path, letter_rank_file)  # create window if its None or destroyed
+            self.wnd_help = hlp.HelpWindow(data_path, letter_rank_file)  # create window if its None or destroyed
         else:
             self.wnd_help.deiconify()  # unhide possible hidden window
             self.wnd_help.focus()  # if window exists focus it
@@ -181,7 +181,7 @@ class Pywordlemainwindow(ctk.CTk):
         w_width = 1240 #1300  # 1036
         w_height = 672
 
-        helpers.size_and_position_this_window(self, w_width, w_height, 0, 0)
+        hlp.size_and_position_this_window(self, w_width, w_height, 0, 0)
 
         # set the Vars
         self.grps_guess_source = tk.IntVar(value=0)
@@ -203,6 +203,7 @@ class Pywordlemainwindow(ctk.CTk):
         # pos_r to be a mutable list of unassigned letter positions
         self.pos_r = self.pos5.copy()
         self.pos_x = self.pos5.copy()
+        self.sel_not_classic = False
         self.sel_rando = False
         self.sel_grpoptimal = False
         self.sel_genetic = False
@@ -211,8 +212,6 @@ class Pywordlemainwindow(ctk.CTk):
         # configure style
         style = ttk.Style()
         style.theme_use()
-
-        # self.bind("<Configure>", on_window_resize)
 
         def show_grps_driller() -> None:
             if self.grpsdriller_window is None or not self.grpsdriller_window.winfo_exists():
@@ -261,7 +260,7 @@ class Pywordlemainwindow(ctk.CTk):
                 vocab_filename = full_wordle_wrd_list
 
             # create the wordletool instance
-            wordletool = helpers.ToolResults(data_path, # relative path to worddata
+            wordletool = hlp.ToolResults(data_path, # relative path to worddata
                                              vocab_filename, # the vocabulary considered for solutions or guesses
                                              letter_rank_file, # file that cointains letter rank data
                                              allow_dups, # allow duplicate multiple letters
@@ -274,12 +273,12 @@ class Pywordlemainwindow(ctk.CTk):
             # The filter builders. Each of these adds to the grep command argument list
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
             wordletool.tool_command_list.add_cmd(build_require_these_grep(rq_ltrs))
-            helpers.build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
-            req_pat = helpers.build_r_pos_grep(wordletool, r_pos_dict)
+            hlp.build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
+            req_pat = hlp.build_r_pos_grep(wordletool, r_pos_dict)
 
             # needed to show the last user entry in title_context with the sanity question.
             self.update()
-            if helpers.wrd_has_duplicates(req_pat) and (not self.allow_dup_state.get()):
+            if hlp.wrd_has_duplicates(req_pat) and (not self.allow_dup_state.get()):
                 sanity_question(self.entry_spec_pattern)
 
             if self.sp_pat_mode_var.get() == 1:
@@ -341,16 +340,26 @@ class Pywordlemainwindow(ctk.CTk):
                 tx_result.highlight_pattern(rand_pick, 'ran', remove_priors=False)
                 comment = " (1 random pick selected)"
 
+            # Not classic marking
+            if self.sel_not_classic and (n_items > 0):
+                wrds_showing: list = list(the_word_list.keys())
+                classic_wrds = hlp.get_classic_wordlist(
+                    hlp.get_word_list_path_name(data_path + classic_pos_sol_wrd_list, False))
+                bot_added_wrds = list(set(wrds_showing) - set(classic_wrds))
+                regex: str = hlp.regex_maxgenrankers(bot_added_wrds, the_word_list)
+                tx_result.highlight_pattern(regex, 'add', remove_priors=False)
+                comment = " (" + str(len(bot_added_wrds)) + " non originals selected)"
+
             # Genetic ranking
             if self.sel_genetic and (n_items > 0):
                 gendict: dict[str, list] = {}
                 for w, r in the_word_list.items():
-                    gencode = helpers.get_gencode(w)
+                    gencode = hlp.get_gencode(w)
                     gendict.update({w: gencode})
-                gen_tally: list = helpers.get_gendict_tally(gendict)
-                maxrank: int = helpers.assign_genrank(gendict, gen_tally)
-                max_rankers: list = helpers.get_maxgenrankers(gendict, maxrank)
-                regex: str = helpers.regex_maxgenrankers(max_rankers, the_word_list)
+                gen_tally: list = hlp.get_gendict_tally(gendict)
+                maxrank: int = hlp.assign_genrank(gendict, gen_tally)
+                max_rankers: list = hlp.get_maxgenrankers(gendict, maxrank)
+                regex: str = hlp.regex_maxgenrankers(max_rankers, the_word_list)
                 tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
 
@@ -382,7 +391,7 @@ class Pywordlemainwindow(ctk.CTk):
                 match grps_guess_source:
                     case 0:
                         # using the showing words (remaining solutions) for guess candidates
-                        optimal_group_guesses = helpers.best_outcomes_from_showing_as_guess_dict(remaining_word_list,
+                        optimal_group_guesses = hlp.best_outcomes_from_showing_as_guess_dict(remaining_word_list,
                                                                                                  self.verbose_grps.get(),
                                                                                                  self.ent_grps.get(),
                                                                                                  self.cond_grps.get(),
@@ -391,18 +400,18 @@ class Pywordlemainwindow(ctk.CTk):
 
                     case 1:
                         # using the classic (original possible solutions) words for guess candidates
-                        guess_targets = helpers.ToolResults(data_path,
+                        guess_targets = hlp.ToolResults(data_path,
                                                           classic_pos_sol_wrd_list,
                                                           letter_rank_file,
                                                           True,
                                                           0,
                                                           True).get_ranked_grep_result_wrd_lst(True)
                         if self.use_hard_mode.get():
-                            guess_targets = helpers.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
+                            guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
                             report_msg1 = 'Classic Vocabulary-HM'
                         else:
                             report_msg1 = 'Classic Vocabulary-DF'
-                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(remaining_word_list,
+                        optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(remaining_word_list,
                                                                                           self.verbose_grps.get(),
                                                                                           self.ent_grps.get(),
                                                                                           self.cond_grps.get(),
@@ -412,18 +421,18 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                           context)
                     case 2:
                         # using the classic+ (entire possible solutions) for guess candidates
-                        guess_targets = helpers.ToolResults(data_path,
+                        guess_targets = hlp.ToolResults(data_path,
                                                           bot_pos_sol_wrd_list,
                                                           letter_rank_file,
                                                           True,
                                                           0,
                                                           True).get_ranked_grep_result_wrd_lst(True)
                         if self.use_hard_mode.get():
-                            guess_targets = helpers.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
+                            guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
                             report_msg1 = 'Classic+ Vocabulary-HM'
                         else:
                             report_msg1 = 'Classic+ Vocabulary-DF'
-                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(remaining_word_list,
+                        optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(remaining_word_list,
                                                                                           self.verbose_grps.get(),
                                                                                           self.ent_grps.get(),
                                                                                           self.cond_grps.get(),
@@ -433,18 +442,18 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                           context)
                     case 3:
                         # using the entire allowed guess list for guess candidates
-                        guess_targets = helpers.ToolResults(data_path,
+                        guess_targets = hlp.ToolResults(data_path,
                                                           full_wordle_wrd_list,
                                                           letter_rank_file,
                                                           True,
                                                           0,
                                                           True).get_ranked_grep_result_wrd_lst(True)
                         if self.use_hard_mode.get():
-                            guess_targets = helpers.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
+                            guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
                             report_msg1 = 'Large Vocabulary-HM'
                         else:
                             report_msg1 = 'Large Vocabulary-DF'
-                        optimal_group_guesses = helpers.extended_best_outcomes_guess_dict(remaining_word_list,
+                        optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(remaining_word_list,
                                                                                           self.verbose_grps.get(),
                                                                                           self.ent_grps.get(),
                                                                                           self.cond_grps.get(),
@@ -456,17 +465,17 @@ class Pywordlemainwindow(ctk.CTk):
                         pass
 
                 opt_group_guesses_as_list = list(optimal_group_guesses.keys())
-                (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = helpers.outcomes_stat_summary(optimal_group_guesses)
+                (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = hlp.outcomes_stat_summary(optimal_group_guesses)
                 match grps_guess_source:
                     case 0:
-                        regex: str = helpers.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
+                        regex: str = hlp.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
                     case _:
                         # The displayed list may not have the words to highlight when the grps_guess_source
                         # uses more words than what is in the current displayed list. Instead, any common
                         # words will be highlighted.
                         displayed_as_list = list(the_word_list.keys())
                         words_in_common = list(set(displayed_as_list) & set(opt_group_guesses_as_list))
-                        regex: str = helpers.regex_maxgenrankers(words_in_common, the_word_list)
+                        regex: str = hlp.regex_maxgenrankers(words_in_common, the_word_list)
 
                 if self.ent_grps.get():
                     tx_result.highlight_pattern(regex, 'ent', remove_priors=False)
@@ -613,6 +622,14 @@ class Pywordlemainwindow(ctk.CTk):
             self.suppress_grep = False
             clear_specials()
 
+        # select all not classic words
+        def not_classic() -> None:
+            self.sel_not_classic = True
+            self.title("> > > ... Busy Finding Not Classics ... < < <")
+            do_grep()
+            self.title("This Wordle Helper")
+            self.sel_not_classic = False
+
         # selected a random word in the result
         def pick_rando() -> None:
             self.sel_rando = True
@@ -628,7 +645,7 @@ class Pywordlemainwindow(ctk.CTk):
         # selected optimal group ranking in the result
         def pick_optimals() -> None:
             self.sel_grpoptimal = True
-            self.title("> > > ... Busy, Please Wait ... < < <")
+            self.title("> > > ... Busy Finding Optimals ... < < <")
             do_grep()
             self.title("This Wordle Helper")
             self.sel_grpoptimal = False
@@ -710,7 +727,7 @@ class Pywordlemainwindow(ctk.CTk):
         lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='ew', padx=6, pady=2)
         # the word list resulting from grep on the main wordlist
         # tx_result = tk.Text(self.result_frame,
-        tx_result = helpers.CustomText(self.result_frame,
+        tx_result = hlp.CustomText(self.result_frame,
                                        font=('Courier', 14, 'normal'),
                                        wrap='word',
                                        background='#dedede',
@@ -728,6 +745,8 @@ class Pywordlemainwindow(ctk.CTk):
         tx_result.tag_configure('gen', background='#ffb8f2')
         # tag 'ent' is used to highlight entropy pick
         tx_result.tag_configure('ent', background='#ffd700')
+        # tag 'add' is used to highlight non classic words
+        tx_result.tag_configure('add', background='#b6df00')
         if self.winfo_screenheight() <= 800:
             tx_result.configure(height=10)  # to do, set according to screen height
         else:
@@ -844,7 +863,7 @@ class Pywordlemainwindow(ctk.CTk):
         # Coordinate duplicates in special pattern with no dup setting
         def coordinate_special_pattern_dups() -> None:
             self.update()
-            if helpers.wrd_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
+            if hlp.wrd_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
                 sanity_question(self.entry_spec_pattern)
 
         def sanity_question(entry: ttk.Entry) -> None:
@@ -863,7 +882,7 @@ class Pywordlemainwindow(ctk.CTk):
         def do_mult_ltr_def(*args) -> None:
             # In this ui all text is shown in uppercase and the format must conform to:
             # <number><letter>,<number><letter>
-            self.mult_ltr_definition.set(helpers.validate_mult_ltr_sets(self.mult_ltr_definition.get()))
+            self.mult_ltr_definition.set(hlp.validate_mult_ltr_sets(self.mult_ltr_definition.get()))
             do_grep()
 
         # label
@@ -1591,7 +1610,7 @@ class Pywordlemainwindow(ctk.CTk):
                                      command=self.show_help)
         self.bt_help.pack(side=tk.LEFT, padx=4, pady=3, fill=tk.X, expand=True)
 
-        self.bt_drill = ctk.CTkButton(self.bt_grpB_frame, text="Groups Driller",
+        self.bt_drill = ctk.CTkButton(self.bt_grpB_frame, text="Outcome Driller",
                                       width=40, text_color="black", command=show_grps_driller)
         self.bt_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
 
@@ -1603,11 +1622,15 @@ class Pywordlemainwindow(ctk.CTk):
                                     command=clear_all)
         self.bt_zap.pack(side=tk.RIGHT, padx=4, pady=1, fill=tk.X, expand=True)
 
-        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Show Genetic ", width=40, text_color="black",
+        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Genetic", width=40, text_color="black",
                                       command=pick_genetic)
         self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
 
-        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Pick Random", width=40, text_color="black",
+        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="! Classic", width=40, text_color="black",
+                                      command=not_classic)
+        self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
+
+        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Random", width=40, text_color="black",
                                       command=pick_rando)
         self.bt_rando.pack(side=tk.LEFT, padx=4, pady=1, fill=tk.X, expand=True)
         # end frame for Clear, Random, Genetic buttons
@@ -1653,7 +1676,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.chk_key_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
         # labelframe within groups frame for which list option
         self.grp_lst_ops_frame = ttk.LabelFrame(self.admin_frame,
-                                                text='Vocabulary Source For Guess Group Words',
+                                                text='Vocabulary Source For Guess Word Outcome',
                                                 labelanchor='n',
                                                 border=0
                                                 )
