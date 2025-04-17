@@ -636,6 +636,9 @@ class Pywordlemainwindow(ctk.CTk):
         def cond_grps_chk() -> None:
             if self.cond_grps.get():
                 self.verbose_grps.set(True)
+                self.keyed_verbose_grps.set(True)
+            else:
+                self.keyed_verbose_grps.set(False)
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
