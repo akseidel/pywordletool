@@ -713,8 +713,11 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame = ctk.CTkFrame(self,
                                          corner_radius=10
                                          )
-        self.result_frame.pack(padx=10, pady=2, fill=tk.X)
+        self.result_frame.pack(anchor="n", padx=10, pady=2, fill="both", expand=1)
         self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
+        self.result_frame.grid_rowconfigure(1,weight=100) # allows row 1 to expand (with sticky)
+        self.result_frame.grid_rowconfigure(2, weight=1)
+        self.result_frame.grid_rowconfigure(3, weight=1)
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
                                 text=str_wrd_list_hrd(set_n_col(self)),
@@ -724,16 +727,16 @@ class Pywordlemainwindow(ctk.CTk):
                                 anchor='w',
                                 borderwidth=0,
                                 highlightthickness=0)
-        lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='ew', padx=6, pady=2)
-        # the word list resulting from grep on the main wordlist
-        # tx_result = tk.Text(self.result_frame,
+        lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='enw', padx=6, pady=2)
+        # The word list resulting from grep on the main wordlist
+        # The CustomText class is a tk.Text extended to support a color for matched text.
         tx_result = hlp.CustomText(self.result_frame,
                                        font=('Courier', 14, 'normal'),
                                        wrap='word',
                                        background='#dedede',
                                        borderwidth=0,
                                        highlightthickness=0)
-        tx_result.grid(row=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        tx_result.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=6, pady=2)
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
         # tag 'grp' is used to highlight group ranker
@@ -756,14 +759,14 @@ class Pywordlemainwindow(ctk.CTk):
         tx_results_sb.grid(row=1, column=5, sticky='ens')
         tx_result.config(yscrollcommand=tx_results_sb.set)
         tx_results_sb.config(command=tx_result.yview)
-
+        # status line
         lb_status = tk.Label(self.result_frame,
                              textvariable=self.status,
                              font=('Courier', 14, 'normal'),
                              background='#dedede',
                              borderwidth=0,
                              highlightthickness=0)
-        lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='new', padx=6, pady=4)
         self.status.set('No status yet.')
 
         # grep line being used
@@ -774,7 +777,7 @@ class Pywordlemainwindow(ctk.CTk):
                         background='#dedede',
                         borderwidth=0,
                         highlightthickness=0)
-        tx_gr.grid(row=4, column=0, columnspan=4, sticky='ew', padx=6, pady=4)
+        tx_gr.grid(row=4, column=0, columnspan=4, sticky='nsew', padx=6, pady=4)
         tx_gr.delete(1.0, tk.END)
         # scrollbar for grep line
         tx_gr_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
@@ -789,7 +792,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.criteria_frame = ctk.CTkFrame(self,
                                            corner_radius=10
                                            )
-        self.criteria_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=0, expand=True)
+        self.criteria_frame.pack( anchor="n", fill=tk.X, padx=10, pady=0, expand=0)
 
         # letter exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
