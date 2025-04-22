@@ -713,7 +713,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame = ctk.CTkFrame(self,
                                          corner_radius=10
                                          )
-        self.result_frame.pack(anchor="n", padx=10, pady=2, fill="both", expand=1)
+        self.result_frame.pack(anchor="n", padx=2, pady=2, fill="both", expand=1)
         self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         self.result_frame.grid_rowconfigure(1,weight=100) # allows row 1 to expand (with sticky)
         self.result_frame.grid_rowconfigure(2, weight=1)
@@ -766,7 +766,7 @@ class Pywordlemainwindow(ctk.CTk):
                              background='#dedede',
                              borderwidth=0,
                              highlightthickness=0)
-        lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='new', padx=6, pady=4)
+        lb_status.grid(row=2, rowspan=1, column=0, columnspan=4, sticky='nsew', padx=6, pady=4)
         self.status.set('No status yet.')
 
         # grep line being used
@@ -785,37 +785,42 @@ class Pywordlemainwindow(ctk.CTk):
         tx_gr.config(yscrollcommand=tx_gr_sb.set)
         tx_gr_sb.config(command=tx_gr.yview)
 
+        self.bottomhalf_frame = ctk.CTkFrame(self,
+                                             corner_radius=10
+                                             )
+        self.bottomhalf_frame.pack(anchor="s", padx=2, pady=2, fill=tk.X, expand=0)
+
         # grep criteria outer frame holding:
         # letter require frame
         # letter exclusion frame
         # letter position frame
-        self.criteria_frame = ctk.CTkFrame(self,
+        self.criteria_frame = ctk.CTkFrame(self.bottomhalf_frame,
                                            corner_radius=10
                                            )
-        self.criteria_frame.pack( anchor="n", fill=tk.X, padx=10, pady=0, expand=0)
+        self.criteria_frame.pack( anchor="n", fill=tk.X, padx=0, pady=0, expand=1)
 
-        # letter exclusion frame - uses pack
+        # letter checkbox exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
                                                text='Letters To Be Excluded',
                                                border=0,
                                                borderwidth=0
                                                )
-        self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=4, pady=1)
+        self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0,expand=1)
 
-        # letter require frame - uses pack
+        # letter checkbox require frame - uses pack
         self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
                                                text='Letters To Be Required',
                                                border=0,
                                                borderwidth=0
                                                )
-        self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=4, pady=1)
+        self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0,expand=1)
 
         # letter position frame overall - uses pack
         self.criteria_frame_p = ttk.LabelFrame(self.criteria_frame,
                                                text='Letter Positioning',
                                                labelanchor='n'
                                                )
-        self.criteria_frame_p.pack(side=tk.LEFT, fill=tk.BOTH, padx=0, pady=2)
+        self.criteria_frame_p.pack(side=tk.LEFT, fill=tk.BOTH, padx=0, pady=0,expand=1)
 
         # letter position frame exclude - uses pack
         self.criteria_frame_px = ttk.LabelFrame(self.criteria_frame_p,
@@ -824,7 +829,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0,
                                                 borderwidth=0
                                                 )
-        self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
+        self.criteria_frame_px.pack(side=tk.RIGHT, fill=tk.Y, padx=0, pady=0,expand=1)
 
         # letter position frame require- uses pack
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
@@ -833,13 +838,13 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0,
                                                 borderwidth=0
                                                 )
-        self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.X, padx=4, pady=2)
+        self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.Y, padx=0, pady=0,expand=1)
 
         # outer frame for multiple actions frame require- uses pack
-        self.actions_outer_frame = tk.Frame(self.criteria_frame,
-
-                                            )
-        self.actions_outer_frame.pack( side=tk.LEFT, fill=tk.X, padx=4, pady=2, expand=True)
+        self.actions_outer_frame = ctk.CTkFrame(self.criteria_frame,
+                                                corner_radius=10
+                                                )
+        self.actions_outer_frame.pack( side=tk.LEFT, fill=tk.X, padx=0, pady=0, expand=1)
 
         # =======  START OF ============ include special patterns control
         # frame for special pattern regex - uses pack
@@ -847,13 +852,13 @@ class Pywordlemainwindow(ctk.CTk):
                                                 text='Special Patterns and Multiple Same Letters',
                                                 labelanchor='n'
                                                 )
-        self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=True)
+        self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=1)
 
-        self.specialpatt_subframeA = ttk.Frame(self.specialpatt_frame)
-        self.specialpatt_subframeA.pack(side=tk.TOP, fill=tk.X, padx=4, pady=0, expand=True)
+        self.specialpatt_subframeA = ctk.CTkFrame(self.specialpatt_frame,corner_radius=4)
+        self.specialpatt_subframeA.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=1)
 
-        self.specialpatt_subframeB = ttk.Frame(self.specialpatt_frame)
-        self.specialpatt_subframeB.pack(side=tk.BOTTOM, fill=tk.X, padx=4, pady=0, expand=True)
+        self.specialpatt_subframeB = ctk.CTkFrame(self.specialpatt_frame,corner_radius=4)
+        self.specialpatt_subframeB.pack(side=tk.BOTTOM, fill=tk.X, padx=0, pady=0, expand=1)
 
         # special pattern control variables
         self.spec_pattern = tk.StringVar()
@@ -888,7 +893,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.mult_ltr_definition.set(hlp.validate_mult_ltr_sets(self.mult_ltr_definition.get()))
             do_grep()
 
-        # label
+        # label for Pattern Special
         self.lb_sp_pat = ctk.CTkLabel(self.specialpatt_subframeA,
                                       text='Pattern'
                                       )
@@ -1070,7 +1075,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.treeview_px = ttk.Treeview(self.criteria_frame_px, style='position.ttk.Treeview')
         self.treeview_px.configure(columns=('1', '2'),
                                    show='headings',
-                                   height=5)
+                                   height=7)
         self.treeview_px.grid(row=1, column=0, columnspan=5, padx=4, pady=2, sticky='ew')
         ttk.Style().configure('Treeview', relief='raised')
         self.treeview_px.heading(1, text='Letter')
@@ -1165,7 +1170,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.treeview_pr = ttk.Treeview(self.criteria_frame_pr, style='position.ttk.Treeview')
         self.treeview_pr.configure(columns=('1', '2'),
                                    show='headings',
-                                   height=5
+                                   height=7
                                    )
         self.treeview_pr.grid(row=1, column=0, columnspan=5, padx=4, pady=2, sticky='ew')
         ttk.Style().configure('Treeview', relief='raised')
@@ -1507,7 +1512,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # === START OF ====== General Controls ==========
         # the_top_frame
-        the_top_frame = ttk.Frame(self.actions_frame,
+        the_top_frame = ctk.CTkFrame(self.actions_frame,
                                   border=0
                                   )
         the_top_frame.pack(padx=6, fill=tk.X, expand=True)
@@ -1590,9 +1595,9 @@ class Pywordlemainwindow(ctk.CTk):
                                           text='Application',
                                           labelanchor='n'
                                           )
-        self.admin_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=0, pady=2, expand=True)
+        self.admin_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=0, pady=0, expand=True)
 
-        self.close_frame = ttk.Frame(self.admin_frame)
+        self.close_frame = ctk.CTkFrame(self.admin_frame)
         self.close_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.bt_Q = ctk.CTkButton(self.close_frame, text="Quit",
@@ -1606,7 +1611,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_S.pack(side=tk.LEFT, padx=4, pady=2, fill=tk.X, expand=True)
 
         # frame for Information and Grp drill buttons
-        self.bt_grpB_frame = ttk.Frame(self.admin_frame)
+        self.bt_grpB_frame = ctk.CTkFrame(self.admin_frame)
         self.bt_grpB_frame.pack(side=tk.BOTTOM, padx=0, pady=3, fill=tk.X)
 
         self.bt_help = ctk.CTkButton(self.bt_grpB_frame, text="Information", width=40, text_color="black",
@@ -1618,7 +1623,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
 
         # frame for Clear, Random, Genetic buttons
-        self.bt_grpA_frame = ttk.Frame(self.admin_frame)
+        self.bt_grpA_frame = ctk.CTkFrame(self.admin_frame)
         self.bt_grpA_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X)
 
         self.bt_zap = ctk.CTkButton(self.bt_grpA_frame, text="Clear Settings", width=40, text_color="black",
@@ -1639,7 +1644,7 @@ class Pywordlemainwindow(ctk.CTk):
         # end frame for Clear, Random, Genetic buttons
 
         # frame for groups outcome options
-        self.grp_frame = ttk.Frame(self.admin_frame)
+        self.grp_frame = ctk.CTkFrame(self.admin_frame)
         self.grp_frame.pack(side=tk.TOP, padx=0, pady=3, fill=tk.X, expand=True)
 
         self.bt_groups = ctk.CTkButton(self.grp_frame,
