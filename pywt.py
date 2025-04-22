@@ -1513,7 +1513,7 @@ class Pywordlemainwindow(ctk.CTk):
         # === START OF ====== General Controls ==========
         # the_top_frame
         the_top_frame = ctk.CTkFrame(self.actions_frame,
-                                  border=0
+                                  border_width=0
                                   )
         the_top_frame.pack(padx=6, fill=tk.X, expand=True)
 
