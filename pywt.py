@@ -713,7 +713,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame = ctk.CTkFrame(self,
                                          corner_radius=10
                                          )
-        self.result_frame.pack(anchor="n", padx=2, pady=2, fill="both", expand=1)
+        self.result_frame.pack(anchor="n", padx=10, pady=2, fill="both", expand=1)
         self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
         self.result_frame.grid_rowconfigure(1,weight=100) # allows row 1 to expand (with sticky)
         self.result_frame.grid_rowconfigure(2, weight=1)
@@ -788,7 +788,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bottomhalf_frame = ctk.CTkFrame(self,
                                              corner_radius=10
                                              )
-        self.bottomhalf_frame.pack(anchor="s", padx=2, pady=2, fill=tk.X, expand=0)
+        self.bottomhalf_frame.pack(anchor="s", padx=10, pady=2, fill=tk.X, expand=0)
 
         # grep criteria outer frame holding:
         # letter require frame
