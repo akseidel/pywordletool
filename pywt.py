@@ -829,7 +829,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0,
                                                 borderwidth=0
                                                 )
-        self.criteria_frame_px.pack(side=tk.RIGHT, fill=tk.Y, padx=0, pady=0,expand=1)
+        self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.Y, padx=0, pady=0,expand=1)
 
         # letter position frame require- uses pack
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
@@ -838,7 +838,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0,
                                                 borderwidth=0
                                                 )
-        self.criteria_frame_pr.pack(side=tk.LEFT, fill=tk.Y, padx=0, pady=0,expand=1)
+        self.criteria_frame_pr.pack(side=tk.RIGHT, fill=tk.Y, padx=0, pady=0,expand=1)
 
         # outer frame for multiple actions frame require- uses pack
         self.actions_outer_frame = ctk.CTkFrame(self.criteria_frame,
