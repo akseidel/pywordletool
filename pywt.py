@@ -47,8 +47,9 @@ ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 def set_n_col(self):
+    # print (self.winfo_screenwidth())
     if self.winfo_screenwidth() > 1280:  # to do
-        return 10
+        return 8
     else:
         return 7
 
@@ -178,8 +179,8 @@ class Pywordlemainwindow(ctk.CTk):
         # print(self.winfo_screenwidth())
 
         # Screen height and width.
-        w_width = 1240 #1300  # 1036
-        w_height = 672
+        w_width = 1360
+        w_height = 780
 
         hlp.size_and_position_this_window(self, w_width, w_height, 0, 0)
 
@@ -818,7 +819,9 @@ class Pywordlemainwindow(ctk.CTk):
         # letter position frame overall - uses pack
         self.criteria_frame_p = ttk.LabelFrame(self.criteria_frame,
                                                text='Letter Positioning',
-                                               labelanchor='n'
+                                               labelanchor='n',
+                                               border=0,
+                                               borderwidth=0
                                                )
         self.criteria_frame_p.pack(side=tk.LEFT, fill=tk.BOTH, padx=0, pady=0,expand=1)
 
@@ -850,7 +853,9 @@ class Pywordlemainwindow(ctk.CTk):
         # frame for special pattern regex - uses pack
         self.specialpatt_frame = ttk.LabelFrame(self.actions_outer_frame,
                                                 text='Special Patterns and Multiple Same Letters',
-                                                labelanchor='n'
+                                                labelanchor='n',
+                                                border=0,
+                                                borderwidth=0
                                                 )
         self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=1)
 
@@ -987,7 +992,9 @@ class Pywordlemainwindow(ctk.CTk):
         # actions frame general - uses pack
         self.actions_frame = ttk.LabelFrame(self.actions_outer_frame,
                                             text='General Settings',
-                                            labelanchor='n'
+                                            labelanchor='n',
+                                            border=0,
+                                            borderwidth=0
                                             )
         self.actions_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, padx=0, pady=2, expand=True)
 
@@ -1019,7 +1026,8 @@ class Pywordlemainwindow(ctk.CTk):
                                               'X', 'Y', 'Z'),
                                       width=4,
                                       justify=tk.CENTER,
-                                      textvariable=self.pos_px_l
+                                      textvariable=self.pos_px_l,
+                                      font=("Helvetica", 12, "normal")
                                       )
         self.cbox_px_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.cbox_px_l.current(0)
@@ -1040,7 +1048,8 @@ class Pywordlemainwindow(ctk.CTk):
                                       values=('1', '2', '3', '4', '5'),
                                       width=4,
                                       justify=tk.CENTER,
-                                      textvariable=self.pos_px_p
+                                      textvariable=self.pos_px_p,
+                                      font=("Helvetica", 12, "normal")
                                       )
         self.cbox_px_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.cbox_px_p.current(0)
@@ -1116,7 +1125,8 @@ class Pywordlemainwindow(ctk.CTk):
                                               'X', 'Y', 'Z'),
                                       width=4,
                                       justify=tk.CENTER,
-                                      textvariable=self.pos_pr_l
+                                      textvariable=self.pos_pr_l,
+                                      font=("Helvetica", 12, "normal")
                                       )
         self.cbox_pr_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.cbox_pr_l.current(0)
@@ -1135,7 +1145,8 @@ class Pywordlemainwindow(ctk.CTk):
                                       values=self.pos5,
                                       width=4,
                                       justify=tk.CENTER,
-                                      textvariable=self.pos_pr_p
+                                      textvariable=self.pos_pr_p,
+                                      font=("Helvetica", 12, "normal")
                                       )
         self.cbox_pr_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.cbox_pr_p.current(0)
@@ -1593,7 +1604,8 @@ class Pywordlemainwindow(ctk.CTk):
         # admin (Application) frame - uses pack
         self.admin_frame = ttk.LabelFrame(self.criteria_frame,
                                           text='Application',
-                                          labelanchor='n'
+                                          labelanchor='n',
+                                          border=0
                                           )
         self.admin_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=0, pady=0, expand=True)
 
