@@ -770,10 +770,10 @@ class Pywordlemainwindow(ctk.CTk):
         tx_result.tag_configure('ent', background='#ffd700')
         # tag 'add' is used to highlight non classic words
         tx_result.tag_configure('add', background='#b6df00')
-        if self.winfo_screenheight() <= 800:
-            tx_result.configure(height=10)  # to do, set according to screen height
-        else:
-            tx_result.configure(height=16)
+        # if self.winfo_screenheight() <= 800:
+        #     tx_result.configure(height=10)  # to do, set according to screen height
+        # else:
+        #     tx_result.configure(height=16)
         # scrollbar for wordlist
         tx_results_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
         tx_results_sb.grid(row=1, column=5, sticky='ens')
