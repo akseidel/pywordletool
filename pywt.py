@@ -22,6 +22,7 @@ import tkinter as tk  # assigns tkinter stuff to tk namespace so that
 import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own ttk
 # namespace so that tk is preserved
 from tkinter import messagebox
+from tkinter.ttk import Style
 
 import customtkinter as ctk
 
@@ -40,36 +41,11 @@ help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 exclude = []  # exclude list used by monkey sampler
-# font_tuple_n = ("Courier", 14, "normal")
-font_tuple_n = ("Helvetica", 14, "normal")
+# font_tuple_n = ("Courier", 12, "normal")
+font_tuple_n = ("Helvetica", 10, "normal")
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
-
-def set_n_col(self):
-    # print (self.winfo_screenwidth())
-    if self.winfo_screenwidth() > 1280:  # to do
-        return 8
-    else:
-        return 7
-
-# def on_window_resize(event):
-#     width = event.width
-#     height = event.height
-#     print(f"Window resized to {width}x{height}")
-
-def str_wrd_list_hrd(ln_col: int) -> str:
-    """Creates the word list header line.
-    @param ln_col: number of columns in header
-    @return: column header string
-    """
-    h_txt = " Word : Rank "
-    left_pad = ""
-    mid_pad = "  "
-    h_line = left_pad + h_txt
-    for i in range(1, ln_col):
-        h_line = h_line + mid_pad + h_txt
-    return h_line
 
 # return a reformatted string with word wrapping
 def wrap_this(string: str, max_chars: int) -> str:
@@ -122,6 +98,21 @@ class Pywordlemainwindow(ctk.CTk):
     global x_pos_dict
     global r_pos_dict
 
+
+    def set_n_col(self):
+        sw = self.result_frame.winfo_width()
+        if sw >= 1280:
+            return 12
+        elif sw >= 1174:
+            return 11
+        elif sw >= 1068:
+            return 10
+        elif sw >= 966:
+            return 9
+        else:
+            return 8
+
+
     def show_help(self) -> None:
         if self.wnd_help is None or not self.wnd_help.winfo_exists():
             self.wnd_help = hlp.HelpWindow(data_path, letter_rank_file)  # create window if its None or destroyed
@@ -173,14 +164,9 @@ class Pywordlemainwindow(ctk.CTk):
 
         self.option_add("*Font", font_tuple_n)
 
-        # To Do - Setup width and height according to current screen
-        # dimensions.
-        # print(self.winfo_screenheight())
-        # print(self.winfo_screenwidth())
-
         # Screen height and width.
-        w_width = 1360
-        w_height = 780
+        w_width = 1150
+        w_height = 700
 
         hlp.size_and_position_this_window(self, w_width, w_height, 0, 0)
 
@@ -212,7 +198,23 @@ class Pywordlemainwindow(ctk.CTk):
 
         # configure style
         style = ttk.Style()
+        # Sets the font used for label in labelframe
+        style.configure('TLabelframe.Label', font=('helvetica', 10, 'normal'))
         style.theme_use()
+
+        def str_wrd_list_hrd() -> None:
+            """Creates the word list header line.
+            @param ln_col: number of columns in header
+            @return: column header string
+            """
+            ln_col = self.set_n_col()
+            h_txt = " Word : Rank "
+            left_pad = ""
+            mid_pad = "  "
+            h_line = left_pad + h_txt
+            for i in range(1, ln_col):
+                h_line = h_line + mid_pad + h_txt
+            lb_result_hd.configure(text=h_line)
 
         def show_grps_driller() -> None:
             if self.grpsdriller_window is None or not self.grpsdriller_window.winfo_exists():
@@ -324,12 +326,15 @@ class Pywordlemainwindow(ctk.CTk):
                 else:
                     l_msg = l_msg + mid_pad + msg
                 c = c + 1
-                if c == set_n_col(self):
+                if c == self.set_n_col():
                     tx_result.insert(tk.END, l_msg + '\n')
                     c = 0
                     l_msg = ""
                 if i == n_items:
                     tx_result.insert(tk.END, l_msg + '\n')
+
+            # configure header line for thge result text
+            str_wrd_list_hrd()
 
             comment = ""
             # Pick a random word
@@ -710,6 +715,16 @@ class Pywordlemainwindow(ctk.CTk):
                 grep_require_these = args
             return grep_require_these
 
+        # def on_window_resize(event):
+        #     width = event.width
+        #     height = event.height
+        #     print(f"Window resized to {width}x{height}")
+        #     sw = self.result_frame.winfo_width()
+        #     print(f"result_frame.winfo_width {sw}")
+        #     sw = self.winfo_screenwidth()
+        #     print(f"winfo_screenwidth {sw}")
+
+
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
                                          corner_radius=10
@@ -719,25 +734,29 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame.grid_rowconfigure(1,weight=100) # allows row 1 to expand (with sticky)
         self.result_frame.grid_rowconfigure(2, weight=1)
         self.result_frame.grid_rowconfigure(3, weight=1)
+
+        # self.pw.add(self.result_frame)
+
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
-                                text=str_wrd_list_hrd(set_n_col(self)),
-                                font=('Courier', 14, 'bold'),
+                                font=('Courier', 12, 'bold'),
                                 relief='sunken',
                                 background='#dedede',
                                 anchor='w',
                                 borderwidth=0,
                                 highlightthickness=0)
         lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='enw', padx=6, pady=2)
+        lb_result_hd.bind("<Configure>", str_wrd_list_hrd())
         # The word list resulting from grep on the main wordlist
         # The CustomText class is a tk.Text extended to support a color for matched text.
         tx_result = hlp.CustomText(self.result_frame,
-                                       font=('Courier', 14, 'normal'),
+                                       font=('Courier', 12, 'normal'),
                                        wrap='word',
                                        background='#dedede',
                                        borderwidth=0,
                                        highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=6, pady=2)
+        # tx_result.bind("<Configure>", on_window_resize)
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
         # tag 'grp' is used to highlight group ranker
@@ -763,7 +782,7 @@ class Pywordlemainwindow(ctk.CTk):
         # status line
         lb_status = tk.Label(self.result_frame,
                              textvariable=self.status,
-                             font=('Courier', 14, 'normal'),
+                             font=('Courier', 12, 'normal'),
                              background='#dedede',
                              borderwidth=0,
                              highlightthickness=0)
@@ -773,7 +792,7 @@ class Pywordlemainwindow(ctk.CTk):
         # grep line being used
         tx_gr = tk.Text(self.result_frame,
                         wrap='word',
-                        font=('Courier', 14, 'normal'),
+                        font=('Courier', 12, 'normal'),
                         height=2,
                         background='#dedede',
                         borderwidth=0,
@@ -786,10 +805,15 @@ class Pywordlemainwindow(ctk.CTk):
         tx_gr.config(yscrollcommand=tx_gr_sb.set)
         tx_gr_sb.config(command=tx_gr.yview)
 
+        # Divide results from controls
+        self.separator = ttk.Separator(self, orient=tk.HORIZONTAL)
+        self.separator.pack(side=tk.TOP, fill=tk.X, pady=2 )
+
         self.bottomhalf_frame = ctk.CTkFrame(self,
                                              corner_radius=10
                                              )
         self.bottomhalf_frame.pack(anchor="s", padx=10, pady=2, fill=tk.X, expand=0)
+        # self.pw.add(self.bottomhalf_frame)
 
         # grep criteria outer frame holding:
         # letter require frame
@@ -798,7 +822,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.criteria_frame = ctk.CTkFrame(self.bottomhalf_frame,
                                            corner_radius=10
                                            )
-        self.criteria_frame.pack( anchor="n", fill=tk.X, padx=0, pady=0, expand=1)
+        self.criteria_frame.pack( fill=tk.X, padx=0, pady=0, expand=1)
 
         # letter checkbox exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
@@ -1027,7 +1051,7 @@ class Pywordlemainwindow(ctk.CTk):
                                       width=4,
                                       justify=tk.CENTER,
                                       textvariable=self.pos_px_l,
-                                      font=("Helvetica", 12, "normal")
+                                      font=("Helvetica", 10, "normal")
                                       )
         self.cbox_px_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.cbox_px_l.current(0)
@@ -1049,7 +1073,7 @@ class Pywordlemainwindow(ctk.CTk):
                                       width=4,
                                       justify=tk.CENTER,
                                       textvariable=self.pos_px_p,
-                                      font=("Helvetica", 12, "normal")
+                                      font=("Helvetica", 10, "normal")
                                       )
         self.cbox_px_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.cbox_px_p.current(0)
@@ -1126,7 +1150,7 @@ class Pywordlemainwindow(ctk.CTk):
                                       width=4,
                                       justify=tk.CENTER,
                                       textvariable=self.pos_pr_l,
-                                      font=("Helvetica", 12, "normal")
+                                      font=("Helvetica", 10, "normal")
                                       )
         self.cbox_pr_l.grid(row=0, column=0, padx=4, pady=2, sticky='w')
         self.cbox_pr_l.current(0)
@@ -1146,7 +1170,7 @@ class Pywordlemainwindow(ctk.CTk):
                                       width=4,
                                       justify=tk.CENTER,
                                       textvariable=self.pos_pr_p,
-                                      font=("Helvetica", 12, "normal")
+                                      font=("Helvetica", 10, "normal")
                                       )
         self.cbox_pr_p.grid(row=0, column=1, padx=1, pady=2, sticky='w')
         self.cbox_pr_p.current(0)

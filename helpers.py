@@ -1644,7 +1644,7 @@ class RptWnd(ctk.CTkToplevel):
 
         self.verbose_data = CustomText(self.verbose_info_frame,
                                        wrap='word',
-                                       font=("Courier", 14, "normal"),
+                                       font=("Courier", 12, "normal"),
                                        padx=6,
                                        pady=6,
                                        background='#dedede',
@@ -1751,7 +1751,7 @@ class HelpWindow(ctk.CTkToplevel):
         # configure style
         style = ttk.Style()
         style.theme_use()
-        help_font_tuple_n = ("Courier", 14, "normal")
+        help_font_tuple_n = ("Courier", 12, "normal")
         self.option_add("*Font", help_font_tuple_n)
 
         self.help_info_frame = tk.Frame(self,

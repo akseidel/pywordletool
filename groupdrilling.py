@@ -326,7 +326,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         # configure style
         style = ttk.Style()
         style.theme_use()
-        font_tuple_n = ("Courier", 14, "normal")
+        font_tuple_n = ("Courier", 12, "normal")
         self.option_add("*Font", font_tuple_n)
 
         # controls frame
