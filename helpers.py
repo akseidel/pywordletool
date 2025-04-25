@@ -18,7 +18,8 @@ from logging import exception
 
 gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-def get_word_list_path_name(local_path_file_name: str, critical = True) -> str:
+
+def get_word_list_path_name(local_path_file_name: str, critical=True) -> str:
     """
     Returns the wordle word list full pathname
     Exits program if not found
@@ -36,14 +37,18 @@ def get_word_list_path_name(local_path_file_name: str, critical = True) -> str:
             messagebox.showerror(title='Stopping Here', message=msg)
             sys.exit()
         else:
-            msg = (f'The wordle word list file {local_path_file_name} was not found. \n\nExpected here: {full_path_name}'
-                   f'\n\nThe option using this file will not use it.')
+            msg = (
+                f'The wordle word list file {local_path_file_name} was not found. \n\nExpected here: {full_path_name}'
+                f'\n\nThe option using this file will not use it.')
             messagebox.showerror(title='Will Continue', message=msg)
             return ''
+
 
 """
 Letter ranking functions for rank that includes by letter position method
 """
+
+
 def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
     """
     Make and return the letter ranking dictionary
@@ -94,6 +99,7 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
         }
     return ltr_rank_dict
 
+
 def wrd_rank(wrd: str, ltr_rank_dict: dict, method: int) -> float:
     """
     Returns a word's letter frequency ranking.
@@ -131,6 +137,7 @@ def wrd_rank(wrd: str, ltr_rank_dict: dict, method: int) -> float:
         return r
     return 0
 
+
 def wrd_has_duplicates(wrd) -> bool:
     """
     Checks is a word has duplicate letters.
@@ -145,6 +152,7 @@ def wrd_has_duplicates(wrd) -> bool:
     for ltr in wrd:
         ltr_d[ltr] = ltr
     return len(ltr_d) < len(wrd)
+
 
 def print_word_list_col_format(the_word_list, n_col):
     """
@@ -178,6 +186,7 @@ def print_word_list_col_format(the_word_list, n_col):
             l_msg = ""
         if i == n_items:
             print(l_msg)
+
 
 def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool,
                                            rank_mode: int, no_ordr: bool, no_rank=False) -> dict:
@@ -222,6 +231,7 @@ def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allo
     else:
         return wrds_dict
 
+
 def get_results_word_list(this_sh_cmd_lst) -> list:
     """
     Returns the result for the grep command list.
@@ -231,6 +241,7 @@ def get_results_word_list(this_sh_cmd_lst) -> list:
     with Popen(this_sh_cmd_lst.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
         return list(map(lambda i: i[: -1], proc.stdout.readlines()))
 
+
 def get_pu_wordlist(full_path_name) -> list:
     pu_wrds = []
     if os.path.exists(full_path_name):
@@ -239,6 +250,7 @@ def get_pu_wordlist(full_path_name) -> list:
                 pu_wrds.append(line.split(',', 1)[0].lower())
     return pu_wrds
 
+
 def get_classic_wordlist(full_path_name) -> list:
     classic_wrds = []
     if os.path.exists(full_path_name):
@@ -246,6 +258,7 @@ def get_classic_wordlist(full_path_name) -> list:
             for line in file:
                 classic_wrds.append(line.split(',', 1)[0].lower().rstrip())
     return classic_wrds
+
 
 def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
     """
@@ -261,11 +274,13 @@ def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
         except ValueError:
             pass
 
+
 def clear_scrn():
     """
     Clears the console window
     """
     os.system("cls" if os.name == "nt" else "clear")
+
 
 def get_gencode(word) -> list:
     """
@@ -292,6 +307,7 @@ def get_gencode(word) -> list:
     gencode[26] = dups
     return gencode
 
+
 def get_gendict_tally(gendict: dict[str, list]) -> list:
     """
     returns genetic letter tally list for a gendictionary, (dict[str, list])
@@ -311,6 +327,7 @@ def get_gendict_tally(gendict: dict[str, list]) -> list:
             if gencode[idx] > 0:
                 gen_tally[idx] = gen_tally[idx] + gencode[idx]
     return gen_tally
+
 
 def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
     """
@@ -335,6 +352,7 @@ def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
         gendict.update({w: new_g})
     return maxrank
 
+
 def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list:
     """
     returns list of the max genrankers in the gendict
@@ -347,6 +365,7 @@ def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list:
         if maxrank == g[27]:
             max_rankers.append(w)
     return max_rankers
+
 
 def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
     """
@@ -363,12 +382,13 @@ def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
     regex_str = '|'.join(pat_list)
     return regex_str
 
+
 def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict: dict,
                              r_pos_dict: dict):
     """
     This function is used by fmwm.py only. This function determines what and how a guess
     matches against a target solution. The parameters returned are used to grep filter the
-    current remaining word list to be the next remaining word list according how the guess
+    current remaining word list to be the next remaining word list according to how the guess
     compares to the solution.
     
     Updates the exclude, exclude position, include position and multi filtering according to
@@ -381,7 +401,7 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
     multi_code:str The multiple same letters and how many code (like 2A,3E)
     @return: [excl_lst: list, x_pos_dict: dict, r_pos_dict:dict, multi_code:str]
     """
-    p_ltr_pos: int = 0 # Current letter position in the pick (pick letter)
+    p_ltr_pos: int = 0  # Current letter position in the pick (pick letter)
     # Multiple same letter accounting is required to filter for multiple same letter
     # instances when they are called for. The user is expected to make that determination
     # in the GUI pywt.py. That determination needs to be coded for fmwm.py.
@@ -426,14 +446,20 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
 
     return [excl_lst, x_pos_dict, r_pos_dict, multi_clues.as_code()]
 
+
 class MultiClues:
     """
-    Multiple same letters accounting and functions
+    Multiple same letters accounting and functions.
+    Only used by fmwm.py.
+    This device only records the number of multiple letter instances for letters that
+    are known to exist at least once somewhere in the target. This information must be later
+    compared to known instances to determine multiple same letter requirement and exclusion.
     """
+
     def __init__(self):
         self.multi_clues: dict[str, int] = {}  # dict for multiple same letter accounting
 
-    def add_multi_ltr_instance(self,pl):
+    def add_multi_ltr_instance(self, pl):
         if pl in self.multi_clues:
             self.multi_clues[pl] = self.multi_clues[pl] + 1
         else:
@@ -446,6 +472,7 @@ class MultiClues:
                 code = str(self.multi_clues[ltr]) + ltr
                 lst.append(code)
         return ','.join(lst)
+
 
 def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
     """Builds the grep line for excluding positions
@@ -466,6 +493,7 @@ def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
             lself.tool_command_list.add_excl_pos_cmd(ltr, p, True)
             # keep track of its require in this function
             rq_lts += ltr
+
 
 def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
     """Builds the grep line for including positions
@@ -496,10 +524,13 @@ def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
     lself.tool_command_list.add_type_cmd(pat, True)
     return pat
 
+
 def build_multi_code_grep(lself, this_multi_code: str) -> None:
     lself.tool_command_list.add_type_mult_ltr_cmd(this_multi_code.lower(), 1)
 
-def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict, multi_code: str):
+
+def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict,
+                        multi_code: str):
     """
     The filter builder. Used only by fmwm.py.
     Filter arguments for each type are added to the grep command argument list
@@ -538,6 +569,7 @@ def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_d
     # build for the coded multiple letters
     if len(multi_code) > 0:
         build_multi_code_grep(wordle_tool_cmd_lst, multi_code.lower())
+
 
 def get_genpattern(subject_word: str, target_word: str) -> str:
     """
@@ -582,6 +614,7 @@ def get_genpattern(subject_word: str, target_word: str) -> str:
 
     return genpat
 
+
 def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict:
     """
     Returns a dictionary of the word outcomes the guess_word would result
@@ -604,6 +637,7 @@ def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict:
             outcomes_dict[genpat].append(subject_word)
     return outcomes_dict
 
+
 def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, float, float, float]:
     """
     Given a single guess's outcome dictionary, returns stats:
@@ -623,7 +657,7 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
     sums = 0  # outcome size sums, this is the number of words
     p2 = 0.0  # outcome population variance
     g_ent = 0.0  # outcomess entropy
-    g_xa = 0.0 # outcomes expected average
+    g_xa = 0.0  # outcomes expected average
     for k, v in the_outcomes_dict.items():
         size = len(v)
         sums = sums + size
@@ -640,6 +674,7 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
         g_xa = g_xa + size * i_p
     p2 /= g_qty
     return g_qty, smallest, largest, mean, p2, g_ent, g_xa
+
 
 def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
     """
@@ -674,7 +709,7 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
     max_grp_size = g_stats[2]  # The min_max is desired. Seed with a member's largest
     min_grp_p2 = g_stats[4]  # Seed with member's variance
     max_grp_ent = 0.0
-    min_grp_xa = g_stats[6] # Seed with member's expected average
+    min_grp_xa = g_stats[6]  # Seed with member's expected average
     for g_stats in best_rank_dict.values():
         (_, min_stat, max_stat, _, p2_stat, e_stat, xa_stat) = g_stats
         min_grp_size = min(min_stat, min_grp_size)
@@ -685,6 +720,7 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
         # outcomes_stat_summary are:[0]:qty,[1]:smallest,[2]:largest,[3]:average,
         # [4]:min p2,[5]:max entropy bit as a tuple
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2, max_grp_ent, min_grp_xa
+
 
 def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
                                       cond_rpt: bool, keyed_rpt: bool,
@@ -777,6 +813,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool,
 
     return inorder_best_rank_dict
 
+
 def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
                                              cond_rpt: bool, keyed_rpt: bool,
                                              title_context: str) -> dict:
@@ -867,6 +904,7 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting
 
     return inorder_best_rank_dict
 
+
 def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, debug_mode: bool) -> dict:
     """
     Intended for finite moinkey use. Not used by pywt.
@@ -888,7 +926,6 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     if debug_mode:
         print(f'Working with {len(targets_word_lst)} remaining possibles. '
               f'Pulling guesses from a {len(guess_word_lst)} guess list.')
-
 
     for guess in guess_word_lst:
         guess_outcomes_dict = outcomes_for_this_guess(guess, targets_word_lst)
@@ -926,11 +963,12 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
 
     if len(best_desired_dict) > 0:
         del best_stats_found_dict
-        best_stats_found_dict =  best_desired_dict
+        best_stats_found_dict = best_desired_dict
         if debug_mode:
             print(f'Using only target best entropy words')
 
     return best_stats_found_dict
+
 
 def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk, cond_rpt: bool):
     report_footer_summary_header_to_window(msg1, word_lst, rptwnd)
@@ -940,10 +978,12 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
         report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
     rptwnd.back_to_summary()
 
+
 def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = "\n\n> >  Outcome summary using the " + msg + " words for guesses on the " + \
            '{0:.0f}'.format(len(source_list)) + " words.  < <"
     rptwnd.verbose_data.insert(tk.END, rptl)
+
 
 def prnt_guesses_header(rptwnd: ctk, keyed=False):
     if not keyed:
@@ -951,12 +991,13 @@ def prnt_guesses_header(rptwnd: ctk, keyed=False):
     else:
         rptl = '\n\nslot' + '\tguess' + '\tqty'
     rptl = rptl + '\tent' + \
-            '\tmin' + \
-            '\tmax' + \
-            '\tave' + \
-            '\texp' + \
-            '\tp2'
+           '\tmin' + \
+           '\tmax' + \
+           '\tave' + \
+           '\texp' + \
+           '\tp2'
     rptwnd.verbose_data.insert(tk.END, rptl)
+
 
 def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptl = rptwnd.context + " - Outcome Patterns For Guesses From The " + msg + " Words List (" + \
@@ -964,6 +1005,7 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptwnd.title(rptl)
     rptl = "> >  " + rptl + "  < <"
     rptwnd.verbose_data.insert(tk.END, rptl)
+
 
 def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, keyed: bool) -> None:
     """
@@ -976,7 +1018,7 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
     indx = 1
     cnt = 0
     c_indx_ent = 0
-    prnt_guesses_header(rptwnd,keyed)
+    prnt_guesses_header(rptwnd, keyed)
     for g, s in inorder_cond_dict.items():
         (qty, smallest, largest, average, p2, ent, g_xa) = s
         if keyed:
@@ -986,7 +1028,7 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
             if not math.isclose(ent, c_indx_ent):
                 indx += 1
                 c_indx_ent = ent
-            rptl = '\n' + str(indx)  + \
+            rptl = '\n' + str(indx) + \
                    '\t' + g + '\t' + str(qty)
         else:
             rptl = '\n' + g + '\t' + str(qty)
@@ -998,6 +1040,7 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
                '\t' + '{0:.2f}'.format(g_xa) + \
                '\t' + '{0:.2f}'.format(p2)
         rptwnd.verbose_data.insert(tk.END, rptl)
+
 
 def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outcomes_dict: dict,
                                     rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
@@ -1024,9 +1067,11 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
                 rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             rptwnd.verbose_data.insert(tk.END, '\n' + rptl)
 
+
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
     rptwnd.verbose_data.insert(tk.END, outcomes_stats_summary_line(best_rank_dict))
     rptwnd.verbose_data.see('end')
+
 
 def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
     # stats_summary [0]:qty,[1]:smallest,[2]:largest, [3]:average,
@@ -1041,8 +1086,10 @@ def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
             ", p2 " + '{0:.2f}'.format(g_p2))
     return rptl
 
+
 def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk, cond_mode=False):
     rptwnd.verbose_data.insert(tk.END, opt_wrds_for_reporting(best_rank_dict, cond_mode))
+
 
 def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode=False) -> str:
     """
@@ -1057,8 +1104,9 @@ def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode=False) -> str:
         len(wrds)) + ' optimal. 1st word is highest ent. Any next have the highest group qty:' + '\n'
             + ', '.join(wrds))
     if cond_mode:
-         rptl += '\n\nSorted by highest ent:'
+        rptl += '\n\nSorted by highest ent:'
     return rptl
+
 
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk):
     # stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
@@ -1082,6 +1130,7 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
     # lock the text widget to prevent user editing
     rptwnd.verbose_data.configure(state='disabled')
 
+
 def valid_mult_ltr(s: str) -> bool:
     """
     The format requires the letter placed after the number. The mltr_entry_str
@@ -1094,6 +1143,7 @@ def valid_mult_ltr(s: str) -> bool:
     else:
         valid = 'QWERTYUIOPASDFGHJKLZXCVBNM ,'
         return valid.find(s[1]) > -1
+
 
 def valid_first_mult_number(s: str) -> bool | None:
     """
@@ -1109,6 +1159,7 @@ def valid_first_mult_number(s: str) -> bool | None:
             return True
     else:
         return False
+
 
 def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
     """
@@ -1138,6 +1189,7 @@ def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
             r = ','.join(valid).replace(',,', ',').strip(',')
     return r
 
+
 def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: int,
                                   offset_h: int, offset_w: int) -> None:
     """
@@ -1152,6 +1204,7 @@ def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: in
     pos_y = int((self.winfo_screenheight() - this_wnd_height) / 2) + offset_h
     self.geometry("{}x{}+{}+{}".format(this_wnd_width, this_wnd_height, pos_x, pos_y))
 
+
 def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> dict:
     """
     Returns hard mode guess words from a dictionary of guess words that comply with
@@ -1162,8 +1215,9 @@ def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> di
     :return: hard mode words dictionary
     """
     return dict(filter(lambda x: (hard_mode_func_grn(x, req_pat)
-                       and hard_mode_func_yel(x, req_ltrs)),
+                                  and hard_mode_func_yel(x, req_ltrs)),
                        default_guesses.items()))
+
 
 def hard_mode_func_grn(pair: tuple, req_pat: str) -> bool:
     """
@@ -1180,6 +1234,7 @@ def hard_mode_func_grn(pair: tuple, req_pat: str) -> bool:
     else:
         return False
 
+
 def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
     """
     A function used in a regex filter.
@@ -1192,9 +1247,10 @@ def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
     key, value = pair
     # return False if anyone fails
     for l in req_ltrs:
-        if not re.findall(l,key):
+        if not re.findall(l, key):
             return False
     return True
+
 
 class ShellCmdList:
     """
@@ -1286,7 +1342,7 @@ class ShellCmdList:
             dpn = ''.rjust(c - p, '.')
             self.shCMDlist.append("grep -E '" + dp + ltr + dpn + "'")
 
-    def add_type_mult_ltr_cmd(self, mult_ltr_definition: str, typ: int)-> None:
+    def add_type_mult_ltr_cmd(self, mult_ltr_definition: str, typ: int) -> None:
         """
         Converts the multiple letter code, like 2a,3a, to the required grep regex
         to affect that multiple letter requirement. The appends the command line to the
@@ -1330,6 +1386,7 @@ class ShellCmdList:
         this_cmd = this_cmd + self.shCMDlist[-1]
         return this_cmd
 
+
 class ToolResults:
     """
     ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
@@ -1343,8 +1400,8 @@ class ToolResults:
                  allow_dups: bool,
                  rank_mode: int,
                  ordr_by_rank: bool,
-                 cull_pu = False,
-                 pu_vocab = '') -> None:
+                 cull_pu=False,
+                 pu_vocab='') -> None:
         """
         @param data_path: words list folder name
         @param vocabulary: words list file name less path
@@ -1395,7 +1452,7 @@ class ToolResults:
         wrds = self.get_result_of_grep_wrd_lst()
         if self.cull_pu:
             pu_wrds = get_pu_wordlist(get_word_list_path_name(self.data_path + self.pu_vocab, False))
-            cull_sol_list(wrds,pu_wrds)
+            cull_sol_list(wrds, pu_wrds)
         self.raw_cnt = len(wrds)
         self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds,
                                                                        self.ltr_rank_dict,
@@ -1405,7 +1462,6 @@ class ToolResults:
                                                                        no_rank)
         self.ranked_cnt = len(self.ranked_wrds_dict)
         return self.ranked_wrds_dict
-
 
     def get_status(self) -> str:
         """
@@ -1459,6 +1515,7 @@ class ToolResults:
             print_word_list_col_format(the_word_list, 6)
         return the_word_list
 
+
 class CustomText(tk.Text):
     """A text widget with a new method, highlight_pattern()
     example:
@@ -1499,7 +1556,7 @@ class CustomText(tk.Text):
         self.mark_set("searchLimit", end)
         is_first_pass = True
         not_found = False
-        first_index=""
+        first_index = ""
         count = tk.IntVar()
         while True:
             try:
@@ -1510,7 +1567,7 @@ class CustomText(tk.Text):
                     if is_first_pass:
                         # if first pass then text cannot be found
                         # so set not_found flag
-                        not_found=True
+                        not_found = True
                     # stop searching
                     break
                 else:
@@ -1521,7 +1578,7 @@ class CustomText(tk.Text):
                         # to instead of scrolling to the last found.
                         first_index = index
                         # no longer in first pass
-                        is_first_pass=False
+                        is_first_pass = False
                         if mode == 1:
                             # only the first match is sought. This is specifically
                             # used to return to the Outcome Summary text for one of the
@@ -1555,6 +1612,7 @@ class CustomText(tk.Text):
         else:
             self.see(first_index)
 
+
 class RptWnd(ctk.CTkToplevel):
     """
     The verbose information window
@@ -1575,7 +1633,7 @@ class RptWnd(ctk.CTkToplevel):
         self.find_the_text()
 
     def find_the_text(self):
-        org_title =  self.title()
+        org_title = self.title()
         find_text = ''
         regex: find_text = self.search_text.get().strip()
         self.title(f"> > Busy on \"{regex}\", Please Wait < <")
@@ -1595,11 +1653,10 @@ class RptWnd(ctk.CTkToplevel):
                    f"\n\nThe time it takes to highlight the search depends on the amount of text to search and the "
                    f"number of items to be highlighted. The report scrolls to the first found instance.")
             if messagebox.showinfo(title=None, message=msg):
-                if len(regex)> 0 and regex != "for:":
+                if len(regex) > 0 and regex != "for:":
                     self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
         self.title(org_title)
         self.update()
-
 
     def back_to_summary(self):
         """
@@ -1662,7 +1719,7 @@ class RptWnd(ctk.CTkToplevel):
 
         button_q = ctk.CTkButton(self, text="Close",
                                  text_color="black",
-                                 width = 100,
+                                 width=100,
                                  command=self.close_rpt)
         button_q.pack(side="right", padx=10, pady=10)
         self.protocol("WM_DELETE_WINDOW", self.close_rpt)  # assign to closing button [X]
@@ -1689,7 +1746,6 @@ class RptWnd(ctk.CTkToplevel):
                                      text_color="black",
                                      command=self.rpt_show_grps_driller)
         button_drill.pack(side=tk.LEFT, padx=4, pady=3)
-
 
 
 class HelpWindow(ctk.CTkToplevel):
@@ -1770,7 +1826,6 @@ class HelpWindow(ctk.CTkToplevel):
                                 highlightthickness=0
                                 )
         self.help_msg.grid(row=0, column=0, padx=6, pady=0, sticky="nsew")
-
 
         # scrollbar for help
         help_sb = ttk.Scrollbar(self.help_info_frame, orient='vertical')
