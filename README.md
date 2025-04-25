@@ -106,7 +106,7 @@
 * The **exp** value is the guess' expected size for the resulting word outcome. Expected size is the sum of the probability weighted word outcome sizes. 
 * The **p2** value is the outcomes size population variance. This value is useful. It is a measure of how variable the outcome sizes are resulting from a guess candidate. When candidates have the same number of outcomes, select the candidate that has the smallest **p2**. Doing so removes the chance the solution will be a member of the larger outcomes because the outcome sizes vary less in size. When candidates vary in **p2** you will see they have differing maximum outcome sizes.
 * Larger **Entropy** values typically, but not always, go with the largest outcome qty having the smallest **min-max** value and smallest **p2** value. The NYT WordleBot selects by its expected number of steps to solution calculation, which is closely coupled to the **Entropy** value.
-* Optimal outcome analysis should always be performed on the total selection list that contains multiple letters. The analysis is for selecting words that puts the solution into smaller remaining word sets. The larger candidate selection pool provides more outcome opportunities will be available.
+* Optimal outcome analysis should always be performed on the total selection list that contains multiple letters.
 
 !['Verbose Window Bottom Image'](InfoImages/PYWTVerboseGrpsBot.png)
 

@@ -166,7 +166,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # Screen height and width.
         w_width = 1150
-        w_height = 700
+        w_height = 720
 
         hlp.size_and_position_this_window(self, w_width, w_height, 0, 0)
 
