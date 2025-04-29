@@ -545,7 +545,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     std_r_pos_dict = {}  # require position dictionary
     std_excl_l = []  # the exclude letters list
     std_requ_l = []  # the require letters list
-    std_multi_dict = ''  # multiple same letters accounting code
+    std_multi_dict = {}  # multiple same letters accounting code
 
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
@@ -581,7 +581,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
         # of ToolResults. So they must be cleared
         clean_slate(std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict)
 
-        std_multi_dict.replace(std_multi_dict,'')
+        std_multi_dict.clear()
 
         # Get the guess word list using the optional no_rank argument with loc_rand_mode.
         # No ranking or sorting is needed when all guesses are random as per rand_mode
@@ -764,7 +764,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
     mag_r_pos_dict = {}  # require position dictionary
     mag_excl_l = []  # exclude letters list
     mag_requ_l = []  # require letters list
-    mag_multi_code = ''  # multiple same letters accounting
+    mag_multi_code = {}  # multiple same letters accounting
 
     prelude_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname, starting_wrd,
                    guess_vocabulary, do_every_wrd, vocab_magic_target_filename)
@@ -780,7 +780,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         # For some reason, mag_excl_l, mag_requ_l, mag_x_pos_dict, mag_r_pos_dict, are maintained outside
         # of ToolResults. So they must be cleared
         clean_slate(mag_excl_l, mag_requ_l, mag_x_pos_dict, mag_r_pos_dict)
-        mag_multi_code.replace(mag_multi_code,'')
+        mag_multi_code.clear()
 
         # This loop ends when the last guess results in only one remaining word that fits the
         # pattern. That word, being the target word, will be the solving guess. The loop's last
