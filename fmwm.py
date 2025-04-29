@@ -545,7 +545,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     std_r_pos_dict = {}  # require position dictionary
     std_excl_l = []  # the exclude letters list
     std_requ_l = []  # the require letters list
-    std_multi_code = ''  # multiple same letters accounting code
+    std_multi_dict = ''  # multiple same letters accounting code
 
     # All samples are identical when there is a fixed starting word and
     # a fixed rank selection method. So run only one sample.
@@ -581,7 +581,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
         # of ToolResults. So they must be cleared
         clean_slate(std_excl_l, std_requ_l, std_x_pos_dict, std_r_pos_dict)
 
-        std_multi_code.replace(std_multi_code,'')
+        std_multi_dict.replace(std_multi_dict,'')
 
         # Get the guess word list using the optional no_rank argument with loc_rand_mode.
         # No ranking or sorting is needed when all guesses are random as per rand_mode
@@ -652,7 +652,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
             [std_excl_l,
              std_x_pos_dict,
              std_r_pos_dict,
-             std_multi_code] = helpers.analyze_pick_to_solution(target_wrd,
+             std_multi_dict] = helpers.analyze_pick_to_solution(target_wrd,
                                                                 guess_word,
                                                                 std_excl_l,
                                                                 std_x_pos_dict,
@@ -671,7 +671,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                                         std_requ_l,
                                         std_x_pos_dict,
                                         std_r_pos_dict,
-                                        std_multi_code)
+                                        std_multi_dict)
 
             # Get the revised remaining targets word list using the optional no_rank argument with loc_rand_mode
             # No ranking or sorting is needed when all guesses are random as per rand_mode argument.
@@ -688,7 +688,7 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                 helpers.load_grep_arguments(targets_wordletool,
                                             std_excl_l, std_requ_l,
                                             std_x_pos_dict, std_r_pos_dict,
-                                            std_multi_code)
+                                            std_multi_dict)
                 loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word,
                                                                               debug_mode, rand_mode)
 

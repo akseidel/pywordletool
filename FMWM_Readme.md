@@ -14,7 +14,7 @@
 
 ### Magic Words Finder
 
-* WARNING NOTE: **FMWM**'s **magic word process** still has problems with candidate guesses that have multiple same letter situations with the target word. Any identified **magic word** that has multiple same letters should be regarded as suspect. The code does not properly build the require or exclude multiple letter grep arguments for most multiple same letter instances. This happens only for **FMWM**. There is no schedule as to when this will be fixed.
+* WARNING NOTE: **FMWM**'s **magic word process** has had problems with candidate guesses that have multiple same letter situations with the target word. A fix has been made, but it has not been thoroughly tested. Any identified **magic word** that has multiple same letters should be regarded as suspect. This happened only for **FMWM**.
 
 * The **FMWM** can find all the Order M Magic Words for any particular word. An Order 1 Magic Word is a word that reduces the possible guesses down to just the solution word. In other words a Magic Word used as a first guess, or as any guess, played in hard mode, forces the next fitting guess to be the solution. Likewise, an Order 2 Magic Word reduces the possible guesses to two words, one of which is the solution word. Magic word finding is initiated using the command line arguments **-m M**. See the **Command Line Options** section below for more information. (Note: Actual 'hard mode' does not follow grey clues. 'hard mode' here requires following every green, yellow and grey clue.)
 

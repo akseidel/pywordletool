@@ -405,7 +405,6 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
     # Multiple same letter accounting is required to filter for multiple same letter
     # instances when they are called for. The user is expected to make that determination
     # in the GUI pywt.py. That determination needs to be coded for fmwm.py.
-    multi_clues = MultiClues()  # class for multiple same letter accounting
     for p_ltr in pick:
         # First check for a p_ltr instance.
         if sol_wrd.find(p_ltr) < 0:
@@ -426,52 +425,133 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
             # This must be a GREEN clue
             # Add p_ltr and p_ltr's position to the required position dictionary.
             r_pos_dict[key] = key
-            # Update number of clues for this letter.
-            multi_clues.add_multi_ltr_instance(p_ltr)
         else:
             # This must be a YELLOW clue
             # Add p_ltr and p_ltr's position to the exclude position dictionary.
             x_pos_dict[key] = key
-            # Check if p_ltr is also elsewhere. If not, then this is only an exclusion clue.
-            # Otherwise, there is also a multiple same letter requirement.
-            if sol_wrd.count(p_ltr) > 1:
-                # There are more p_ltr in the word.
-                # Increase the number of required instances for this letter. The grep command assembly
-                # will fill out the multiple same letter regex necessary for including the multiple
-                # same letter words.
-                multi_clues.add_multi_ltr_instance(p_ltr)
         # keep track of index position
         p_ltr_pos += 1
     # end for
+    # Handling multiple same letter will be done as this afterwards process that returns a dictionary of letter count
+    # and include/exclude mode.
 
-    return [excl_lst, x_pos_dict, r_pos_dict, multi_clues.as_code()]
+    mult_dict = mult_ltr_dict(pick, sol_wrd, r_pos_dict)
 
+    return [excl_lst, x_pos_dict, r_pos_dict, mult_dict]
 
-class MultiClues:
+def letter_counts(word: str) -> dict:
     """
-    Multiple same letters accounting and functions.
-    Only used by fmwm.py.
-    This device only records the number of multiple letter instances for letters that
-    are known to exist at least once somewhere in the target. This information must be later
-    compared to known instances to determine multiple same letter requirement and exclusion.
+    Used by only fmwm.py
+    Returns a dictionary holding the instance counts for the letters
+    withing the word argument.
+    :param word: str
+    :return:
     """
-
-    def __init__(self):
-        self.multi_clues: dict[str, int] = {}  # dict for multiple same letter accounting
-
-    def add_multi_ltr_instance(self, pl):
-        if pl in self.multi_clues:
-            self.multi_clues[pl] = self.multi_clues[pl] + 1
+    lc_dict: dict[str ,int] ={}
+    for w_ltr in word:
+        if w_ltr in lc_dict:
+            lc_dict[w_ltr] = lc_dict[w_ltr] + 1
         else:
-            self.multi_clues[pl] = 1
+            lc_dict[w_ltr] = 1
+    return lc_dict
 
-    def as_code(self) -> str:
-        lst = []
-        for ltr in self.multi_clues:
-            if self.multi_clues[ltr] > 1:
-                code = str(self.multi_clues[ltr]) + ltr
-                lst.append(code)
-        return ','.join(lst)
+
+def is_include_necessary(r_pos_dict: dict, gl: str, tc: int) -> bool:
+    """
+    Used by only fmwm.py
+    Used for the multiple letter include grep line where the current required letter at position
+    dictionary does not inherently require the gc number of gl letters.
+    :param gc: guess letter count in question
+    :param gl: guess letter in question
+    :type r_pos_dict: dict Required letter at position dictionary
+    :rtype: bool
+    """
+    gl_cnt = 0
+    for key in r_pos_dict:
+        if key[0] == gl:
+            gl_cnt = gl_cnt + 1
+    r = not (gl_cnt == tc)
+    return r
+
+
+def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
+    """
+    Returns the requirements for handling multiple same letters
+    Used by only fmwm.py
+    :param guess: guess candidate word
+    :param target: solution word
+    :param r_pos_dict: required letter at position dictionary
+    :return: dict; multiple letter with count needing exclusion or inclusion
+    key is the letter and its count, value is the mode 1=include, 2=exclude
+    """
+    lc_guess = letter_counts(guess)
+    lc_target = letter_counts(target)
+    mult_dict: dict[str, int] = {}
+    for gl, gc in lc_guess.items():
+        if gc == 1:
+            # Multiple exclude or include cannot be determined
+            continue
+        if gc > 1:
+            # Quess has multiple same letter. This letter would be excluded or required by earlier code
+            # but if required then an xgL require or exclude might be necessary.
+            tc = None
+            if gl in lc_target:
+                tc = lc_target[gl]
+            match tc:
+                case None:
+                    # gl would have been excluded by prior code
+                    continue
+                case 1:
+                    # target has 1
+                    if gc == 2:
+                        # target has 1, guess has 2
+                        # Exclude 2gl
+                        key = f"{str(gc)}{gl}"
+                        mode_value = 2 # exclude
+                        mult_dict[key] = mode_value
+                case 2:
+                    # target has 2, guess has 2 or 3
+                    if gc == 2:
+                        # target has 2, guess has 2
+                        # Include 2gl, but only if both guess gl are NOT green since
+                        # the prior require dict would cover the grep requirement.
+                        if is_include_necessary(r_pos_dict, gl, tc):
+                            key = f"2{gl}"
+                            mode_value = 1 # include
+                            mult_dict[key] = mode_value
+                    if gc == 3:
+                        # target has 2, guess has 3
+                        # Exclude 3gl
+                        key = f"3{gl}"
+                        mode_value = 2 # exclude
+                        mult_dict[key] = mode_value
+                        # Include 2gl, but only if both guess gl are NOT green since
+                        # the prior require dict would cover the grep requirement.
+                        if is_include_necessary(r_pos_dict, gl, tc):
+                            key = f"2{gl}"
+                            mode_value = 1 # include
+                            mult_dict[key] = mode_value
+                case 3:
+                    # target has 3, guess has 2 or 3
+                    if gc == 2:
+                        # target has 3, guess has 2
+                        # Include 2gl, but only if both guess gl are NOT green since
+                        # the prior require dict would cover the grep requirement.
+                        if is_include_necessary(r_pos_dict, gl, tc):
+                            key = f"2{gl}"
+                            mode_value = 1 # include
+                            mult_dict[key] = mode_value
+                    if gc == 3:
+                        # target has 3, guess has 3
+                        # Include 3gl, but only if all 3 guess gl are NOT green since
+                        # the prior require dict would cover the grep requirement.
+                        if is_include_necessary(r_pos_dict, gl, gc):
+                            key = f"3{gl}"
+                            mode_value = 1 # include
+                            mult_dict[key] = mode_value
+    # print(f"{guess} for {target}")
+    # print(mult_dict)
+    return mult_dict
 
 
 def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
@@ -525,8 +605,15 @@ def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
     return pat
 
 
-def build_multi_code_grep(lself, this_multi_code: str) -> None:
-    lself.tool_command_list.add_type_mult_ltr_cmd(this_multi_code.lower(), 1)
+def build_multi_code_grep(lself, multi_code: dict) -> None:
+    """
+    used only by fmwm.py
+    It is here that add_type_mult_ltr_cmd must be sent for each
+    multi_code entry with the correct require/excluse argument. Otherwise, Only a letter require
+    is sent regardless of what it should be.
+    """
+    for mltr, mode in multi_code.items():
+        lself.tool_command_list.add_type_mult_ltr_cmd(mltr.lower(), mode)
 
 
 def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict,
@@ -539,7 +626,8 @@ def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_d
     @param requ_l: required letters list
     @param x_pos_dict: excluded letter position dictionary
     @param r_pos_dict: required letter position dictionary
-    @param multi_code: coded multiple same letters string
+    @param multi_code: coded multiple same letters dict
+
     """
     pipe = "|"
     pipe2 = "| "
@@ -568,7 +656,7 @@ def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_d
 
     # build for the coded multiple letters
     if len(multi_code) > 0:
-        build_multi_code_grep(wordle_tool_cmd_lst, multi_code.lower())
+        build_multi_code_grep(wordle_tool_cmd_lst, multi_code)
 
 
 def get_genpattern(subject_word: str, target_word: str) -> str:
@@ -1533,7 +1621,7 @@ class CustomText(tk.Text):
         self.tag_remove(tag, "1.0", "end")
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=True, remove_priors=True, do_scroll=True, mode=0):
+                          regexp=True, remove_priors=True, do_scroll=True, mode=0) -> int:
         """Apply the given tag to all text that matches the given pattern
         If 'regexp' is set to True, pattern will be treated as a regular
         expression according to Tcl's regular expression syntax.
@@ -1558,6 +1646,7 @@ class CustomText(tk.Text):
         not_found = False
         first_index = ""
         count = tk.IntVar()
+        fnd_cnt = 0
         while True:
             try:
                 index = self.search(pattern, "matchEnd", "searchLimit",
@@ -1572,6 +1661,7 @@ class CustomText(tk.Text):
                     break
                 else:
                     # text was found
+                    fnd_cnt += 1
                     if first_index == "":
                         # text found must be the first found
                         # save first found index so that it can be scrolled
@@ -1603,15 +1693,18 @@ class CustomText(tk.Text):
                        f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
             else:
                 msg = (f"Did not find \"{pattern}\"."
-                       f"\n\n\"Find\" in this verbose mode includes \"for: \" in the search text because the main use"
-                       f" is to find the outcomes for a particular word. Adding the \"for: \" does this."
-                       f"\n\n\"Find\" operates a regex search on the entire text that includes the \"for: \""
-                       f" Putting \"^\", which means \"starting with\", does not make sense when not the first"
-                       f" character in the search text.")
+                       f"\n\n\"Find\" in the non-condensed format verbose mode includes \"for: \" in the search "
+                       f"text because the main use is to find the outcomes for a particular word. Adding the "
+                       f"\"for: \" does this because the outcome header uniquely includes \"for: \"."
+                       f"\n\n\"Find\" operates a regex search on the entire text."
+                       f" Putting \"^\", which means \"starting with\", works in the unkeyed condensed report "
+                       f"because each line starts with the guess word and it is the guess word that is usually "
+                       f"what one searches for.")
             messagebox.showinfo(title=None, message=msg)
         else:
             self.see(first_index)
 
+        return fnd_cnt
 
 class RptWnd(ctk.CTkToplevel):
     """
@@ -1639,22 +1732,31 @@ class RptWnd(ctk.CTkToplevel):
         self.title(f"> > Busy on \"{regex}\", Please Wait < <")
         self.update()
         if len(regex) > 4:
-            self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+            fnd_cnt = self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+            # TO DO finish this
+            # msg = f"Found {str(fnd_cnt)} instances of \"{regex}\"."
+            # messagebox.showinfo(title=None, message=msg)
         else:
             msg = (f"Find \"{regex}\"?\n\nIn a verbose report one usually searches for a five letter guess word"
                    f" preceded by \"for:\", which is then very quickly highlighted.\n\nThe same, but without \"for:\","
-                   f" is how one searches in the condensed verbose report.\n\nFind can accept any text, including a regex"
-                   f" pattern. A regex pattern can do most of the work required to find hard mode candidates in the condensed"
+                   f" is typically how one searches in the condensed verbose report.\n\nFind can accept any text, "
+                   f"including a regex"
+                   f" pattern. A regex pattern can do most of the work required to find hard mode candidates in the "
+                   f"condensed"
                    f" list.\n\nFor example, \"^.t..p\" would indicate words where t and p are at those positions. The "
-                   f"\"^\" is important. The \"^\" indicates the next character \".\", which means any character, must be at"
-                   f" the text beginning. Thus five letter words and not parts of larger words are highlighted."
+                   f"\"^\" is important. The \"^\" indicates the next character \".\", which means any character, "
+                   f"must be at the text line beginning. Thus five letter words and not parts of larger words are "
+                   f"highlighted. It is best to not have the condensed report keyed."
                    f"\n\nThe \"|\" character allows for multiple search criteria. For example, \"^..c..|^.ed..|^....h\""
                    f" finds words matching any one of those three patterns."
                    f"\n\nThe time it takes to highlight the search depends on the amount of text to search and the "
                    f"number of items to be highlighted. The report scrolls to the first found instance.")
-            if messagebox.showinfo(title=None, message=msg):
+            if messagebox.askokcancel(title=None, message=msg):
                 if len(regex) > 0 and regex != "for:":
-                    self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+                    fnd_cnt = self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+                    # TO DO finish this
+                    # msg = f"Found {str(fnd_cnt)} instances of \"{regex}\"."
+                    # messagebox.showinfo(title=None, message=msg)
         self.title(org_title)
         self.update()
 
