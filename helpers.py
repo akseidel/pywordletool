@@ -12,7 +12,7 @@ import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own
 # ttk namespace so that tk is preserved
 from tkinter import messagebox
 import customtkinter as ctk
-import groupdrilling
+import outcomedrilling
 from fmwm import debug_mode
 from logging import exception
 
@@ -432,7 +432,7 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
         # keep track of index position
         p_ltr_pos += 1
     # end for
-    # Handling multiple same letter will be done as this afterwards process that returns a dictionary of letter count
+    # Handling multiple same letter will be done as this afterward process that returns a dictionary of letter count
     # and include/exclude mode.
 
     mult_dict = mult_ltr_dict(pick, sol_wrd, r_pos_dict)
@@ -461,7 +461,7 @@ def is_include_necessary(r_pos_dict: dict, gl: str, tc: int) -> bool:
     Used by only fmwm.py
     Used for the multiple letter include grep line where the current required letter at position
     dictionary does not inherently require the gc number of gl letters.
-    :param gc: guess letter count in question
+    :param tc: guess letter count in question
     :param gl: guess letter in question
     :type r_pos_dict: dict Required letter at position dictionary
     :rtype: bool
@@ -1773,7 +1773,7 @@ class RptWnd(ctk.CTkToplevel):
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
-            self.rpt_grpsdriller_window = groupdrilling.GrpsDrillingMain()  # create window if its None or destroyed
+            self.rpt_grpsdriller_window = (outcomedrilling.OutcmsDrillingMain())  # create window if its None or destroyed
         else:
             self.rpt_grpsdriller_window.focus()  # if window exists focus it
 

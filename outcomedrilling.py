@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------
-# groupdrilling akseidel 2/2023
+# outcomerilling akseidel 2/2023
 # ----------------------------------------------------------------
 import tkinter as tk  # assigns tkinter stuff to tk namespace so that
 # it may be separate from ttk
@@ -17,29 +17,29 @@ data_path = 'worddata/'  # path from here to data folder
 letter_rank_file = 'letter_ranks.txt'
 
 
-def process_grp_list(self, g_word_lst: list) -> dict:
+def process_outcms_list(self, o_word_lst: list) -> dict:
     """
     Processes the words list for its outcomes. Uses the method options in the outcomes
     driller for the processing arguments.
     @param self:
-    @param g_word_lst: The words list to be examined for outcomes
+    @param o_word_lst: The words list to be examined for outcomes
     @return: dictionary of the optimal words
     """
     # Flag to use various solutions as guesses instead of the current displayed word list.
     # This allows the option to outcome rank from the entire guess list.
-    grps_guess_source = self.grps_guess_source.get()
+    outcms_guess_source = self.outcms_guess_source.get()
     optimal_outcome_guesses = {}
     context = 'Outcome Drilling'
-    match grps_guess_source:
+    match outcms_guess_source:
         case 0:
             # using the showing words (remaining solutions) for guess candidates
-            optimal_outcome_guesses = hlp.best_outcomes_from_showing_as_guess_dict(g_word_lst,
-                                                                                     self.d_verbose_grps.get(),
-                                                                                     self.d_ent_grps.get(),
-                                                                                     self.d_verbose_grps_cond.get(),
-                                                                                     self.d_keyed_verbose_grps.get(),
-                                                                                     context
-                                                                                     )
+            optimal_outcome_guesses = hlp.best_outcomes_from_showing_as_guess_dict(o_word_lst,
+                                                                                   self.d_verbose_outcms.get(),
+                                                                                   self.d_ent_outcms.get(),
+                                                                                   self.d_verbose_outcms_cond.get(),
+                                                                                   self.d_keyed_verbose_outcms.get(),
+                                                                                   context
+                                                                                   )
 
         case 1:
             # using the classic (original possible solutions) words for guess candidates
@@ -50,15 +50,15 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               0,
                                               True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Classic Vocabulary'
-            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(g_word_lst,
-                                                                              self.d_verbose_grps.get(),
-                                                                              self.d_ent_grps.get(),
-                                                                              self.d_verbose_grps_cond.get(),
-                                                                              self.d_keyed_verbose_grps.get(),
-                                                                              all_targets,
-                                                                              msg1,
-                                                                              context
-                                                                              )
+            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(o_word_lst,
+                                                                            self.d_verbose_outcms.get(),
+                                                                            self.d_ent_outcms.get(),
+                                                                            self.d_verbose_outcms_cond.get(),
+                                                                            self.d_keyed_verbose_outcms.get(),
+                                                                            all_targets,
+                                                                            msg1,
+                                                                            context
+                                                                            )
         case 2:
             # using the classic+ (entire possible solutions) for guess candidates
             all_targets = hlp.ToolResults(data_path,
@@ -68,15 +68,15 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               0,
                                               True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Classic+ Vocabulary'
-            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(g_word_lst,
-                                                                              self.d_verbose_grps.get(),
-                                                                              self.d_ent_grps.get(),
-                                                                              self.d_verbose_grps_cond.get(),
-                                                                              self.d_keyed_verbose_grps.get(),
-                                                                              all_targets,
-                                                                              msg1,
-                                                                              context
-                                                                              )
+            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(o_word_lst,
+                                                                            self.d_verbose_outcms.get(),
+                                                                            self.d_ent_outcms.get(),
+                                                                            self.d_verbose_outcms_cond.get(),
+                                                                            self.d_keyed_verbose_outcms.get(),
+                                                                            all_targets,
+                                                                            msg1,
+                                                                            context
+                                                                            )
         case 3:
             # using the entire allowed guess list for guess candidates
             all_targets = hlp.ToolResults(data_path,
@@ -86,22 +86,22 @@ def process_grp_list(self, g_word_lst: list) -> dict:
                                               0,
                                               True).get_ranked_grep_result_wrd_lst(True)
             msg1 = 'Large Vocabulary'
-            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(g_word_lst,
-                                                                              self.d_verbose_grps.get(),
-                                                                              self.d_ent_grps.get(),
-                                                                              self.d_verbose_grps_cond.get(),
-                                                                              self.d_keyed_verbose_grps.get(),
-                                                                              all_targets,
-                                                                              msg1,
-                                                                              context
-                                                                              )
+            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(o_word_lst,
+                                                                            self.d_verbose_outcms.get(),
+                                                                            self.d_ent_outcms.get(),
+                                                                            self.d_verbose_outcms_cond.get(),
+                                                                            self.d_keyed_verbose_outcms.get(),
+                                                                            all_targets,
+                                                                            msg1,
+                                                                            context
+                                                                            )
         case _:
             pass
 
     return optimal_outcome_guesses
 
 
-class GrpsDrillingMain(ctk.CTkToplevel):
+class OutcmsDrillingMain(ctk.CTkToplevel):
     common_msg = '\n> >  Highlighted words are common to both the entry words and the optimal outcome guess words.'
     def_msg = 'Paste or write in the words list into the above entry field.' + \
               '\n\nRaw pastes from the This Wordle Helper will be automatically cleaned and converted to ' + \
@@ -110,32 +110,32 @@ class GrpsDrillingMain(ctk.CTkToplevel):
     def close_rpt(self) -> None:
         self.destroy()
 
-    def clean_the_grp_list(self) -> tuple[bool, list[str], list[str]]:
+    def clean_the_outcm_list(self) -> tuple[bool, list[str], list[str]]:
         """
         Processes what was pasted into the word list entry into a proper looking list of
         five-letter words. The intent is to be able to paste raw text copied out of the Helper's
-        list window, raw text copied from a Outcome Driller output and other copied text sources like
+        list window, raw text copied from an Outcome Driller output, and other copied text sources like
         spreadsheet ranges. Numbers, spaces, punctuation, non-alphabet characters and line feeds
         are to be removed.
-        @return: a tuple containing Status, the list of five-letter words , the list of invalid words.
+        @return: a tuple containing Status, the list of five-letter words, the list of invalid words.
         """
-        this_grp = self.grp_words_text.get()
-        # First strip out numbers, like those that are rankings from
+        this_outcome = self.outcms_words_text.get()
+        # First, strip out numbers, like those that are rankings from
         # the wordle helper and other characters.
-        this_grp = re.sub('[-:;.0123456789()~!@#$%^&*+_|?><`/{}]', '', this_grp).lower()
+        this_outcome = re.sub('[-:;.0123456789()~!@#$%^&*+_|?><`/{}]', '', this_outcome).lower()
         # Let spaces comma separate the words. Commas will be used in a
         # later strip function that operates on section split by comma.
         # Empty words will be culled later on.
-        this_grp = this_grp.replace(' ', ',')
+        this_outcome = this_outcome.replace(' ', ',')
         # A paste from a spreadsheet row will be tab delineated.
-        this_grp = this_grp.replace('\t', ',')
+        this_outcome = this_outcome.replace('\t', ',')
         # Handling the newline characters.
-        this_grp = this_grp.replace('\n', ',')
+        this_outcome = this_outcome.replace('\n', ',')
         # Strip unwanted characters that might be.
-        this_lst = [x.strip(' ,[]\"\'\n') for x in this_grp.split(',')]
-        # Remove any empty strings from list.
+        this_lst = [x.strip(' ,[]\"\'\n') for x in this_outcome.split(',')]
+        # Remove any empty strings from the list.
         this_lst = [i for i in this_lst if i]
-        self.grp_words_text.set(', '.join(this_lst))
+        self.outcms_words_text.set(', '.join(this_lst))
 
         status = True
         bads = []
@@ -146,7 +146,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         return status, this_lst, bads
 
     def process_entry_list(self):
-        (entry_status, this_lst, bads) = self.clean_the_grp_list()
+        (entry_status, this_lst, bads) = self.clean_the_outcm_list()
         if not entry_status:
             self.update()
             tkinter.messagebox.showerror(title='Will Not Proceed',
@@ -158,10 +158,10 @@ class GrpsDrillingMain(ctk.CTkToplevel):
             self.set_busy_status_msg()
             self.enable_controls('disabled')
             self.update()
-            optimal_outcome_guesses = process_grp_list(self, this_lst)
+            optimal_outcome_guesses = process_outcms_list(self, this_lst)
 
             # Report the results
-            self.report_results(this_lst, optimal_outcome_guesses, self.d_verbose_grps_cond.get())
+            self.report_results(this_lst, optimal_outcome_guesses, self.d_verbose_outcms_cond.get())
             self.title("Outcome Drilling")
             self.enable_controls('enabled')
 
@@ -181,10 +181,10 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.set_vocab_look(look)
 
     def set_optimal_options_look(self, look: str) -> None:
-        self.chk_grp_disp.configure(state=look)
+        self.chk_outcms_disp.configure(state=look)
         self.chk_ent_disp.configure(state=look)
-        self.chk_grp_disp_cond.configure(state=look)
-        self.chk_keyed_grp_disp.configure(state=look)
+        self.chk_outcms_disp_cond.configure(state=look)
+        self.chk_keyed_outcms_disp.configure(state=look)
 
     def set_vocab_look(self, look: str) -> None:
         self.rbrA.configure(state=look)
@@ -211,14 +211,14 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.tx_status.insert('end', hlp.outcomes_stats_summary_line(optimal_outcome_guesses))
         self.tx_status.insert('end', wrds)
         self.tx_status.see('1.0')
-        if self.d_ent_grps.get():
+        if self.d_ent_outcms.get():
             self.tx_status.highlight_pattern(regex, 'ent', remove_priors=False, do_scroll=False)
         else:
-            self.tx_status.highlight_pattern(regex, 'grp', remove_priors=False, do_scroll=False)
+            self.tx_status.highlight_pattern(regex, 'out', remove_priors=False, do_scroll=False)
         self.tx_status.configure(state='disabled')
 
     def clear_list(self):
-        self.grp_words_text.set('')
+        self.outcms_words_text.set('')
         self.set_default_status_msg()
         self.entry_find.focus()
 
@@ -238,7 +238,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         finally:
             self.clipboard_clear()
             if ntext:
-                self.grp_words_text.set(ntext)
+                self.outcms_words_text.set(ntext)
                 self.just_clean_list()
 
     def set_default_status_msg(self):
@@ -258,7 +258,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.tx_status.configure(state='disabled')
 
     def title_status(self):
-        match self.grps_guess_source.get():
+        match self.outcms_guess_source.get():
             case 0:
                 self.title("Outcome Drilling Using The Words Entered List For Guesses")
             case 1:
@@ -273,26 +273,27 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.entry_find.focus()
 
     def verbose_chk(self):
-        if not self.d_verbose_grps.get():
-            self.d_verbose_grps_cond.set(False)
-            self.d_keyed_verbose_grps.set(False)
+        if not self.d_verbose_outcms.get():
+            self.d_verbose_outcms_cond.set(False)
+            self.d_keyed_verbose_outcms.set(False)
 
     def condensed_chk(self):
-        if self.d_verbose_grps_cond.get():
-            self.d_verbose_grps.set(True)
-            self.d_keyed_verbose_grps.set(True)
+        if self.d_verbose_outcms_cond.get():
+            self.d_verbose_outcms.set(True)
+            self.chk_keyed_outcms_disp.configure(state='enabled')
         else:
-            self.d_keyed_verbose_grps.set(False)
+            self.d_keyed_verbose_outcms.set(False)
+            self.chk_keyed_outcms_disp.configure(state='disabled')
 
     def keyed_chk(self):
-        if self.d_keyed_verbose_grps.get():
-            self.d_verbose_grps.set(True)
+        if self.d_keyed_verbose_outcms.get():
+            self.d_verbose_outcms.set(True)
 
     def on_list_entry_return_release(self, _):
         self.just_clean_list()
 
     def just_clean_list(self):
-        (entry_status, this_lst, bads) = self.clean_the_grp_list()
+        (entry_status, this_lst, bads) = self.clean_the_outcm_list()
         if not entry_status:
             self.update()
             tkinter.messagebox.showerror(title='Entry Will Not Be Processed',
@@ -316,12 +317,12 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
 
         # set the Vars
-        self.grp_words_text = tk.StringVar()
-        self.grps_guess_source = tk.IntVar(value=0)
-        self.d_verbose_grps = tk.BooleanVar(value=False)
-        self.d_ent_grps = tk.BooleanVar(value=False)
-        self.d_keyed_verbose_grps = tk.BooleanVar(value=False)
-        self.d_verbose_grps_cond = tk.BooleanVar(value=False)
+        self.outcms_words_text = tk.StringVar()
+        self.outcms_guess_source = tk.IntVar(value=0)
+        self.d_verbose_outcms = tk.BooleanVar(value=False)
+        self.d_ent_outcms = tk.BooleanVar(value=False)
+        self.d_keyed_verbose_outcms = tk.BooleanVar(value=False)
+        self.d_verbose_outcms_cond = tk.BooleanVar(value=False)
 
         # configure style
         style = ttk.Style()
@@ -343,7 +344,7 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.bts_frame.pack(fill=tk.X, padx=0, pady=2)
 
         self.entry_find = ctk.CTkEntry(self.bts_frame,
-                                       textvariable=self.grp_words_text
+                                       textvariable=self.outcms_words_text
                                        )
         self.entry_find.pack(side=tk.LEFT, padx=10, pady=6, expand=1, fill=tk.X)
         self.entry_find.bind("<KeyRelease-Return>", self.on_list_entry_return_release)
@@ -373,67 +374,68 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         self.button_clear.pack(side="left", padx=6, pady=10)
 
         # labelframe within outcomes frame for which list option
-        self.grp_lst_ops_frame = ttk.LabelFrame(self,
-                                                text='Vocabulary Source For Guess Outcome Words:',
-                                                labelanchor='w',
-                                                borderwidth=0
-                                                )
-        self.grp_lst_ops_frame.pack(side=tk.TOP, padx=10, pady=4, fill=tk.X)
-        self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Words Entered",
-                                    variable=self.grps_guess_source, value=0,
+        self.outcm_lst_ops_frame = ttk.LabelFrame(self,
+                                                  text='Vocabulary Source For Guess Outcome Words:',
+                                                  labelanchor='w',
+                                                  borderwidth=0
+                                                  )
+        self.outcm_lst_ops_frame.pack(side=tk.TOP, padx=10, pady=4, fill=tk.X)
+        self.rbrA = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Words Entered",
+                                    variable=self.outcms_guess_source, value=0,
                                     command=self.title_status)
         self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
-        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic",
-                                    variable=self.grps_guess_source, value=1,
+        self.rbrB = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Classic",
+                                    variable=self.outcms_guess_source, value=1,
                                     command=self.title_status)
         self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
-        self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+",
-                                     variable=self.grps_guess_source, value=2,
+        self.rbrBB = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Classic+",
+                                     variable=self.outcms_guess_source, value=2,
                                      command=self.title_status)
         self.rbrBB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
-        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large",
-                                    variable=self.grps_guess_source, value=3,
+        self.rbrC = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Large",
+                                    variable=self.outcms_guess_source, value=3,
                                     command=self.title_status)
         self.rbrC.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
 
         # Show Keyed Report checkbox
-        self.chk_keyed_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
-                                            text="Keyed",
-                                            variable=self.d_keyed_verbose_grps,
-                                            onvalue=True,
-                                            offvalue=False,
-                                            command=self.keyed_chk
-                                            )
-        self.chk_keyed_grp_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_keyed_outcms_disp = ttk.Checkbutton(self.outcm_lst_ops_frame,
+                                                     text="Keyed",
+                                                     variable=self.d_keyed_verbose_outcms,
+                                                     onvalue=True,
+                                                     offvalue=False,
+                                                     command=self.keyed_chk
+                                                     )
+        self.chk_keyed_outcms_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_keyed_outcms_disp.configure(state='disabled')
 
         # Show Condensed Report checkbox
-        self.chk_grp_disp_cond = ttk.Checkbutton(self.grp_lst_ops_frame,
-                                                 text="Cond",
-                                                 variable=self.d_verbose_grps_cond,
-                                                 onvalue=True,
-                                                 offvalue=False,
-                                                 command=self.condensed_chk
-                                                 )
-        self.chk_grp_disp_cond.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_outcms_disp_cond = ttk.Checkbutton(self.outcm_lst_ops_frame,
+                                                    text="Cond",
+                                                    variable=self.d_verbose_outcms_cond,
+                                                    onvalue=True,
+                                                    offvalue=False,
+                                                    command=self.condensed_chk
+                                                    )
+        self.chk_outcms_disp_cond.pack(side=tk.RIGHT, padx=10, pady=2)
 
         # Show Entropy Report checkbox
-        self.chk_ent_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
+        self.chk_ent_disp = ttk.Checkbutton(self.outcm_lst_ops_frame,
                                             text="Entropy",
-                                            variable=self.d_ent_grps,
+                                            variable=self.d_ent_outcms,
                                             onvalue=True,
                                             offvalue=False
                                             )
         self.chk_ent_disp.pack(side=tk.RIGHT, padx=10, pady=2)
 
         # Show Verbose Report checkbox
-        self.chk_grp_disp = ttk.Checkbutton(self.grp_lst_ops_frame,
-                                            text="Verbose",
-                                            variable=self.d_verbose_grps,
-                                            onvalue=True,
-                                            offvalue=False,
-                                            command=self.verbose_chk
-                                            )
-        self.chk_grp_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_outcms_disp = ttk.Checkbutton(self.outcm_lst_ops_frame,
+                                               text="Verbose",
+                                               variable=self.d_verbose_outcms,
+                                               onvalue=True,
+                                               offvalue=False,
+                                               command=self.verbose_chk
+                                               )
+        self.chk_outcms_disp.pack(side=tk.RIGHT, padx=10, pady=2)
 
         # end labelframe within outcomes frame for which list option
 
@@ -452,9 +454,9 @@ class GrpsDrillingMain(ctk.CTkToplevel):
                                             highlightthickness=0)
         self.tx_status.pack(side="left", anchor=tk.NW, padx=10, pady=4, expand=True, fill=tk.BOTH)
         # The CustomText class is a tk.Text extended to support a color for matched text.
-        # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
-        # tag 'grp' is used to highlight outcome ranker
-        self.tx_status.tag_configure('grp', background='#fff69a')
+        # #c6e2ff = red 198, green 226, blue 255 => a light blue, www.color-hex.com
+        # tag 'out' is used to highlight outcome ranker
+        self.tx_status.tag_configure('out', background='#fff69a')
         # tag 'ent' is used to highlight entropy pick
         self.tx_status.tag_configure('ent', background='#ffd700')
 
@@ -467,11 +469,11 @@ class GrpsDrillingMain(ctk.CTkToplevel):
         # Respond to initial state
         self.title_status()
 
-# end GrpsDrillingMain class
+# end OutcmsDrillingMain class
 
 
 def mainloop(_args=None):
-    drill_app: GrpsDrillingMain = GrpsDrillingMain()
+    drill_app: OutcmsDrillingMain = OutcmsDrillingMain()
     drill_app.mainloop()
 
 

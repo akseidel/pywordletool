@@ -15,9 +15,9 @@
 * Expect nothing more than a helper with a thorough vocabulary that presents words only matching the letters you specify.
 * The **Helper** was created for investigating Wordle word pick strategies. Using the **Helper** removes the task of thinking up five-letter words to allow one to focus only on play strategy.
 * The **Helper** "knows" the words but not which word is the solution. As such the Helper ruins the game for those where thinking up words is the attraction to Wordle.
-* The **Helper** can calculate the **entropy** or **information bits** for every guess applied to the current words showing. The guess having the highest **entropy** is the best guess baring any additional information regarding the words showing.
-* A companion to the **Helper** is the word outcome analyzer **Groups Driller**. The **Helper's** **Groups Driller** button runs an instance of the **Outcome Driller's** output in context with the words the **Helper** currently shows. The **Outcome Driller** button runs a separate **Outcome Driller** word outcome analyzer instance. Its purpose is for examining outcome properties in a manor independent of the **Helper**  and without disturbing the **Helper's** current state. Outcomes can be used to calculate the expected number of steps associated with any guess word. See [EXPECTEDSTEPS_Readme.md](EXPECTEDSTEPS_Readme.md) for more information.
-* A side show to the **Helper** is **fmwm.py**, the Finite Monkey Wordle Machine (**FMWM**). **FMWM** dispatches a machine, the monkey, to perform Wordle related tasks, like how many random guesses are required to solve Wordles. It can also find all the **Magic Words** present in the vocabulary for a given word. **Magic Words** reduce the selection guess pool to contain just the solution word. See [FMWM_Readme.md](FMWM_Readme.md) for more information.
+* The **Helper** can calculate the outcome set **entropy** or **information bits** for every guess applied to the current words showing. The guess having the highest outcome set  **entropy** is the best guess baring any additional information regarding the words showing and also baring secondary inter-outcome word interactions.
+* A companion to the **Helper** is the outcome set analyzer **Outcome Driller**. The **Helper's** **Outcome Driller** button runs an instance of the **Outcome Driller's** output in context with the words the **Helper** currently shows. The **Outcome Driller** button runs a separate **Outcome Driller** word outcome analyzer instance. Its purpose is for examining outcome properties in a manor independent of the **Helper**  and without disturbing the **Helper's** current state. Outcomes can be used to calculate the expected number of steps associated with any guess word. See [EXPECTEDSTEPS_Readme.md](EXPECTEDSTEPS_Readme.md) for more information.
+* A side show to the **Helper** is **fmwm.py**. This is the Finite Monkey Wordle Machine (**FMWM**). **FMWM** dispatches a machine, the monkey, to perform Wordle related tasks, like how many random guesses are required to solve Wordles. It can also find all the **Magic Words** present in the vocabulary for a given word. **Magic Words** reduce the selection guess pool to contain just the solution word. See [FMWM_Readme.md](FMWM_Readme.md) for more information.
 
 ### Running the Wordle helper
 
@@ -62,13 +62,12 @@
 * Download the **pywtpackage.zip** release file from the repository releases link.
 * Unzip the **pywtpackage.zip** release file. It should unzip to be a folder named pywtpackage.
 * Rename the **pywtpackage** folder as you wish and place the folder with its contents to where you would like to keep it.
-* A file privilege for the **start-pywt.command** double-click-to-run convenience file needs to be changed for it to work. Use the command: ```chmod +x start-pywt.command``` executed in Terminal, at the file's folder, to make the change. The same applies to the other convenience files: **start-fmwm.command** and **start-groupdrilling.command**. For these use the commands: ```chmod +x start-fmwm.command``` and ```chmod +x start-groupdrilling.command``` executed in Terminal, at the file's folder, to make the changes.
+* A file privilege for the **start-pywt.command** double-click-to-run convenience file needs to be changed for it to work. Use the command: ```chmod +x start-pywt.command``` executed in Terminal, at the file's folder, to make the change. The same applies to the other convenience file: **start-fmwm.command**. For these use the commands: ```chmod +x start-fmwm.command``` executed in Terminal, at the file's folder, to make the changes.
 * In the zip package, this **README.md** file, the images it uses and a couple of files in the **worddata** folder regarding letter ranking may be deleted if desired. The only required files, and their associated folder, that are in **pywtpackage.zip** are:
   * **start-pywt.command**  (the double-click-to-run convenience script file)
   * **pywt.py**             (the wordle helper app.)
   * **helpers.py**          (a helper to the app.)
   * **groupdrilling.py**    (a helper app for outcome analysis)
-  * **start-groupdrilling.command** (convenience script file)
   * **fmwm.py**             (a command line application to measure strategies)
   * **start-fmwm.command**  (convenience script file to run fmwm.py)
   * **helpinfo.txt**        (help information)
@@ -114,11 +113,11 @@
 
 !['Verbose Window Top Image'](InfoImages/PYWTVerboseGrpsTop.png)
 
-* The **Cond.** checkbox results in the verbose output to be a **condensed** format that lists the guess words in order of highest information entropy first. Here is an example:
+* The **Cond** checkbox results in the verbose output to be a **condensed** format that lists the guess words in order of highest information entropy first. Here is an example:
 
 !['Condensed Result Window Image'](InfoImages/PYWTCondensedView.png)
 
-* Condensed mode defaults to be **Keyed** where each guess is indexed according to which entropy rank slot it resides. Guesses can have equal rank order with other guess words. Thus a guess might appear as 4th down in the ranking but in fact might be sharing the 1st rank slot with the guesses listed above it.
+* The **Keyed** option, enabled when the **Cond** option is set, add the entropy rank slot number. The slot number is indexed according to the entropy rank slot into which guess resides. Guesses can have equal rank order with other guess words. Thus a guess might appear as 4th down in the ranking but in fact might be sharing the 1st rank slot with the guesses listed above it. The **Keyed** option makes this obvious, but it does interfere with using advanced regex filters in Find because the guess word is no longer the first line on which the regex operates.
 
 * The concept of **Wordle Outcome** is explained in an allegory here: [Groups Allegory](/groupsallegory/README.md). Note that "Groups" is the more confusing term for "Outcomes".
   

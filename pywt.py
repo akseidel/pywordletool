@@ -12,8 +12,8 @@
 # so to get the basic engine working first. Then the GUI was created,
 # discarding the original command line interface.
 #
-# get customtkinter  -> pip3 install customtkinter
-# if already  present, you may need to upgrade it -> pip3 install customtkinter --upgrade
+# Get customtkinter -> pip3 install customtkinter
+# if already present, you may need to upgrade it -> pip3 install customtkinter --upgrade
 # Hopefully the upgrade does not break this code.
 #
 import random
@@ -27,7 +27,7 @@ from tkinter.ttk import Style
 import customtkinter as ctk
 
 import helpers as hlp
-import groupdrilling
+import outcomedrilling
 
 # globals
 data_path = 'worddata/'  # path from here to data folder
@@ -145,7 +145,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.chk_grp_disp.configure(state=look)
         self.chk_ent_disp.configure(state=look)
         self.chk_cond_disp.configure(state=look)
-        self.chk_key_disp.configure(state=look)
+        self.chk_keyed_disp.configure(state=look)
     def set_opt_vocab_ckb_look(self, look: str) -> None:
         self.rbrA.configure(state=look)
         self.rbrB.configure(state=look)
@@ -166,20 +166,20 @@ class Pywordlemainwindow(ctk.CTk):
 
         # Screen height and width.
         w_width = 1150
-        w_height = 720
+        w_height = 726
 
         hlp.size_and_position_this_window(self, w_width, w_height, 0, 0)
 
         # set the Vars
-        self.grps_guess_source = tk.IntVar(value=0)
+        self.outcms_guess_source = tk.IntVar(value=0)
         self.allow_dup_state = tk.BooleanVar(value=False)
         self.use_classic_frequency = tk.BooleanVar(value=False)
         self.use_hard_mode = tk.BooleanVar(value=False)
         self.ordr_by_rank = tk.BooleanVar(value=True)
-        self.verbose_grps = tk.BooleanVar(value=False)
-        self.ent_grps = tk.BooleanVar(value=False)
-        self.cond_grps = tk.BooleanVar(value=False)
-        self.keyed_verbose_grps = tk.BooleanVar(value=False)
+        self.verbose_outcms = tk.BooleanVar(value=False)
+        self.ent_outcms = tk.BooleanVar(value=False)
+        self.cond_outcms = tk.BooleanVar(value=False)
+        self.keyed_verbose_outcms = tk.BooleanVar(value=False)
         self.vocab_var = tk.IntVar(value=1)
         self.cull_the_pu = tk.BooleanVar(value=False)
         self.status = tk.StringVar()
@@ -192,9 +192,9 @@ class Pywordlemainwindow(ctk.CTk):
         self.pos_x = self.pos5.copy()
         self.sel_not_classic = False
         self.sel_rando = False
-        self.sel_grpoptimal = False
+        self.sel_outcm_optimal = False
         self.sel_genetic = False
-        self.grpsdriller_window = None
+        self.outcms_driller_window = None
 
         # configure style
         style = ttk.Style()
@@ -216,11 +216,11 @@ class Pywordlemainwindow(ctk.CTk):
                 h_line = h_line + mid_pad + h_txt
             lb_result_hd.configure(text=h_line)
 
-        def show_grps_driller() -> None:
-            if self.grpsdriller_window is None or not self.grpsdriller_window.winfo_exists():
-                self.grpsdriller_window = groupdrilling.GrpsDrillingMain()  # create window if its None or destroyed
+        def show_outcome_driller() -> None:
+            if self.outcms_driller_window is None or not self.outcms_driller_window.winfo_exists():
+                self.outcms_driller_window = outcomedrilling.OutcmsDrillingMain()  # create window if its None or destroyed
             else:
-                self.grpsdriller_window.focus()  # if window exists focus it
+                self.outcms_driller_window.focus()  # if window exists focus it
 
         def do_freq_type() -> None:
             global letter_rank_file
@@ -229,18 +229,22 @@ class Pywordlemainwindow(ctk.CTk):
             else:
                 letter_rank_file = 'letter_ranks_bot.txt'
             do_grep()
-            update_help_wind(letter_rank_file)
+            if self.wnd_help is not None:
+                # This seems to be the only way to avoid an exception if the
+                # wnd_help had already been visible but also destroyed. It remains
+                # existing, i.e., not None even after being destroyed. In this condition
+                # it has no children (parts) that would error if an update tries to
+                # change.
+                if len(self.wnd_help.children) > 0:
+                    update_help_wind(letter_rank_file)
 
         def do_list_by() -> None:
             do_grep()
 
         def update_help_wind(letter_rank_file) -> None:
-            if self.wnd_help is None:
-                return
-            else:
-                self.wnd_help.letter_rank_file = letter_rank_file
-                self.wnd_help.show_rank_info()
-                self.wnd_help.deiconify()
+            self.wnd_help.letter_rank_file = letter_rank_file
+            self.wnd_help.show_rank_info()
+            self.wnd_help.deiconify()
 
         def do_grep() -> None:
             """Runs a wordletool helper grep instance
@@ -370,7 +374,7 @@ class Pywordlemainwindow(ctk.CTk):
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
 
             # group optimals ranking
-            if self.sel_grpoptimal and (n_items > 0):
+            if self.sel_outcm_optimal and (n_items > 0):
                 self.enable_optimal_controls('disabled')
                 # Clear any highlighting prior to what could be a long wait.
                 tx_result.remove_tag('grp')
@@ -380,7 +384,7 @@ class Pywordlemainwindow(ctk.CTk):
                 remaining_word_list = list(the_word_list.keys())
                 # Flag to use various solutions as guesses instead of the current displayed word list.
                 # This allows the option to group rank from the entire guess list.
-                grps_guess_source = self.grps_guess_source.get()
+                grps_guess_source = self.outcms_guess_source.get()
                 optimal_group_guesses = {}
                 context = "Wordle Helper"
 
@@ -398,11 +402,11 @@ class Pywordlemainwindow(ctk.CTk):
                     case 0:
                         # using the showing words (remaining solutions) for guess candidates
                         optimal_group_guesses = hlp.best_outcomes_from_showing_as_guess_dict(remaining_word_list,
-                                                                                                 self.verbose_grps.get(),
-                                                                                                 self.ent_grps.get(),
-                                                                                                 self.cond_grps.get(),
-                                                                                                 self.keyed_verbose_grps.get(),
-                                                                                                 context)
+                                                                                             self.verbose_outcms.get(),
+                                                                                             self.ent_outcms.get(),
+                                                                                             self.cond_outcms.get(),
+                                                                                             self.keyed_verbose_outcms.get(),
+                                                                                             context)
 
                     case 1:
                         # using the classic (original possible solutions) words for guess candidates
@@ -418,13 +422,13 @@ class Pywordlemainwindow(ctk.CTk):
                         else:
                             report_msg1 = 'Classic Vocabulary-DF'
                         optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(remaining_word_list,
-                                                                                          self.verbose_grps.get(),
-                                                                                          self.ent_grps.get(),
-                                                                                          self.cond_grps.get(),
-                                                                                          self.keyed_verbose_grps.get(),
-                                                                                          guess_targets,
-                                                                                          report_msg1,
-                                                                                          context)
+                                                                                      self.verbose_outcms.get(),
+                                                                                      self.ent_outcms.get(),
+                                                                                      self.cond_outcms.get(),
+                                                                                      self.keyed_verbose_outcms.get(),
+                                                                                      guess_targets,
+                                                                                      report_msg1,
+                                                                                      context)
                     case 2:
                         # using the classic+ (entire possible solutions) for guess candidates
                         guess_targets = hlp.ToolResults(data_path,
@@ -439,13 +443,13 @@ class Pywordlemainwindow(ctk.CTk):
                         else:
                             report_msg1 = 'Classic+ Vocabulary-DF'
                         optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(remaining_word_list,
-                                                                                          self.verbose_grps.get(),
-                                                                                          self.ent_grps.get(),
-                                                                                          self.cond_grps.get(),
-                                                                                          self.keyed_verbose_grps.get(),
-                                                                                          guess_targets,
-                                                                                          report_msg1,
-                                                                                          context)
+                                                                                      self.verbose_outcms.get(),
+                                                                                      self.ent_outcms.get(),
+                                                                                      self.cond_outcms.get(),
+                                                                                      self.keyed_verbose_outcms.get(),
+                                                                                      guess_targets,
+                                                                                      report_msg1,
+                                                                                      context)
                     case 3:
                         # using the entire allowed guess list for guess candidates
                         guess_targets = hlp.ToolResults(data_path,
@@ -460,13 +464,13 @@ class Pywordlemainwindow(ctk.CTk):
                         else:
                             report_msg1 = 'Large Vocabulary-DF'
                         optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(remaining_word_list,
-                                                                                          self.verbose_grps.get(),
-                                                                                          self.ent_grps.get(),
-                                                                                          self.cond_grps.get(),
-                                                                                          self.keyed_verbose_grps.get(),
-                                                                                          guess_targets,
-                                                                                          report_msg1,
-                                                                                          context)
+                                                                                      self.verbose_outcms.get(),
+                                                                                      self.ent_outcms.get(),
+                                                                                      self.cond_outcms.get(),
+                                                                                      self.keyed_verbose_outcms.get(),
+                                                                                      guess_targets,
+                                                                                      report_msg1,
+                                                                                      context)
                     case _:
                         pass
 
@@ -476,14 +480,14 @@ class Pywordlemainwindow(ctk.CTk):
                     case 0:
                         regex: str = hlp.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
                     case _:
-                        # The displayed list may not have the words to highlight when the grps_guess_source
+                        # The displayed list may not have the words to highlight when the outcms_guess_source
                         # uses more words than what is in the current displayed list. Instead, any common
                         # words will be highlighted.
                         displayed_as_list = list(the_word_list.keys())
                         words_in_common = list(set(displayed_as_list) & set(opt_group_guesses_as_list))
                         regex: str = hlp.regex_maxgenrankers(words_in_common, the_word_list)
 
-                if self.ent_grps.get():
+                if self.ent_outcms.get():
                     tx_result.highlight_pattern(regex, 'ent', remove_priors=False)
                 else:
                     tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
@@ -498,7 +502,7 @@ class Pywordlemainwindow(ctk.CTk):
                 self.enable_optimal_controls('active')
 
             tx_result.configure(state='disabled')
-            if not self.sel_rando and not self.sel_grpoptimal and not self.sel_genetic:
+            if not self.sel_rando and not self.sel_outcm_optimal and not self.sel_genetic:
                 # Do not scroll to end when a rando pick, genetic or optimal group is highlighted
                 tx_result.see('end')
             self.status.set(wordletool.get_status() + comment)
@@ -650,22 +654,23 @@ class Pywordlemainwindow(ctk.CTk):
 
         # selected optimal group ranking in the result
         def pick_optimals() -> None:
-            self.sel_grpoptimal = True
+            self.sel_outcm_optimal = True
             self.title("> > > ... Busy Finding Optimals ... < < <")
             do_grep()
             self.title("This Wordle Helper")
-            self.sel_grpoptimal = False
+            self.sel_outcm_optimal = False
 
-        def cond_grps_chk() -> None:
-            if self.cond_grps.get():
-                self.verbose_grps.set(True)
-                self.keyed_verbose_grps.set(True)
+        def cond_outcms_chk() -> None:
+            if self.cond_outcms.get():
+                self.verbose_outcms.set(True)
+                self.chk_keyed_disp.configure(state='enabled')
             else:
-                self.keyed_verbose_grps.set(False)
+                self.keyed_verbose_outcms.set(False)
+                self.chk_keyed_disp.configure(state='disabled')
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
-        # by_what indicated by key 0 or by value 1 so that the required position
+        # By_what indicated by key 0 or by value 1 so that the required position
         # list sorts by the position while the excluded position list sorts by
         # the letter.
         def fill_treeview_per_dictionary(this_treeview, this_pos_dict: dict, by_what: int) -> None:
@@ -758,7 +763,7 @@ class Pywordlemainwindow(ctk.CTk):
         tx_result.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=6, pady=2)
         # tx_result.bind("<Configure>", on_window_resize)
         # The CustomText class is a tk.Text extended to support a color for matched text.
-        # #c6e2ff = red 198, green 226, blue 255 => a light blue,  www.color-hex.com
+        # #c6e2ff = red 198, green 226, blue 255 => a light blue, www.color-hex.com
         # tag 'grp' is used to highlight group ranker
         tx_result.tag_configure('grp', background='#fff69a')
         # tx_result.tag_configure('grp', background='#91c790')
@@ -932,7 +937,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # The special pattern controls are in a sub frame and all but the text label are RIGHT positioned.
         # Therefore, they are defined from last to first.
-        # special pattern mode radio buttons
+        # Special pattern mode radio buttons
         rb_px = ttk.Radiobutton(self.specialpatt_subframeA, text="Exclude", variable=self.sp_pat_mode_var, value=2,
                                 command=do_spec_pat)
         rb_px.pack(side=tk.RIGHT, padx=2, pady=0)
@@ -966,7 +971,6 @@ class Pywordlemainwindow(ctk.CTk):
         # ............ multiple same letters section
         # The multiple same letters controls are in a sub frame and all but the text label are RIGHT positioned.
         # Therefore, they are defined from last to first.
-        # label
         self.lb_mult_ltrs = ctk.CTkLabel(self.specialpatt_subframeB,
                                          text='Multiples',
                                          )
@@ -1652,7 +1656,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_help.pack(side=tk.LEFT, padx=4, pady=3, fill=tk.X, expand=True)
 
         self.bt_drill = ctk.CTkButton(self.bt_grpB_frame, text="Outcome Driller",
-                                      width=40, text_color="black", command=show_grps_driller)
+                                      width=40, text_color="black", command=show_outcome_driller)
         self.bt_drill.pack(side=tk.RIGHT, padx=4, pady=3, fill=tk.X, expand=True)
 
         # frame for Clear, Random, Genetic buttons
@@ -1688,33 +1692,34 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_groups.pack(side=tk.LEFT, padx=4, pady=0, fill=tk.X)
         self.chk_grp_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Verbose",
-                                            variable=self.verbose_grps,
+                                            variable=self.verbose_outcms,
                                             onvalue=True,
                                             offvalue=False
                                             )
         self.chk_grp_disp.pack(side=tk.LEFT, padx=0, pady=0, expand=True)
         self.chk_ent_disp = ttk.Checkbutton(self.grp_frame,
                                             text="Entropy",
-                                            variable=self.ent_grps,
+                                            variable=self.ent_outcms,
                                             onvalue=True,
                                             offvalue=False
                                             )
         self.chk_ent_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
         self.chk_cond_disp = ttk.Checkbutton(self.grp_frame,
                                              text="Cond",
-                                             variable=self.cond_grps,
+                                             variable=self.cond_outcms,
                                              onvalue=True,
                                              offvalue=False,
-                                             command=cond_grps_chk
+                                             command=cond_outcms_chk
                                              )
         self.chk_cond_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
-        self.chk_key_disp = ttk.Checkbutton(self.grp_frame,
-                                            text="Keyed",
-                                            variable=self.keyed_verbose_grps,
-                                            onvalue=True,
-                                            offvalue=False
-                                            )
-        self.chk_key_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
+        self.chk_keyed_disp = ttk.Checkbutton(self.grp_frame,
+                                              text="Keyed",
+                                              variable=self.keyed_verbose_outcms,
+                                              onvalue=True,
+                                              offvalue=False
+                                              )
+        self.chk_keyed_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
+        self.chk_keyed_disp.configure(state='disabled')
         # labelframe within groups frame for which list option
         self.grp_lst_ops_frame = ttk.LabelFrame(self.admin_frame,
                                                 text='Vocabulary Source For Guess Word Outcome',
@@ -1722,14 +1727,14 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0
                                                 )
         self.grp_lst_ops_frame.pack(side=tk.TOP, padx=0, pady=4, fill=tk.X)
-        self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Showing", variable=self.grps_guess_source,
+        self.rbrA = ttk.Radiobutton(self.grp_lst_ops_frame, text="Showing", variable=self.outcms_guess_source,
                                     value=0)
         self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2, expand=True)
-        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic", variable=self.grps_guess_source, value=1)
+        self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic", variable=self.outcms_guess_source, value=1)
         self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
-        self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+", variable=self.grps_guess_source, value=2)
+        self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+", variable=self.outcms_guess_source, value=2)
         self.rbrBB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
-        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large", variable=self.grps_guess_source, value=3)
+        self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large", variable=self.outcms_guess_source, value=3)
         self.rbrC.pack(side=tk.RIGHT, fill=tk.X, padx=0, pady=2, expand=True)
         # end labelframe within groups frame for which list option
 
