@@ -185,7 +185,13 @@ Special **Pattern** allows one to quickly introduce a custom require or exclude 
 
 **Multiples** allows one to specify "there must be two E letters" or "there cannot be two E letters, nor three E letters". The entry format is 'number''letter' , 'number''letter' and so on. For example: 2A,3E. A space character also puts in the comma for you.
 
-**Multiples** is a concept that may be difficult to understand at first. If your guess word has multiple same letters and one of those letters is yellow or green then all words with two or more of those letters must be *excluded* via **Multiples** because one of those letters being gray means the solution has just one of those letters. You can ignore the idea when all of those guess same letters are grey. If your guess word has multiple same letters and both of those letters is yellow or green in any combination then all words with two or more of those letters must be *included* via **Multiples**. You might need to think about needing three of those letters being *included*. **Multiples** operates as either include or exclude. More complicated requirements can be achieved by combining **Multiples** inclusions with **Exclude From Position** exclusions or **Special Pattern**. The Helper does not do any thinking for you in this regard.
+**Multiples** is a concept that may be difficult to understand. If your guess word has multiple same letters and one of those letters is yellow or green then all words with two or more of those letters must be *excluded* via **Multiples** because one of those letters being gray means the solution has just one of those letters.
+
+You can ignore the **Multiples** idea when all of those same letter guess letters are grey.
+
+If your guess word has multiple same letters and both of those letters is yellow or green in any combination then all words with two or more of those letters must be *included* via **Multiples**. An easy mistake is not to position exclude subsequent additional yellow letter clues for letters for which you already have **Multiples** indicated.
+
+You might need to think about needing three of those letters being *included*. **Multiples** operates as either include or exclude. More complicated requirements can be achieved by combining **Multiples** inclusions with **Exclude From Position** exclusions or **Special Pattern**. The Helper does not do any thinking for you in this regard.
 
 * **Hard Mode** restricts the guesses shown by the **Optimals** feature to comply with Wordle Hard Mode rules where green letters must be used in their green positions and yellow letters must be somewhere present.
 
