@@ -22,11 +22,22 @@ import argparse
 import csv
 
 
+class BlankLinesHelpFormatter(argparse.HelpFormatter):
+    """
+       This class modifies the argparse.ArgumentParser so that a new
+       line is added after each help argument explanation that is
+       outputted when using the -h or --help command line argument to
+       explain the command line arguments.
+    """
+    def _split_lines(self, text, width):
+        return super()._split_lines(text, width) + ['']
+
+
 def process_any_arguments() -> None:
     """
     Process any command line arguments
     """
-    global debug_mode, reveal_mode, botadd_sol_filename, vocab_full_filename,\
+    global debug_mode, reveal_mode, botadd_sol_filename, vocab_full_filename, \
         vocab_standard_target_filename, vocab_standard_guess_filename, \
         vocab_magic_target_filename, vocab_magic_guess_filename, use_starting_wrd, \
         starting_wrd, target_wrd, rank_mode, allow_dups, rand_mode, guess_mode, run_type, \
@@ -34,7 +45,8 @@ def process_any_arguments() -> None:
         query_mode, magic_mode, magic_order, ts_ptw, ts_psw, ts_pmo, ts_pqm, ts_ptw, \
         ts_prt, ts_psn, ts_ppw, resume, resume_after_wrd
 
-    parser = argparse.ArgumentParser(description='Process command line settings.')
+    parser = argparse.ArgumentParser(description='Process command line settings.',
+                                     formatter_class=BlankLinesHelpFormatter)
     parser.add_argument('-d', action='store_true', help='Prints out lists, guesses etc.')
     parser.add_argument('-l', action='store_true', help='Lists each solution run data')
     parser.add_argument('-n', action='store_true', help='Random first guess word, ie skip asking about it')
@@ -106,7 +118,6 @@ def process_any_arguments() -> None:
         vocab_magic_target_filename = botadd_sol_filename
         vocab_standard_target_filename = botadd_sol_filename
 
-
     if args.n:
         # no starting word, skip asking about it
         use_starting_wrd = 0
@@ -176,7 +187,9 @@ def unranked_word_dict() -> dict:
     @return: dict
     """
     return helpers.ToolResults(data_path,
-                               vocab_standard_guess_filename, letter_rank_file, True, 0, True).get_ranked_grep_result_wrd_lst(True)
+                               vocab_standard_guess_filename, letter_rank_file, True, 0,
+                               True).get_ranked_grep_result_wrd_lst(True)
+
 
 def unranked_large_word_dict() -> dict:
     """
@@ -186,7 +199,8 @@ def unranked_large_word_dict() -> dict:
     @return: dict
     """
     return helpers.ToolResults(data_path,
-                               vocab_full_filename, letter_rank_file, True, 0, True).get_ranked_grep_result_wrd_lst(True)
+                               vocab_full_filename, letter_rank_file, True, 0, True).get_ranked_grep_result_wrd_lst(
+        True)
 
 
 def clean_slate(loc_excl_l: list, loc_requ_l: list, loc_x_pos_dict: dict,
@@ -372,13 +386,13 @@ def output_msg(msg: any, also2file: bool, loc_fname: str) -> None:
                     f.write(str(msg) + '\n')
                 if type(msg) is list:
                     csvwriter = csv.writer(f)
-                    csvwriter.writerow([str(w).replace('\'','') for w in msg])
+                    csvwriter.writerow([str(w).replace('\'', '') for w in msg])
         except IOError:
             sys.stdout.write(f'\nIOError for file {fn_csv}\n')
             sys.stdout.write(f'trying to write {msg}\n')
             exit()
     else:
-        sys.stdout.write('\033[K' + str(msg).replace('\'','') + '\n')
+        sys.stdout.write('\033[K' + str(msg).replace('\'', '') + '\n')
     return
 
 
@@ -432,7 +446,7 @@ def reveal_output(x: int,
                   run_stats: list,
                   loc_record_this_run: bool,
                   loc_run_fname: str,
-                  run_word_dict= None
+                  run_word_dict=None
                   ) -> None:
     """
     Reveal mode is the option to report the results for an xth sample run
@@ -452,7 +466,7 @@ def reveal_output(x: int,
     reveal_stat = [x, guesses]
     reveal_stat.extend(run_stats)
     if run_word_dict:
-        reveal_stat.extend([list(run_word_dict.keys()) ])
+        reveal_stat.extend([list(run_word_dict.keys())])
     output_msg(reveal_stat, False, loc_run_fname)
     if loc_record_this_run:
         output_msg(reveal_stat, loc_record_this_run, loc_run_fname)
@@ -519,13 +533,13 @@ def query_output(loc_target_wrd):
         stat_msg = f'Encountered {len(query_set)} order #{magic_order} magic word guesses ' \
                    f'that eliminate all but {magic_order} guesses:\n{query_list}'
     # print(stat_msg)
-    msg = stat_msg.replace('\'','')
+    msg = stat_msg.replace('\'', '')
     sys.stdout.write(f'\033[K{msg}\n')
 
 
 def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     global dur_tw, guess_mode, allow_dups, rank_mode, rand_mode, run_type, query_set, run_fname, \
-    vocab_standard_guess_filename, vocab_standard_target_filename
+        vocab_standard_guess_filename, vocab_standard_target_filename
 
     if record_run:
         print('Output being written to ' + run_fname)
@@ -539,7 +553,6 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
               f'Average guesses to solve Wordle by sampling {loc_sample_number} tries.')
         if rank_mode > 2:
             print(f'-- The processing time duration varies exponentially with the starting word result size!')
-
 
     std_x_pos_dict = {}  # exclude position dictionary
     std_r_pos_dict = {}  # require position dictionary
@@ -567,10 +580,12 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     # is the number of times to solve the target word using the run mode.
     for x in range(loc_sample_number):
         # initialize a fresh targets_wordletool instance
-        targets_wordletool = helpers.ToolResults(data_path, vocab_standard_target_filename, letter_rank_file, allow_dups,
+        targets_wordletool = helpers.ToolResults(data_path, vocab_standard_target_filename, letter_rank_file,
+                                                 allow_dups,
                                                  rank_mode, True)
         # initialize a fresh guess_pool_wordletool instance
-        guess_pool_wordletool = helpers.ToolResults(data_path, vocab_standard_guess_filename, letter_rank_file, allow_dups,
+        guess_pool_wordletool = helpers.ToolResults(data_path, vocab_standard_guess_filename, letter_rank_file,
+                                                    allow_dups,
                                                     rank_mode, True)
 
         guesses = 0
@@ -628,8 +643,8 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
                         # This for best (highest) entropy selection mode.
                         targets_list = list(loc_targets_word_list_dict.keys())
                         best_ent_wrds_list = list(helpers.best_entropy_outcomes_guess_dict(targets_list,
-                                                                                       special_guess_list,
-                                                                                       debug_mode))
+                                                                                           special_guess_list,
+                                                                                           debug_mode))
                         # There could be multiple equal highest entropy words.
                         # Make a random choice.
                         guess_word = random.choice(best_ent_wrds_list)
@@ -675,7 +690,8 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
 
             # Get the revised remaining targets word list using the optional no_rank argument with loc_rand_mode
             # No ranking or sorting is needed when all guesses are random as per rand_mode argument.
-            loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word, debug_mode, rand_mode)
+            loc_targets_word_list_dict = targets_wordletool.get_word_list(guesses + 2, guess_word, debug_mode,
+                                                                          rand_mode)
             # Because the target word is known to exist in the overall pool then loc_guess_pool_word_list_dict can
             # only be less than 1 when the target had duplicate letters and the pool was not
             # allowing duplicates. Here that condition is checked and the pool revised to allow
@@ -729,11 +745,10 @@ def standard_monkey(loc_sample_number: int, loc_wrd_x: int):
     prologue_output(loc_sample_number, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, tot, vocab_standard_target_filename, dur_tw)
 
-
     sys.stdout.write('\n')
 
 
-def magic_word_monkey(loc_wrd_x: int) -> None:
+def magic_word_monkey(loc_wrd_x: int, target_qty: int) -> None:
     """
     Intended to find only the first guess words that reduce the vocabulary selection,
     pool to the magic_order word count. Magic_order 1 means the target word only. Magic_order
@@ -745,7 +760,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
 
     if record_run:
         print('Output being written to ' + run_fname)
-    print(f'{loc_wrd_x}  Finding #{magic_order} order magic words for: {target_wrd}')
+    print(f'\nTarget {loc_wrd_x} of {target_qty}  Finding #{magic_order} order magic words for: {target_wrd}')
 
     guess_vocabulary = vocab_magic_guess_filename
     # Need to iterate through all unranked words in the specified vocabulary
@@ -826,7 +841,7 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
                 query_set.add(run_stats[1])
                 # Reveal_mode is where output is desired to show the guesses and their pool impact
                 if reveal_mode:
-                    reveal_output(r, guesses, run_stats,  record_run, run_fname, loc_the_word_list)
+                    reveal_output(r, guesses, run_stats, record_run, run_fname, loc_the_word_list)
 
         del wordletool
         # animated in progress showing
@@ -834,14 +849,16 @@ def magic_word_monkey(loc_wrd_x: int) -> None:
         mw_qty = len(query_set)
         msg = (f'\033[K=> ... {r} Searching {loc_n} words in {vocab_magic_guess_filename}'
                f' for {target_wrd}\'s order {magic_order} magic words. Finding: {mw_qty} \r')
-        sys.stdout.write(msg)
+        # Adding comma after msg. Maybe this will eliminate an odd condition where occasionally
+        # the \033[K does not take effect.
+        sys.stdout.write(msg, )
         sys.stdout.flush()
 
     dur_tw = time.perf_counter() - start_mt  # this word's process time
     prologue_output(loc_wrd_x, guess_mode, allow_dups, record_run, run_fname,
                     target_wrd, starting_wrd, mw_qty, vocab_magic_target_filename, dur_tw)
-
-    sys.stdout.write('\n')
+    sys.stdout.write(f'\n{target_wrd}\'s duration: {dur_tw:0.4f} sec.')
+    sys.stdout.write('\n\n')
 
 
 # ==== setup ======= These variables can be overriden by command line argument. ================
@@ -858,7 +875,7 @@ botadd_sol_filename = 'botadd_nyt_wordlist.txt'  # classic+ solutions vocabulary
 # vocab_pos_sol_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 # solutions_vocab_filename = 'wo_nyt_wordlist.txt'  # solutions vocabulary list only
 # loc_vocab_filename = 'nyt_wordlist.txt'     # total vocabulary list
-vocab_full_filename = 'nyt_wordlist.txt'     # total vocabulary list
+vocab_full_filename = 'nyt_wordlist.txt'  # total vocabulary list
 vocab_standard_target_filename = ''
 vocab_standard_guess_filename = ''
 vocab_magic_target_filename = ''
@@ -884,13 +901,13 @@ rand_mode = True  # random monkeys
 # is required to be able to correctly handle target words that have
 # duplicate letters.
 allow_dups = False
-target_wrd = '' # the target solution word
-guess_mode = '' # general guess mode description
-starting_wrd = '' # a required first guess if any
+target_wrd = ''  # the target solution word
+guess_mode = ''  # general guess mode description
+starting_wrd = ''  # a required first guess if any
 use_starting_wrd = -1
-run_type = -1 # seems to be a flag indicating pick strategy random or method or yet to be defined
+run_type = -1  # seems to be a flag indicating pick strategy random or method or yet to be defined
 first_run = True
-run_fname = '' # filename when saving run data
+run_fname = ''  # filename when saving run data
 do_every_wrd = False  # Process every vocabulary word as a target word.
 conditions = ''
 dur_tw = 0.0  # seconds to process word
@@ -922,7 +939,7 @@ def main(_args=None):
         if not magic_mode:
             # Confirm the target Wordle word the guessing sessions are trying to discover. Note: The monkey can
             # be started with the target word already set.
-            ask_for_target_word()            # Set the first guess if desired.
+            ask_for_target_word()  # Set the first guess if desired.
             ask_for_starting_guess()
             # Set the guess mode and rank mode.
             ask_for_guess_mode()
@@ -957,7 +974,7 @@ def main(_args=None):
                     if not magic_mode:
                         standard_monkey(sample_number, wrd_x)
                     else:
-                        magic_word_monkey(wrd_x)
+                        magic_word_monkey(wrd_x, len(targets))
                     # dur_tw is measured by the monkey
                     dur_sf = dur_sf + dur_tw
                     avg_t = dur_sf / (wrd_x - skip_qty)
@@ -967,7 +984,7 @@ def main(_args=None):
                     # Do targets remain?
                     if wrd_x < len(targets):
                         print(
-                            f'Duration so far: {dsf}, avg. {avg_t:0.4f} s/wrd, last word {dur_tw:0.4f}'
+                            f'Elapsed time so far: {dsf}, avg. {avg_t:0.4f} s/wrd, last word {dur_tw:0.4f}'
                             f' s/wrd, ETF: {etf}')
                 else:
                     if target_wrd == resume_after_wrd:
@@ -984,7 +1001,7 @@ def main(_args=None):
             if not magic_mode:
                 standard_monkey(sample_number, wrd_x)
             elif magic_mode:
-                magic_word_monkey(wrd_x)
+                magic_word_monkey(wrd_x, 1)
 
     except KeyboardInterrupt:
         sys.stdout.write(f'\033[K user canceled. \n')
