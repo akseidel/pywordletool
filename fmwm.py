@@ -20,6 +20,7 @@ import helpers
 import random
 import argparse
 import csv
+import os
 
 
 class BlankLinesHelpFormatter(argparse.HelpFormatter):
@@ -847,11 +848,17 @@ def magic_word_monkey(loc_wrd_x: int, target_qty: int) -> None:
         # animated in progress showing
         r += 1
         mw_qty = len(query_set)
-        msg = (f'\033[K=> ... {r} Searching {loc_n} words in {vocab_magic_guess_filename}'
-               f' for {target_wrd}\'s order {magic_order} magic words. Finding: {mw_qty} \r')
-        # Adding comma after msg. Maybe this will eliminate an odd condition where occasionally
-        # the \033[K does not take effect.
-        sys.stdout.write(msg, )
+        msg = (f'\033[K=> {r} scanning {loc_n} wrds in {vocab_magic_guess_filename}'
+               f' for order {magic_order} magic wrds. Found: {mw_qty}\r')
+        h=os.get_terminal_size().lines
+        w=os.get_terminal_size().columns
+        rw=len(msg)
+        if rw > w:
+            try:
+                os.system(f'printf \'\033[8;{h};{rw}t\'')
+            except:
+                pass
+        sys.stdout.write(msg)
         sys.stdout.flush()
 
     dur_tw = time.perf_counter() - start_mt  # this word's process time
