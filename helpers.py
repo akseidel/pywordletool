@@ -1681,29 +1681,27 @@ class CustomText(tk.Text):
                 self.tag_add(tag, "matchStart", "matchEnd")
                 if do_scroll:
                     self.see(index)  # scroll widget to show the index's line
+                if not_found:
+                    if pattern.find("^") == -1:
+                        msg = (f"Did not find \"{pattern}\"."
+                               f"\n\nThe word that was searched is not in the vocabulary that was used for guesses."
+                               f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
+                    else:
+                        msg = (f"Did not find \"{pattern}\"."
+                               f"\n\n\"Find\" in the non-condensed format verbose mode includes \"for: \" in the search "
+                               f"text because the main use is to find the outcomes for a particular word. Adding the "
+                               f"\"for: \" does this because the outcome header uniquely includes \"for: \"."
+                               f"\n\n\"Find\" operates a regex search on the entire text."
+                               f" Putting \"^\", which means \"starting with\", works in the unkeyed condensed report "
+                               f"because each line starts with the guess word and it is the guess word that is usually "
+                               f"what one searches for.")
+                    messagebox.showinfo(title=None, message=msg)
+                else:
+                    self.see(first_index)
             except Exception as e:
                 msg = f"Regex error: \"{e}\"."
                 messagebox.showinfo(title=None, message=msg)
                 break
-
-        if not_found:
-            if pattern.find("^") == -1:
-                msg = (f"Did not find \"{pattern}\"."
-                       f"\n\nThe word that was searched is not in the vocabulary that was used for guesses."
-                       f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
-            else:
-                msg = (f"Did not find \"{pattern}\"."
-                       f"\n\n\"Find\" in the non-condensed format verbose mode includes \"for: \" in the search "
-                       f"text because the main use is to find the outcomes for a particular word. Adding the "
-                       f"\"for: \" does this because the outcome header uniquely includes \"for: \"."
-                       f"\n\n\"Find\" operates a regex search on the entire text."
-                       f" Putting \"^\", which means \"starting with\", works in the unkeyed condensed report "
-                       f"because each line starts with the guess word and it is the guess word that is usually "
-                       f"what one searches for.")
-            messagebox.showinfo(title=None, message=msg)
-        else:
-            self.see(first_index)
-
         return fnd_cnt
 
 class RptWnd(ctk.CTkToplevel):
