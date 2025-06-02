@@ -767,7 +767,7 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
 def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
     """
     Summarizes the outcomes best_rank_dictionary, mainly to extract the
-    minimum and maximum group sizes
+    minimum and maximum outcome sizes
     @param best_rank_dict:
     @return: outcomes_stat_summary tuple:
     [0]:qty,[1]:smallest,[2]:largest,[3]:average,
@@ -826,7 +826,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool,
     @param guess_targets: guess vocabulary dictionary
     @param report_header_msg1: msg string put in verbose report header
     @param title_context: String used in title so indicate owner
-    @return: dictionary of the best group ranked guesses
+    @return: dictionary of the best outcome ranked guesses
     """
     guess_rank_dict = {}
     best_rank_dict = {}
@@ -886,7 +886,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool,
                 if g not in best_rank_dict:
                     best_rank_dict[g] = s
         # Also collect the max_ent instances, these are not
-        # always with max group size.
+        # always with max outcome size.
         if math.isclose(s[5], max_ent):
             if g not in best_rank_dict:
                 best_rank_dict[g] = s
@@ -977,7 +977,7 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting
                 if g not in best_stat_dict:
                     best_stat_dict[g] = s
         # Also collect the max_ent instances, these are not
-        # always with max group size.
+        # always with max outcome size.
         if math.isclose(s[5], max_ent):
             if g not in best_stat_dict:
                 best_stat_dict[g] = s
@@ -1189,7 +1189,7 @@ def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode=False) -> str:
     """
     wrds = list(best_rank_dict.keys())
     rptl = ('\n> >  {0:.0f}'.format(
-        len(wrds)) + ' optimal. 1st word is highest ent. Any next have the highest group qty:' + '\n'
+        len(wrds)) + ' optimal. 1st word is highest ent. Any next have the highest outcome qty:' + '\n'
             + ', '.join(wrds))
     if cond_mode:
         rptl += '\n\nSorted by highest ent:'
@@ -1200,7 +1200,7 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
     # stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
     # [4]:population variance,[5]:entropy bits as a tuple
     stats_summary = outcomes_stat_summary(best_rank_dict)
-    rptl = '\n> >  Optimal guess stats, each has group qty ' + '{0:.0f}'.format(
+    rptl = '\n> >  Optimal guess stats, each has outcome qty ' + '{0:.0f}'.format(
         stats_summary[0]) + ' or is max entropy:'
     rptwnd.verbose_data.insert(tk.END, rptl)
     for w, s in best_rank_dict.items():
