@@ -377,7 +377,7 @@ class Pywordlemainwindow(ctk.CTk):
             if self.sel_outcm_optimal and (n_items > 0):
                 self.enable_optimal_controls('disabled')
                 # Clear any highlighting prior to what could be a long wait.
-                tx_result.remove_tag('grp')
+                tx_result.remove_tag('opt')
                 # This requires forcing TK to update the display now instead of later.
                 self.update()
                 # current displayed word list
@@ -490,7 +490,7 @@ class Pywordlemainwindow(ctk.CTk):
                 if self.ent_outcms.get():
                     tx_result.highlight_pattern(regex, 'ent', remove_priors=False)
                 else:
-                    tx_result.highlight_pattern(regex, 'grp', remove_priors=False)
+                    tx_result.highlight_pattern(regex, 'opt', remove_priors=False)
                 comment = " (" + str(len(opt_group_guesses_as_list)) + " optimal" + \
                           ", grp qty " + '{0:.0f}'.format(g_qty) + \
                           ", ent " + "{0:.2f}".format(g_e) + \
@@ -764,9 +764,8 @@ class Pywordlemainwindow(ctk.CTk):
         # tx_result.bind("<Configure>", on_window_resize)
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue, www.color-hex.com
-        # tag 'grp' is used to highlight group ranker
-        tx_result.tag_configure('grp', background='#fff69a')
-        # tx_result.tag_configure('grp', background='#91c790')
+        # tag 'opt' is used to highlight group ranker
+        tx_result.tag_configure('opt', background='#fff69a')
         # tag 'ran' is used to highlight random pick
         tx_result.tag_configure('ran', background='#7cfc00')
         # tag 'gen' is used to highlight genetic pick

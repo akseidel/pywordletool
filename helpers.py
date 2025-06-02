@@ -1748,7 +1748,7 @@ class RptWnd(ctk.CTkToplevel):
         self.title(f"> > Busy on \"{regex}\", Please Wait < <")
         self.update()
         if len(regex) > 4:
-            fnd_cnt = self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+            fnd_cnt = self.verbose_data.highlight_pattern(regex, 'opt', remove_priors=True, mode=0)
             # TO DO finish this
             # msg = f"Found {str(fnd_cnt)} instances of \"{regex}\"."
             # messagebox.showinfo(title=None, message=msg)
@@ -1769,7 +1769,7 @@ class RptWnd(ctk.CTkToplevel):
                    f"number of items to be highlighted. The report scrolls to the first found instance.")
             if messagebox.askokcancel(title=None, message=msg):
                 if len(regex) > 0 and regex != "for:":
-                    fnd_cnt = self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=0)
+                    fnd_cnt = self.verbose_data.highlight_pattern(regex, 'opt', remove_priors=True, mode=0)
                     # TO DO finish this
                     # msg = f"Found {str(fnd_cnt)} instances of \"{regex}\"."
                     # messagebox.showinfo(title=None, message=msg)
@@ -1784,8 +1784,8 @@ class RptWnd(ctk.CTkToplevel):
         """
         search_text = ''
         regex: search_text = 'Outcome summary'
-        self.verbose_data.highlight_pattern(regex, 'grp', remove_priors=True, mode=1)
-        self.verbose_data.remove_tag('grp')
+        self.verbose_data.highlight_pattern(regex, 'opt', remove_priors=True, mode=1)
+        self.verbose_data.remove_tag('opt')
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
@@ -1827,7 +1827,7 @@ class RptWnd(ctk.CTkToplevel):
                                        highlightthickness=0
                                        )
         self.verbose_data.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
-        self.verbose_data.tag_configure('grp', background='#ffd700')
+        self.verbose_data.tag_configure('opt', background='#ffd700')
         # scrollbar for rpt
         verbose_rpt_sb = ttk.Scrollbar(self.verbose_info_frame, orient='vertical')
         verbose_rpt_sb.grid(row=0, column=1, sticky='ens')
