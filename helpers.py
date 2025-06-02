@@ -726,7 +726,7 @@ def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict:
     return outcomes_dict
 
 
-def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, float, float, float]:
+def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, float, float, float, int, int, int]:
     """
     Given a single guess's outcome dictionary, returns stats:
     outcome pattern quantity,
@@ -744,11 +744,20 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
     largest = 0  # largest outcome size
     sums = 0  # outcome size sums, this is the number of words
     p2 = 0.0  # outcome population variance
-    g_ent = 0.0  # outcomess entropy
+    g_ent = 0.0  # outcomes entropy
     g_xa = 0.0  # outcomes expected average
+    cnt_0 = 0 # number of clue 0
+    cnt_1 = 0  # number of clue 1
+    cnt_2 = 0  # number of clue 2
     for k, v in the_outcomes_dict.items():
         size = len(v)
+        n_0 = k.count('0') * size
+        n_1 = k.count('1') * size
+        n_2 = k.count('2') * size
         sums = sums + size
+        cnt_0 = cnt_0 + n_0
+        cnt_1 = cnt_1 + n_1
+        cnt_2 = cnt_2 + n_2
         largest = max(largest, size)
         smallest = min(smallest, size)
     # mean = group average size
@@ -761,7 +770,7 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
         g_ent = g_ent + i_entropy
         g_xa = g_xa + size * i_p
     p2 /= g_qty
-    return g_qty, smallest, largest, mean, p2, g_ent, g_xa
+    return g_qty, smallest, largest, mean, p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2
 
 
 def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
@@ -799,14 +808,15 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
     max_grp_ent = 0.0
     min_grp_xa = g_stats[6]  # Seed with member's expected average
     for g_stats in best_rank_dict.values():
-        (_, min_stat, max_stat, _, p2_stat, e_stat, xa_stat) = g_stats
+        (_, min_stat, max_stat, _, p2_stat, e_stat, xa_stat, cnt_0, cnt_1, cnt_2) = g_stats
         min_grp_size = min(min_stat, min_grp_size)
         max_grp_size = min(max_stat, max_grp_size)  # The min_max is desired.
         min_grp_p2 = min(p2_stat, min_grp_p2)
         max_grp_ent = max(max_grp_ent, e_stat)
         min_grp_xa = min(min_grp_xa, xa_stat)
         # outcomes_stat_summary are:[0]:qty,[1]:smallest,[2]:largest,[3]:average,
-        # [4]:min p2,[5]:max entropy bit as a tuple
+        # [4]:min p2,[5]:max entropy bit, [6] expected outcome size,
+        # [7] cnt_0, [8] cnt_1, [9] cnt_2 as a tuple
     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2, max_grp_ent, min_grp_xa
 
 
@@ -1020,8 +1030,9 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
         outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
         # outcome_stats tuple is: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
         # [4]:population variance, [5]:entropy, [6] expected outcome size
-
+        # [7] cnt_0, [8] cnt_1, [9] cnt_2
         guess_stat_dict[guess] = outcomes_stats
+        print(guess, outcomes_stats)
 
         # Record the maximum entropy seen
         max_ent = max(outcomes_stats[5], max_ent)
@@ -1083,7 +1094,10 @@ def prnt_guesses_header(rptwnd: ctk, keyed=False):
            '\tmax' + \
            '\tave' + \
            '\texp' + \
-           '\tp2'
+           '\tp2' + \
+           '\t#0' + \
+           '\t#1' + \
+           '\t#2'
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 
@@ -1108,7 +1122,7 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
     c_indx_ent = 0
     prnt_guesses_header(rptwnd, keyed)
     for g, s in inorder_cond_dict.items():
-        (qty, smallest, largest, average, p2, ent, g_xa) = s
+        (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = s
         if keyed:
             cnt += 1
             if cnt == 1:
@@ -1126,13 +1140,16 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
                '\t' + str(largest) + \
                '\t' + '{0:.3f}'.format(average) + \
                '\t' + '{0:.2f}'.format(g_xa) + \
-               '\t' + '{0:.2f}'.format(p2)
+               '\t' + '{0:.1f}'.format(p2) + \
+               '\t' + str(cnt_0) + \
+               '\t' + str(cnt_1) + \
+               '\t' + str(cnt_2)
         rptwnd.verbose_data.insert(tk.END, rptl)
 
 
 def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outcomes_dict: dict,
                                     rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
-    (qty, smallest, largest, average, p2, ent, g_xa) = outcome_stats
+    (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = outcome_stats
     # report in full or condensed format according to cond_prt flag
     if not cond_rpt:
         rptl = '\n\n> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
@@ -1143,7 +1160,7 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
                ", max " + str(largest) + \
                ', ave ' + '{0:.2f}'.format(average) + \
                ', exp ' + '{0:.2f}'.format(g_xa) + \
-               ', p2 ' + '{0:.2f}'.format(p2)
+               ', p2 ' + '{0:.1f}'.format(p2)
 
         rptwnd.verbose_data.insert(tk.END, rptl)
         rptwnd.verbose_data.insert(tk.END, '\n')
@@ -1171,7 +1188,7 @@ def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
             ", min-max " + '{0:.0f}'.format(g_max) +
             ", ave " + '{0:.3f}'.format(g_ave) +
             ", exp " + '{0:.2f}'.format(g_xa) +
-            ", p2 " + '{0:.2f}'.format(g_p2))
+            ", p2 " + '{0:.1f}'.format(g_p2))
     return rptl
 
 
@@ -1204,7 +1221,7 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
         stats_summary[0]) + ' or is max entropy:'
     rptwnd.verbose_data.insert(tk.END, rptl)
     for w, s in best_rank_dict.items():
-        (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa) = s
+        (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2) = s
         rptl = "\n" + w + " - " + \
                "qty " + '{0:.0f}'.format(g_qty) + \
                ", ent " + '{0:.3f}'.format(g_ent) + \
@@ -1212,7 +1229,8 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
                ", max " + '{0:.0f}'.format(g_max) + \
                ", ave " + '{0:.3f}'.format(g_ave) + \
                ", exp " + '{0:.2f}'.format(g_xa) + \
-               ", p2 " + '{0:.3f}'.format(g_p2)
+               ", p2 " + '{0:.1f}'.format(g_p2)
+
         rptwnd.verbose_data.insert(tk.END, rptl)
         rptwnd.verbose_data.see('end')
     # lock the text widget to prevent user editing
