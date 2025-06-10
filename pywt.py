@@ -199,7 +199,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.sel_outcm_optimal = False
         self.sel_genetic = False
         self.outcms_driller_window = None
-        self.meta_l = False
+        self.meta_lr = False
 
         # configure style
         style = ttk.Style()
@@ -209,10 +209,11 @@ class Pywordlemainwindow(ctk.CTk):
 
         # Set meta left pressed flag used for clue type tally count
         # in condensed output.
-        def key_handler_meta_l(e):
-            self.meta_l = True
+        def key_handler_meta_lr(e):
+            self.meta_lr = True
 
-        self.bind('<KeyPress>', key_handler_meta_l)
+        self.bind('<Meta_L>', key_handler_meta_lr)
+        self.bind('<Meta_R>', key_handler_meta_lr)
 
         def str_wrd_list_hrd() -> None:
             """Creates the word list header line.
@@ -441,7 +442,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                       guess_targets,
                                                                                       report_msg1,
                                                                                       context,
-                                                                                      self.meta_l)
+                                                                                      self.meta_lr)
                     case 2:
                         # using the classic+ (entire possible solutions) for guess candidates
                         guess_targets = hlp.ToolResults(data_path,
@@ -463,7 +464,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                       guess_targets,
                                                                                       report_msg1,
                                                                                       context,
-                                                                                      self.meta_l)
+                                                                                      self.meta_lr)
                     case 3:
                         # using the entire allowed guess list for guess candidates
                         guess_targets = hlp.ToolResults(data_path,
@@ -485,11 +486,11 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                       guess_targets,
                                                                                       report_msg1,
                                                                                       context,
-                                                                                      self.meta_l)
+                                                                                      self.meta_lr)
                     case _:
                         pass
 
-                self.meta_l=False
+                self.meta_lr=False
                 opt_group_guesses_as_list = list(optimal_group_guesses.keys())
                 (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = hlp.outcomes_stat_summary(optimal_group_guesses)
                 match grps_guess_source:

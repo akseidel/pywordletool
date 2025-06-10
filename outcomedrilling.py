@@ -161,8 +161,8 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
             self.set_busy_status_msg()
             self.enable_controls('disabled')
             self.update()
-            optimal_outcome_guesses = process_outcms_list(self, this_lst, self.d_meta_l)
-            self.d_meta_l=False
+            optimal_outcome_guesses = process_outcms_list(self, this_lst, self.d_meta_lr)
+            self.d_meta_lr=False
 
             # Report the results
             self.report_results(this_lst, optimal_outcome_guesses, self.d_verbose_outcms_cond.get())
@@ -327,7 +327,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.d_ent_outcms = tk.BooleanVar(value=False)
         self.d_keyed_verbose_outcms = tk.BooleanVar(value=False)
         self.d_verbose_outcms_cond = tk.BooleanVar(value=False)
-        self.d_meta_l = False
+        self.d_meta_lr = False
 
         # configure style
         style = ttk.Style()
@@ -337,11 +337,11 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
 
         # Set meta left pressed flag used for clue type tally count
         # in condensed output.
-        def key_handler_meta_l(e):
-            self.d_meta_l = True
+        def key_handler_meta_lr(e):
+            self.d_meta_lr = True
 
-        # self.bind('<KeyPress>', key_handler_keydown)
-        self.bind('<Meta_L>', key_handler_meta_l)
+        self.bind('<Meta_L>', key_handler_meta_lr)
+        self.bind('<Meta_R>', key_handler_meta_lr)
 
         # controls frame
         self.cnt_frame = ctk.CTkFrame(self,

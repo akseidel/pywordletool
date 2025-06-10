@@ -754,7 +754,7 @@ def get_outcomes_stats(the_outcomes_dict: dict, meta_l=False) -> tuple[int, int,
         sums = sums + size
         largest = max(largest, size)
         smallest = min(smallest, size)
-        # tally the clue types if meta_l is True
+        # tally the clue types if meta_lr is True
         # (Presumably pressing the meta key to the spacebar left.)
         if meta_l:
             n_0 = k.count('0') * size
