@@ -47,6 +47,7 @@ font_tuple_n = ("Helvetica", 10, "normal")
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
+
 # return a reformatted string with word wrapping
 def wrap_this(string: str, max_chars: int) -> str:
     """A helper that will return the string with word-break wrapping.
@@ -71,6 +72,7 @@ def wrap_this(string: str, max_chars: int) -> str:
         the_newline += '\n' + w
     return the_newline
 
+
 # Remove certain characters from loc_str string argument.
 def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) -> str:
     """
@@ -92,12 +94,14 @@ def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) ->
         loc_str = loc_str.replace(char, '')
     return loc_str
 
+
+
+
 class Pywordlemainwindow(ctk.CTk):
     """The pywordletool application GUI window
     """
     global x_pos_dict
     global r_pos_dict
-
 
     def set_n_col(self):
         sw = self.result_frame.winfo_width()
@@ -111,7 +115,6 @@ class Pywordlemainwindow(ctk.CTk):
             return 9
         else:
             return 8
-
 
     def show_help(self) -> None:
         if self.wnd_help is None or not self.wnd_help.winfo_exists():
@@ -146,6 +149,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.chk_ent_disp.configure(state=look)
         self.chk_cond_disp.configure(state=look)
         self.chk_keyed_disp.configure(state=look)
+
     def set_opt_vocab_ckb_look(self, look: str) -> None:
         self.rbrA.configure(state=look)
         self.rbrB.configure(state=look)
@@ -195,12 +199,20 @@ class Pywordlemainwindow(ctk.CTk):
         self.sel_outcm_optimal = False
         self.sel_genetic = False
         self.outcms_driller_window = None
+        self.meta_l = False
 
         # configure style
         style = ttk.Style()
         # Sets the font used for label in labelframe
         style.configure('TLabelframe.Label', font=('helvetica', 10, 'normal'))
         style.theme_use()
+
+        # Set meta left pressed flag used for clue type tally count
+        # in condensed output.
+        def key_handler_meta_l(e):
+            self.meta_l = True
+
+        self.bind('<KeyPress>', key_handler_meta_l)
 
         def str_wrd_list_hrd() -> None:
             """Creates the word list header line.
@@ -267,15 +279,15 @@ class Pywordlemainwindow(ctk.CTk):
                 vocab_filename = full_wordle_wrd_list
 
             # create the wordletool instance
-            wordletool = hlp.ToolResults(data_path, # relative path to worddata
-                                             vocab_filename, # the vocabulary considered for solutions or guesses
-                                             letter_rank_file, # file that cointains letter rank data
-                                             allow_dups, # allow duplicate multiple letters
-                                             self.rank_mode.get(), # return ranked data
-                                             self.ordr_by_rank.get(),  # return data ordered by rank
-                                             self.cull_the_pu.get(), # cull the previously used words from the solutions
-                                             pu_sol_wrd_list # filename for the previously used words
-                                             )
+            wordletool = hlp.ToolResults(data_path,  # relative path to worddata
+                                         vocab_filename,  # the vocabulary considered for solutions or guesses
+                                         letter_rank_file,  # file that cointains letter rank data
+                                         allow_dups,  # allow duplicate multiple letters
+                                         self.rank_mode.get(),  # return ranked data
+                                         self.ordr_by_rank.get(),  # return data ordered by rank
+                                         self.cull_the_pu.get(),  # cull the previously used words from the solutions
+                                         pu_sol_wrd_list  # filename for the previously used words
+                                         )
 
             # The filter builders. Each of these adds to the grep command argument list
             wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
@@ -411,11 +423,11 @@ class Pywordlemainwindow(ctk.CTk):
                     case 1:
                         # using the classic (original possible solutions) words for guess candidates
                         guess_targets = hlp.ToolResults(data_path,
-                                                          classic_pos_sol_wrd_list,
-                                                          letter_rank_file,
-                                                          True,
-                                                          0,
-                                                          True).get_ranked_grep_result_wrd_lst(True)
+                                                        classic_pos_sol_wrd_list,
+                                                        letter_rank_file,
+                                                        True,
+                                                        0,
+                                                        True).get_ranked_grep_result_wrd_lst(True)
                         if self.use_hard_mode.get():
                             guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
                             report_msg1 = 'Classic Vocabulary-HM'
@@ -428,15 +440,16 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                       self.keyed_verbose_outcms.get(),
                                                                                       guess_targets,
                                                                                       report_msg1,
-                                                                                      context)
+                                                                                      context,
+                                                                                      self.meta_l)
                     case 2:
                         # using the classic+ (entire possible solutions) for guess candidates
                         guess_targets = hlp.ToolResults(data_path,
-                                                          bot_pos_sol_wrd_list,
-                                                          letter_rank_file,
-                                                          True,
-                                                          0,
-                                                          True).get_ranked_grep_result_wrd_lst(True)
+                                                        bot_pos_sol_wrd_list,
+                                                        letter_rank_file,
+                                                        True,
+                                                        0,
+                                                        True).get_ranked_grep_result_wrd_lst(True)
                         if self.use_hard_mode.get():
                             guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
                             report_msg1 = 'Classic+ Vocabulary-HM'
@@ -449,15 +462,16 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                       self.keyed_verbose_outcms.get(),
                                                                                       guess_targets,
                                                                                       report_msg1,
-                                                                                      context)
+                                                                                      context,
+                                                                                      self.meta_l)
                     case 3:
                         # using the entire allowed guess list for guess candidates
                         guess_targets = hlp.ToolResults(data_path,
-                                                          full_wordle_wrd_list,
-                                                          letter_rank_file,
-                                                          True,
-                                                          0,
-                                                          True).get_ranked_grep_result_wrd_lst(True)
+                                                        full_wordle_wrd_list,
+                                                        letter_rank_file,
+                                                        True,
+                                                        0,
+                                                        True).get_ranked_grep_result_wrd_lst(True)
                         if self.use_hard_mode.get():
                             guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
                             report_msg1 = 'Large Vocabulary-HM'
@@ -470,10 +484,12 @@ class Pywordlemainwindow(ctk.CTk):
                                                                                       self.keyed_verbose_outcms.get(),
                                                                                       guess_targets,
                                                                                       report_msg1,
-                                                                                      context)
+                                                                                      context,
+                                                                                      self.meta_l)
                     case _:
                         pass
 
+                self.meta_l=False
                 opt_group_guesses_as_list = list(optimal_group_guesses.keys())
                 (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = hlp.outcomes_stat_summary(optimal_group_guesses)
                 match grps_guess_source:
@@ -729,14 +745,13 @@ class Pywordlemainwindow(ctk.CTk):
         #     sw = self.winfo_screenwidth()
         #     print(f"winfo_screenwidth {sw}")
 
-
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
                                          corner_radius=10
                                          )
         self.result_frame.pack(anchor="n", padx=10, pady=2, fill="both", expand=1)
         self.result_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
-        self.result_frame.grid_rowconfigure(1,weight=100) # allows row 1 to expand (with sticky)
+        self.result_frame.grid_rowconfigure(1, weight=100)  # allows row 1 to expand (with sticky)
         self.result_frame.grid_rowconfigure(2, weight=1)
         self.result_frame.grid_rowconfigure(3, weight=1)
 
@@ -755,11 +770,11 @@ class Pywordlemainwindow(ctk.CTk):
         # The word list resulting from grep on the main wordlist
         # The CustomText class is a tk.Text extended to support a color for matched text.
         tx_result = hlp.CustomText(self.result_frame,
-                                       font=('Courier', 12, 'normal'),
-                                       wrap='word',
-                                       background='#dedede',
-                                       borderwidth=0,
-                                       highlightthickness=0)
+                                   font=('Courier', 12, 'normal'),
+                                   wrap='word',
+                                   background='#dedede',
+                                   borderwidth=0,
+                                   highlightthickness=0)
         tx_result.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=6, pady=2)
         # tx_result.bind("<Configure>", on_window_resize)
         # The CustomText class is a tk.Text extended to support a color for matched text.
@@ -808,7 +823,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # Divide results from controls
         self.separator = ttk.Separator(self, orient=tk.HORIZONTAL)
-        self.separator.pack(side=tk.TOP, fill=tk.X, pady=2 )
+        self.separator.pack(side=tk.TOP, fill=tk.X, pady=2)
 
         self.bottomhalf_frame = ctk.CTkFrame(self,
                                              corner_radius=10
@@ -823,7 +838,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.criteria_frame = ctk.CTkFrame(self.bottomhalf_frame,
                                            corner_radius=10
                                            )
-        self.criteria_frame.pack( fill=tk.X, padx=0, pady=0, expand=1)
+        self.criteria_frame.pack(fill=tk.X, padx=0, pady=0, expand=1)
 
         # letter checkbox exclusion frame - uses pack
         self.criteria_frame_x = ttk.LabelFrame(self.criteria_frame,
@@ -831,7 +846,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                border=0,
                                                borderwidth=0
                                                )
-        self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0,expand=1)
+        self.criteria_frame_x.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=1)
 
         # letter checkbox require frame - uses pack
         self.criteria_frame_r = ttk.LabelFrame(self.criteria_frame,
@@ -839,7 +854,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                border=0,
                                                borderwidth=0
                                                )
-        self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0,expand=1)
+        self.criteria_frame_r.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=1)
 
         # letter position frame overall - uses pack
         self.criteria_frame_p = ttk.LabelFrame(self.criteria_frame,
@@ -848,7 +863,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                border=0,
                                                borderwidth=0
                                                )
-        self.criteria_frame_p.pack(side=tk.LEFT, fill=tk.BOTH, padx=0, pady=0,expand=1)
+        self.criteria_frame_p.pack(side=tk.LEFT, fill=tk.BOTH, padx=0, pady=0, expand=1)
 
         # letter position frame exclude - uses pack
         self.criteria_frame_px = ttk.LabelFrame(self.criteria_frame_p,
@@ -857,7 +872,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0,
                                                 borderwidth=0
                                                 )
-        self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.Y, padx=0, pady=0,expand=1)
+        self.criteria_frame_px.pack(side=tk.LEFT, fill=tk.Y, padx=0, pady=0, expand=1)
 
         # letter position frame require- uses pack
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
@@ -866,13 +881,13 @@ class Pywordlemainwindow(ctk.CTk):
                                                 border=0,
                                                 borderwidth=0
                                                 )
-        self.criteria_frame_pr.pack(side=tk.RIGHT, fill=tk.Y, padx=0, pady=0,expand=1)
+        self.criteria_frame_pr.pack(side=tk.RIGHT, fill=tk.Y, padx=0, pady=0, expand=1)
 
         # outer frame for multiple actions frame require- uses pack
         self.actions_outer_frame = ctk.CTkFrame(self.criteria_frame,
                                                 corner_radius=10
                                                 )
-        self.actions_outer_frame.pack( side=tk.LEFT, fill=tk.X, padx=0, pady=0, expand=1)
+        self.actions_outer_frame.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=0, expand=1)
 
         # =======  START OF ============ include special patterns control
         # frame for special pattern regex - uses pack
@@ -884,10 +899,10 @@ class Pywordlemainwindow(ctk.CTk):
                                                 )
         self.specialpatt_frame.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=1)
 
-        self.specialpatt_subframeA = ctk.CTkFrame(self.specialpatt_frame,corner_radius=4)
+        self.specialpatt_subframeA = ctk.CTkFrame(self.specialpatt_frame, corner_radius=4)
         self.specialpatt_subframeA.pack(side=tk.TOP, fill=tk.X, padx=0, pady=0, expand=1)
 
-        self.specialpatt_subframeB = ctk.CTkFrame(self.specialpatt_frame,corner_radius=4)
+        self.specialpatt_subframeB = ctk.CTkFrame(self.specialpatt_frame, corner_radius=4)
         self.specialpatt_subframeB.pack(side=tk.BOTTOM, fill=tk.X, padx=0, pady=0, expand=1)
 
         # special pattern control variables
@@ -1548,8 +1563,8 @@ class Pywordlemainwindow(ctk.CTk):
         # === START OF ====== General Controls ==========
         # the_top_frame
         the_top_frame = ctk.CTkFrame(self.actions_frame,
-                                  border_width=0
-                                  )
+                                     border_width=0
+                                     )
         the_top_frame.pack(padx=6, fill=tk.X, expand=True)
 
         chk_allow_dups = ttk.Checkbutton(the_top_frame,
@@ -1562,11 +1577,11 @@ class Pywordlemainwindow(ctk.CTk):
         chk_allow_dups.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         chk_hard_mode = ttk.Checkbutton(the_top_frame,
-                                           text="Hard Mode",
-                                           variable=self.use_hard_mode,
-                                           onvalue=True,
-                                           offvalue=False,
-                                           padding=0)
+                                        text="Hard Mode",
+                                        variable=self.use_hard_mode,
+                                        onvalue=True,
+                                        offvalue=False,
+                                        padding=0)
         chk_hard_mode.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
 
         chk_ordr_by_rank = ttk.Checkbutton(the_top_frame,
@@ -1686,7 +1701,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_groups = ctk.CTkButton(self.grp_frame,
                                        text="Optimals",
                                        text_color="black",
-                                       width= 20,
+                                       width=20,
                                        command=pick_optimals)
         self.bt_groups.pack(side=tk.LEFT, padx=4, pady=0, fill=tk.X)
         self.chk_grp_disp = ttk.Checkbutton(self.grp_frame,
@@ -1731,7 +1746,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2, expand=True)
         self.rbrB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic", variable=self.outcms_guess_source, value=1)
         self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
-        self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+", variable=self.outcms_guess_source, value=2)
+        self.rbrBB = ttk.Radiobutton(self.grp_lst_ops_frame, text="Classic+", variable=self.outcms_guess_source,
+                                     value=2)
         self.rbrBB.pack(side=tk.LEFT, fill=tk.X, padx=0, pady=2, expand=True)
         self.rbrC = ttk.Radiobutton(self.grp_lst_ops_frame, text="Large", variable=self.outcms_guess_source, value=3)
         self.rbrC.pack(side=tk.RIGHT, fill=tk.X, padx=0, pady=2, expand=True)
@@ -1744,11 +1760,17 @@ class Pywordlemainwindow(ctk.CTk):
         # run the initial grep
         do_grep()
 
+
 # end Pywordlemainwindow class
 
+# def key_handler(event):
+#     print(event.char, event.keysym, event.keycode)
+
 def main(args=None):
-    this_app: Pywordlemainwindow = Pywordlemainwindow()
+    this_app = Pywordlemainwindow()
+    # this_app.bind("<Key>", key_handler)
     this_app.mainloop()
+
 
 # ====================================== main ================================================
 if __name__ == '__main__':

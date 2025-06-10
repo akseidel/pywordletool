@@ -119,6 +119,8 @@
 
 * The **Keyed** option, enabled when the **Cond** option is set, add the entropy rank slot number. The slot number is indexed according to the entropy rank slot into which guess resides. Guesses can have equal rank order with other guess words. Thus a guess might appear as 4th down in the ranking but in fact might be sharing the 1st rank slot with the guesses listed above it. The **Keyed** option makes this obvious, but it does interfere with using advanced regex filters in Find because the guess word is no longer the first line on which the regex operates.
 
+* Pressing the Left Meta key while pressing the **Optimals** button causes the number of clue types associated with each guess to be reported.
+
 * The concept of **Wordle Outcome** is explained in an allegory here: [Groups Allegory](/groupsallegory/README.md). Note that "Groups" is the more confusing term for "Outcomes".
   
 ### Outcome Driller

@@ -726,7 +726,7 @@ def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict:
     return outcomes_dict
 
 
-def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, float, float, float, int, int, int]:
+def get_outcomes_stats(the_outcomes_dict: dict, meta_l=False) -> tuple[int, int, int, float, float, float, float, int, int, int]:
     """
     Given a single guess's outcome dictionary, returns stats:
     outcome pattern quantity,
@@ -751,15 +751,19 @@ def get_outcomes_stats(the_outcomes_dict: dict) -> tuple[int, int, int, float, f
     cnt_2 = 0  # number of clue 2
     for k, v in the_outcomes_dict.items():
         size = len(v)
-        n_0 = k.count('0') * size
-        n_1 = k.count('1') * size
-        n_2 = k.count('2') * size
         sums = sums + size
-        cnt_0 = cnt_0 + n_0
-        cnt_1 = cnt_1 + n_1
-        cnt_2 = cnt_2 + n_2
         largest = max(largest, size)
         smallest = min(smallest, size)
+        # tally the clue types if meta_l is True
+        # (Presumably pressing the meta key to the spacebar left.)
+        if meta_l:
+            n_0 = k.count('0') * size
+            n_1 = k.count('1') * size
+            n_2 = k.count('2') * size
+            cnt_0 = cnt_0 + n_0
+            cnt_1 = cnt_1 + n_1
+            cnt_2 = cnt_2 + n_2
+
     # mean = group average size
     mean = sums / g_qty
     for k, v in the_outcomes_dict.items():
@@ -823,7 +827,7 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
 def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
                                       cond_rpt: bool, keyed_rpt: bool,
                                       guess_targets: dict,
-                                      report_header_msg1: str, title_context: str) -> dict:
+                                      report_header_msg1: str, title_context: str, meta_l=False) -> dict:
     """
     Wraps guess word outcome ranking to return the best
     outcome rank guesses. Guesses resulting in more outcomes
@@ -854,7 +858,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool,
         guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_lst)
         # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest,
         # [3]:average , [4]:population variance , [5]:entropy as a tuple
-        outcome_stats = get_outcomes_stats(guess_outcomes_dict)
+        outcome_stats = get_outcomes_stats(guess_outcomes_dict, meta_l)
 
         if reporting:
             clue_pattern_outcomes_to_window(guess, outcome_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
@@ -907,14 +911,14 @@ def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool,
     if reporting:
         report_footer_wrapper(report_header_msg1, remaining_word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
         if cond_rpt:
-            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt)
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
 
     return inorder_best_rank_dict
 
 
 def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
                                              cond_rpt: bool, keyed_rpt: bool,
-                                             title_context: str) -> dict:
+                                             title_context: str, meta_l=False) -> dict:
     """
     Wraps guess word outcomes ranking to return the best
     outcomes rank guesses. Guesses resulting in more outcomes
@@ -998,7 +1002,7 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting
     if reporting:
         report_footer_wrapper("Words Showing", remaining_word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
         if cond_rpt:
-            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt)
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
 
     return inorder_best_rank_dict
 
@@ -1084,7 +1088,7 @@ def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: c
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 
-def prnt_guesses_header(rptwnd: ctk, keyed=False):
+def prnt_guesses_header(rptwnd: ctk, keyed=False, meta_l=False):
     if not keyed:
         rptl = '\n\nguess' + '\tqty'
     else:
@@ -1094,10 +1098,12 @@ def prnt_guesses_header(rptwnd: ctk, keyed=False):
            '\tmax' + \
            '\tave' + \
            '\texp' + \
-           '\tp2' + \
-           '\t#0' + \
-           '\t#1' + \
-           '\t#2'
+           '\tp2'
+    if meta_l:
+        rptl = rptl + \
+        '\t#0' + \
+        '\t#1' + \
+        '\t#2'
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 
@@ -1109,18 +1115,20 @@ def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 
-def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, keyed: bool) -> None:
+def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, keyed: bool, meta_l=False) -> None:
     """
     Produces the condensed line by line guess outcome stats
     :param l_cond_dict: Dictionary of the guesses and their outcome stats
     :param rptwnd: The report window to show this.
     :param keyed: Bool to index the guesses into slots where each slot has equal entropy guesses
+    :param meta_l: Bool flag indicating the left meta key was pressed. The clue type tally is made if
+    the meta key was pressed.
     """
     inorder_cond_dict = dict(sorted(l_cond_dict.items(), key=lambda item: item[1][5], reverse=True))
     indx = 1
     cnt = 0
     c_indx_ent = 0
-    prnt_guesses_header(rptwnd, keyed)
+    prnt_guesses_header(rptwnd, keyed, meta_l)
     for g, s in inorder_cond_dict.items():
         (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = s
         if keyed:
@@ -1140,8 +1148,10 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
                '\t' + str(largest) + \
                '\t' + '{0:.3f}'.format(average) + \
                '\t' + '{0:.2f}'.format(g_xa) + \
-               '\t' + '{0:.1f}'.format(p2) + \
-               '\t' + str(cnt_0) + \
+               '\t' + '{0:.1f}'.format(p2)
+        if meta_l:
+                rptl = rptl + \
+                '\t' + str(cnt_0) + \
                '\t' + str(cnt_1) + \
                '\t' + str(cnt_2)
         rptwnd.verbose_data.insert(tk.END, rptl)

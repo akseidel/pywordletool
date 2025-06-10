@@ -17,7 +17,7 @@ data_path = 'worddata/'  # path from here to data folder
 letter_rank_file = 'letter_ranks.txt'
 
 
-def process_outcms_list(self, o_word_lst: list) -> dict:
+def process_outcms_list(self, o_word_lst: list, d_meta_l=False) -> dict:
     """
     Processes the words list for its outcomes. Uses the method options in the outcomes
     driller for the processing arguments.
@@ -57,7 +57,8 @@ def process_outcms_list(self, o_word_lst: list) -> dict:
                                                                             self.d_keyed_verbose_outcms.get(),
                                                                             all_targets,
                                                                             msg1,
-                                                                            context
+                                                                            context,
+                                                                            d_meta_l
                                                                             )
         case 2:
             # using the classic+ (entire possible solutions) for guess candidates
@@ -75,7 +76,8 @@ def process_outcms_list(self, o_word_lst: list) -> dict:
                                                                             self.d_keyed_verbose_outcms.get(),
                                                                             all_targets,
                                                                             msg1,
-                                                                            context
+                                                                            context,
+                                                                            d_meta_l
                                                                             )
         case 3:
             # using the entire allowed guess list for guess candidates
@@ -93,7 +95,8 @@ def process_outcms_list(self, o_word_lst: list) -> dict:
                                                                             self.d_keyed_verbose_outcms.get(),
                                                                             all_targets,
                                                                             msg1,
-                                                                            context
+                                                                            context,
+                                                                            d_meta_l
                                                                             )
         case _:
             pass
@@ -158,7 +161,8 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
             self.set_busy_status_msg()
             self.enable_controls('disabled')
             self.update()
-            optimal_outcome_guesses = process_outcms_list(self, this_lst)
+            optimal_outcome_guesses = process_outcms_list(self, this_lst, self.d_meta_l)
+            self.d_meta_l=False
 
             # Report the results
             self.report_results(this_lst, optimal_outcome_guesses, self.d_verbose_outcms_cond.get())
@@ -323,12 +327,21 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.d_ent_outcms = tk.BooleanVar(value=False)
         self.d_keyed_verbose_outcms = tk.BooleanVar(value=False)
         self.d_verbose_outcms_cond = tk.BooleanVar(value=False)
+        self.d_meta_l = False
 
         # configure style
         style = ttk.Style()
         style.theme_use()
         font_tuple_n = ("Courier", 12, "normal")
         self.option_add("*Font", font_tuple_n)
+
+        # Set meta left pressed flag used for clue type tally count
+        # in condensed output.
+        def key_handler_meta_l(e):
+            self.d_meta_l = True
+
+        # self.bind('<KeyPress>', key_handler_keydown)
+        self.bind('<Meta_L>', key_handler_meta_l)
 
         # controls frame
         self.cnt_frame = ctk.CTkFrame(self,
