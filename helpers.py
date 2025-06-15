@@ -549,8 +549,6 @@ def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
                             key = f"3{gl}"
                             mode_value = 1 # include
                             mult_dict[key] = mode_value
-    # print(f"{guess} for {target}")
-    # print(mult_dict)
     return mult_dict
 
 
@@ -1024,10 +1022,12 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     best_stats_found_dict = {}
     best_desired_dict = {}
     max_ent = 0.0
+    gl_len=len(guess_word_lst)
+    g_n=0
 
     if debug_mode:
         print(f'Working with {len(targets_word_lst)} remaining possibles. '
-              f'Pulling guesses from a {len(guess_word_lst)} guess list.')
+              f'Pulling guesses from a {gl_len} guess list.')
 
     for guess in guess_word_lst:
         guess_outcomes_dict = outcomes_for_this_guess(guess, targets_word_lst)
@@ -1036,7 +1036,10 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
         # [4]:population variance, [5]:entropy, [6] expected outcome size
         # [7] cnt_0, [8] cnt_1, [9] cnt_2
         guess_stat_dict[guess] = outcomes_stats
-        print(guess, outcomes_stats)
+        # animated in progress showing
+        msg = '\033[K' + '> ' + guess + ' : ' + str(g_n) + ' of ' + str(gl_len) + '\r'
+        sys.stdout.write(msg)
+        g_n = g_n + 1
 
         # Record the maximum entropy seen
         max_ent = max(outcomes_stats[5], max_ent)
