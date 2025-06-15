@@ -1179,9 +1179,6 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
         rptwnd.verbose_data.insert(tk.END, '\n')
         for key in sorted(guess_outcomes_dict):
             g = guess_outcomes_dict[key]
-            # if keyed_rpt:
-            #     rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
-            # else:
             rptl =  '\n' + keyed_if + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             rptwnd.verbose_data.insert(tk.END, rptl)
 
@@ -1276,6 +1273,7 @@ def valid_first_mult_number(s: str) -> bool | None:
             return True
         if s[0] == '3':
             return True
+        return None
     else:
         return False
 

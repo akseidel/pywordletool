@@ -113,11 +113,15 @@
 
 !['Verbose Window Top Image'](InfoImages/PYWTVerboseGrpsTop.png)
 
+* The **Keyed** option when enabled without the **Cond** option, adds the guess word to each verbose data line. This preserves the guess word to which the data belongs. The report can then be analyzed by some other application.
+  
+!['Verbose Window Keyed Image'](InfoImages/PYWTVerboseKeyed.png)
+
 * The **Cond** checkbox results in the verbose output to be a **condensed** format that lists the guess words in order of highest information entropy first. Here is an example:
 
 !['Condensed Result Window Image'](InfoImages/PYWTCondensedView.png)
 
-* The **Keyed** option, enabled when the **Cond** option is set, add the entropy rank slot number. The slot number is indexed according to the entropy rank slot into which guess resides. Guesses can have equal rank order with other guess words. Thus a guess might appear as 4th down in the ranking but in fact might be sharing the 1st rank slot with the guesses listed above it. The **Keyed** option makes this obvious, but it does interfere with using advanced regex filters in Find because the guess word is no longer the first line on which the regex operates.
+* The **Keyed** option when enabled with the **Cond** option, adds the entropy rank slot number to each condensed data line. The slot number is indexed according to the entropy rank slot into which guess resides. Guesses can have equal rank order with other guess words. Thus a guess might appear as 4th down in the ranking but in fact might be sharing the 1st rank slot with the guesses listed above it. The **Keyed** option makes this obvious, but it does interfere with using advanced regex filters in Find because the guess word is no longer the first line on which the regex operates.
 
 * Pressing the Left Meta key while pressing the **Optimals** button causes the number of clue types associated with each guess to be reported.
 
