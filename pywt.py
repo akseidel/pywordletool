@@ -678,12 +678,7 @@ class Pywordlemainwindow(ctk.CTk):
             self.sel_outcm_optimal = False
 
         def cond_outcms_chk() -> None:
-            if self.cond_outcms.get():
-                self.verbose_outcms.set(True)
-                self.chk_keyed_disp.configure(state='enabled')
-            else:
-                self.keyed_verbose_outcms.set(False)
-                self.chk_keyed_disp.configure(state='disabled')
+            self.verbose_outcms.set(self.cond_outcms.get())
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.
@@ -1734,7 +1729,6 @@ class Pywordlemainwindow(ctk.CTk):
                                               offvalue=False
                                               )
         self.chk_keyed_disp.pack(side=tk.LEFT, padx=2, pady=0, expand=True)
-        self.chk_keyed_disp.configure(state='disabled')
         # labelframe within groups frame for which list option
         self.grp_lst_ops_frame = ttk.LabelFrame(self.admin_frame,
                                                 text='Vocabulary Source For Guess Word Outcome',

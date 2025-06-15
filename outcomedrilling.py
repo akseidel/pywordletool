@@ -282,12 +282,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
             self.d_keyed_verbose_outcms.set(False)
 
     def condensed_chk(self):
-        if self.d_verbose_outcms_cond.get():
-            self.d_verbose_outcms.set(True)
-            self.chk_keyed_outcms_disp.configure(state='enabled')
-        else:
-            self.d_keyed_verbose_outcms.set(False)
-            self.chk_keyed_outcms_disp.configure(state='disabled')
+        self.d_verbose_outcms.set(self.d_verbose_outcms_cond.get())
 
     def keyed_chk(self):
         if self.d_keyed_verbose_outcms.get():
@@ -419,7 +414,6 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                                      command=self.keyed_chk
                                                      )
         self.chk_keyed_outcms_disp.pack(side=tk.RIGHT, padx=10, pady=2)
-        self.chk_keyed_outcms_disp.configure(state='disabled')
 
         # Show Condensed Report checkbox
         self.chk_outcms_disp_cond = ttk.Checkbutton(self.outcm_lst_ops_frame,
