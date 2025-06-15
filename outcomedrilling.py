@@ -285,8 +285,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.d_verbose_outcms.set(self.d_verbose_outcms_cond.get())
 
     def keyed_chk(self):
-        if self.d_keyed_verbose_outcms.get():
-            self.d_verbose_outcms.set(True)
+        self.d_verbose_outcms.set(self.d_keyed_verbose_outcms.get())
 
     def on_list_entry_return_release(self, _):
         self.just_clean_list()

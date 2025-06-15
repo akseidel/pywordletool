@@ -1161,10 +1161,13 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
                                     rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
     (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = outcome_stats
     # report in full or condensed format according to cond_prt flag
+    keyed_if=''
+    if keyed_rpt:
+        keyed_if =  guess + '  '
     if not cond_rpt:
-        rptl = '\n\n> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
+        rptl = '\n\n' + keyed_if + '> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
         rptwnd.verbose_data.insert(tk.END, rptl)
-        rptl = '\n> qty ' + str(qty) + \
+        rptl = '\n' + keyed_if + '> qty ' + str(qty) + \
                ', ent ' + '{0:.3f}'.format(ent) + \
                ", sizes: min " + str(smallest) + \
                ", max " + str(largest) + \
@@ -1176,11 +1179,11 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
         rptwnd.verbose_data.insert(tk.END, '\n')
         for key in sorted(guess_outcomes_dict):
             g = guess_outcomes_dict[key]
-            if keyed_rpt:
-                rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
-            else:
-                rptl = key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
-            rptwnd.verbose_data.insert(tk.END, '\n' + rptl)
+            # if keyed_rpt:
+            #     rptl = guess + '  ' + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
+            # else:
+            rptl =  '\n' + keyed_if + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
+            rptwnd.verbose_data.insert(tk.END, rptl)
 
 
 def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
