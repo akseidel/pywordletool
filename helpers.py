@@ -1701,11 +1701,6 @@ class CustomText(tk.Text):
                         first_index = index
                         # no longer in first pass
                         is_first_pass = False
-                        if mode == 1:
-                            # only the first match is sought. This is specifically
-                            # used to return to the Outcome Summary text for one of the
-                            # report types
-                            break
                 if count.get() == 0:
                     break  # degenerate pattern which matches zero-length strings
                 self.mark_set("matchStart", index)
@@ -1713,6 +1708,12 @@ class CustomText(tk.Text):
                 self.tag_add(tag, "matchStart", "matchEnd")
                 if do_scroll:
                     self.see(index)  # scroll widget to show the index's line
+
+                if mode == 1:
+                    # Only the first match is sought. This is specifically
+                    # used to return to the Outcome Summary text.
+                    break
+
                 if not_found:
                     if pattern.find("^") == -1:
                         msg = (f"Did not find \"{pattern}\"."
