@@ -678,7 +678,8 @@ class Pywordlemainwindow(ctk.CTk):
             self.sel_outcm_optimal = False
 
         def cond_outcms_chk() -> None:
-            self.verbose_outcms.set(self.cond_outcms.get())
+            if not self.verbose_outcms.get():
+                self.verbose_outcms.set(self.cond_outcms.get())
 
         # Clears and fills a treeview with dictionary contents
         # Results are sorted by the dictionary keys.

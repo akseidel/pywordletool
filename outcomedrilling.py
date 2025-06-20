@@ -282,7 +282,8 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
             self.d_keyed_verbose_outcms.set(False)
 
     def condensed_chk(self):
-        self.d_verbose_outcms.set(self.d_verbose_outcms_cond.get())
+        if not self.d_verbose_outcms.get():
+            self.d_verbose_outcms.set(self.d_verbose_outcms_cond.get())
 
     def keyed_chk(self):
         self.d_verbose_outcms.set(self.d_keyed_verbose_outcms.get())
