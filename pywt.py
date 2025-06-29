@@ -385,6 +385,13 @@ class Pywordlemainwindow(ctk.CTk):
                 regex: str = hlp.regex_maxgenrankers(max_rankers, the_word_list)
                 tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
+                gen_tally_dict = hlp.dict_gen_tally(gen_tally, len(the_word_list))
+                use_details_dict = hlp.dict_ltr_frq_data_for_words_list(list(the_word_list.keys()))
+                print("-- intra-list letter use --")
+                for ltr, lper in gen_tally_dict.items():
+                    print(ltr.upper(), round(lper, 2), use_details_dict[ltr])
+                print("")
+                pass
 
             # group optimals ranking
             if self.sel_outcm_optimal and (n_items > 0):

@@ -1,6 +1,7 @@
 # ----------------------------------------------------------------
 # helpers akseidel 5/2022
 # ----------------------------------------------------------------
+from string import ascii_lowercase
 from subprocess import Popen, PIPE
 import sys
 import os
@@ -329,6 +330,19 @@ def get_gendict_tally(gendict: dict[str, list]) -> list:
     return gen_tally
 
 
+def dict_gen_tally(gt: list, cnt: int) -> dict:
+    lf_dict: dict[str, float] = {}
+    s = 97
+    for lcnt in gt:
+        if lcnt:
+            lc_ltr = chr(s)
+            if not lc_ltr in lf_dict:
+                lf_dict.update({lc_ltr: lcnt / cnt})
+        s = s + 1
+    s_lf_dict = dict(sorted(lf_dict.items(), key=lambda item: item[1], reverse=True))
+    return s_lf_dict
+
+
 def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
     """
     Places the product sums of gendict values and the gen_tally vector. This value is
@@ -401,7 +415,7 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
     multi_code:str The multiple same letters and how many code (like 2A,3E)
     @return: [excl_lst: list, x_pos_dict: dict, r_pos_dict:dict, multi_code:str]
     """
-    p_ltr_pos: int = 0  # Current letter position in the pick (pick letter)
+    p_ltr_pos: int = 0  # Current letter position in the pick
     # Multiple same letter accounting is required to filter for multiple same letter
     # instances when they are called for. The user is expected to make that determination
     # in the GUI pywt.py. That determination needs to be coded for fmwm.py.
@@ -413,7 +427,7 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
             if not excl_lst.__contains__(p_ltr):
                 excl_lst.append(p_ltr)
             # done with this letter
-            # keep track of index position
+            # keep track of the index position
             p_ltr_pos += 1
             continue
         # If here, then p_ltr has at least one instance.
@@ -439,6 +453,7 @@ def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict
 
     return [excl_lst, x_pos_dict, r_pos_dict, mult_dict]
 
+
 def letter_counts(word: str) -> dict:
     """
     Used by only fmwm.py
@@ -447,7 +462,7 @@ def letter_counts(word: str) -> dict:
     :param word: str
     :return:
     """
-    lc_dict: dict[str ,int] ={}
+    lc_dict: dict[str, int] = {}
     for w_ltr in word:
         if w_ltr in lc_dict:
             lc_dict[w_ltr] = lc_dict[w_ltr] + 1
@@ -507,7 +522,7 @@ def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
                         # target has 1, guess has 2
                         # Exclude 2gl
                         key = f"{str(gc)}{gl}"
-                        mode_value = 2 # exclude
+                        mode_value = 2  # exclude
                         mult_dict[key] = mode_value
                 case 2:
                     # target has 2, guess has 2 or 3
@@ -517,19 +532,19 @@ def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
                         # the prior require dict would cover the grep requirement.
                         if is_include_necessary(r_pos_dict, gl, tc):
                             key = f"2{gl}"
-                            mode_value = 1 # include
+                            mode_value = 1  # include
                             mult_dict[key] = mode_value
                     if gc == 3:
                         # target has 2, guess has 3
                         # Exclude 3gl
                         key = f"3{gl}"
-                        mode_value = 2 # exclude
+                        mode_value = 2  # exclude
                         mult_dict[key] = mode_value
                         # Include 2gl, but only if both guess gl are NOT green since
                         # the prior require dict would cover the grep requirement.
                         if is_include_necessary(r_pos_dict, gl, tc):
                             key = f"2{gl}"
-                            mode_value = 1 # include
+                            mode_value = 1  # include
                             mult_dict[key] = mode_value
                 case 3:
                     # target has 3, guess has 2 or 3
@@ -539,7 +554,7 @@ def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
                         # the prior require dict would cover the grep requirement.
                         if is_include_necessary(r_pos_dict, gl, tc):
                             key = f"2{gl}"
-                            mode_value = 1 # include
+                            mode_value = 1  # include
                             mult_dict[key] = mode_value
                     if gc == 3:
                         # target has 3, guess has 3
@@ -547,7 +562,7 @@ def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
                         # the prior require dict would cover the grep requirement.
                         if is_include_necessary(r_pos_dict, gl, gc):
                             key = f"3{gl}"
-                            mode_value = 1 # include
+                            mode_value = 1  # include
                             mult_dict[key] = mode_value
     return mult_dict
 
@@ -615,7 +630,7 @@ def build_multi_code_grep(lself, multi_code: dict) -> None:
 
 
 def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict,
-                        multi_code: str):
+                        multi_code: dict):
     """
     The filter builder. Used only by fmwm.py.
     Filter arguments for each type are added to the grep command argument list
@@ -724,7 +739,8 @@ def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict:
     return outcomes_dict
 
 
-def get_outcomes_stats(the_outcomes_dict: dict, meta_l=False) -> tuple[int, int, int, float, float, float, float, int, int, int]:
+def get_outcomes_stats(the_outcomes_dict: dict, meta_l=False) -> tuple[
+    int, int, int, float, float, float, float, int, int, int]:
     """
     Given a single guess's outcome dictionary, returns stats:
     outcome pattern quantity,
@@ -744,7 +760,7 @@ def get_outcomes_stats(the_outcomes_dict: dict, meta_l=False) -> tuple[int, int,
     p2 = 0.0  # outcome population variance
     g_ent = 0.0  # outcomes entropy
     g_xa = 0.0  # outcomes expected average
-    cnt_0 = 0 # number of clue 0
+    cnt_0 = 0  # number of clue 0
     cnt_1 = 0  # number of clue 1
     cnt_2 = 0  # number of clue 2
     for k, v in the_outcomes_dict.items():
@@ -1022,8 +1038,8 @@ def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: lis
     best_stats_found_dict = {}
     best_desired_dict = {}
     max_ent = 0.0
-    gl_len=len(guess_word_lst)
-    g_n=0
+    gl_len = len(guess_word_lst)
+    g_n = 0
 
     if debug_mode:
         print(f'Working with {len(targets_word_lst)} remaining possibles. '
@@ -1104,9 +1120,9 @@ def prnt_guesses_header(rptwnd: ctk, keyed=False, meta_l=False):
            '\tp2'
     if meta_l:
         rptl = rptl + \
-        '\t#0' + \
-        '\t#1' + \
-        '\t#2'
+               '\t#0' + \
+               '\t#1' + \
+               '\t#2'
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 
@@ -1153,10 +1169,10 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
                '\t' + '{0:.2f}'.format(g_xa) + \
                '\t' + '{0:.1f}'.format(p2)
         if meta_l:
-                rptl = rptl + \
-                '\t' + str(cnt_0) + \
-               '\t' + str(cnt_1) + \
-               '\t' + str(cnt_2)
+            rptl = rptl + \
+                   '\t' + str(cnt_0) + \
+                   '\t' + str(cnt_1) + \
+                   '\t' + str(cnt_2)
         rptwnd.verbose_data.insert(tk.END, rptl)
 
 
@@ -1164,9 +1180,9 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
                                     rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
     (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = outcome_stats
     # report in full or condensed format according to cond_prt flag
-    keyed_if=''
+    keyed_if = ''
     if keyed_rpt:
-        keyed_if =  guess + '  '
+        keyed_if = guess + '  '
     if not cond_rpt:
         rptl = '\n\n' + keyed_if + '> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
         rptwnd.verbose_data.insert(tk.END, rptl)
@@ -1182,7 +1198,7 @@ def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outc
         rptwnd.verbose_data.insert(tk.END, '\n')
         for key in sorted(guess_outcomes_dict):
             g = guess_outcomes_dict[key]
-            rptl =  '\n' + keyed_if + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
+            rptl = '\n' + keyed_if + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
             rptwnd.verbose_data.insert(tk.END, rptl)
 
 
@@ -1370,6 +1386,90 @@ def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
         if not re.findall(l, key):
             return False
     return True
+
+
+def make_lpc_list_dict(wrds) -> dict[str, list]:
+    """
+    Given a word list
+    records a letter position dictionary for found letters.
+    :param wrds: a words list (assumed to be 5 letter words)
+    """
+    this_dict: dict[str, list] = {}
+    # tally up the letter position counts for the wrd in the wrds
+    for wrd in wrds:
+        slice_s = 0
+        for lt in wrd:
+            # Add the letter to letter position dictionary if not
+            # already there.
+            if not lt in this_dict:
+                this_dict.update({lt: [0, 0, 0, 0, 0]})
+            ind = wrd.index(lt, slice_s)
+            lpc_list = this_dict[lt]
+            lpc_list[ind] = lpc_list[ind] + 1
+            slice_s = slice_s + 1
+    return this_dict
+
+
+def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
+    """
+
+    :rtype: dict[str, list]
+    """
+    # Fill the count list dictionary according to the wrds list
+    lpc_list_dict = make_lpc_list_dict(wrds)
+
+    # Develop the position hierarchy for each letter. This is in which position number
+    # is a letter most common followed the lesser occurring position numbers.
+    for l, lpc_list in lpc_list_dict.items():
+        pos_hierarchy_dict: dict[int, list]
+        pos_hierarchy_dict = {}
+        # Skipping any letter that did not have an occurrence. Any sum means
+        # the letter occurred somewhere in a word.
+        if sum(lpc_list):
+            # Copy the lpc_list and sort its contents from
+            # high to low. That is the hierarchy for the counts.
+            sorted_lpc_list = lpc_list.copy()
+            sorted_lpc_list.sort(reverse=True)
+            # Using a set to hold the position numbers. Sometimes a letter will have the same
+            # count at more than one position. A set is used for holding multiple numbers and
+            # cannot hold duplicate entries. That property is used to handle the same count
+            # occurring at more than one position.
+            cnt_set = set()
+            # lpc_list is letter count at letter position. sorted_lpc_list is that
+            # list in order of large to small.
+            # Looping through the sorted high to low.
+            for i in range(4):
+                # Get the count. We need to find where that count number is in the
+                # lpc_list. Sometimes a letter will have the same count in more than
+                # one position.
+                ltr_qty_at_pos = sorted_lpc_list[i]
+                # Skip any position having zero count.
+                if not ltr_qty_at_pos:
+                    break
+                # start_idx is a slicing point. It is used for two reasons. One is to
+                # stop the while loop when the count sum is zero for any remaining positions.
+                # The second reason is for limiting the search for the count number to
+                # start beyond the found index.
+                start_idx = 0
+                while sum(lpc_list[start_idx:]):
+                    try:
+                        # Using index to find where the count number occurs in the unsorted
+                        # counts list.
+                        pos_for_ltr_qty_at_pos = lpc_list.index(ltr_qty_at_pos, start_idx)
+                        # record pos_for_ltr_qty_at_pos only once for the letter
+                        if pos_for_ltr_qty_at_pos not in cnt_set:
+                            cnt_set.add(pos_for_ltr_qty_at_pos)
+                            if i in pos_hierarchy_dict:
+                                pos_hierarchy_dict[i].append(pos_for_ltr_qty_at_pos + 1)
+                            else:
+                                pos_hierarchy_dict[i] = [pos_for_ltr_qty_at_pos + 1]
+                        start_idx = pos_for_ltr_qty_at_pos + 1
+                    except ValueError:
+                        start_idx = start_idx + 1
+                        pass
+            # Only the pos_hierarchy_dict values are needed.
+            lpc_list.insert(0,list(pos_hierarchy_dict.values()))
+    return lpc_list_dict
 
 
 class ShellCmdList:
@@ -1737,6 +1837,7 @@ class CustomText(tk.Text):
                 break
         return fnd_cnt
 
+
 class RptWnd(ctk.CTkToplevel):
     """
     The verbose information window
@@ -1804,7 +1905,8 @@ class RptWnd(ctk.CTkToplevel):
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
-            self.rpt_grpsdriller_window = (outcomedrilling.OutcmsDrillingMain())  # create window if its None or destroyed
+            self.rpt_grpsdriller_window = (
+                outcomedrilling.OutcmsDrillingMain())  # create window if its None or destroyed
         else:
             self.rpt_grpsdriller_window.focus()  # if window exists focus it
 
@@ -1946,7 +2048,7 @@ class HelpWindow(ctk.CTkToplevel):
         self.help_info_frame = tk.Frame(self,
                                         borderwidth=0
                                         )
-        self.help_info_frame.pack(side=tk.TOP, fill='both', padx=2, pady=0, expand=True)
+        self.help_info_frame.pack(side='top', fill='both', padx=2, pady=0, expand=True)
         self.help_info_frame.grid_rowconfigure(0, weight=1)
         self.help_info_frame.grid_columnconfigure(0, weight=1)
 
