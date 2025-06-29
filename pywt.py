@@ -389,7 +389,7 @@ class Pywordlemainwindow(ctk.CTk):
                 use_details_dict = hlp.dict_ltr_frq_data_for_words_list(list(the_word_list.keys()))
                 print("-- intra-list letter use --")
                 for ltr, lper in gen_tally_dict.items():
-                    print(ltr.upper(), round(lper, 2), use_details_dict[ltr])
+                    print(ltr.upper(),f"{round(lper, 2):.2f}", use_details_dict[ltr])
                 print("")
                 pass
 
