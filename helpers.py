@@ -1438,7 +1438,7 @@ def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
             # lpc_list is letter count at letter position. sorted_lpc_list is that
             # list in order of large to small.
             # Looping through the sorted high to low.
-            for i in range(4):
+            for i in range(5):
                 # Get the count. We need to find where that count number is in the
                 # lpc_list. Sometimes a letter will have the same count in more than
                 # one position.
