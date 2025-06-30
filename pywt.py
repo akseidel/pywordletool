@@ -387,15 +387,16 @@ class Pywordlemainwindow(ctk.CTk):
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
                 if self.meta_lr:
                     datawnd = hlp.RptWnd("Data")
-                    datawnd.title("Wordle Helper - Letter Use Information")
+                    datawnd.title("Wordle Helper - Letter Use Details")
                     gen_tally_dict = hlp.dict_gen_tally(gen_tally, len(the_word_list))
                     use_details_dict = hlp.dict_ltr_frq_data_for_words_list(list(the_word_list.keys()))
-                    rptl = f"----- Letter use in the {len(the_word_list)} words -----\n"
+                    rptl = f"----- Letter use details for the {len(the_word_list)} words -----\n"
                     datawnd.verbose_data.insert(tk.END, rptl)
                     rptl = "- Letter, % having, [position hierarchy], position counts -\n"
                     datawnd.verbose_data.insert(tk.END, rptl)
                     for ltr, lper in gen_tally_dict.items():
-                        rptl = f"{ltr.upper()} {round(lper, 2):.2f} {use_details_dict[ltr]}\n"
+                        use_details = str(use_details_dict[ltr]).replace('[[[','[').replace(']]',']')[:-1]
+                        rptl = f"{ltr.upper()} {round(lper, 2):.2f} {use_details}\n"
                         datawnd.verbose_data.insert(tk.END, rptl)
                     self.meta_lr = False
 

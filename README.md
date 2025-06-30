@@ -161,7 +161,8 @@
   * % (fraction) of words in the list that have the letter
   * Letter position hierarchy in order of position most to position least
   * Letter position counts in order from position 1 to position 5
-  
+  * Example: **Z 0.02 [4, 5], [3], 0, 0, 1, 2, 2** means the letter Z is in 2% of the words. The 4th and 5th position share the most common position location within words containing Z. The 3rd position is the next common position. Z did not occur in the missing positions numbers 1 and 2. The last five numbers not [ ] bracketed are the counts for Z at each position. The first two 0s are the 1st and 2nd positions. No Zs found there. The 1 is the 3rd position. 1 Z was found as the 3rd letter in a word. 2 Zs each were found in the next two 4th and 5th positions. Those Zs are found as the last and second to last letters in the words. The 4th and 5th position share the use same use count. That count is also most common Z use count. This is why 4 and 5 are shown as [4, 5] and also listed before [3].
+
 ### Wordle Play Strategies
 
 * Discover Wordle play strategies yourself with the Helper's assistance. That was the reason for creating this Helper.
