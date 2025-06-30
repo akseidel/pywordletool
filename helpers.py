@@ -1982,6 +1982,12 @@ class RptWnd(ctk.CTkToplevel):
                                      command=self.rpt_show_grps_driller)
         button_drill.pack(side=tk.LEFT, padx=4, pady=3)
 
+        if self.context=="Data":
+            button_drill.pack_forget()
+            button_b.pack_forget()
+            button_f.pack_forget()
+            entry_find.pack_forget()
+            size_and_position_this_window(self, 600, 440, 0, 0)
 
 class HelpWindow(ctk.CTkToplevel):
     """

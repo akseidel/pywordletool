@@ -149,7 +149,17 @@
 * The **Find** feature operates on regex patterns. For example, if the letter **i** is required as the 2nd letter and the letter **r** is required as the last letter, then "**^.i..r**" is the regex pattern that will cause all words like **timer**, **sitar** and **tiger** to be highlighted. Note that the "**^**" is required. Its regex meaning is "starting with". The "**.**", or dots, mean "any character." 
 
 !['Group Drilling Condensed Result Window Image'](InfoImages/PYWTGroupDrillingCond.png)
+### Letter Use View
+!['Letter Use Window Image'](InfoImages/PYWTLetterUseView.png)
 
+* Pressing the **Genetic** button while also holding down the left or right meta keys, which are the keyboard keys next to the spacebar key, performs the **Genetic** operation and displays letter use information for the currently showing words.
+* The letter use information is particularly useful for choosing the next guess word because the most commonly used letters amongst the remaining solutions list that are not yet identified will better disperse the remaining solutions than the lease commonly found letters.
+* The letter use information is:
+  * Letter
+  * % (fraction) of words in the list that have the letter
+  * Letter position hierarchy in order of position most to position least
+  * Letter position counts in order from position 1 to position 5
+  
 ### Wordle Play Strategies
 
 * Discover Wordle play strategies yourself with the Helper's assistance. That was the reason for creating this Helper.
