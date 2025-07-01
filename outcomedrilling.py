@@ -156,6 +156,16 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                          message='Not proceeding.\nOnly five letter words allowed.'
                                          )
             return
+        if self.d_meta_lr:
+            if len(this_lst):
+                gendict: dict[str, list] = {}
+                for w in this_lst:
+                    gencode = hlp.get_gencode(w)
+                    gendict.update({w: gencode})
+                gen_tally: list = hlp.get_gendict_tally(gendict)
+                hlp.rpt_ltr_use(gen_tally, this_lst)
+            self.d_meta_lr = False
+            return
         if len(this_lst) > 2:
             self.title("> > > ... Busy, Please Wait ... < < <")
             self.set_busy_status_msg()
@@ -322,6 +332,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.d_ent_outcms = tk.BooleanVar(value=False)
         self.d_keyed_verbose_outcms = tk.BooleanVar(value=False)
         self.d_verbose_outcms_cond = tk.BooleanVar(value=False)
+        self.d_letter_use_disp = tk.BooleanVar(value=False)
         self.d_meta_lr = False
 
         # configure style
@@ -342,19 +353,19 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.cnt_frame = ctk.CTkFrame(self,
                                       corner_radius=10
                                       )
-        self.cnt_frame.pack(fill=tk.X, padx=8, pady=2)
+        self.cnt_frame.pack(fill="x", padx=8, pady=2)
 
         # controls
 
         self.bts_frame = ctk.CTkFrame(self.cnt_frame,
                                       corner_radius=10
                                       )
-        self.bts_frame.pack(fill=tk.X, padx=0, pady=2)
+        self.bts_frame.pack(fill="x", padx=0, pady=2)
 
         self.entry_find = ctk.CTkEntry(self.bts_frame,
                                        textvariable=self.outcms_words_text
                                        )
-        self.entry_find.pack(side=tk.LEFT, padx=10, pady=6, expand=1, fill=tk.X)
+        self.entry_find.pack(side="left", padx=10, pady=6, expand=1, fill="x")
         self.entry_find.bind("<KeyRelease-Return>", self.on_list_entry_return_release)
 
         self.button_close = ctk.CTkButton(self.bts_frame, text="Close",
@@ -387,23 +398,23 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                                   labelanchor='w',
                                                   borderwidth=0
                                                   )
-        self.outcm_lst_ops_frame.pack(side=tk.TOP, padx=10, pady=4, fill=tk.X)
+        self.outcm_lst_ops_frame.pack(side="top", padx=10, pady=4, fill="x")
         self.rbrA = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Words Entered",
                                     variable=self.outcms_guess_source, value=0,
                                     command=self.title_status)
-        self.rbrA.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.rbrA.pack(side="left", fill="x", padx=6, pady=2)
         self.rbrB = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Classic",
                                     variable=self.outcms_guess_source, value=1,
                                     command=self.title_status)
-        self.rbrB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.rbrB.pack(side="left", fill="x", padx=6, pady=2)
         self.rbrBB = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Classic+",
                                      variable=self.outcms_guess_source, value=2,
                                      command=self.title_status)
-        self.rbrBB.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.rbrBB.pack(side="left", fill="x", padx=6, pady=2)
         self.rbrC = ttk.Radiobutton(self.outcm_lst_ops_frame, text="Large",
                                     variable=self.outcms_guess_source, value=3,
                                     command=self.title_status)
-        self.rbrC.pack(side=tk.LEFT, fill=tk.X, padx=6, pady=2)
+        self.rbrC.pack(side="left", fill="x", padx=6, pady=2)
 
         # Show Keyed Report checkbox
         self.chk_keyed_outcms_disp = ttk.Checkbutton(self.outcm_lst_ops_frame,
@@ -413,7 +424,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                                      offvalue=False,
                                                      command=self.keyed_chk
                                                      )
-        self.chk_keyed_outcms_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_keyed_outcms_disp.pack(side="right", padx=10, pady=2)
 
         # Show Condensed Report checkbox
         self.chk_outcms_disp_cond = ttk.Checkbutton(self.outcm_lst_ops_frame,
@@ -423,7 +434,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                                     offvalue=False,
                                                     command=self.condensed_chk
                                                     )
-        self.chk_outcms_disp_cond.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_outcms_disp_cond.pack(side="right", padx=10, pady=2)
 
         # Show Entropy Report checkbox
         self.chk_ent_disp = ttk.Checkbutton(self.outcm_lst_ops_frame,
@@ -432,7 +443,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                             onvalue=True,
                                             offvalue=False
                                             )
-        self.chk_ent_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_ent_disp.pack(side="right", padx=10, pady=2)
 
         # Show Verbose Report checkbox
         self.chk_outcms_disp = ttk.Checkbutton(self.outcm_lst_ops_frame,
@@ -442,7 +453,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                                offvalue=False,
                                                command=self.verbose_chk
                                                )
-        self.chk_outcms_disp.pack(side=tk.RIGHT, padx=10, pady=2)
+        self.chk_outcms_disp.pack(side="right", padx=10, pady=2)
 
         # end labelframe within outcomes frame for which list option
 
@@ -450,7 +461,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.stat_frame = ctk.CTkFrame(self,
                                        corner_radius=10
                                        )
-        self.stat_frame.pack(fill=tk.BOTH, padx=8, pady=2, expand=True)
+        self.stat_frame.pack(fill="both", padx=8, pady=2, expand=True)
 
         # status line
         self.tx_status = hlp.CustomText(self.stat_frame,
@@ -459,7 +470,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                             borderwidth=0,
                                             height=10,
                                             highlightthickness=0)
-        self.tx_status.pack(side="left", anchor=tk.NW, padx=10, pady=4, expand=True, fill=tk.BOTH)
+        self.tx_status.pack(side="left", anchor="nw", padx=10, pady=4, expand=True, fill="both")
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue, www.color-hex.com
         # tag 'out' is used to highlight outcome ranker
@@ -470,7 +481,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.tx_status.insert('1.0', self.def_msg)
         # scrollbar for tx_status
         self.tx_status_sb = ttk.Scrollbar(self.stat_frame, orient='vertical')
-        self.tx_status_sb.pack(side="right", fill=tk.Y)
+        self.tx_status_sb.pack(side="right", fill="y")
         self.tx_status.config(yscrollcommand=self.tx_status_sb.set)
         self.tx_status_sb.config(command=self.tx_status.yview)
         # Respond to initial state

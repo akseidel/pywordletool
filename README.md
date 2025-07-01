@@ -154,7 +154,7 @@
 
 !['Letter Use Window Image'](InfoImages/PYWTLetterUseView.png)
 
-* Pressing the **Genetic** button while also holding down the left or right meta keys, which are the keyboard keys next to the space bar key, performs the **Genetic** operation and displays letter use information for the currently showing words.
+* Pressing the **Genetic** button while also holding down the left or right meta keys, which are the keyboard keys next to the space bar key, performs the **Genetic** operation and displays letter use information for the currently showing words. The same happens when pressing the **Process** button in the **Outcome Driller** while holding down a meta-key.
 * The letter use information is particularly useful for choosing the next guess word because the most commonly used letters amongst the remaining solutions list that are not yet identified will better disperse the remaining solutions than the least commonly found letters.
 * The letter use information is:
   * Letter

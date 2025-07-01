@@ -1471,6 +1471,19 @@ def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
             lpc_list.insert(0,list(pos_hierarchy_dict.values()))
     return lpc_list_dict
 
+def rpt_ltr_use(gen_tally: list, the_word_list: list ):
+    datawnd = RptWnd("Data")
+    datawnd.title("Wordle Helper - Letter Use Details")
+    gen_tally_dict = dict_gen_tally(gen_tally, len(the_word_list))
+    use_details_dict = dict_ltr_frq_data_for_words_list(the_word_list)
+    rptl = f"----- Letter use details for the {len(the_word_list)} words -----\n"
+    datawnd.verbose_data.insert(tk.END, rptl)
+    rptl = "- Letter, % having, [position hierarchy], position counts -\n"
+    datawnd.verbose_data.insert(tk.END, rptl)
+    for ltr, lper in gen_tally_dict.items():
+        use_details = str(use_details_dict[ltr]).replace('[[[', '[').replace(']]', ']')[:-1]
+        rptl = f"{ltr.upper()} {round(lper, 2):.2f} {use_details}\n"
+        datawnd.verbose_data.insert(tk.END, rptl)
 
 class ShellCmdList:
     """

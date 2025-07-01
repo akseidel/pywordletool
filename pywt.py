@@ -376,7 +376,7 @@ class Pywordlemainwindow(ctk.CTk):
             # Genetic ranking
             if self.sel_genetic and (n_items > 0):
                 gendict: dict[str, list] = {}
-                for w, r in the_word_list.items():
+                for w in the_word_list.keys():
                     gencode = hlp.get_gencode(w)
                     gendict.update({w: gencode})
                 gen_tally: list = hlp.get_gendict_tally(gendict)
@@ -386,18 +386,7 @@ class Pywordlemainwindow(ctk.CTk):
                 tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
                 comment = " (" + str(len(max_rankers)) + " highest genetic rank selected)"
                 if self.meta_lr:
-                    datawnd = hlp.RptWnd("Data")
-                    datawnd.title("Wordle Helper - Letter Use Details")
-                    gen_tally_dict = hlp.dict_gen_tally(gen_tally, len(the_word_list))
-                    use_details_dict = hlp.dict_ltr_frq_data_for_words_list(list(the_word_list.keys()))
-                    rptl = f"----- Letter use details for the {len(the_word_list)} words -----\n"
-                    datawnd.verbose_data.insert(tk.END, rptl)
-                    rptl = "- Letter, % having, [position hierarchy], position counts -\n"
-                    datawnd.verbose_data.insert(tk.END, rptl)
-                    for ltr, lper in gen_tally_dict.items():
-                        use_details = str(use_details_dict[ltr]).replace('[[[','[').replace(']]',']')[:-1]
-                        rptl = f"{ltr.upper()} {round(lper, 2):.2f} {use_details}\n"
-                        datawnd.verbose_data.insert(tk.END, rptl)
+                    hlp.rpt_ltr_use(gen_tally, list(the_word_list.keys()))
                     self.meta_lr = False
 
             # group optimals ranking
