@@ -64,6 +64,12 @@ If 'The Wordle Helper' shows more words than 'WordleBot' by a word or so, then t
 
 If 'The Wordle Helper' shows fewer words than 'WordleBot', then 'The Wordle Helper' is missing some transferred words or there is an issue with multiple same letters.
 
+- Letter Use Details and Clue Type Details:
+
+'Letter Use Details' displays the letter type quantity and letter position information for the words currently showing in the main 'Helper' window or the words pasted into the 'Outcome Driller' entry field. With the focus first established in the 'Helper' or 'Outcome Driller', hold down the keyboard's 'meta' key and then press the 'Genetic' button or the 'Process' button. A window will be created that displays the letter use details for the word list in question. The 'meta' keys are typically the keyboard keys just to the left and right of the space bar key. Either meta key may be used. 
+
+'Clue Type Details' is additional information regarding the total number of gray (#0), yellow (#1) and green (#2) clues that a guess has in outcomes for solutions in the 'Condensed' 'Optimals' reporting. With the focus first established in the 'Helper' with the 'Cond' option checked, hold down the keyboard's 'meta' key and then press the 'Optimals' button. The 'Condensed' report will include the clue type details. The 'meta' keys are typically the keyboard keys just to the left and right of the space bar key. Either meta key may be used.  
+
 - Tips:
 
 Please develop your own strategy for picks. Sorry, none are mentioned here. What you discover might be surprising at first.
