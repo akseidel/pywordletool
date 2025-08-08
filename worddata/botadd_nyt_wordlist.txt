@@ -791,7 +791,6 @@ divvy
 dizzy
 dodge
 dodgy
-doggo
 doggy
 dogma
 doily
@@ -1122,7 +1121,6 @@ froze
 fruit
 frump
 fryer
-fubar
 fudge
 fudgy
 fugal
@@ -1709,7 +1707,6 @@ medic
 melee
 melon
 melty
-mensa
 merch
 mercy
 merge
@@ -1844,7 +1841,6 @@ niche
 niece
 nifty
 night
-nimby
 ninja
 ninny
 ninth
@@ -2104,7 +2100,6 @@ prion
 prior
 prise
 prism
-priss
 privy
 prize
 probe
@@ -2114,7 +2109,6 @@ prone
 prong
 proof
 prose
-proto
 proud
 prove
 prowl
@@ -2122,7 +2116,6 @@ proxy
 prude
 prune
 psalm
-pshaw
 psych
 pubic
 pudge
@@ -2371,7 +2364,6 @@ scarp
 scary
 scene
 scent
-schmo
 schwa
 scion
 scoff
@@ -2450,7 +2442,6 @@ shire
 shirk
 shirt
 shiva
-shlep
 shoal
 shock
 shoed

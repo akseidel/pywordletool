@@ -224,7 +224,6 @@ divan
 dived
 divot
 divvy
-doggo
 doggy
 doily
 doled
@@ -304,7 +303,6 @@ frizz
 frosh
 frump
 fryer
-fubar
 fudgy
 fugal
 fumed
@@ -496,7 +494,6 @@ matzo
 maven
 maxed
 melty
-mensa
 merch
 meshy
 messy
@@ -548,7 +545,6 @@ nervy
 newsy
 nexus
 nifty
-nimby
 nippy
 nitro
 nixed
@@ -638,11 +634,8 @@ prima
 primp
 prion
 prise
-priss
 prole
 promo
-proto
-pshaw
 psych
 pudge
 puked
@@ -714,7 +707,6 @@ saver
 sawed
 scape
 scarp
-schmo
 schwa
 scoot
 scrim
@@ -729,7 +721,6 @@ sewed
 sheaf
 shill
 shiva
-shlep
 shoed
 shred
 shyer
