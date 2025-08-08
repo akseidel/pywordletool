@@ -34,6 +34,7 @@ amour
 amped
 amuck
 ancho
+anima
 anise
 annal
 anole
@@ -56,6 +57,7 @@ auger
 aural
 avast
 axing
+babel
 babka
 baked
 baldy
@@ -115,6 +117,7 @@ brava
 bream
 brier
 bronc
+bruin
 brusk
 bulgy
 bumpy
@@ -186,6 +189,7 @@ cowed
 coxed
 crema
 croon
+cruet
 cubby
 cubed
 cubit
@@ -193,6 +197,7 @@ cuing
 cupid
 cured
 curer
+curia
 cushy
 cuter
 cutup
@@ -301,6 +306,7 @@ frump
 fryer
 fubar
 fudgy
+fugal
 fumed
 fungo
 fused
@@ -316,16 +322,19 @@ gator
 gauzy
 gazed
 geode
+germy
 getup
 gibed
 gimme
 gizmo
+glace
 glamp
 glitz
 gloam
 gloop
 glowy
 glued
+gluey
 glute
 gnarl
 gofer
@@ -383,6 +392,7 @@ hoppy
 hosed
 hubby
 huffy
+huggy
 hulky
 hydra
 hyped
@@ -416,6 +426,7 @@ kabob
 kaput
 karat
 kazoo
+kefir
 kempt
 keyed
 kiddo
@@ -484,6 +495,7 @@ matte
 matzo
 maven
 maxed
+melty
 mensa
 merch
 meshy
@@ -617,6 +629,7 @@ polis
 poofy
 popup
 pored
+porgy
 porky
 posed
 potty
@@ -624,6 +637,7 @@ pricy
 prima
 primp
 prion
+prise
 priss
 prole
 promo
@@ -693,6 +707,7 @@ sabre
 saggy
 samba
 samey
+satay
 sated
 saved
 saver
@@ -717,6 +732,7 @@ shiva
 shlep
 shoed
 shred
+shyer
 sided
 sidle
 silty
@@ -753,6 +769,7 @@ stele
 steno
 stent
 stile
+stoma
 strep
 strew
 strum
@@ -795,6 +812,7 @@ toned
 toner
 toney
 torah
+torta
 torte
 toted
 towed
@@ -802,6 +820,7 @@ toyed
 trans
 treed
 tress
+trier
 trike
 trill
 tromp
@@ -888,4 +907,3 @@ yummy
 zilch
 zippy
 zoned
-

@@ -117,6 +117,7 @@ anger
 angle
 angry
 angst
+anima
 anime
 anise
 ankle
@@ -196,6 +197,7 @@ axing
 axiom
 axion
 azure
+babel
 babka
 bacon
 badge
@@ -404,6 +406,7 @@ brook
 broom
 broth
 brown
+bruin
 brunt
 brush
 brusk
@@ -680,6 +683,7 @@ crowd
 crown
 crude
 cruel
+cruet
 crumb
 crump
 crush
@@ -694,6 +698,7 @@ cumin
 cupid
 cured
 curer
+curia
 curio
 curly
 curry
@@ -1120,6 +1125,7 @@ fryer
 fubar
 fudge
 fudgy
+fugal
 fugue
 fully
 fumed
@@ -1164,6 +1170,7 @@ geese
 genie
 genre
 geode
+germy
 getup
 ghost
 ghoul
@@ -1176,6 +1183,7 @@ girth
 given
 giver
 gizmo
+glace
 glade
 glamp
 gland
@@ -1197,6 +1205,7 @@ gloss
 glove
 glowy
 glued
+gluey
 glute
 glyph
 gnarl
@@ -1378,6 +1387,7 @@ hover
 howdy
 hubby
 huffy
+huggy
 hulky
 human
 humid
@@ -1484,6 +1494,7 @@ karma
 kayak
 kazoo
 kebab
+kefir
 kempt
 keyed
 khaki
@@ -1697,6 +1708,7 @@ media
 medic
 melee
 melon
+melty
 mensa
 merch
 mercy
@@ -2063,6 +2075,7 @@ poppy
 popup
 porch
 pored
+porgy
 porky
 posed
 poser
@@ -2089,6 +2102,7 @@ primp
 print
 prion
 prior
+prise
 prism
 priss
 privy
@@ -2330,6 +2344,7 @@ sandy
 saner
 sappy
 sassy
+satay
 sated
 satin
 satyr
@@ -2456,6 +2471,7 @@ shrug
 shuck
 shunt
 shush
+shyer
 shyly
 sided
 sidle
@@ -2677,6 +2693,7 @@ stock
 stoic
 stoke
 stole
+stoma
 stomp
 stone
 stony
@@ -2868,6 +2885,7 @@ topic
 torah
 torch
 torso
+torta
 torte
 torus
 total
@@ -2903,6 +2921,7 @@ tribe
 trice
 trick
 tried
+trier
 trike
 trill
 tripe

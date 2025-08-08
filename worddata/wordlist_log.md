@@ -49,3 +49,12 @@ The following tracks some of the word changes. Removed means removed from being 
 * unbag, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * yeesh, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * zowie, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* doggo, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* fubar, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* mensa, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* nimby, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* priss, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* proto, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* pshaw, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* schmo, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* shlep, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
