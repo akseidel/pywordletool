@@ -49,6 +49,8 @@ The following tracks some of the word changes, but has omissions. Removed means 
 * unbag, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * yeesh, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
 * zowie, Was a Wordlebot added word, but then later removed. Edited here 01/11/24
+* pansy. once Wordlebot removed perhaps in 2023, was Wordlebot added back in 7/2025
+* loris, transferred in to Wordlebot possibles list in 7/2025  
 * doggo, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
 * fubar, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
 * mensa, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
@@ -59,3 +61,4 @@ The following tracks some of the word changes, but has omissions. Removed means 
 * schmo, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
 * shlep, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
 * xerox, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* anima, babel, bruin, curia, cruet, fugal, germy, glace, gluey, huggy, kefir, melty, porgy, prise, satay, shyer, stoma, torta, trier all transferred in to Wordlebot possibles list in 8/2025 
