@@ -139,7 +139,7 @@ dmypy.json
 *.DS_Store
 
 #Exclude
-Exclude/
+exclude/
 .DS_Store
 .DS_Store
 *.csv
