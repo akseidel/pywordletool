@@ -886,7 +886,6 @@ wormy
 wowed
 wurst
 xenon
-xerox
 yahoo
 yappy
 yodel

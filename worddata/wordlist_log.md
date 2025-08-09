@@ -58,3 +58,4 @@ The following tracks some of the word changes. Removed means removed from being 
 * pshaw, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
 * schmo, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
 * shlep, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
+* xerox, Was a Wordlebot added word, but then later removed. Edited here 08/07/25
