@@ -1,11 +1,7 @@
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
+plead,1620,2025-11-25,Org,1432
+dough,1619,2025-11-24,Org,575
+bunny,1618,2025-11-23,Org,303
 thick,1617,2025-11-22,Org,2039
->>>>>>> Stashed changes
-=======
-thick,1617,2025-11-22,Org,2039
->>>>>>> Stashed changes
 vowel,1616,2025-11-21,Org,2217
 grave,1615,2025-11-20,Org,902
 maker,1614,2025-11-19,Org,1185
