@@ -1468,7 +1468,7 @@ def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
                         start_idx = start_idx + 1
                         pass
             # Only the pos_hierarchy_dict values are needed.
-            lpc_list.insert(0,list(pos_hierarchy_dict.values()))
+            lpc_list.insert(len(lpc_list), list(pos_hierarchy_dict.values()))
     return lpc_list_dict
 
 def rpt_ltr_use(gen_tally: list, the_word_list: list ):
@@ -1478,11 +1478,12 @@ def rpt_ltr_use(gen_tally: list, the_word_list: list ):
     use_details_dict = dict_ltr_frq_data_for_words_list(the_word_list)
     rptl = f"----- Letter use details for the {len(the_word_list)} words -----\n"
     datawnd.verbose_data.insert(tk.END, rptl)
-    rptl = "- Letter, % having, [position hierarchy], position counts -\n"
+    rptl = "- Letter, % having, position counts, [position hierarchy] -\n"
     datawnd.verbose_data.insert(tk.END, rptl)
     for ltr, lper in gen_tally_dict.items():
-        use_details = str(use_details_dict[ltr]).replace('[[[', '[').replace(']]', ']')[:-1]
-        rptl = f"{ltr.upper()} {round(lper, 2):.2f} {use_details}\n"
+        temp = str(use_details_dict[ltr]).replace(']]]', ']').replace('[[', '[')
+        use_details = temp[-(len(temp)-1):]
+        rptl = f"{ltr.upper()}, {round(lper, 2):.2f}, {use_details}\n"
         datawnd.verbose_data.insert(tk.END, rptl)
 
 class ShellCmdList:

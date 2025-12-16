@@ -457,12 +457,6 @@ def reveal_output(x: int,
     @param run_word_dict: the current remaining words as dict
     @param loc_record_run: save to file bool
     @param loc_run_fname: filename for recording
-    :param x:
-    :param guesses:
-    :param run_stats:
-    :param run_word_list:
-    :param loc_record_this_run:
-    :param loc_run_fname:
     """
     reveal_stat = [x, guesses]
     reveal_stat.extend(run_stats)
