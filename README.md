@@ -34,48 +34,9 @@
 * **start-pywt.command** output looks like this when it is launching the Wordle helper:
 !['start-pywt.command Image'](InfoImages/PYWTLauncher.png)
 
-### Requirements
+* This window shows up when the **Wordle Helper** successfully launches.
 
-* Linux, Apple OSX or Microsoft Windows running a Linux subsystem
-  * It should be possible to have the **Helper** running in a Linux subsystem running in Microsoft Windows, but these instructions do not explain how. The Linux subsystem would need to have OS components, like 'cat', 'grep' and 'bash' typically present on any Apple OSX or Linux system in addition to the python3, pip and customtkinter installs.  
-* **python3**: (<https://www.python.org/downloads/>)
-  * As of this writing Python 3.10 is recommended.
-    * **Customtkinter** can have a problem with Python 3.12.
-    * There is an annoying graphical user interface focus bug when using Python 3.12 where the controls on the **Helper** window do not activate unless the window background is first touched. Using Python 3.10 avoids the problem. Using the command ```python3.10 pywt.py``` runs the **Helper** in Python 3.10 when other Python3 versions are present on your system.
-  * Python 3.12 can be used.
-    * 'distutils', a deprecated module used by **Custimtkinter**, was removed from Python 3.12. Nevertheless, it will be installed using the command "pip3 install setuptools" entered in a Terminal window.
-* **pip**: **pip** is a package installer for **python3**.
-* **customtkinter**
-
-'tkinter' provides graphical user interface support for python applications. It should automatically install with python, but be aware you might need to manually install it. 'customtkinter' is an expansion to 'tkinter'. This Wordle game helper uses some **customtkinter** features and so it needs to be installed along with **python3**. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
-
-#### Installing **python3**, **pip** and **customtkinter**
-
-* First, install **python3** by using the standard install package provided at <https://www.python.org/downloads/>. Be aware **Python3** can be installed by using many different methods. Each method may install **python3** and its versions at different locations on your system. This can cause complications for you if you are not aware of it. Each of the next two requirements **pip** and **customtkinter** will be installed at the specific **python3** version and location that corresponds to the **python3** version used to install them. For this reason using the standard install package provided at <https://www.python.org/downloads/> is recommended.
-* Second, install **pip** by using the command `python3 -m ensurepip --upgrade` entered in a Terminal window. Not all **python3** installations are equal. It is possible for the **ensurepip** feature to not exist, in which case you will need to search the web for the method that works for your situation to install **pip**.  
-* Lastly, install **customtkinter** by using the command `pip3 install --upgrade customtkinter==4.6.3` entered in a Terminal window.
-
-* Note: **customtkinter** is in active development. Changes to it might cause Wordle **Helper** to fail running. When using the convenience script **start-pywt.command** to start the Wordle **Helper** there is no failure feedback other than not seeing the **Helper**. As of this writing the **Helper** runs with **customtkinter** versions 4.6.3 and 5.2.2.  Version 4.6.3 and 5.2.2 with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
-
-### Installing the Wordle Helper
-
-* Download the **pywtpackage.zip** release file from the repository releases link.
-* Unzip the **pywtpackage.zip** release file. It should unzip to be a folder named pywtpackage.
-* Rename the **pywtpackage** folder as you wish and place the folder with its contents to where you would like to keep it.
-* A file privilege for the **start-pywt.command** double-click-to-run convenience file needs to be changed for it to work. Use the command: ```chmod +x start-pywt.command``` executed in Terminal, at the file's folder, to make the change. The same applies to the other convenience file: **start-fmwm.command**. For these use the commands: ```chmod +x start-fmwm.command``` executed in Terminal, at the file's folder, to make the changes.
-* In the zip package, this **README.md** file, the images it uses and a couple of files in the **worddata** folder regarding letter ranking may be deleted if desired. The only required files, and their associated folder, that are in **pywtpackage.zip** are:
-  * **start-pywt.command**  (the double-click-to-run convenience script file)
-  * **pywt.py**             (the wordle helper app.)
-  * **helpers.py**          (a helper to the app.)
-  * **groupdrilling.py**    (a helper app for outcome analysis)
-  * **fmwm.py**             (a command line application to measure strategies)
-  * **start-fmwm.command**  (convenience script file to run fmwm.py)
-  * **helpinfo.txt**        (help information)
-  * **letter_ranks.txt**    (letter ranking data file)
-  * **nyt_wordlist.txt**    (wordlist - shuffled)
-  * **wo_nyt_wordlist.txt** (wordlist - shuffled)
-  * **pu_wordlist.txt**     (previously used wordlist. You need to maintain this list if you intend to take advantage of previously used solutions.)
-
+!['Main Window Image'](InfoImages/PYWTMainWindow.png)
 ### Word Ranking
 
 * Word ranking based on letter occurrence frequency is part of what this Wordle **Helper** was initially developed to investigate and then automate as a selection strategy for the **FMWM**. This is why the word lists are shown ranked in this way and why these instructions appear to emphasize **Word Ranking** even though the **Helper** has evolved to perform the more effective **Outcome** analysis method.
@@ -267,3 +228,46 @@ You might need to think about needing three of those letters being *included*. *
 
 * The **Classic** and **Large** word vocabularies are current as of May 3, 2023. In the past year the vocabularies were seen to change once.
 * The **Classic+** word vocabulary is the **Classic** word vocabulary plus additional words that the NYT **WordleBot** adds to the **Classic** words for reasons not explicitly explained by the NYT but that clearly serve both as an intentional fuzziness to the vocabulary the **WordleBot** uses to solve the **Wordle** and to serve as a means to add additional solutions that the **WordleBot** would be able to solve. The **outcome (groups)** method used by the **WordleBot** and this **Wordle Helper** requires the solution to be within the possible solutions' vocabulary.
+
+## Requirements and Installation
+
+### Requirements
+* Linux, Apple OSX or Microsoft Windows running a Linux subsystem
+  * It should be possible to have the **Helper** running in a Linux subsystem running in Microsoft Windows, but these instructions do not explain how. The Linux subsystem would need to have OS components, like 'cat', 'grep' and 'bash' typically present on any Apple OSX or Linux system in addition to the python3, pip and customtkinter installs.  
+* **python3**: (<https://www.python.org/downloads/>)
+  * As of this writing Python 3.10 is recommended.
+    * **Customtkinter** can have a problem with Python 3.12.
+    * There is an annoying graphical user interface focus bug when using Python 3.12 where the controls on the **Helper** window do not activate unless the window background is first touched. Using Python 3.10 avoids the problem. Using the command ```python3.10 pywt.py``` runs the **Helper** in Python 3.10 when other Python3 versions are present on your system.
+  * Python 3.12 can be used.
+    * 'distutils', a deprecated module used by **Custimtkinter**, was removed from Python 3.12. Nevertheless, it will be installed using the command "pip3 install setuptools" entered in a Terminal window.
+* **pip**: **pip** is a package installer for **python3**.
+* **customtkinter**
+
+'tkinter' provides graphical user interface support for python applications. It should automatically install with python, but be aware you might need to manually install it. 'customtkinter' is an expansion to 'tkinter'. This Wordle game helper uses some **customtkinter** features and so it needs to be installed along with **python3**. 'pip' is python's utility for installing components like 'customtkinter'. 'pip' needs to be installed in order to install customtkinter.
+
+#### Installing **python3**, **pip** and **customtkinter**
+
+* First, install **python3** by using the standard install package provided at <https://www.python.org/downloads/>. Be aware **Python3** can be installed by using many different methods. Each method may install **python3** and its versions at different locations on your system. This can cause complications for you if you are not aware of it. Each of the next two requirements **pip** and **customtkinter** will be installed at the specific **python3** version and location that corresponds to the **python3** version used to install them. For this reason using the standard install package provided at <https://www.python.org/downloads/> is recommended.
+* Second, install **pip** by using the command `python3 -m ensurepip --upgrade` entered in a Terminal window. Not all **python3** installations are equal. It is possible for the **ensurepip** feature to not exist, in which case you will need to search the web for the method that works for your situation to install **pip**.  
+* Lastly, install **customtkinter** by using the command `pip3 install --upgrade customtkinter==4.6.3` entered in a Terminal window.
+
+* Note: **customtkinter** is in active development. Changes to it might cause Wordle **Helper** to fail running. When using the convenience script **start-pywt.command** to start the Wordle **Helper** there is no failure feedback other than not seeing the **Helper**. As of this writing the **Helper** runs with **customtkinter** versions 4.6.3 and 5.2.2.  Version 4.6.3 and 5.2.2 with this **Helper** in Apple OSs: Ventura 13.0, Monterey 12.6 and Catalina 10.15.7.
+
+### Installing the Wordle Helper
+
+* Download the **pywtpackage.zip** release file from the repository releases link.
+* Unzip the **pywtpackage.zip** release file. It should unzip to be a folder named pywtpackage.
+* Rename the **pywtpackage** folder as you wish and place the folder with its contents to where you would like to keep it.
+* A file privilege for the **start-pywt.command** double-click-to-run convenience file needs to be changed for it to work. Use the command: ```chmod +x start-pywt.command``` executed in Terminal, at the file's folder, to make the change. The same applies to the other convenience file: **start-fmwm.command**. For these use the commands: ```chmod +x start-fmwm.command``` executed in Terminal, at the file's folder, to make the changes.
+* In the zip package, this **README.md** file, the images it uses and a couple of files in the **worddata** folder regarding letter ranking may be deleted if desired. The only required files, and their associated folder, that are in **pywtpackage.zip** are:
+  * **start-pywt.command**  (the double-click-to-run convenience script file)
+  * **pywt.py**             (the wordle helper app.)
+  * **helpers.py**          (a helper to the app.)
+  * **groupdrilling.py**    (a helper app for outcome analysis)
+  * **fmwm.py**             (a command line application to measure strategies)
+  * **start-fmwm.command**  (convenience script file to run fmwm.py)
+  * **helpinfo.txt**        (help information)
+  * **letter_ranks.txt**    (letter ranking data file)
+  * **nyt_wordlist.txt**    (wordlist - shuffled)
+  * **wo_nyt_wordlist.txt** (wordlist - shuffled)
+  * **pu_wordlist.txt**     (previously used wordlist. You need to maintain this list if you intend to take advantage of previously used solutions.)
