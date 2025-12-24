@@ -43,7 +43,7 @@
     * **Customtkinter** can have a problem with Python 3.12.
     * There is an annoying graphical user interface focus bug when using Python 3.12 where the controls on the **Helper** window do not activate unless the window background is first touched. Using Python 3.10 avoids the problem. Using the command ```python3.10 pywt.py``` runs the **Helper** in Python 3.10 when other Python3 versions are present on your system.
   * Python 3.12 can be used.
-    * 'distutils', a deprecated module used **Custimtkinter**, was removed from Python 3.12. Nevertheless, it will be installed using the command "pip3 install setuptools" entered in a Terminal window.
+    * 'distutils', a deprecated module used by **Custimtkinter**, was removed from Python 3.12. Nevertheless, it will be installed using the command "pip3 install setuptools" entered in a Terminal window.
 * **pip**: **pip** is a package installer for **python3**.
 * **customtkinter**
 
