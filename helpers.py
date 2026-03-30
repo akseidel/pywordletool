@@ -228,108 +228,6 @@ def get_results_word_list(shell_cmd) -> list:
 
 
 
-
-# def print_word_list_col_format(the_word_list, n_col):
-#     """
-#     List out the ranked word list into n_col columns.
-#     @param the_word_list:
-#     @param n_col: number of columns to fill.
-#     """
-#     n_items = len(the_word_list)
-#     h_txt = " Word : Rank"
-#     left_pad = ""
-#     mid_pad = "   "
-#     h_line = left_pad + h_txt
-#     for i in range(1, n_col):
-#         mid = ' ' * 2
-#         h_line = h_line + mid + h_txt
-#     print(h_line)
-#     c = 0
-#     i = 0
-#     l_msg = ""
-#     for key, value in the_word_list.items():
-#         msg = key + " : " + str(value)
-#         i = i + 1
-#         if c == 0:
-#             l_msg = left_pad + msg
-#         else:
-#             l_msg = l_msg + mid_pad + msg
-#         c = c + 1
-#         if c == n_col:
-#             print(l_msg)
-#             c = 0
-#             l_msg = ""
-#         if i == n_items:
-#             print(l_msg)
-
-def print_word_list_col_format(word_list: dict, n_col: int) -> None:
-    """
-    List out the ranked word list into n_col columns.
-
-    :param word_list: Dictionary mapping words to their ranks.
-    :param n_col: Number of columns to display.
-    """
-    col_header = "Word : Rank"
-    col_sep = "   "
-
-    print(col_sep.join([col_header] * n_col))
-
-    items = list(word_list.items())
-    for row_start in range(0, len(items), n_col):
-        row_items = items[row_start:row_start + n_col]
-        print(col_sep.join(f"{word} : {rank}" for word, rank in row_items))
-
-
-def make_ranked_filtered_result_dictionary(
-    words: list,
-    ltr_rank_dict: dict,
-    allow_dups: bool,
-    rank_mode: int,
-    no_ordr: bool,
-    no_rank: bool = False,
-) -> dict:
-    """
-    Build a ranked and filtered word dictionary.
-
-    :param words: The filtered word list.
-    :param ltr_rank_dict: Letter ranking dictionary.
-    :param allow_dups: If True, include words with duplicate letters.
-    :param rank_mode: Letter ranking mode to use.
-    :param no_ordr: If True, sort alphabetically instead of by rank.
-    :param no_rank: If True, skip ranking (e.g. for random selection).
-    :return: Dictionary of words mapped to their formatted rank strings.
-    """
-    words_dict = {}
-
-    for word in words:
-        if not word:
-            continue
-        if not allow_dups and word_has_duplicates(word):
-            continue
-        words_dict[word] = "000" if no_rank else f"{wrd_rank(word, ltr_rank_dict, rank_mode):05.1f}"
-
-    if no_rank:
-        return words_dict
-
-    sort_key = (lambda x: x[0]) if no_ordr else (lambda x: x[1])
-    return dict(sorted(words_dict.items(), key=sort_key))
-
-
-
-def get_results_word_list(shell_cmd) -> list:
-    """
-    Run the grep command pipeline and return the matched words.
-
-    :param shell_cmd: Command object exposing a .full_cmd() shell string.
-    :return: List of words that pass the grep command pipeline.
-    """
-    with Popen(shell_cmd.full_cmd(), shell=True, stdout=PIPE, text=True) as proc:
-        return [line.rstrip('\n') for line in proc.stdout]
-
-
-
-
-
 def get_wordlist(full_path_name: str) -> list:
     """
     Read a word list from a CSV-style file, returning the first field of each line.
@@ -365,65 +263,27 @@ def clear_scrn() -> None:
     """
     os.system("cls" if os.name == "nt" else "clear")
 
-
 def get_gencode(word: str) -> list:
-    """
-    Return the genetic code for a word as a 28-element integer list.
+    """Return a word's genetic code.
 
-    Indices 0–25: 1 if the letter is present, 0 otherwise.
-    Index 26: excess occurrence count — sum of (appearances − 1) for each
-              repeated letter. e.g. "woody" → 1 (o×2), "toott" → 3 (o×2, t×3).
-    Index 27: genetic rank, calculated externally and defaulting to 0.
+    Indices 0-25: letter-presence flags (1 if that a-z letter appears, else 0).
+    Index 26:     count of extra duplicate occurrences beyond the first.
+    Index 27:     genetic rank, populated later in context.
 
-    Example — "woody":
-        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
+    Example: 'woody' → [0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,1,0]
 
     :param word: The word to encode.
-    :return: 28-element list encoding letter presence, duplicate count, and rank.
+    :return:     28-element list encoding the word's genetic code.
     """
-# def get_gencode(word) -> list:
-#     """
-#     Return a word's genetic code
-#     example:woody
-#     returns:[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
-#     translated: idx 0-25 'abc...xyz' letter count, idx 26 duplicates count, idx 27 genetic rank.
-#     Rank applies in the title_context for a list of words, so it is calculated later
-#     @param word: a word in question
-#     @return: a special list of ints that encode the genetic code
-#     """
-#     # gencode is the list of integers that will be returned
-#     gencode = gc_z.copy()
-#     # dups counts the number of times letters occur more than once.
-#     # In woody the letter o occurs 1 time more than once. dups = 1
-#     # In toott the letter o occurs 1 time more than once. The letter t
-#     # occurs 2 times more han once. dups = 1 + 2 = 3
-#     dups = 0
-#     # loop through each letter in the word
-#     for ltr in word:
-#         idx = ord(ltr) - 97
-#         # Increment dups if that letter has already been seen.
-#         if gencode[idx] > 0:
-#             dups += 1
-#         # Mark that letter as having been seen.
-#         gencode[idx] = 1
-#     gencode[26] = dups
-#     return gencode
-
-def get_gencode(word: str) -> list:
-    """
-    Return the genetic code for a word as a 28-element integer list.
-
-    Indices 0–25: 1 if the letter is present, 0 otherwise.
-    Index 26: excess occurrence count — sum of (appearances − 1) for each
-              repeated letter. e.g. "woody" → 1 (o×2), "toott" → 3 (o×2, t×3).
-    Index 27: genetic rank, calculated externally and defaulting to 0.
-
-    Example — "woody":
-        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
-
-    :param word: The word to encode.
-    :return: 28-element list encoding letter presence, duplicate count, and rank.
-    """
+    gencode = [0] * 28
+    dups = 0
+    for ltr in word:
+        idx = ord(ltr) - ord('a')
+        if gencode[idx]:
+            dups += 1
+        gencode[idx] = 1
+    gencode[26] = dups
+    return gencode
 
 
 
@@ -442,22 +302,6 @@ def get_gendict_tally(gendict: dict[str, list]) -> list:
         for idx in range(26):
             gen_tally[idx] += gencode[idx]
     return gen_tally
-
-def dict_gen_tally(gt: list, cnt: int) -> dict[str, float]:
-    """
-    Convert a letter tally list into a sorted letter-frequency dictionary.
-
-# def dict_gen_tally(gt: list, cnt: int) -> dict:
-#     lf_dict: dict[str, float] = {}
-#     s = 97
-#     for lcnt in gt:
-#         if lcnt:
-#             lc_ltr = chr(s)
-#             if not lc_ltr in lf_dict:
-#                 lf_dict.update({lc_ltr: lcnt / cnt})
-#         s = s + 1
-#     s_lf_dict = dict(sorted(lf_dict.items(), key=lambda item: item[1], reverse=True))
-#     return s_lf_dict
 
 def dict_gen_tally(gt: list, cnt: int) -> dict[str, float]:
     """
@@ -871,9 +715,6 @@ def get_outcomes_stats(the_outcomes_dict: dict, meta_l: bool = False) -> tuple[
 
     return g_qty, min(sizes), max(sizes), mean, p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2
 
-    return g_qty, min(sizes), max(sizes), mean, p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2
-
-
 
 def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
     """
@@ -925,15 +766,6 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
 
     return grps_qty, min_grp_size, max_grp_size, mean, min_grp_p2, max_grp_ent, min_grp_xa
 
-    for g_stats in best_rank_dict.values():
-        _, min_stat, max_stat, _, p2_stat, e_stat, xa_stat, *_ = g_stats
-        min_grp_size = min(min_grp_size, min_stat)
-        max_grp_size = min(max_grp_size, max_stat)  # min_max: prefer smaller largest group
-        min_grp_p2   = min(min_grp_p2, p2_stat)
-        max_grp_ent  = max(max_grp_ent, e_stat)
-        min_grp_xa   = min(min_grp_xa, xa_stat)
-
-    return grps_qty, min_grp_size, max_grp_size, mean, min_grp_p2, max_grp_ent, min_grp_xa
 
 
 def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
