@@ -7,137 +7,149 @@ from subprocess import Popen, PIPE
 import sys
 import os
 import random
-import math
 import re
-import tkinter as tk  # assigns tkinter stuff to tk namespace
-import tkinter.ttk as ttk  # assigns tkinter.ttk stuff to its own
-# ttk namespace so that tk is preserved
+import string
+import sys
+import tkinter as tk
+import tkinter.ttk as ttk
+from itertools import groupby
+# from logging import exception
+# from string import ascii_lowercase
+from subprocess import Popen, PIPE
 from tkinter import messagebox
+
 import customtkinter as ctk
+
 import outcomedrilling
 from fmwm import debug_mode
 from logging import exception
 from itertools import groupby
 
-gc_z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 
-def get_word_list_path_name(local_path_file_name: str, critical=True) -> str:
+gc_z = [0] * 28
+
+def get_word_list_path_name(local_path_file_name: str, critical: bool = True) -> str:
+    """Return the full path to a Wordle word-list file.
+
+    :param local_path_file_name: Path to the word-list file, relative to this module.
+    :param critical:             If True, show an error dialog and exit when the file
+                                 is not found. If False, show a warning and return ''.
+    :return:                     Absolute path to the file, or '' if not found and
+                                 critical is False.
     """
-    Returns the wordle word list full pathname
-    Exits program if not found
-    @param local_path_file_name:
-    @return: wordle word list full pathname
-    """
-    full_path_name = os.path.join(os.path.dirname(__file__), local_path_file_name)
-    if os.path.exists(full_path_name):
-        return full_path_name
-    else:
-        if critical:
-            msg = f'The wordle word list file {local_path_file_name} was not found. \n\nExpected here: {full_path_name}'
-            print(msg)
-            print()
-            messagebox.showerror(title='Stopping Here', message=msg)
-            sys.exit()
-        else:
-            msg = (
-                f'The wordle word list file {local_path_file_name} was not found. \n\nExpected here: {full_path_name}'
-                f'\n\nThe option using this file will not use it.')
-            messagebox.showerror(title='Will Continue', message=msg)
-            return ''
+    full_path = os.path.join(os.path.dirname(__file__), local_path_file_name)
+    if os.path.exists(full_path):
+        return full_path
 
+    if critical:
+        msg = (f'The wordle word list file {local_path_file_name} was not found.'
+               f'\n\nExpected here: {full_path}')
+        print(msg)
+        messagebox.showerror(title='Stopping Here', message=msg)
+        sys.exit()
+
+    msg = (f'The wordle word list file {local_path_file_name} was not found.'
+           f'\n\nExpected here: {full_path}'
+           f'\n\nThe option using this file will not use it.')
+    messagebox.showwarning(title='Will Continue', message=msg)
+    return ''
 
 """
 Letter ranking functions for rank that includes by letter position method
 """
 
 
-def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
-    """
-    Make and return the letter ranking dictionary
-    @param local_path_rank_file:
-    @return: the letter ranking dictionary
-    """
-    full_path_name = os.path.join(os.path.dirname(__file__), local_path_rank_file)
-    ltr_rank_dict = {}  # ltr_rank_dict will be the rank dictionary
-    if os.path.exists(full_path_name):
-        with open(full_path_name) as f:
-            for ltr in f:
-                ltr = ltr.split(":")
-                ltr[-1] = ltr[-1].strip()
-                k = ltr[0]
-                ltr.pop(0)
-                ltr_rank_dict[k] = [float(d) for d in ltr]  # want as floats
-    else:
-        msg = f'Letter ranking file {local_path_rank_file} not found. Switching to built in Classic letter ranking.'
-        print(msg)
-        messagebox.showwarning('Warning', message=msg)
-        ltr_rank_dict = {
-            'e': [44.9, 2.30, 8.12, 5.27, 16.59, 12.57],
-            'a': [35.3, 5.27, 12.56, 9.38, 5.40, 2.70],
-            'r': [31.4, 4.04, 8.30, 6.41, 5.08, 7.56],
-            'o': [27.3, 1.58, 11.46, 7.55, 4.42, 2.29],
-            'i': [25.4, 1.27, 8.84, 9.04, 5.68, 0.61],
-            't': [24.7, 5.29, 2.33, 4.79, 4.61, 7.72],
-            'l': [23.4, 3.41, 6.06, 4.29, 4.99, 4.68],
-            's': [22.5, 11.76, 0.66, 3.02, 5.48, 1.59],
-            'n': [20.5, 1.53, 3.19, 5.43, 5.95, 4.39],
-            'd': [19.9, 4.14, 0.82, 3.16, 2.19, 9.57],
-            'u': [17.9, 1.39, 7.66, 5.66, 3.09, 0.14],
-            'y': [17.0, 0.39, 0.78, 1.04, 0.17, 14.65],
-            'c': [16.8, 7.36, 1.51, 2.33, 4.54, 1.03],
-            'p': [14.4, 5.55, 1.86, 2.68, 2.02, 2.31],
-            'h': [13.8, 3.10, 4.80, 0.50, 1.03, 4.36],
-            'm': [13.8, 4.69, 1.58, 2.90, 2.99, 1.61],
-            'g': [11.4, 4.23, 0.46, 2.65, 2.65, 1.45],
-            'b': [10.9, 6.53, 0.56, 2.34, 0.91, 0.54],
-            'k': [8.7, 1.08, 0.39, 1.28, 2.39, 3.52],
-            'f': [7.8, 4.56, 0.26, 0.98, 1.18, 0.85],
-            'w': [7.4, 3.06, 1.59, 1.30, 0.85, 0.57],
-            'v': [5.6, 1.56, 0.56, 2.01, 1.50, 0.00],
-            'z': [1.9, 0.15, 0.05, 0.64, 0.81, 0.24],
-            'x': [1.9, 0.03, 0.54, 0.80, 0.09, 0.40],
-            'j': [1.3, 0.97, 0.06, 0.14, 0.11, 0.00],
-            'q': [1.0, 0.77, 0.20, 0.03, 0.00, 0.00]
-        }
-    return ltr_rank_dict
+_CLASSIC_LTR_RANK: dict = {
+    'e': [44.9, 2.30, 8.12, 5.27, 16.59, 12.57],
+    'a': [35.3, 5.27, 12.56, 9.38, 5.40, 2.70],
+    'r': [31.4, 4.04, 8.30, 6.41, 5.08, 7.56],
+    'o': [27.3, 1.58, 11.46, 7.55, 4.42, 2.29],
+    'i': [25.4, 1.27, 8.84, 9.04, 5.68, 0.61],
+    't': [24.7, 5.29, 2.33, 4.79, 4.61, 7.72],
+    'l': [23.4, 3.41, 6.06, 4.29, 4.99, 4.68],
+    's': [22.5, 11.76, 0.66, 3.02, 5.48, 1.59],
+    'n': [20.5, 1.53, 3.19, 5.43, 5.95, 4.39],
+    'd': [19.9, 4.14, 0.82, 3.16, 2.19, 9.57],
+    'u': [17.9, 1.39, 7.66, 5.66, 3.09, 0.14],
+    'y': [17.0, 0.39, 0.78, 1.04, 0.17, 14.65],
+    'c': [16.8, 7.36, 1.51, 2.33, 4.54, 1.03],
+    'p': [14.4, 5.55, 1.86, 2.68, 2.02, 2.31],
+    'h': [13.8, 3.10, 4.80, 0.50, 1.03, 4.36],
+    'm': [13.8, 4.69, 1.58, 2.90, 2.99, 1.61],
+    'g': [11.4, 4.23, 0.46, 2.65, 2.65, 1.45],
+    'b': [10.9, 6.53, 0.56, 2.34, 0.91, 0.54],
+    'k': [8.7,  1.08, 0.39, 1.28, 2.39, 3.52],
+    'f': [7.8,  4.56, 0.26, 0.98, 1.18, 0.85],
+    'w': [7.4,  3.06, 1.59, 1.30, 0.85, 0.57],
+    'v': [5.6,  1.56, 0.56, 2.01, 1.50, 0.00],
+    'z': [1.9,  0.15, 0.05, 0.64, 0.81, 0.24],
+    'x': [1.9,  0.03, 0.54, 0.80, 0.09, 0.40],
+    'j': [1.3,  0.97, 0.06, 0.14, 0.11, 0.00],
+    'q': [1.0,  0.77, 0.20, 0.03, 0.00, 0.00],
+}
 
+
+def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
+    """Build and return the letter ranking dictionary.
+
+    Reads rankings from a file; falls back to the built-in classic ranking
+    if the file is not found.
+
+    File format — one entry per line::
+
+        e:44.9:2.30:8.12:5.27:16.59:12.57
+
+    where the first field is the letter, index 0 is the anywhere-rank,
+    and indices 1-5 are the positional ranks.
+
+    :param local_path_rank_file: Path to the ranking file, relative to this module.
+    :return:                     Letter ranking dictionary keyed by letter;
+                                 values are lists of six floats.
+    """
+    full_path = os.path.join(os.path.dirname(__file__), local_path_rank_file)
+
+    if os.path.exists(full_path):
+        ltr_rank_dict = {}
+        with open(full_path) as f:
+            for line in f:
+                key, *values = line.strip().split(':')
+                ltr_rank_dict[key] = [float(v) for v in values]
+        return ltr_rank_dict
+
+    msg = (f'Letter ranking file "{local_path_rank_file}" not found. '
+           f'Switching to built-in classic letter ranking.')
+    print(msg)
+    messagebox.showwarning('Warning', message=msg)
+    return _CLASSIC_LTR_RANK
 
 def wrd_rank(wrd: str, ltr_rank_dict: dict, method: int) -> float:
-    """
-    Returns a word's letter frequency ranking.
-    # Any word longer than 5 letters has undefined rank.
-    # This allows for wordlist flexibility.
-    @param wrd: subject word
-    @param ltr_rank_dict: ranking dictionary
-    @param method: int 0=occurrence, 1=position, 2=both occurrence and position
-    @return: Returns a word's letter frequency ranking.
+    """Return a word's letter-frequency ranking.
+
+    Words longer than 5 letters return 0 (undefined rank), allowing
+    word-list flexibility.
+
+    :param wrd:           Subject word (lowercase, max 5 letters).
+    :param ltr_rank_dict: Ranking dictionary keyed by letter; each value is
+                          a list where index 0 is the anywhere-rank and
+                          indices 1-5 are the positional ranks.
+    :param method:        0 = rank by letter occurrence (anywhere in word);
+                          1 = rank by letter position;
+                          2 = combined occurrence and position rank.
+    :return:              Cumulative letter-frequency rank, or 0 for an
+                          unrecognised method or a word longer than 5 letters.
     """
     if len(wrd) > 5:
         return 0
-    r = 0
-    if method == 0:  # rank by anywhere in word
-        for x in wrd:
-            # 0th position is rank by anywhere
-            if 97 <= ord(x) <= 122:
-                r = r + ltr_rank_dict[x][0]
-        return r
-    if method == 1:  # rank by position in the word
-        p = 1
-        for x in wrd:
-            # 1 to 5th position is rank for being in that position
-            if 97 <= ord(x) <= 122:
-                r = r + ltr_rank_dict[x][p]
-                p += 1
-        return r
-    if method == 2:  # rank by position in the word
-        p = 1
-        for x in wrd:
-            # combine methods 0 and 1
-            if 97 <= ord(x) <= 122:
-                r = r + ltr_rank_dict[x][0] + ltr_rank_dict[x][p]
-                p += 1
-        return r
+
+    letters = [(p, x) for p, x in enumerate(wrd, 1) if 'a' <= x <= 'z']
+
+    if method == 0:
+        return sum(ltr_rank_dict[x][0] for _, x in letters)
+    if method == 1:
+        return sum(ltr_rank_dict[x][p] for p, x in letters)
+    if method == 2:
+        return sum(ltr_rank_dict[x][0] + ltr_rank_dict[x][p] for p, x in letters)
     return 0
 
 
@@ -168,6 +180,71 @@ def word_has_duplicates(word: str) -> bool:
     """
     filtered = word.replace('.', '').replace(' ', '')
     return len(set(filtered)) < len(filtered)
+
+def print_word_list_col_format(word_list: dict, n_col: int) -> None:
+    """
+    List out the ranked word list into n_col columns.
+
+    :param word_list: Dictionary mapping words to their ranks.
+    :param n_col: Number of columns to display.
+    """
+    col_header = "Word : Rank"
+    col_sep = "   "
+
+    print(col_sep.join([col_header] * n_col))
+
+    items = list(word_list.items())
+    for row_start in range(0, len(items), n_col):
+        row_items = items[row_start:row_start + n_col]
+        print(col_sep.join(f"{word} : {rank}" for word, rank in row_items))
+
+
+def make_ranked_filtered_result_dictionary(
+    words: list,
+    ltr_rank_dict: dict,
+    allow_dups: bool,
+    rank_mode: int,
+    no_ordr: bool,
+    no_rank: bool = False,
+) -> dict:
+    """
+    Build a ranked and filtered word dictionary.
+
+    :param words: The filtered word list.
+    :param ltr_rank_dict: Letter ranking dictionary.
+    :param allow_dups: If True, include words with duplicate letters.
+    :param rank_mode: Letter ranking mode to use.
+    :param no_ordr: If True, sort alphabetically instead of by rank.
+    :param no_rank: If True, skip ranking (e.g. for random selection).
+    :return: Dictionary of words mapped to their formatted rank strings.
+    """
+    words_dict = {}
+
+    for word in words:
+        if not word:
+            continue
+        if not allow_dups and word_has_duplicates(word):
+            continue
+        words_dict[word] = "000" if no_rank else f"{wrd_rank(word, ltr_rank_dict, rank_mode):05.1f}"
+
+    if no_rank:
+        return words_dict
+
+    sort_key = (lambda x: x[0]) if no_ordr else (lambda x: x[1])
+    return dict(sorted(words_dict.items(), key=sort_key))
+
+
+
+def get_results_word_list(shell_cmd) -> list:
+    """
+    Run the grep command pipeline and return the matched words.
+
+    :param shell_cmd: Command object exposing a .full_cmd() shell string.
+    :return: List of words that pass the grep command pipeline.
+    """
+    with Popen(shell_cmd.full_cmd(), shell=True, stdout=PIPE, text=True) as proc:
+        return [line.rstrip('\n') for line in proc.stdout]
+
 
 
 
@@ -413,6 +490,21 @@ def clear_scrn() -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
 
+def get_gencode(word: str) -> list:
+    """
+    Return the genetic code for a word as a 28-element integer list.
+
+    Indices 0–25: 1 if the letter is present, 0 otherwise.
+    Index 26: excess occurrence count — sum of (appearances − 1) for each
+              repeated letter. e.g. "woody" → 1 (o×2), "toott" → 3 (o×2, t×3).
+    Index 27: genetic rank, calculated externally and defaulting to 0.
+
+    Example — "woody":
+        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0]
+
+    :param word: The word to encode.
+    :return: 28-element list encoding letter presence, duplicate count, and rank.
+    """
 # def get_gencode(word) -> list:
 #     """
 #     Return a word's genetic code
@@ -503,6 +595,10 @@ def get_gendict_tally(gendict: dict[str, list]) -> list:
             gen_tally[idx] += gencode[idx]
     return gen_tally
 
+def dict_gen_tally(gt: list, cnt: int) -> dict[str, float]:
+    """
+    Convert a letter tally list into a sorted letter-frequency dictionary.
+
 # def dict_gen_tally(gt: list, cnt: int) -> dict:
 #     lf_dict: dict[str, float] = {}
 #     s = 97
@@ -571,19 +667,6 @@ def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
         maxrank = max(maxrank, g[27])
     return maxrank
 
-# def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list:
-#     """
-#     returns list of the max genrankers in the gendict
-#     @param gendict: dict[str, list]
-#     @param maxrank: int
-#     @return:
-#     """
-#     max_rankers = []
-#     for w, g in gendict.items():
-#         if maxrank == g[27]:
-#             max_rankers.append(w)
-#     return max_rankers
-
 def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list[str]:
     """
     Return all words in gendict whose genetic rank equals maxrank.
@@ -593,21 +676,6 @@ def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list[str]:
     :return: List of words whose gencode rank (index 27) equals maxrank.
     """
     return [w for w, g in gendict.items() if g[27] == maxrank]
-
-# def regex_maxgenrankers(max_rankers: list, wordsdict: dict) -> str:
-#     """
-#     returns a regex formatted pattern string for highlighting
-#     @param max_rankers:
-#     @param wordsdict:
-#     @return:
-#     """
-#     pat_list = []
-#     mid_div = " : "
-#     for w in max_rankers:
-#         r = wordsdict[w]
-#         pat_list.append(w + mid_div + r)
-#     regex_str = '|'.join(pat_list)
-#     return regex_str
 
 def regex_maxgenrankers(max_rankers: list[str], wordsdict: dict) -> str:
     """
@@ -790,44 +858,6 @@ def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
                             mult_dict[key] = mode_value
     return mult_dict
 
-
-# def build_x_pos_grep(lself, this_pos_dict: dict, rq_lts: str):
-#     """Builds the grep line for excluding positions
-#     """
-#     # example 'grep -vE \'..b..\'' for b,3
-#     sort_by_key_dict = {}
-#     for j in sorted(this_pos_dict):
-#         sort_by_key_dict[j] = this_pos_dict[j]
-#     for x in sort_by_key_dict:
-#         parts = this_pos_dict[x].split(',')
-#         ltr = parts[0].lower()
-#         p = int(parts[1])
-#         if rq_lts.__contains__(ltr):
-#             # add without the requirement, it has been done already
-#             lself.tool_command_list.add_excl_pos_cmd(ltr, p, False)
-#         else:
-#             # add with the requirement
-#             lself.tool_command_list.add_excl_pos_cmd(ltr, p, True)
-#             # keep track of its require in this function
-#             rq_lts += ltr
-
-# def build_x_pos_grep(self, this_pos_dict: dict, rq_lts: str) -> None:
-#     """
-#     Build grep exclusion commands for each letter-position pair in this_pos_dict.
-#
-#     Example: entry "b,3" produces grep -vE '..b..'
-#
-#     :param this_pos_dict: Dict of exclusion entries; each value is "letter,position" (e.g. "b,3").
-#     :param rq_lts: String of letters already marked as required.
-#     """
-#     for key in sorted(this_pos_dict):
-#         ltr, pos = this_pos_dict[key].split(',')
-#         ltr = ltr.lower()
-#         already_required = ltr in rq_lts
-#         self.tool_command_list.add_excl_pos_cmd(ltr, int(pos), not already_required)
-#         if not already_required:
-#             rq_lts += ltr
-
 def build_x_pos_grep(self, this_pos_dict: dict, rq_lts: str) -> None:
     """
     Build grep exclusion commands for each letter-position pair in this_pos_dict.
@@ -844,64 +874,6 @@ def build_x_pos_grep(self, this_pos_dict: dict, rq_lts: str) -> None:
         self.tool_command_list.add_excl_pos_cmd(ltr, int(pos), not already_required)
         if not already_required:
             rq_lts += ltr
-# def build_r_pos_grep(lself, this_pos_dict: dict) -> str:
-#     """Builds the grep line for including positions
-#     """
-#     # example 'grep -vE \'..b.a\'' for (b,3) (a,5)
-#     pat = ''
-#     pos = 1
-#     if len(this_pos_dict) < 1:  # no grep required
-#         return pat
-#
-#     # first make a dictionary of the dictionary sorted by the position number
-#     tlist = sorted(this_pos_dict.items(), key=lambda lx: lx[1].split(',')[1])
-#     sorted_by_pos_dict = dict(tlist)
-#
-#     for x in sorted_by_pos_dict:
-#         parts = sorted_by_pos_dict[x].split(',')
-#         ltr = parts[0].lower()
-#         p = int(parts[1])
-#         while pos < p:
-#             pat = pat + '.'
-#             pos += 1
-#         pat = pat + ltr
-#         pos += 1
-#
-#     # fill out the trailing undefined positions
-#     while len(pat) < 5:
-#         pat = pat + '.'
-#     lself.tool_command_list.add_type_cmd(pat, True)
-#     return pat
-
-# def build_r_pos_grep(self, this_pos_dict: dict) -> str:
-#     """
-#     Build a grep inclusion pattern for required letter positions.
-#
-#     Example: entries (b, 3) and (a, 5) produce pattern '..b.a'.
-#
-#     :param this_pos_dict: Dict of inclusion entries; each value is "letter,position" (e.g. "b,3").
-#     :return: The grep pattern string, or '' if this_pos_dict is empty.
-#     """
-#     if not this_pos_dict:
-#         return ''
-#
-#     sorted_entries = sorted(
-#         this_pos_dict.values(),
-#         key=lambda v: int(v.split(',')[1])
-#     )
-#
-#     pat = ''
-#     pos = 1
-#     for entry in sorted_entries:
-#         ltr, p_str = entry.split(',')
-#         p = int(p_str)
-#         pat += '.' * (p - pos)
-#         pat += ltr.lower()
-#         pos = p + 1
-#
-#     pat = pat.ljust(5, '.')
-#     self.tool_command_list.add_type_cmd(pat, True)
-#     return pat
 
 def build_r_pos_grep(self, this_pos_dict: dict) -> str:
     """
@@ -934,48 +906,6 @@ def build_multi_code_grep(lself, multi_code: dict) -> None:
     for mltr, mode in multi_code.items():
         lself.tool_command_list.add_type_mult_ltr_cmd(mltr.lower(), mode)
 
-
-# def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict, r_pos_dict: dict,
-#                         multi_code: dict):
-#     """
-#     The filter builder. Used only by fmwm.py.
-#     Filter arguments for each type are added to the grep command argument list
-#     @param wordle_tool_cmd_lst: the shell command list object
-#     @param excl_l: exclude letters list
-#     @param requ_l: required letters list
-#     @param x_pos_dict: excluded letter position dictionary
-#     @param r_pos_dict: required letter position dictionary
-#     @param multi_code: coded multiple same letters dict
-#
-#     """
-#     pipe = "|"
-#     pipe2 = "| "
-#     # Builds the grep line for excluding letters
-#     # example 'grep -vE \'b|f|k|w\''
-#     if len(excl_l) > 0:
-#         args = pipe.join(excl_l)
-#         grep_exclude = f"grep -vE \'{args}\'"
-#         wordle_tool_cmd_lst.tool_command_list.add_cmd(grep_exclude)
-#
-#     # Builds the grep line for requiring letters
-#     # Each letter gets its own grep
-#     if len(requ_l) > 0:
-#         items = []
-#         for ltr in requ_l:
-#             items.append(f"grep -E \'{ltr}\'")
-#         grep_require_these = pipe2.join(items)
-#         wordle_tool_cmd_lst.tool_command_list.add_cmd(grep_require_these)
-#
-#     # Build exclude from position, but require
-#     rq_ltrs = "".join(requ_l)
-#     build_x_pos_grep(wordle_tool_cmd_lst, x_pos_dict, rq_ltrs)
-#
-#     # Build require at position
-#     build_r_pos_grep(wordle_tool_cmd_lst, r_pos_dict)
-#
-#     # build for the coded multiple letters
-#     if len(multi_code) > 0:
-#         build_multi_code_grep(wordle_tool_cmd_lst, multi_code)
 
 def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict,
                         r_pos_dict: dict, multi_code: dict) -> None:
@@ -1092,27 +1022,6 @@ def get_genpattern(subject_word: str, target_word: str) -> str:
 
     return ''.join(pattern)
 
-# def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict:
-#     """
-#     Returns a dictionary of the word outcomes the guess_word would result
-#     from applying the guess_word on the word_list. The key values will be
-#     five-digit codes where 0 means letter is not present, 1 letter is present
-#     but at wrong position and 2 means letter is present and in correct position.
-#     @param guess_word: target word
-#     @param word_list: list of subject words
-#     @return: The keys will be five-digit codes where 0 means letter is
-#     not present, 1 letter is present but at wrong position and 2 means letter
-#     is present and in correct position. Values are the words categorized by that code.
-#     """
-#     outcomes_dict = {}
-#     for subject_word in word_list:
-#         # This appears to be the correct title_context.
-#         genpat = get_genpattern(guess_word, subject_word)
-#         if genpat not in outcomes_dict:
-#             outcomes_dict[genpat] = [subject_word]
-#         else:
-#             outcomes_dict[genpat].append(subject_word)
-#     return outcomes_dict
 
 def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict[str, list]:
     """
@@ -1135,57 +1044,6 @@ def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict[str, list]
         outcomes.setdefault(genpat, []).append(subject_word)
     return outcomes
 
-
-# def get_outcomes_stats(the_outcomes_dict: dict, meta_l=False) -> tuple[
-#     int, int, int, float, float, float, float, int, int, int]:
-#     """
-#     Given a single guess's outcome dictionary, returns stats:
-#     outcome pattern quantity,
-#     smallest outcome pattern size,
-#     largest outcome pattern size,
-#     average outcome pattern size,
-#     outcome population variance,
-#     outcome entropy,
-#     outcome expected size
-#     @param the_outcomes_dict: dictionary for a single guess outcome
-#     @return: tuple - [0] qty, [1] smallest, [2] largest, [3] ave, [4] var, [5] ent, [6] exp outcome size
-#     """
-#     g_qty = len(the_outcomes_dict)  # number of outcomes
-#     smallest = g_qty  # smallest outcome size
-#     largest = 0  # largest outcome size
-#     sums = 0  # outcome size sums, this is the number of words
-#     p2 = 0.0  # outcome population variance
-#     g_ent = 0.0  # outcomes entropy
-#     g_xa = 0.0  # outcomes expected average
-#     cnt_0 = 0  # number of clue 0
-#     cnt_1 = 0  # number of clue 1
-#     cnt_2 = 0  # number of clue 2
-#     for k, v in the_outcomes_dict.items():
-#         size = len(v)
-#         sums = sums + size
-#         largest = max(largest, size)
-#         smallest = min(smallest, size)
-#         # tally the clue types if meta_lr is True
-#         # (Presumably pressing the meta key to the spacebar left.)
-#         if meta_l:
-#             n_0 = k.count('0') * size
-#             n_1 = k.count('1') * size
-#             n_2 = k.count('2') * size
-#             cnt_0 = cnt_0 + n_0
-#             cnt_1 = cnt_1 + n_1
-#             cnt_2 = cnt_2 + n_2
-#
-#     # mean = group average size
-#     mean = sums / g_qty
-#     for k, v in the_outcomes_dict.items():
-#         size = len(v)
-#         p2 += (size - mean) ** 2
-#         i_p = size / sums
-#         i_entropy = -(i_p * math.log(i_p, 2))
-#         g_ent = g_ent + i_entropy
-#         g_xa = g_xa + size * i_p
-#     p2 /= g_qty
-#     return g_qty, smallest, largest, mean, p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2
 
 def get_outcomes_stats(the_outcomes_dict: dict, meta_l: bool = False) -> tuple[
         int, int, int, float, float, float, float, int, int, int]:
@@ -1226,6 +1084,8 @@ def get_outcomes_stats(the_outcomes_dict: dict, meta_l: bool = False) -> tuple[
             cnt_1 += k.count('1') * size
             cnt_2 += k.count('2') * size
     p2 /= g_qty
+
+    return g_qty, min(sizes), max(sizes), mean, p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2
 
     return g_qty, min(sizes), max(sizes), mean, p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2
 
@@ -1315,6 +1175,16 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
     min_grp_p2   = first[4] # Seed with member's variance
     max_grp_ent  = first[5]
     min_grp_xa   = first[6] # Seed with member's expected average
+
+    for g_stats in best_rank_dict.values():
+        _, min_stat, max_stat, _, p2_stat, e_stat, xa_stat, *_ = g_stats
+        min_grp_size = min(min_grp_size, min_stat)
+        max_grp_size = min(max_grp_size, max_stat)  # min_max: prefer smaller largest group
+        min_grp_p2   = min(min_grp_p2, p2_stat)
+        max_grp_ent  = max(max_grp_ent, e_stat)
+        min_grp_xa   = min(min_grp_xa, xa_stat)
+
+    return grps_qty, min_grp_size, max_grp_size, mean, min_grp_p2, max_grp_ent, min_grp_xa
 
     for g_stats in best_rank_dict.values():
         _, min_stat, max_stat, _, p2_stat, e_stat, xa_stat, *_ = g_stats
@@ -1687,12 +1557,6 @@ def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwn
         report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
     rptwnd.back_to_summary()
 
-
-# def report_footer_summary_header_to_window(msg: str, source_list: any, rptwnd: ctk):
-#     rptl = "\n\n> >  Outcome summary using the " + msg + " words for guesses on the " + \
-#            '{0:.0f}'.format(len(source_list)) + " words.  < <"
-#     rptwnd.verbose_data.insert(tk.END, rptl)
-
 def report_footer_summary_header_to_window(msg: str, source_list: list, rptwnd: ctk) -> None:
     """
     Append the outcome summary header line to the report window.
@@ -1703,24 +1567,6 @@ def report_footer_summary_header_to_window(msg: str, source_list: list, rptwnd: 
     """
     rptl = f"\n\n> >  Outcome summary using the {msg} words for guesses on the {len(source_list)} words.  < <"
     rptwnd.verbose_data.insert(tk.END, rptl)
-
-# def prnt_guesses_header(rptwnd: ctk, keyed=False, meta_l=False):
-#     if not keyed:
-#         rptl = '\n\nguess' + '\tqty'
-#     else:
-#         rptl = '\n\nslot' + '\tguess' + '\tqty'
-#     rptl = rptl + '\tent' + \
-#            '\tmin' + \
-#            '\tmax' + \
-#            '\tave' + \
-#            '\texp' + \
-#            '\tp2'
-#     if meta_l:
-#         rptl = rptl + \
-#                '\t#0' + \
-#                '\t#1' + \
-#                '\t#2'
-#     rptwnd.verbose_data.insert(tk.END, rptl)
 
 def prnt_guesses_header(rptwnd: ctk, keyed: bool = False, meta_l: bool = False) -> None:
     """
@@ -1736,13 +1582,6 @@ def prnt_guesses_header(rptwnd: ctk, keyed: bool = False, meta_l: bool = False) 
         cols += ['#0', '#1', '#2']
     rptwnd.verbose_data.insert(tk.END, '\n\n' + '\t'.join(cols))
 
-# def reporting_header_to_window(msg: str, source_list: any, rptwnd: ctk):
-#     rptl = rptwnd.context + " - Outcome Patterns For Guesses From The " + msg + " Words List (" + \
-#            '{0:.0f}'.format(len(source_list)) + ")"
-#     rptwnd.title(rptl)
-#     rptl = "> >  " + rptl + "  < <"
-#     rptwnd.verbose_data.insert(tk.END, rptl)
-
 def reporting_header_to_window(msg: str, source_list: list, rptwnd: ctk) -> None:
     """
     Set the report window title and append the decorated header line.
@@ -1754,47 +1593,6 @@ def reporting_header_to_window(msg: str, source_list: list, rptwnd: ctk) -> None
     title = f"{rptwnd.context} - Outcome Patterns For Guesses From The {msg} Words List ({len(source_list)})"
     rptwnd.title(title)
     rptwnd.verbose_data.insert(tk.END, f"> >  {title}  < <")
-
-# def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, keyed: bool, meta_l=False) -> None:
-#     """
-#     Produces the condensed line by line guess outcome stats
-#     :param l_cond_dict: Dictionary of the guesses and their outcome stats
-#     :param rptwnd: The report window to show this.
-#     :param keyed: Bool to index the guesses into slots where each slot has equal entropy guesses
-#     :param meta_l: Bool flag indicating the left meta key was pressed. The clue type tally is made if
-#     the meta key was pressed.
-#     """
-#     inorder_cond_dict = dict(sorted(l_cond_dict.items(), key=lambda item: item[1][5], reverse=True))
-#     indx = 1
-#     cnt = 0
-#     c_indx_ent = 0
-#     prnt_guesses_header(rptwnd, keyed, meta_l)
-#     for g, s in inorder_cond_dict.items():
-#         (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = s
-#         if keyed:
-#             cnt += 1
-#             if cnt == 1:
-#                 c_indx_ent = ent
-#             if not math.isclose(ent, c_indx_ent):
-#                 indx += 1
-#                 c_indx_ent = ent
-#             rptl = '\n' + str(indx) + \
-#                    '\t' + g + '\t' + str(qty)
-#         else:
-#             rptl = '\n' + g + '\t' + str(qty)
-#         rptl = rptl + \
-#                '\t' + '{0:.3f}'.format(ent) + \
-#                '\t' + str(smallest) + \
-#                '\t' + str(largest) + \
-#                '\t' + '{0:.3f}'.format(average) + \
-#                '\t' + '{0:.2f}'.format(g_xa) + \
-#                '\t' + '{0:.1f}'.format(p2)
-#         if meta_l:
-#             rptl = rptl + \
-#                    '\t' + str(cnt_0) + \
-#                    '\t' + str(cnt_1) + \
-#                    '\t' + str(cnt_2)
-#         rptwnd.verbose_data.insert(tk.END, rptl)
 
 def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, keyed: bool, meta_l: bool = False) -> None:
     """
@@ -1835,31 +1633,6 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, key
 
         rptwnd.verbose_data.insert(tk.END, rptl)
 
-# def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outcomes_dict: dict,
-#                                     rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
-#     (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = outcome_stats
-#     # report in full or condensed format according to cond_prt flag
-#     keyed_if = ''
-#     if keyed_rpt:
-#         keyed_if = guess + '  '
-#     if not cond_rpt:
-#         rptl = '\n\n' + keyed_if + '> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
-#         rptwnd.verbose_data.insert(tk.END, rptl)
-#         rptl = '\n' + keyed_if + '> qty ' + str(qty) + \
-#                ', ent ' + '{0:.3f}'.format(ent) + \
-#                ", sizes: min " + str(smallest) + \
-#                ", max " + str(largest) + \
-#                ', ave ' + '{0:.2f}'.format(average) + \
-#                ', exp ' + '{0:.2f}'.format(g_xa) + \
-#                ', p2 ' + '{0:.1f}'.format(p2)
-#
-#         rptwnd.verbose_data.insert(tk.END, rptl)
-#         rptwnd.verbose_data.insert(tk.END, '\n')
-#         for key in sorted(guess_outcomes_dict):
-#             g = guess_outcomes_dict[key]
-#             rptl = '\n' + keyed_if + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
-#             rptwnd.verbose_data.insert(tk.END, rptl)
-
 def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outcomes_dict: dict,
                                     rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
     (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = outcome_stats
@@ -1891,20 +1664,6 @@ def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
     rptwnd.verbose_data.insert(tk.END, outcomes_stats_summary_line(best_rank_dict))
     rptwnd.verbose_data.see('end')
 
-
-# def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
-#     # stats_summary [0]:qty,[1]:smallest,[2]:largest, [3]:average,
-#     # [4]:population variance, [5]:entropy bits as a tuple
-#     (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa) = outcomes_stat_summary(best_rank_dict)
-#     rptl = ("\n> >  Max ent " + '{0:.3f}'.format(g_ent) +
-#             ", grp qty " + '{0:.0f}'.format(g_qty) +
-#             ", sizes: min " + '{0:.0f}'.format(g_min) +
-#             ", min-max " + '{0:.0f}'.format(g_max) +
-#             ", ave " + '{0:.3f}'.format(g_ave) +
-#             ", exp " + '{0:.2f}'.format(g_xa) +
-#             ", p2 " + '{0:.1f}'.format(g_p2))
-#     return rptl
-
 def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
     """
     Return a formatted summary line of outcome stats across all best-ranked guesses.
@@ -1925,23 +1684,6 @@ def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
 def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk, cond_mode=False):
     rptwnd.verbose_data.insert(tk.END, opt_wrds_for_reporting(best_rank_dict, cond_mode))
 
-
-# def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode=False) -> str:
-#     """
-#     Takes the dictionary of optimal words, which BTW is already sorted by entropy,
-#     and then uses the dictionary keys, ie the words, to build a sentence for printing out
-#     the optimal words list.
-#     @param best_rank_dict: The dictionary of optimal words.
-#     @return: The string used for printing out the optimal word list.
-#     """
-#     wrds = list(best_rank_dict.keys())
-#     rptl = ('\n> >  {0:.0f}'.format(
-#         len(wrds)) + ' optimal. 1st word is highest ent. Any next have the highest outcome qty:' + '\n'
-#             + ', '.join(wrds))
-#     if cond_mode:
-#         rptl += '\n\nSorted by highest ent:'
-#     return rptl
-
 def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode: bool = False) -> str:
     """
     Build a formatted string listing the optimal words for report output.
@@ -1960,30 +1702,6 @@ def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode: bool = False) -> str
     if cond_mode:
         rptl += '\n\nSorted by highest ent:'
     return rptl
-
-
-# def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk):
-#     # stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
-#     # [4]:population variance,[5]:entropy bits as a tuple
-#     stats_summary = outcomes_stat_summary(best_rank_dict)
-#     rptl = '\n> >  Optimal guess stats, each has outcome qty ' + '{0:.0f}'.format(
-#         stats_summary[0]) + ' or is max entropy:'
-#     rptwnd.verbose_data.insert(tk.END, rptl)
-#     for w, s in best_rank_dict.items():
-#         (g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2) = s
-#         rptl = "\n" + w + " - " + \
-#                "qty " + '{0:.0f}'.format(g_qty) + \
-#                ", ent " + '{0:.3f}'.format(g_ent) + \
-#                ", min " + '{0:.0f}'.format(g_min) + \
-#                ", max " + '{0:.0f}'.format(g_max) + \
-#                ", ave " + '{0:.3f}'.format(g_ave) + \
-#                ", exp " + '{0:.2f}'.format(g_xa) + \
-#                ", p2 " + '{0:.1f}'.format(g_p2)
-#
-#         rptwnd.verbose_data.insert(tk.END, rptl)
-#         rptwnd.verbose_data.see('end')
-#     # lock the text widget to prevent user editing
-#     rptwnd.verbose_data.configure(state='disabled')
 
 def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk) -> None:
     """
@@ -2014,7 +1732,6 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
 
     rptwnd.verbose_data.configure(state='disabled')
 
-
 # def valid_mult_ltr(s: str) -> bool:
 #     """
 #     The format requires the letter placed after the number. The mltr_entry_str
@@ -2038,23 +1755,6 @@ def valid_mult_ltr(s: str) -> bool:
     """
     return len(s) == 2 and s[1] in string.ascii_uppercase
 
-
-# def valid_first_mult_number(s: str) -> bool | None:
-#     """
-#     The multiple letter requirement would apply to only
-#     2 or 3 multiple instances for that letter. The format
-#     requires the number placed before the letter.
-#     @param s: True if the first character is a 2 or 3.
-#     """
-#     if len(s) > 0:
-#         if s[0] == '2':
-#             return True
-#         if s[0] == '3':
-#             return True
-#         return None
-#     else:
-#         return False
-
 def valid_first_mult_number(s: str) -> bool:
     """
     Return True if the first character of s is a valid multiplicity number (2 or 3).
@@ -2065,35 +1765,6 @@ def valid_first_mult_number(s: str) -> bool:
     :return: True if s starts with '2' or '3', False otherwise.
     """
     return bool(s) and s[0] in ('2', '3')
-
-
-# def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
-#     """
-#     Most definitely very crude!
-#     Used to conform the user's entry to a specific format.
-#     Validates the multiple letter specification to be in the
-#     correct format <number><letter>,<number><letter>.
-#     @param mltr_entry_str: The multiple letter specification.
-#     @return: The cleaned entries in a comma separated string
-#     """
-#     r = mltr_entry_str
-#     if len(mltr_entry_str) > 0:
-#         if mltr_entry_str[-1] == ',':
-#             return r
-#         elif mltr_entry_str[-1] == ' ':
-#             return r.strip(' ') + ','
-#         else:
-#             my_list = mltr_entry_str.upper().split(",")
-#             valid = []
-#             for s in my_list:
-#                 if len(s) > 0:
-#                     if valid_first_mult_number(s):
-#                         if valid_mult_ltr(s):
-#                             valid.append(s[0] + s[1] + ',')
-#                         else:
-#                             valid.append(s[0])
-#             r = ','.join(valid).replace(',,', ',').strip(',')
-#     return r
 
 def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
     """
@@ -2121,21 +1792,6 @@ def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
 
     return ','.join(valid)
 
-
-# def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: int,
-#                                   offset_h: int, offset_w: int) -> None:
-#     """
-#     Sets desired window size and location on the screen
-#     :param self: tk window
-#     :param this_wnd_height: desired window height
-#     :param this_wnd_width: desired window width
-#     :param offset_w: left to right offset
-#     :param offset_h: up down offset
-#     """
-#     pos_x = int((self.winfo_screenwidth() - this_wnd_width) / 2) + offset_w
-#     pos_y = int((self.winfo_screenheight() - this_wnd_height) / 2) + offset_h
-#     self.geometry("{}x{}+{}+{}".format(this_wnd_width, this_wnd_height, pos_x, pos_y))
-
 def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: int,
                                   offset_h: int, offset_w: int) -> None:
     """
@@ -2150,19 +1806,6 @@ def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: in
     pos_y = (self.winfo_screenheight() - this_wnd_height) // 2 + offset_h
     self.geometry(f"{this_wnd_width}x{this_wnd_height}+{pos_x}+{pos_y}")
 
-# def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> dict:
-#     """
-#     Returns hard mode guess words from a dictionary of guess words that comply with
-#     hard mode for green clues as a regex string and yellow clue letters in a list.
-#     :param default_guesses: dictionary of guess words
-#     :param req_pat: green clues a regex string
-#     :param req_ltrs: yellow clues as a list of letters
-#     :return: hard mode words dictionary
-#     """
-#     return dict(filter(lambda x: (hard_mode_func_grn(x, req_pat)
-#                                   and hard_mode_func_yel(x, req_ltrs)),
-#                        default_guesses.items()))
-
 def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> dict:
     """
     Filter guess words to those complying with hard mode green and yellow clue constraints.
@@ -2176,22 +1819,6 @@ def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> di
     return {w: v for w, v in default_guesses.items()
             if hard_mode_func_grn((w, v), req_pat) and hard_mode_func_yel((w, v), req_ltrs)}
 
-
-# def hard_mode_func_grn(pair: tuple, req_pat: str) -> bool:
-#     """
-#     A function used in a regex filter.
-#     Given a guess word dictionary tuple and a required green letter pattern,
-#     returns true if key word matches to green letter pattern.
-#     :param pair: dictionary key word and its value
-#     :param req_pat: regex green clue pattern
-#     :return: True or False
-#     """
-#     key, value = pair
-#     if re.match(req_pat, key):
-#         return True
-#     else:
-#         return False
-
 def hard_mode_func_grn(pair: tuple, req_pat: str) -> bool:
     """
     Return True if the word (key) in pair matches the required green letter pattern.
@@ -2203,25 +1830,6 @@ def hard_mode_func_grn(pair: tuple, req_pat: str) -> bool:
     key, _ = pair
     return bool(re.match(req_pat, key))
 
-
-
-
-# def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
-#     """
-#     A function used in a regex filter.
-#     Given a guess word dictionary tuple and a required yellow letters list,
-#     returns true if key word contains all the yellow letters.
-#     :param pair: dictionary key word and its value
-#     :param req_ltrs: yellow letters as a list
-#     :return: True or False
-#     """
-#     key, value = pair
-#     # return False if anyone fails
-#     for l in req_ltrs:
-#         if not re.findall(l, key):
-#             return False
-#     return True
-
 def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
     """
     Return True if the word (key) in pair contains all required yellow letters.
@@ -2232,29 +1840,6 @@ def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
     """
     key, _ = pair
     return all(ltr in key for ltr in req_ltrs)
-
-
-
-# def make_lpc_list_dict(wrds) -> dict[str, list]:
-#     """
-#     Given a word list
-#     records a letter position dictionary for found letters.
-#     :param wrds: a words list (assumed to be 5 letter words)
-#     """
-#     this_dict: dict[str, list] = {}
-#     # tally up the letter position counts for the wrd in the wrds
-#     for wrd in wrds:
-#         slice_s = 0
-#         for lt in wrd:
-#             # Add the letter to letter position dictionary if not
-#             # already there.
-#             if not lt in this_dict:
-#                 this_dict.update({lt: [0, 0, 0, 0, 0]})
-#             ind = wrd.index(lt, slice_s)
-#             lpc_list = this_dict[lt]
-#             lpc_list[ind] = lpc_list[ind] + 1
-#             slice_s = slice_s + 1
-#     return this_dict
 
 def make_lpc_list_dict(wrds: list) -> dict[str, list]:
     """
@@ -2272,70 +1857,6 @@ def make_lpc_list_dict(wrds: list) -> dict[str, list]:
             lpc_dict.setdefault(lt, [0, 0, 0, 0, 0])
             lpc_dict[lt][i] += 1
     return lpc_dict
-
-
-# def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
-#     """
-#
-#     :rtype: dict[str, list]
-#     """
-#     # Fill the count list dictionary according to the wrds list
-#     lpc_list_dict = make_lpc_list_dict(wrds)
-#
-#     # Develop the position hierarchy for each letter. This is in which position number
-#     # is a letter most common followed the lesser occurring position numbers.
-#     for l, lpc_list in lpc_list_dict.items():
-#         pos_hierarchy_dict: dict[int, list]
-#         pos_hierarchy_dict = {}
-#         # Skipping any letter that did not have an occurrence. Any sum means
-#         # the letter occurred somewhere in a word.
-#         if sum(lpc_list):
-#             # Copy the lpc_list and sort its contents from
-#             # high to low. That is the hierarchy for the counts.
-#             sorted_lpc_list = lpc_list.copy()
-#             sorted_lpc_list.sort(reverse=True)
-#             # Using a set to hold the position numbers. Sometimes a letter will have the same
-#             # count at more than one position. A set is used for holding multiple numbers and
-#             # cannot hold duplicate entries. That property is used to handle the same count
-#             # occurring at more than one position.
-#             cnt_set = set()
-#             # lpc_list is letter count at letter position. sorted_lpc_list is that
-#             # list in order of large to small.
-#             # Looping through the sorted high to low.
-#             for i in range(5):
-#                 # Get the count. We need to find where that count number is in the
-#                 # lpc_list. Sometimes a letter will have the same count in more than
-#                 # one position.
-#                 ltr_qty_at_pos = sorted_lpc_list[i]
-#                 # Skip any position having zero count.
-#                 if not ltr_qty_at_pos:
-#                     break
-#                 # start_idx is a slicing point. It is used for two reasons. One is to
-#                 # stop the while loop when the count sum is zero for any remaining positions.
-#                 # The second reason is for limiting the search for the count number to
-#                 # start beyond the found index.
-#                 start_idx = 0
-#                 while sum(lpc_list[start_idx:]):
-#                     try:
-#                         # Using index to find where the count number occurs in the unsorted
-#                         # counts list.
-#                         pos_for_ltr_qty_at_pos = lpc_list.index(ltr_qty_at_pos, start_idx)
-#                         # record pos_for_ltr_qty_at_pos only once for the letter
-#                         if pos_for_ltr_qty_at_pos not in cnt_set:
-#                             cnt_set.add(pos_for_ltr_qty_at_pos)
-#                             if i in pos_hierarchy_dict:
-#                                 pos_hierarchy_dict[i].append(pos_for_ltr_qty_at_pos + 1)
-#                             else:
-#                                 pos_hierarchy_dict[i] = [pos_for_ltr_qty_at_pos + 1]
-#                         start_idx = pos_for_ltr_qty_at_pos + 1
-#                     except ValueError:
-#                         start_idx = start_idx + 1
-#                         pass
-#             # Only the pos_hierarchy_dict values are needed.
-#             lpc_list.insert(len(lpc_list), list(pos_hierarchy_dict.values()))
-#     return lpc_list_dict
-
-
 
 def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
     """
@@ -2372,22 +1893,6 @@ def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
 
     return lpc_list_dict
 
-
-
-# def rpt_ltr_use(gen_tally: list, the_word_list: list ):
-#     datawnd = RptWnd("Data")
-#     datawnd.title("Wordle Helper - Letter Use Details")
-#     gen_tally_dict = dict_gen_tally(gen_tally, len(the_word_list))
-#     use_details_dict = dict_ltr_frq_data_for_words_list(the_word_list)
-#     rptl = f"----- Letter use details for the {len(the_word_list)} words -----\n"
-#     datawnd.verbose_data.insert(tk.END, rptl)
-#     rptl = "- Letter, % having, position counts, [position hierarchy] -\n"
-#     datawnd.verbose_data.insert(tk.END, rptl)
-#     for ltr, lper in gen_tally_dict.items():
-#         temp = str(use_details_dict[ltr]).replace(']]]', ']').replace('[[', '[')
-#         use_details = temp[-(len(temp)-1):]
-#         rptl = f"{ltr.upper()}, {round(lper, 2):.2f}, {use_details}\n"
-#         datawnd.verbose_data.insert(tk.END, rptl)
 
 def rpt_ltr_use(gen_tally: list, the_word_list: list) -> None:
     """
@@ -2695,242 +2200,238 @@ class CustomText(tk.Text):
     def remove_tag(self, tag):
         self.tag_remove(tag, "1.0", "end")
 
+
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
                           regexp=True, remove_priors=True, do_scroll=True, mode=0) -> int:
-        """Apply the given tag to all text that matches the given pattern
-        If 'regexp' is set to True, pattern will be treated as a regular
-        expression according to Tcl's regular expression syntax.
-        mode=1 finds only first match
-        :param pattern: text to find, can be regex expression
-        :param tag: highlight color tag
-        :param start: start position
-        :param end: end position
-        :param regexp: use regex
-        :param remove_priors:  remove all prior highlighting
-        :param do_scroll: scroll text as it is found
-        :param mode: 0=scroll every, 1=scroll only to first found
+        """Apply the given tag to all text that matches the given pattern.
+        If 'regexp' is True, pattern is treated as a Tcl regular expression.
+
+        :param pattern:       Text or regex to find.
+        :param tag:           Highlight colour tag to apply.
+        :param start:         Search start position (default "1.0").
+        :param end:           Search end position (default "end").
+        :param regexp:        Use regex matching.
+        :param remove_priors: Remove all prior highlighting for this tag first.
+        :param do_scroll:     Scroll to each found occurrence during search;
+                              always scrolls to first match when done.
+        :param mode:          0 = find all; 1 = find first match only.
+        :return:              Number of matches found.
         """
         if remove_priors:
             self.remove_tag(tag)
-        start = self.index(start)
-        end = self.index(end)
-        self.mark_set("matchStart", start)
-        self.mark_set("matchEnd", start)
-        self.mark_set("searchLimit", end)
-        is_first_pass = True
-        not_found = False
-        first_index = ""
+
+        if not pattern:
+            return 0
+
+        self.mark_set("matchStart", self.index(start))
+        self.mark_set("matchEnd",   self.index(start))
+        self.mark_set("searchLimit", self.index(end))
+
         count = tk.IntVar()
+        first_index = ""
         fnd_cnt = 0
+
         while True:
             try:
                 index = self.search(pattern, "matchEnd", "searchLimit",
                                     count=count, regexp=regexp)
-                if index == "":
-                    # text not found
-                    if is_first_pass:
-                        # if first pass then text cannot be found
-                        # so set not_found flag
-                        not_found = True
-                    # stop searching
-                    break
-                else:
-                    # text was found
-                    fnd_cnt += 1
-                    if first_index == "":
-                        # text found must be the first found
-                        # save first found index so that it can be scrolled
-                        # to instead of scrolling to the last found.
-                        first_index = index
-                        # no longer in first pass
-                        is_first_pass = False
-                if count.get() == 0:
-                    break  # degenerate pattern which matches zero-length strings
-                self.mark_set("matchStart", index)
-                self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.tag_add(tag, "matchStart", "matchEnd")
-                if do_scroll:
-                    self.see(index)  # scroll widget to show the index's line
-
-                if mode == 1:
-                    # Only the first match is sought. This is specifically
-                    # used to return to the Outcome Summary text.
-                    break
-
-                if not_found:
-                    if pattern.find("^") == -1:
-                        msg = (f"Did not find \"{pattern}\"."
-                               f"\n\nThe word that was searched is not in the vocabulary that was used for guesses."
-                               f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary.")
-                    else:
-                        msg = (f"Did not find \"{pattern}\"."
-                               f"\n\n\"Find\" in the non-condensed format verbose mode includes \"for: \" in the search "
-                               f"text because the main use is to find the outcomes for a particular word. Adding the "
-                               f"\"for: \" does this because the outcome header uniquely includes \"for: \"."
-                               f"\n\n\"Find\" operates a regex search on the entire text."
-                               f" Putting \"^\", which means \"starting with\", works in the unkeyed condensed report "
-                               f"because each line starts with the guess word and it is the guess word that is usually "
-                               f"what one searches for.")
-                    messagebox.showinfo(title=None, message=msg)
-                else:
-                    self.see(first_index)
             except Exception as e:
-                msg = f"Regex error: \"{e}\"."
-                messagebox.showinfo(title=None, message=msg)
+                messagebox.showinfo(title=None, message=f'Regex error: "{e}".')
                 break
+
+            if index == "":
+                break  # no (more) matches
+
+            if count.get() == 0:
+                break  # degenerate pattern that matches zero-length strings
+
+            fnd_cnt += 1
+            if first_index == "":
+                first_index = index
+
+            self.mark_set("matchStart", index)
+            self.mark_set("matchEnd", f"{index}+{count.get()}c")
+            self.tag_add(tag, "matchStart", "matchEnd")
+
+            if do_scroll:
+                self.see(index)
+
+            if mode == 1:
+                break  # caller only wants the first match
+
+        # Post-loop: report outcome once, then settle on first match.
+        if fnd_cnt == 0:
+            if "^" not in pattern:
+                msg = (
+                    f'Did not find "{pattern}".'
+                    f"\n\nThe word that was searched is not in the vocabulary that was used for guesses."
+                    f"\n\nIs Hard Mode selected? Hard Mode excludes guesses from the vocabulary."
+                )
+            else:
+                msg = (
+                    f'Did not find "{pattern}".'
+                    f'\n\n"Find" in the non-condensed format verbose mode includes "for: " in the search '
+                    f"text because the main use is to find the outcomes for a particular word. Adding the "
+                    f'"for: " does this because the outcome header uniquely includes "for: ".'
+                    f'\n\n"Find" operates a regex search on the entire text.'
+                    f' Putting "^", which means "starting with", works in the unkeyed condensed report '
+                    f"because each line starts with the guess word and it is the guess word that is usually "
+                    f"what one searches for."
+                )
+            messagebox.showinfo(title=None, message=msg)
+        elif first_index:
+            self.see(first_index)  # settle view on first match, not last
+
         return fnd_cnt
 
 
 class RptWnd(ctk.CTkToplevel):
-    """
-    The verbose information window
-    """
+    """Verbose information window."""
+
+    _TAG = 'opt'
+    _DEFAULT_SEARCH = 'for: '
 
     def clear_msg1(self) -> None:
         self.verbose_data.configure(state='normal')
         self.verbose_data.delete(1.0, tk.END)
         self.verbose_data.configure(state='disabled')
+        self._reset_next_button()
 
     def close_rpt(self) -> None:
         self.destroy()
 
-    def search_for_text(self):
-        self.find_the_text()
-
-    def entry_release_return(self, event):
-        self.find_the_text()
-
-    def find_the_text(self):
+    def find_the_text(self, _event=None) -> None:
+        regex = self.search_text.get().strip()
         org_title = self.title()
-        find_text = ''
-        regex: find_text = self.search_text.get().strip()
-        self.title(f"> > Busy on \"{regex}\", Please Wait < <")
+        self.title(f'> > Busy on "{regex}", Please Wait < <')
         self.update()
+
         if len(regex) > 4:
-            fnd_cnt = self.verbose_data.highlight_pattern(regex, 'opt', remove_priors=True, mode=0)
-            # TO DO finish this
-            # msg = f"Found {str(fnd_cnt)} instances of \"{regex}\"."
-            # messagebox.showinfo(title=None, message=msg)
+            self._run_search(regex)
         else:
-            msg = (f"Find \"{regex}\"?\n\nIn a verbose report one usually searches for a five letter guess word"
-                   f" preceded by \"for:\", which is then very quickly highlighted.\n\nThe same, but without \"for:\","
-                   f" is typically how one searches in the condensed verbose report.\n\nFind can accept any text, "
-                   f"including a regex"
-                   f" pattern. A regex pattern can do most of the work required to find hard mode candidates in the "
-                   f"condensed"
-                   f" list.\n\nFor example, \"^.t..p\" would indicate words where t and p are at those positions. The "
-                   f"\"^\" is important. The \"^\" indicates the next character \".\", which means any character, "
-                   f"must be at the text line beginning. Thus five letter words and not parts of larger words are "
-                   f"highlighted. It is best to not have the condensed report keyed."
-                   f"\n\nThe \"|\" character allows for multiple search criteria. For example, \"^..c..|^.ed..|^....h\""
-                   f" finds words matching any one of those three patterns."
-                   f"\n\nThe time it takes to highlight the search depends on the amount of text to search and the "
-                   f"number of items to be highlighted. The report scrolls to the first found instance.")
+            msg = (
+                f'Find "{regex}"?\n\nIn a verbose report one usually searches for a five letter guess word'
+                f' preceded by "for:", which is then very quickly highlighted.\n\nThe same, but without "for:",'
+                f' is typically how one searches in the condensed verbose report.\n\nFind can accept any text, '
+                f'including a regex pattern. A regex pattern can do most of the work required to find hard mode '
+                f'candidates in the condensed list.\n\nFor example, "^.t..p" would indicate words where t and p '
+                f'are at those positions. The "^" is important. The "^" indicates the next character ".", which '
+                f'means any character, must be at the text line beginning. Thus five letter words and not parts '
+                f'of larger words are highlighted. It is best to not have the condensed report keyed.'
+                f'\n\nThe "|" character allows for multiple search criteria. For example, "^..c..|^.ed..|^....h"'
+                f' finds words matching any one of those three patterns.'
+                f'\n\nThe time it takes to highlight the search depends on the amount of text to search and the '
+                f'number of items to be highlighted. The report scrolls to the first found instance.'
+            )
             if messagebox.askokcancel(title=None, message=msg):
-                if len(regex) > 0 and regex != "for:":
-                    fnd_cnt = self.verbose_data.highlight_pattern(regex, 'opt', remove_priors=True, mode=0)
-                    # TO DO finish this
-                    # msg = f"Found {str(fnd_cnt)} instances of \"{regex}\"."
-                    # messagebox.showinfo(title=None, message=msg)
+                if regex and regex != self._DEFAULT_SEARCH.strip():
+                    self._run_search(regex)
+
         self.title(org_title)
         self.update()
 
-    def back_to_summary(self):
-        """
-        Scrolls the window to the part that says 'Outcome summary'. It does
-        this by highlighting the text, which causes the scroll, and then removes
-        the highlight pattern.
-        """
-        search_text = ''
-        regex: search_text = 'Outcome summary'
-        self.verbose_data.highlight_pattern(regex, 'opt', remove_priors=True, mode=1)
-        self.verbose_data.remove_tag('opt')
+    def _run_search(self, regex: str) -> None:
+        fnd_cnt = self.verbose_data.highlight_pattern(
+            regex, self._TAG, remove_priors=True, mode=0)
+
+        # Collect match start positions from tag ranges without a second search pass.
+        ranges = self.verbose_data.tag_ranges(self._TAG)
+        self._match_positions = [str(ranges[i]) for i in range(0, len(ranges), 2)]
+        self._match_index = 0
+
+        if fnd_cnt > 1:
+            self._button_next.configure(state='normal', text=f'Next  1/{fnd_cnt}')
+        else:
+            self._reset_next_button()
+
+    def next_match(self) -> None:
+        if not self._match_positions:
+            return
+        self._match_index = (self._match_index + 1) % len(self._match_positions)
+        self.verbose_data.see(self._match_positions[self._match_index])
+        n = len(self._match_positions)
+        self._button_next.configure(text=f'Next  {self._match_index + 1}/{n}')
+
+    def _reset_next_button(self) -> None:
+        self._match_positions = []
+        self._match_index = 0
+        if hasattr(self, '_button_next'):
+            self._button_next.configure(state='disabled', text='Next')
+
+    def back_to_summary(self) -> None:
+        """Scroll to 'Outcome summary' by highlighting it briefly, then remove the highlight."""
+        self.verbose_data.highlight_pattern(
+            'Outcome summary', self._TAG, remove_priors=True, mode=1)
+        self.verbose_data.remove_tag(self._TAG)
+        self._reset_next_button()
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
-            self.rpt_grpsdriller_window = (
-                outcomedrilling.OutcmsDrillingMain())  # create window if its None or destroyed
+            self.rpt_grpsdriller_window = outcomedrilling.OutcmsDrillingMain()
         else:
-            self.rpt_grpsdriller_window.focus()  # if window exists focus it
+            self.rpt_grpsdriller_window.focus()
 
-    def __init__(self, context=''):
+    def __init__(self, context: str = '') -> None:
         super().__init__()
         self.context = context
         self.resizable(width=True, height=True)
-        size_and_position_this_window(self, 790, 600, 0, 0)
 
-        verbose_font_tuple_n = ("Helvetica", 14, "normal")
-        self.option_add("*Font", verbose_font_tuple_n)
+        is_data = (context == 'Data')
+        size_and_position_this_window(self, 600 if is_data else 790,
+                                           440 if is_data else 600, 0, 0)
 
-        self.search_text = tk.StringVar()
-        self.search_text.set('for: ')
+        self.option_add('*Font', ('Helvetica', 14, 'normal'))
+        self.search_text = tk.StringVar(value=self._DEFAULT_SEARCH)
         self.rpt_grpsdriller_window = None
+        self._match_positions: list = []
+        self._match_index: int = 0
 
-        self.verbose_info_frame = ctk.CTkFrame(self,
-                                               corner_radius=10
-                                               )
-        self.verbose_info_frame.pack(fill='both',
-                                     padx=2,
-                                     pady=0,
-                                     expand=True
-                                     )
-        self.verbose_info_frame.grid_columnconfigure(0, weight=1)  # non-zero weight allows grid to expand
-        self.verbose_info_frame.grid_rowconfigure(0, weight=1)  # non-zero weight allows grid to expand
+        self.verbose_info_frame = ctk.CTkFrame(self, corner_radius=10)
+        self.verbose_info_frame.pack(fill='both', padx=2, pady=0, expand=True)
+        self.verbose_info_frame.grid_columnconfigure(0, weight=1)
+        self.verbose_info_frame.grid_rowconfigure(0, weight=1)
 
-        self.verbose_data = CustomText(self.verbose_info_frame,
-                                       wrap='word',
-                                       font=("Courier", 12, "normal"),
-                                       padx=6,
-                                       pady=6,
-                                       background='#dedede',
-                                       borderwidth=0,
-                                       highlightthickness=0
-                                       )
+        self.verbose_data = CustomText(
+            self.verbose_info_frame,
+            wrap='word',
+            font=('Courier', 12, 'normal'),
+            padx=6, pady=6,
+            background='#dedede',
+            borderwidth=0,
+            highlightthickness=0,
+        )
         self.verbose_data.grid(row=0, column=0, padx=6, pady=0, sticky='nsew')
-        self.verbose_data.tag_configure('opt', background='#ffd700')
-        # scrollbar for rpt
+        self.verbose_data.tag_configure(self._TAG, background='#ffd700')
+
         verbose_rpt_sb = ttk.Scrollbar(self.verbose_info_frame, orient='vertical')
         verbose_rpt_sb.grid(row=0, column=1, sticky='ens')
-
         self.verbose_data.config(yscrollcommand=verbose_rpt_sb.set)
         verbose_rpt_sb.config(command=self.verbose_data.yview)
 
-        button_q = ctk.CTkButton(self, text="Close",
-                                 text_color="black",
-                                 width=100,
-                                 command=self.close_rpt)
-        button_q.pack(side="right", padx=10, pady=10)
-        self.protocol("WM_DELETE_WINDOW", self.close_rpt)  # assign to closing button [X]
+        button_q = ctk.CTkButton(self, text='Close', text_color='black',
+                                 width=100, command=self.close_rpt)
+        button_q.pack(side='right', padx=10, pady=10)
+        self.protocol('WM_DELETE_WINDOW', self.close_rpt)
 
-        entry_find = ctk.CTkEntry(self,
-                                  textvariable=self.search_text
-                                  )
-        entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=True, fill=tk.X)
-        entry_find.bind('<KeyRelease-Return>', self.entry_release_return)
+        if not is_data:
+            entry_find = ctk.CTkEntry(self, textvariable=self.search_text)
+            entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=True, fill=tk.X)
+            entry_find.bind('<KeyRelease-Return>', self.find_the_text)
 
-        button_f = ctk.CTkButton(self, text="Find",
-                                 text_color="black",
-                                 command=self.search_for_text
-                                 )
-        button_f.pack(side=tk.LEFT, padx=0, pady=10)
+            ctk.CTkButton(self, text='Find', text_color='black', width=110,
+                          command=self.find_the_text).pack(side=tk.LEFT, padx=4, pady=10)
 
-        button_b = ctk.CTkButton(self, text="Summary",
-                                 text_color="black",
-                                 command=self.back_to_summary
-                                 )
-        button_b.pack(side=tk.LEFT, padx=10, pady=10)
+            # Created and packed here to fix its position between Find and Summary;
+            # starts disabled and is enabled only when a search yields more than one match.
+            self._button_next = ctk.CTkButton(self, text='Next', text_color='black', width=110,
+                                              state='disabled', command=self.next_match)
+            self._button_next.pack(side=tk.LEFT, padx=4, pady=10)
 
-        button_drill = ctk.CTkButton(self, text="Outcome Driller",
-                                     text_color="black",
-                                     command=self.rpt_show_grps_driller)
-        button_drill.pack(side=tk.LEFT, padx=4, pady=3)
+            ctk.CTkButton(self, text='Summary', text_color='black',
+                          command=self.back_to_summary).pack(side=tk.LEFT, padx=4, pady=10)
 
-        if self.context=="Data":
-            button_drill.pack_forget()
-            button_b.pack_forget()
-            button_f.pack_forget()
-            entry_find.pack_forget()
-            size_and_position_this_window(self, 600, 440, 0, 0)
+            ctk.CTkButton(self, text='Outcome Driller', text_color='black',
+                          command=self.rpt_show_grps_driller).pack(side=tk.LEFT, padx=4, pady=10)
 
 
 
