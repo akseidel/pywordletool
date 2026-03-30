@@ -297,7 +297,7 @@ class Pywordlemainwindow(ctk.CTk):
 
             # needed to show the last user entry in title_context with the sanity question.
             self.update()
-            if hlp.wrd_has_duplicates(req_pat) and (not self.allow_dup_state.get()):
+            if hlp.word_has_duplicates(req_pat) and (not self.allow_dup_state.get()):
                 sanity_question(self.entry_spec_pattern)
 
             if self.sp_pat_mode_var.get() == 1:
@@ -365,7 +365,7 @@ class Pywordlemainwindow(ctk.CTk):
             # Not classic marking
             if self.sel_not_classic and (n_items > 0):
                 wrds_showing: list = list(the_word_list.keys())
-                classic_wrds = hlp.get_classic_wordlist(
+                classic_wrds = hlp.get_wordlist(
                     hlp.get_word_list_path_name(data_path + classic_pos_sol_wrd_list, False))
                 bot_added_wrds = list(set(wrds_showing) - set(classic_wrds))
                 regex: str = hlp.regex_maxgenrankers(bot_added_wrds, the_word_list)
@@ -915,7 +915,7 @@ class Pywordlemainwindow(ctk.CTk):
         # Coordinate duplicates in special pattern with no dup setting
         def coordinate_special_pattern_dups() -> None:
             self.update()
-            if hlp.wrd_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
+            if hlp.word_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
                 sanity_question(self.entry_spec_pattern)
 
         def sanity_question(entry: ttk.Entry) -> None:
