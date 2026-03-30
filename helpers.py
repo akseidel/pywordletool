@@ -1,10 +1,7 @@
 # ----------------------------------------------------------------
 # helpers akseidel 5/2022
 # ----------------------------------------------------------------
-import string
-from string import ascii_lowercase
-from subprocess import Popen, PIPE
-import sys
+import math
 import os
 import random
 import re
@@ -21,9 +18,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 
 import outcomedrilling
-from fmwm import debug_mode
-from logging import exception
-from itertools import groupby
+# from fmwm import debug_mode
 
 
 
@@ -153,20 +148,6 @@ def wrd_rank(wrd: str, ltr_rank_dict: dict, method: int) -> float:
     return 0
 
 
-# def word_has_duplicates(wrd) -> bool:
-#     """
-#     Checks is a word has duplicate letters.
-#     This function is also used for the special pattern
-#     where '.' is allowed. These would not be duplicates.
-#     @param wrd: word in question
-#     @return: true=has duplicate letters, false=no duplicate letters
-#     """
-#     ltr_d = {}
-#     wrd = wrd.replace('.', '')
-#     wrd = wrd.replace(' ', '')
-#     for ltr in wrd:
-#         ltr_d[ltr] = ltr
-#     return len(ltr_d) < len(wrd)
 
 def word_has_duplicates(word: str) -> bool:
     """
@@ -299,49 +280,6 @@ def print_word_list_col_format(word_list: dict, n_col: int) -> None:
         print(col_sep.join(f"{word} : {rank}" for word, rank in row_items))
 
 
-# def make_ranked_filtered_result_dictionary(wrds: list, ltr_rank_dict: dict, allow_dups: bool,
-#                                            rank_mode: int, no_ordr: bool, no_rank=False) -> dict:
-#     """
-#     Ranking and filtering the words into a dictionary.
-#     @param wrds: The filtered words list
-#     @param ltr_rank_dict: Letter ranking dictionary
-#     @param allow_dups:  Allows duplicate letters bool
-#     @param rank_mode: Letter ranking mode to use
-#     @param no_ordr: Omit ordering bool
-#     @param no_rank: Omit ranking bool
-#     @return: dictionary sorted by the word rank
-#     """
-#     wrds_dict = {}
-#     for w in wrds:
-#         # currently, the wrd_rank function can handle only 5-letter words
-#         # if len(w) == 5:
-#         if len(w) == 0:
-#             print("len 0")
-#         if allow_dups:
-#             # every word goes into the dictionary
-#             if not no_rank:
-#                 wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
-#             else:
-#                 # no ranking for speed since pick will be random
-#                 wrds_dict[w] = '000'
-#         else:
-#             # only words having no duplicates goes into the dictionary
-#             if not word_has_duplicates(w):
-#                 if not no_rank:
-#                     wrds_dict[w] = "{:05.1f}".format(wrd_rank(w, ltr_rank_dict, rank_mode))
-#                 else:
-#                     # no ranking for speed since pick will be random
-#                     wrds_dict[w] = '000'
-#
-#     # sorting the ranked word list into a dictionary
-#     if not no_rank:
-#         if no_ordr:
-#             return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[0]))
-#         else:
-#             return dict(sorted(wrds_dict.items(), reverse=False, key=lambda x: x[1]))
-#     else:
-#         return wrds_dict
-
 def make_ranked_filtered_result_dictionary(
     words: list,
     ltr_rank_dict: dict,
@@ -377,14 +315,6 @@ def make_ranked_filtered_result_dictionary(
     return dict(sorted(words_dict.items(), key=sort_key))
 
 
-# def get_results_word_list(this_sh_cmd_lst) -> list:
-#     """
-#     Returns the result for the grep command list.
-#     @param this_sh_cmd_lst: the grep stack of command list
-#     @return: Returns the list of words that pass the grep command list
-#     """
-#     with Popen(this_sh_cmd_lst.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
-#         return list(map(lambda i: i[: -1], proc.stdout.readlines()))
 
 def get_results_word_list(shell_cmd) -> list:
     """
@@ -396,51 +326,9 @@ def get_results_word_list(shell_cmd) -> list:
     with Popen(shell_cmd.full_cmd(), shell=True, stdout=PIPE, text=True) as proc:
         return [line.rstrip('\n') for line in proc.stdout]
 
-# def get_pu_wordlist(full_path_name) -> list:
-#     pu_wrds = []
-#     if os.path.exists(full_path_name):
-#         with open(full_path_name, 'r') as file:
-#             for line in file:
-#                 pu_wrds.append(line.split(',', 1)[0].lower())
-#     return pu_wrds
-# def get_pu_wordlist(full_path_name: str) -> list:
-#     """
-#     Read a word list from a CSV-style file, returning the first field of each line.
-#
-#     :param full_path_name: Path to the word list file.
-#     :return: List of lowercase words, or an empty list if the file does not exist.
-#     """
-#     if not os.path.exists(full_path_name):
-#         return []
-#     with open(full_path_name, 'r') as file:
-#         return [
-#             line.split(',', 1)[0].strip().lower()
-#             for line in file
-#             if line.strip()
-#         ]
 
-# def get_classic_wordlist(full_path_name) -> list:
-#     classic_wrds = []
-#     if os.path.exists(full_path_name):
-#         with open(full_path_name, 'r') as file:
-#             for line in file:
-#                 classic_wrds.append(line.split(',', 1)[0].lower().rstrip())
-#     return classic_wrds
-# def get_classic_wordlist(full_path_name: str) -> list:
-#     """
-#     Read a classic word list from a CSV-style file, returning the first field of each line.
-#
-#     :param full_path_name: Path to the word list file.
-#     :return: List of lowercase words, or an empty list if the file does not exist.
-#     """
-#     if not os.path.exists(full_path_name):
-#         return []
-#     with open(full_path_name, 'r') as file:
-#         return [
-#             line.split(',', 1)[0].strip().lower()
-#             for line in file
-#             if line.strip()
-#         ]
+
+
 
 def get_wordlist(full_path_name: str) -> list:
     """
@@ -458,19 +346,7 @@ def get_wordlist(full_path_name: str) -> list:
             if line.strip()
         ]
 
-# def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
-#     """
-#     Culls the p_wrds list from the s_wrds list. Intended
-#     for removing the previously used words from the
-#     possible solutions word list.
-#     :param s_wrds: total solutions wordlist
-#     :param p_wrds:  previously used wordlist
-#     """
-#     for w in p_wrds:
-#         try:
-#             s_wrds.remove(w)
-#         except ValueError:
-#             pass
+
 def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
     """
     Culls the p_wrds list from the s_wrds list. Intended
@@ -548,36 +424,8 @@ def get_gencode(word: str) -> list:
     :param word: The word to encode.
     :return: 28-element list encoding letter presence, duplicate count, and rank.
     """
-    gencode = gc_z.copy()
-    dups = 0
-    for ltr in word:
-        idx = ord(ltr) - ord('a')
-        if gencode[idx] > 0:
-            dups += 1
-        gencode[idx] = 1
-    gencode[26] = dups
-    return gencode
 
 
-# def get_gendict_tally(gendict: dict[str, list]) -> list:
-#     """
-#     returns genetic letter tally list for a gendictionary, (dict[str, list])
-#     this list is 26 members where each member corresponds to the count for
-#     that letter position idx 0-25 where idx 0=a and idx 25=z
-#     @param gendict:
-#     @return:
-#     """
-#     gen_tally = []
-#     for x in range(26):
-#         gen_tally.append(0)
-#     # loop through each gencode values list
-#     for gencode in gendict.values():
-#         # looking at just the list's a...z letter presence value,
-#         # add them up
-#         for idx in range(26):
-#             if gencode[idx] > 0:
-#                 gen_tally[idx] = gen_tally[idx] + gencode[idx]
-#     return gen_tally
 
 def get_gendict_tally(gendict: dict[str, list]) -> list:
     """
@@ -626,28 +474,6 @@ def dict_gen_tally(gt: list, cnt: int) -> dict[str, float]:
             lf_dict[chr(ord('a') + i)] = tally / cnt
     return dict(sorted(lf_dict.items(), key=lambda item: item[1], reverse=True))
 
-# def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
-#     """
-#     Places the product sums of gendict values and the gen_tally vector. This value is
-#     the genetic rank for the gendict words (the keys). The genetic rank is injected into
-#     the gendict value vector as the 27th item of the 1 x 27 value vector. The maximum
-#     genetic rank calculated is the integer being returned.
-#     @param gendict: dictionary of words (keys) with values being 1 x 27 letter count vectors
-#     @param gen_tally: 1 x 26 vector of letter tallies
-#     @return: maximum genetic rank seen as integer
-#     """
-#     maxrank = 0
-#     for w, g in gendict.items():
-#         gr = 0
-#         for idx in range(26):
-#             gr = gr + g[idx] * gen_tally[idx]
-#         gr = gr + g[26]
-#         new_g = g
-#         new_g[27] = gr
-#         if gr > maxrank:
-#             maxrank = gr
-#         gendict.update({w: new_g})
-#     return maxrank
 
 def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
     """
@@ -933,48 +759,6 @@ def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_d
     if multi_code:
         build_multi_code_grep(wordle_tool_cmd_lst, multi_code)
 
-# def get_genpattern(subject_word: str, target_word: str) -> str:
-#     """
-#     Return a subject word's genetic pattern against a target guess word
-#     example:heavy against leash is the string 12200 pattern
-#     @param subject_word: The word to check against the guess word.
-#     @param target_word: The guess word
-#     @return: String pattern representing each digit in the subject word where
-#     0 = letter not present, 1 = letter present but not this position and
-#     2 = letter present at correct position
-#     """
-#     ltr_pos = [0, 1, 2, 3, 4]
-#     genpat = '00000'
-#
-#     # dictionary of subject sltr instances in target. sltr is key, value is sltr positions
-#     subj_in_target_dict = {}
-#     for sltr in subject_word:
-#         subj_in_target = ([pos for pos, char in enumerate(target_word) if char == sltr])
-#         if subj_in_target:
-#             subj_in_target_dict[sltr] = subj_in_target
-#
-#     rec_pos = ltr_pos.copy()
-#     # first find all ltr matches, mark as 2s and remove their positions
-#     # from rec_pos and the subject_in_target dictionary
-#     for slp in ltr_pos:
-#         sl = subject_word[slp]
-#         if subject_word[slp] == target_word[slp]:
-#             genpat = genpat[:slp] + '2' + genpat[slp + 1:]
-#             rec_pos.remove(slp)
-#             subj_in_target_dict[sl].remove(slp)
-#             if not subj_in_target_dict[sl]:
-#                 subj_in_target_dict.pop(sl)
-#
-#     # rec_pos now holds only the positions needing further examination
-#     for slp in rec_pos:
-#         sl = subject_word[slp]
-#         if sl in subj_in_target_dict:
-#             genpat = genpat[:slp] + '1' + genpat[slp + 1:]
-#             subj_in_target_dict[sl].pop(0)
-#             if not subj_in_target_dict[sl]:
-#                 subj_in_target_dict.pop(sl)
-#
-#     return genpat
 
 def get_genpattern(subject_word: str, target_word: str) -> str:
     """
@@ -1090,51 +874,6 @@ def get_outcomes_stats(the_outcomes_dict: dict, meta_l: bool = False) -> tuple[
     return g_qty, min(sizes), max(sizes), mean, p2, g_ent, g_xa, cnt_0, cnt_1, cnt_2
 
 
-# def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
-#     """
-#     Summarizes the outcomes best_rank_dictionary, mainly to extract the
-#     minimum and maximum outcome sizes
-#     @param best_rank_dict:
-#     @return: outcomes_stat_summary tuple:
-#     [0]:qty,[1]:smallest,[2]:largest,[3]:average,
-#     [4]:population variance,[5]:entropy bits,all as a tuple
-#     """
-#     # The outcome_stats for each best_rank_dict member are:
-#     # [0]:qty, [1]:smallest, [2]:largest, [3]:average, [4]:population variance and [5]:entropy bits as tuple parts
-#     # Each member is 'best' because they have the maximum found grps_qty as the [0]:qty.
-#     # The 'best' are equal in grps_qty and average but could have varying
-#     # [2]:largest values and thus varying [4]:population variance values and [5] entropy bits
-#     # BTW, optimal_rank ([3]:average) in this function is an old name. It is not always optimal.
-#     #
-#     # This function's purpose, outcomes_stat_summary, it to summarize the outcome stats in all the found
-#     # best words that have their outcome stats contained by the best_rank_dictionary for reporting outcome
-#     # optimal words. The summary report is for noticing when better word selections exist. Because an outcome stat
-#     # largest outcome count ([2]:largest) identifies a better selection within the best_rank_dictionary the
-#     # max_grp_size this function reports will actually be the minimum of the [3]:largest present in the
-#     # best_rank_dictionary. This is where we get the minimum of the maximums (min_max) idea. This is a subtlety
-#     # noticed occasionally where some word selections among words all having the same grps_qty could be better
-#     # because they have more balanced word outcome sizes, ie smaller population variance. Perhaps they also happen
-#     # to be from the list showing. These selections would be harder to spot when the summary reports the max outcome
-#     # size instead of the min_max outcome size.
-#     g_stats = best_rank_dict[list(best_rank_dict.keys())[0]]
-#     optimal_rank = g_stats[3]
-#     grps_qty = g_stats[0]
-#     min_grp_size = g_stats[2]  # Seed with a member's largest
-#     max_grp_size = g_stats[2]  # The min_max is desired. Seed with a member's largest
-#     min_grp_p2 = g_stats[4]  # Seed with member's variance
-#     max_grp_ent = 0.0
-#     min_grp_xa = g_stats[6]  # Seed with member's expected average
-#     for g_stats in best_rank_dict.values():
-#         (_, min_stat, max_stat, _, p2_stat, e_stat, xa_stat, cnt_0, cnt_1, cnt_2) = g_stats
-#         min_grp_size = min(min_stat, min_grp_size)
-#         max_grp_size = min(max_stat, max_grp_size)  # The min_max is desired.
-#         min_grp_p2 = min(p2_stat, min_grp_p2)
-#         max_grp_ent = max(max_grp_ent, e_stat)
-#         min_grp_xa = min(min_grp_xa, xa_stat)
-#         # outcomes_stat_summary are:[0]:qty,[1]:smallest,[2]:largest,[3]:average,
-#         # [4]:min p2,[5]:max entropy bit, [6] expected outcome size,
-#         # [7] cnt_0, [8] cnt_1, [9] cnt_2 as a tuple
-#     return grps_qty, min_grp_size, max_grp_size, optimal_rank, min_grp_p2, max_grp_ent, min_grp_xa
 
 def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, float, float, float]:
     """
@@ -1196,97 +935,6 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
 
     return grps_qty, min_grp_size, max_grp_size, mean, min_grp_p2, max_grp_ent, min_grp_xa
 
-
-# def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
-#                                       cond_rpt: bool, keyed_rpt: bool,
-#                                       guess_targets: dict,
-#                                       report_header_msg1: str, title_context: str, meta_l=False) -> dict:
-#     """
-#     Wraps guess word outcome ranking to return the best
-#     outcome rank guesses. Guesses resulting in more outcomes
-#     and smaller outcomes are better guesses.
-#     @param remaining_word_lst: the remaining solutions word list
-#     @param reporting: flag for verbose printing to rptwnd
-#     @param byentonly: flag to return only the highest entropy guesses
-#     @param cond_rpt: flag for condensed verbose printing to rptwnd
-#     @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
-#     @param guess_targets: guess vocabulary dictionary
-#     @param report_header_msg1: msg string put in verbose report header
-#     @param title_context: String used in title so indicate owner
-#     @return: dictionary of the best outcome ranked guesses
-#     """
-#     guess_rank_dict = {}
-#     best_rank_dict = {}
-#     cond_dict = {}
-#     min_score = len(remaining_word_lst)
-#     max_ent = 0.0
-#     rptwnd = RptWnd(title_context)
-#     rptwnd.withdraw()
-#
-#     if reporting:
-#         rptwnd.deiconify()
-#         reporting_header_to_window(report_header_msg1, guess_targets, rptwnd)
-#
-#     for guess in guess_targets:
-#         guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_lst)
-#         # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest,
-#         # [3]:average , [4]:population variance , [5]:entropy as a tuple
-#         outcome_stats = get_outcomes_stats(guess_outcomes_dict, meta_l)
-#
-#         if reporting:
-#             clue_pattern_outcomes_to_window(guess, outcome_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
-#             # saving the condensed stats for later sorting
-#             if cond_rpt:
-#                 cond_dict[guess] = outcome_stats
-#                 # omit the 'For:' in the search control
-#                 rptwnd.search_text.set('')
-#
-#         # This function has changed over time. Its purpose is to return a best_stat_dict of guess
-#         # words and their stats sorted by the best rank. Guesses having the most outcomes tend to
-#         # result in smaller outcomes. However, within guesses having the same number of outcomes,
-#         # the guesses with smaller maximum outcomes or guesses with more evenly distributed
-#         # outcomes tend to be better than their brethren. Outcome entropy measures that quality.
-#         #
-#         # Here the guesses' average outcome size (essentially outcome qty) is used as the rank
-#         # criteria while also keeping track of the guess having the maximum entropy. Then the
-#         # ranked guess dictionary is sorted by entropy. This pulls the best equal outcome qty
-#         # words to the top and, if there are actually lesser outcome qty guesses with the higher
-#         # entropy, puts the single best word at the dictionary top.
-#         #
-#         # It is understood this function does not list all the best guesses in order, but does
-#         # but the best at the top. It is also understood entropy only approximates the
-#         # expected number of steps to solve.
-#         #
-#         guess_rank_dict[guess] = outcome_stats
-#         # Record the smallest outcome pattern average size. (essentially max outcome qty)
-#         min_score = min(outcome_stats[3], min_score)
-#         # Record the maximum entropy seen
-#         max_ent = max(outcome_stats[5], max_ent)
-#
-#     # Populate the best_rank_dict with the best guesses.
-#     # This dictionary's values are outcome_stats tuples.
-#     for g, s in guess_rank_dict.items():
-#         # if not only by entropy, then include all with
-#         # minimum average outcome size (max outcome size)
-#         if not byentonly:
-#             if math.isclose(s[3], min_score):
-#                 if g not in best_rank_dict:
-#                     best_rank_dict[g] = s
-#         # Also collect the max_ent instances, these are not
-#         # always with max outcome size.
-#         if math.isclose(s[5], max_ent):
-#             if g not in best_rank_dict:
-#                 best_rank_dict[g] = s
-#
-#     # make a new dict that is best_rank_dict sorted by ent size
-#     inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
-#     # Reporting only the best ranking guesses.
-#     if reporting:
-#         report_footer_wrapper(report_header_msg1, remaining_word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
-#         if cond_rpt:
-#             report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
-#
-#     return inorder_best_rank_dict
 
 def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
                                       cond_rpt: bool, keyed_rpt: bool,
