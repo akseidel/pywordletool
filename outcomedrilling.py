@@ -17,101 +17,42 @@ data_path = 'worddata/'  # path from here to data folder
 letter_rank_file = 'letter_ranks.txt'
 
 
-def process_outcms_list(self, o_word_lst: list, d_meta_l=False) -> dict:
-    """
-    Processes the words list for its outcomes. Uses the method options in the outcomes
-    driller for the processing arguments.
-    @param self:
-    @param o_word_lst: The words list to be examined for outcomes
-    @return: dictionary of the optimal words
-    """
-    # Flag to use various solutions as guesses instead of the current displayed word list.
-    # This allows the option to outcome rank from the entire guess list.
-    outcms_guess_source = self.outcms_guess_source.get()
-    optimal_outcome_guesses = {}
-    context = 'Outcome Drilling'
-    match outcms_guess_source:
-        case 0:
-            # using the showing words (remaining solutions) for guess candidates
-            optimal_outcome_guesses = hlp.best_outcomes_from_showing_as_guess_dict(o_word_lst,
-                                                                                   self.d_verbose_outcms.get(),
-                                                                                   self.d_ent_outcms.get(),
-                                                                                   self.d_verbose_outcms_cond.get(),
-                                                                                   self.d_keyed_verbose_outcms.get(),
-                                                                                   context
-                                                                                   )
-
-        case 1:
-            # using the classic (original possible solutions) words for guess candidates
-            all_targets = hlp.ToolResults(data_path,
-                                              'wo_nyt_wordlist.txt',
-                                              letter_rank_file,
-                                              True,
-                                              0,
-                                              True).get_ranked_grep_result_wrd_lst(True)
-            msg1 = 'Classic Vocabulary'
-            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(o_word_lst,
-                                                                            self.d_verbose_outcms.get(),
-                                                                            self.d_ent_outcms.get(),
-                                                                            self.d_verbose_outcms_cond.get(),
-                                                                            self.d_keyed_verbose_outcms.get(),
-                                                                            all_targets,
-                                                                            msg1,
-                                                                            context,
-                                                                            d_meta_l
-                                                                            )
-        case 2:
-            # using the classic+ (entire possible solutions) for guess candidates
-            all_targets = hlp.ToolResults(data_path,
-                                              'botadd_nyt_wordlist.txt',
-                                              letter_rank_file,
-                                              True,
-                                              0,
-                                              True).get_ranked_grep_result_wrd_lst(True)
-            msg1 = 'Classic+ Vocabulary'
-            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(o_word_lst,
-                                                                            self.d_verbose_outcms.get(),
-                                                                            self.d_ent_outcms.get(),
-                                                                            self.d_verbose_outcms_cond.get(),
-                                                                            self.d_keyed_verbose_outcms.get(),
-                                                                            all_targets,
-                                                                            msg1,
-                                                                            context,
-                                                                            d_meta_l
-                                                                            )
-        case 3:
-            # using the entire allowed guess list for guess candidates
-            all_targets = hlp.ToolResults(data_path,
-                                              'nyt_wordlist.txt',
-                                              letter_rank_file,
-                                              True,
-                                              0,
-                                              True).get_ranked_grep_result_wrd_lst(True)
-            msg1 = 'Large Vocabulary'
-            optimal_outcome_guesses = hlp.extended_best_outcomes_guess_dict(o_word_lst,
-                                                                            self.d_verbose_outcms.get(),
-                                                                            self.d_ent_outcms.get(),
-                                                                            self.d_verbose_outcms_cond.get(),
-                                                                            self.d_keyed_verbose_outcms.get(),
-                                                                            all_targets,
-                                                                            msg1,
-                                                                            context,
-                                                                            d_meta_l
-                                                                            )
-        case _:
-            pass
-
-    return optimal_outcome_guesses
-
-
 class OutcmsDrillingMain(ctk.CTkToplevel):
     common_msg = '\n> >  Highlighted words are common to both the entry words and the optimal outcome guess words.'
     def_msg = 'Paste or write in the words list into the above entry field.' + \
               '\n\nRaw pastes from the This Wordle Helper will be automatically cleaned and converted to ' + \
               'a valid word list entry.'
 
-    def close_rpt(self) -> None:
-        self.destroy()
+    def process_outcms_list(self, o_word_lst: list, d_meta_l=False) -> dict:
+        source = self.outcms_guess_source.get()
+
+        vocab_map = {
+            1: ('wo_nyt_wordlist.txt', 'Classic Vocabulary'),
+            2: ('botadd_nyt_wordlist.txt', 'Classic+ Vocabulary'),
+            3: ('nyt_wordlist.txt', 'Large Vocabulary'),
+        }
+
+        verbose_args = (
+            self.d_verbose_outcms.get(),
+            self.d_ent_outcms.get(),
+            self.d_verbose_outcms_cond.get(),
+            self.d_keyed_verbose_outcms.get(),
+        )
+
+        if source == 0:
+            return hlp.best_outcomes_from_showing_as_guess_dict(o_word_lst, *verbose_args, 'Outcome Drilling')
+
+        filename, msg = vocab_map.get(source, (None, None))
+        if filename is None:
+            return {}
+
+        all_targets = hlp.ToolResults(
+            data_path, filename, letter_rank_file, True, 0, True
+        ).get_ranked_grep_result_wrd_lst(True)
+
+        return hlp.extended_best_outcomes_guess_dict(
+            o_word_lst, *verbose_args, all_targets, msg, 'Outcome Drilling', d_meta_l
+        )
 
     def clean_the_outcm_list(self) -> tuple[bool, list[str], list[str]]:
         """
@@ -128,28 +69,23 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         this_outcome = re.sub('[-:;.0123456789()~!@#$%^&*+_|?><`/{}]', '', this_outcome).lower()
         # Let spaces comma separate the words. Commas will be used in a
         # later strip function that operates on section split by comma.
+
         # Empty words will be culled later on.
-        this_outcome = this_outcome.replace(' ', ',')
         # A paste from a spreadsheet row will be tab delineated.
-        this_outcome = this_outcome.replace('\t', ',')
         # Handling the newline characters.
-        this_outcome = this_outcome.replace('\n', ',')
-        # Strip unwanted characters that might be.
-        this_lst = [x.strip(' ,[]\"\'\n') for x in this_outcome.split(',')]
-        # Remove any empty strings from the list.
-        this_lst = [i for i in this_lst if i]
+        this_outcome = this_outcome.translate(str.maketrans(' \t\n', ',,,'))
+
+        # Strip unwanted characters that might be. This also excludes empty strings.
+        this_lst = [x for item in this_outcome.split(',') if (x := item.strip(' ,[]\"\'\n'))]
         self.outcms_words_text.set(', '.join(this_lst))
 
-        status = True
-        bads = []
-        for w in this_lst:
-            if len(w) != 5:
-                status = False
-                bads.append(w)
+        # Collect nay bad sized words and use their count as a flag.
+        bads = [w for w in this_lst if len(w) != 5]
+        status = not bads
         return status, this_lst, bads
 
     def process_entry_list(self):
-        (entry_status, this_lst, bads) = self.clean_the_outcm_list()
+        entry_status, this_lst, bads = self.clean_the_outcm_list()
         if not entry_status:
             self.update()
             tkinter.messagebox.showerror(title='Will Not Proceed',
@@ -157,28 +93,23 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                          )
             return
         if self.d_meta_lr:
-            if len(this_lst):
-                gendict: dict[str, list] = {}
-                for w in this_lst:
-                    gencode = hlp.get_gencode(w)
-                    gendict.update({w: gencode})
+            if this_lst:
+                gendict = {w: hlp.get_gencode(w) for w in this_lst}
                 gen_tally: list = hlp.get_gendict_tally(gendict)
                 hlp.rpt_ltr_use(gen_tally, this_lst)
             self.d_meta_lr = False
             return
-        if len(this_lst) > 2:
+        if len(this_lst) >= 3:
             self.title("> > > ... Busy, Please Wait ... < < <")
             self.set_busy_status_msg()
             self.enable_controls('disabled')
             self.update()
-            optimal_outcome_guesses = process_outcms_list(self, this_lst, self.d_meta_lr)
-            self.d_meta_lr=False
+            optimal_outcome_guesses = self.process_outcms_list( this_lst, self.d_meta_lr)
 
             # Report the results
             self.report_results(this_lst, optimal_outcome_guesses, self.d_verbose_outcms_cond.get())
             self.title("Outcome Drilling")
-            self.enable_controls('enabled')
-
+            self.enable_controls('normal')
             self.deiconify()
 
         else:
@@ -189,22 +120,19 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                          )
             return
 
-    def enable_controls(self, look: str) -> None:
-        self.button_process.configure(look)
-        self.set_optimal_options_look(look)
-        self.set_vocab_look(look)
+    def enable_controls(self, state_appearance: str) -> None:
+        self.button_process.configure(state=state_appearance)
+        self.set_optimal_options_look(state_appearance)
+        self.set_vocab_look(state_appearance)
 
-    def set_optimal_options_look(self, look: str) -> None:
-        self.chk_outcms_disp.configure(state=look)
-        self.chk_ent_disp.configure(state=look)
-        self.chk_outcms_disp_cond.configure(state=look)
-        self.chk_keyed_outcms_disp.configure(state=look)
+    def set_optimal_options_look(self, state_appearance: str) -> None:
+        for widget in (self.chk_outcms_disp, self.chk_ent_disp,
+                       self.chk_outcms_disp_cond, self.chk_keyed_outcms_disp):
+            widget.configure(state=state_appearance)
 
-    def set_vocab_look(self, look: str) -> None:
-        self.rbrA.configure(state=look)
-        self.rbrB.configure(state=look)
-        self.rbrBB.configure(state=look)
-        self.rbrC.configure(state=look)
+    def set_vocab_look(self, state_appearance: str) -> None:
+        for widget in (self.rbrA, self.rbrB, self.rbrBB, self.rbrC):
+            widget.configure(state=state_appearance)
 
     def report_results(self, this_lst: list, optimal_outcome_guesses: dict, cond_mode=False) -> None:
         """
@@ -219,16 +147,15 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         wrds = hlp.opt_wrds_for_reporting(optimal_outcome_guesses, cond_mode)
         self.tx_status.configure(state='normal')
         self.tx_status.delete("1.0", "end")
-        self.tx_status.insert('end', '> >  {} submitted words'.format(len(this_lst)))
-        if len(words_in_common) > 0:
+        self.tx_status.insert('end', f'> >  {len(this_lst)} submitted words')
+        if words_in_common:
             self.tx_status.insert('end', self.common_msg)
         self.tx_status.insert('end', hlp.outcomes_stats_summary_line(optimal_outcome_guesses))
         self.tx_status.insert('end', wrds)
         self.tx_status.see('1.0')
         if self.d_ent_outcms.get():
-            self.tx_status.highlight_pattern(regex, 'ent', remove_priors=False, do_scroll=False)
-        else:
-            self.tx_status.highlight_pattern(regex, 'out', remove_priors=False, do_scroll=False)
+            tag = 'ent' if self.d_ent_outcms.get() else 'out'
+        self.tx_status.highlight_pattern(regex, tag, remove_priors=False, do_scroll=False)
         self.tx_status.configure(state='disabled')
 
     def clear_list(self):
@@ -239,50 +166,43 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
     def clear_and_paste(self):
         self.set_default_status_msg()
         self.entry_find.focus()
-        ntext = ''
         try:
             ntext = self.clipboard_get()
-        except tkinter.TclError:
-            tkinter.messagebox.showerror(title='Clipboard Is Empty',
-                                         message='\nThere is nothing to paste.'
-                                                 '\nFirst copy an outcome. Then use this. The clipboard will '
-                                                 'be empty afterwards.'
-                                         )
-            return
-        finally:
             self.clipboard_clear()
-            if ntext:
-                self.outcms_words_text.set(ntext)
-                self.just_clean_list()
+        except tkinter.TclError:
+            tkinter.messagebox.showerror(
+                title='Clipboard Is Empty',
+                message='\nThere is nothing to paste.'
+                        '\nFirst copy an outcome. Then use this. The clipboard will '
+                        'be empty afterwards.'
+            )
+            return
+        self.outcms_words_text.set(ntext)
+        self.just_clean_list()
+
+    def _set_status_text(self, text: str) -> None:
+        self.tx_status.configure(state='normal')
+        self.tx_status.replace('1.0', 'end', text)
+        self.tx_status.configure(state='disabled')
 
     def set_default_status_msg(self):
-        self.tx_status.configure(state='normal')
-        self.tx_status.replace('1.0', 'end', self.def_msg)
-        self.tx_status.configure(state='disabled')
+        self._set_status_text(self.def_msg)
 
     def set_busy_status_msg(self):
-        self.tx_status.configure(state='normal')
-        self.tx_status.replace('1.0', 'end', 'Busy, please wait ...')
-        self.tx_status.configure(state='disabled')
+        self._set_status_text('Busy, please wait ...')
 
     def set_clean_status_msg(self, this_lst: list[str]):
-        self.tx_status.configure(state='normal')
-        self.tx_status.delete("1.0", "end")
-        self.tx_status.insert('end', '> >  {} words ready'.format(len(this_lst)))
-        self.tx_status.configure(state='disabled')
+        self._set_status_text(f'> >  {len(this_lst)} words ready')
 
     def title_status(self):
-        match self.outcms_guess_source.get():
-            case 0:
-                self.title("Outcome Drilling Using The Words Entered List For Guesses")
-            case 1:
-                self.title("Outcome Drilling Using The Classic Vocabulary For Guesses")
-            case 2:
-                self.title("Outcome Drilling Using The Classic+ Vocabulary For Guesses")
-            case 3:
-                self.title("Outcome Drilling Using The Large Vocabulary For Guesses")
-            case _:
-                pass
+        titles = {
+            0: "Outcome Drilling Using The Words Entered List For Guesses",
+            1: "Outcome Drilling Using The Classic Vocabulary For Guesses",
+            2: "Outcome Drilling Using The Classic+ Vocabulary For Guesses",
+            3: "Outcome Drilling Using The Large Vocabulary For Guesses",
+        }
+        if title := titles.get(self.outcms_guess_source.get()):
+            self.title(title)
         # Focus is most likely best at the entry field.
         self.entry_find.focus()
 
@@ -302,28 +222,29 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.just_clean_list()
 
     def just_clean_list(self):
-        (entry_status, this_lst, bads) = self.clean_the_outcm_list()
+        entry_status, this_lst, bads = self.clean_the_outcm_list()
         if not entry_status:
             self.update()
             tkinter.messagebox.showerror(title='Entry Will Not Be Processed',
                                          message='\nOnly five letter words allowed.'
                                                  '\nCheck the entry for:'
-                                                 '\n{}'.format(str(bads)[1:-1])
+                                                 f'\n{", ".join(bads)}'
                                          )
         else:
             self.set_clean_status_msg(this_lst)
-            pass
         self.focus()
         self.entry_find.focus()
 
     def __init__(self):
         super().__init__()
         self.title("Outcome Drilling Using The Large Vocabulary")
+
+       # init geometry
         w_width = 1120
         w_height = 200
         pos_x = int(self.winfo_screenwidth() / 2 - w_width / 2)
         pos_y = int(self.winfo_screenheight() / 3 - w_height / 2)
-        self.geometry("{}x{}+{}+{}".format(w_width, w_height, pos_x, pos_y))
+        self.geometry(f"{w_width}x{w_height}+{pos_x}+{pos_y}")
 
         # set the Vars
         self.outcms_words_text = tk.StringVar()
@@ -332,7 +253,6 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.d_ent_outcms = tk.BooleanVar(value=False)
         self.d_keyed_verbose_outcms = tk.BooleanVar(value=False)
         self.d_verbose_outcms_cond = tk.BooleanVar(value=False)
-        self.d_letter_use_disp = tk.BooleanVar(value=False)
         self.d_meta_lr = False
 
         # configure style
@@ -386,11 +306,11 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
                                           )
         self.button_clear.pack(side="left", padx=6, pady=10)
 
-        self.button_clear = ctk.CTkButton(self.bts_frame, text="Clear 'N Paste",
+        self.button_clear_paste = ctk.CTkButton(self.bts_frame, text="Clear 'N Paste",
                                           width=40, text_color="black",
                                           command=self.clear_and_paste
                                           )
-        self.button_clear.pack(side="left", padx=6, pady=10)
+        self.button_clear_paste.pack(side="left", padx=6, pady=10)
 
         # labelframe within outcomes frame for which list option
         self.outcm_lst_ops_frame = ttk.LabelFrame(self,
@@ -486,6 +406,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.tx_status_sb.config(command=self.tx_status.yview)
         # Respond to initial state
         self.title_status()
+
 
 # end OutcmsDrillingMain class
 

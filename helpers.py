@@ -1212,18 +1212,6 @@ def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk
 
     rptwnd.verbose_data.configure(state='disabled')
 
-# def valid_mult_ltr(s: str) -> bool:
-#     """
-#     The format requires the letter placed after the number. The mltr_entry_str
-#     argument will have already been converted to uppercase.
-#     @param s: The string being checked.
-#     @return: Returns True if the second character is an uppercase letter A - Z.
-#     """
-#     if len(s) != 2:
-#         return False
-#     else:
-#         valid = 'QWERTYUIOPASDFGHJKLZXCVBNM ,'
-#         return valid.find(s[1]) > -1
 
 def valid_mult_ltr(s: str) -> bool:
     """
@@ -1913,112 +1901,6 @@ class RptWnd(ctk.CTkToplevel):
             ctk.CTkButton(self, text='Outcome Driller', text_color='black',
                           command=self.rpt_show_grps_driller).pack(side=tk.LEFT, padx=4, pady=10)
 
-
-
-
-# class HelpWindow(ctk.CTkToplevel):
-#     """
-#     The help information window
-#     """
-#
-#     def close_help(self) -> None:
-#         self.destroy()
-#
-#     def get_rank_data(self) -> str:
-#         """
-#         @return: Returns string that is the information
-#         """
-#         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path, self.letter_rank_file)
-#         if os.path.exists(full_path_name):
-#             f = open(full_path_name, "r", encoding="UTF8").read()
-#         else:
-#             f = 'Could not find. ' + str(full_path_name)
-#         return f
-#
-#     def get_info(self) -> str:
-#         full_path_name = os.path.join(os.path.dirname(__file__), self.data_path, 'helpinfo.txt')
-#         if os.path.exists(full_path_name):
-#             f = open(full_path_name, "r", encoding="UTF8").read()
-#         else:
-#             f = 'This is all the help you get because file helpinfo.txt has gone missing.'
-#         return f
-#
-#     def show_info(self) -> None:
-#         self.help_msg.configure(state='normal')
-#         self.help_msg.delete(1.0, tk.END)
-#         self.help_msg.insert(tk.END, self.get_info())
-#         self.help_msg.configure(state='disabled')
-#
-#     def show_rank_info(self) -> None:
-#         self.help_msg.configure(state='normal')
-#         self.help_msg.delete(1.0, tk.END)
-#         raw_rank_data = self.get_rank_data()
-#         f = raw_rank_data.replace(":", "\t")
-#         self.help_msg.insert(tk.END, "Using file: " + self.letter_rank_file + "\n")
-#         self.help_msg.insert(tk.END, "RNK = Rank for any occurrence\n")
-#         self.help_msg.insert(tk.END, "RNK-X = Rank at position X in the word\n\n")
-#         self.help_msg.insert(tk.END, "LTR\tRNK\tRNK-1\tRNK-2\tRNK-3\tRNK-4\tRNK-5\n")
-#         self.help_msg.insert(tk.END, "---\t---\t-----\t-----\t-----\t-----\t-----\n")
-#         self.help_msg.insert(tk.END, f)
-#         self.help_msg.configure(state='disabled')
-#
-#     def __init__(self, data_path, letter_rank_file):
-#         super().__init__()
-#         self.data_path = data_path
-#         self.letter_rank_file = letter_rank_file
-#         self.resizable(width=True, height=True)
-#         self.title('Some Information For You')
-#         help_wd = 530
-#         help_ht = 500
-#         size_and_position_this_window(self, help_ht, help_wd, 0, 0)
-#
-#         # configure style
-#         style = ttk.Style()
-#         style.theme_use()
-#         help_font_tuple_n = ("Courier", 12, "normal")
-#         self.option_add("*Font", help_font_tuple_n)
-#
-#         self.help_info_frame = tk.Frame(self,
-#                                         borderwidth=0
-#                                         )
-#         self.help_info_frame.pack(side='top', fill='both', padx=2, pady=0, expand=True)
-#         self.help_info_frame.grid_rowconfigure(0, weight=1)
-#         self.help_info_frame.grid_columnconfigure(0, weight=1)
-#
-#         self.help_msg = tk.Text(self.help_info_frame,
-#                                 wrap='word',
-#                                 padx=10,
-#                                 pady=8,
-#                                 background='#dedede',
-#                                 borderwidth=0,
-#                                 highlightthickness=0
-#                                 )
-#         self.help_msg.grid(row=0, column=0, padx=6, pady=0, sticky="nsew")
-#
-#         # scrollbar for help
-#         help_sb = ttk.Scrollbar(self.help_info_frame, orient='vertical')
-#         help_sb.grid(row=0, column=1, padx=1, pady=2, sticky='ens')
-#         self.help_msg.config(yscrollcommand=help_sb.set)
-#         help_sb.config(command=self.help_msg.yview)
-#         self.show_info()
-#
-#         button_q = ctk.CTkButton(self, text="Close",
-#                                  text_color="black",
-#                                  command=self.close_help)
-#         button_q.pack(side="right", padx=10, pady=10)
-#         self.protocol("WM_DELETE_WINDOW", self.close_help)  # assign to closing button [X]
-#
-#         button_r = ctk.CTkButton(self, text="Letter Ranking",
-#                                  text_color="black",
-#                                  command=self.show_rank_info
-#                                  )
-#         button_r.pack(side="left", padx=10, pady=10)
-#
-#         button_i = ctk.CTkButton(self, text="Information",
-#                                  text_color="black",
-#                                  command=self.show_info
-#                                  )
-#         button_i.pack(side="left", padx=10, pady=10)
 
 class HelpWindow(ctk.CTkToplevel):
     """

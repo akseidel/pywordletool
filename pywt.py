@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------
 # pywt.py  akseidel 5/2022
 # ----------------------------------------------------------------
-# This program was created without any prior python programing knowledge
+# This program was created without any prior python programming knowledge
 # nor classical training in programming. It must be chock-full of coding
 # misuse. Do not think for a moment the code is "proper". It is likely
 # very good for showing how something should not be done or how what
@@ -457,7 +457,7 @@ class Pywordlemainwindow(ctk.CTk):
         def reset_cbox_focus(entrywidget) -> None:
             # now set focus back to the letter cbox for use next assignment convenience
             entrywidget.focus()
-            # and make the letter look selected even though it makes no difference
+            # and make the letter state_appearance selected even though it makes no difference
             entrywidget.selection_range(0, 1)
 
 
