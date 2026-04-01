@@ -23,11 +23,6 @@ import customtkinter as ctk
 import outcomedrilling
 
 
-# from fmwm import debug_mode
-
-
-
-
 def get_word_list_path_name(local_path_file_name: str, critical: bool = True) -> str:
     """Return the full path to a Wordle word-list file.
 
@@ -885,6 +880,7 @@ class RptWnd(ctk.CTkToplevel):
             )
             if messagebox.askokcancel(title=None, message=msg):
                 if regex and regex != self._DEFAULT_SEARCH.strip():
+                    self.update()
                     self._run_search(regex)
 
         self.title(org_title)
@@ -921,7 +917,6 @@ class RptWnd(ctk.CTkToplevel):
     def _entry_widget(self) -> tk.Entry | None:
         """Return the underlying tk.Entry inside the CTkEntry, regardless of ctk version."""
         return next((w for w in self.entry_find.winfo_children() if isinstance(w, tk.Entry)), None)
-
 
     def back_to_summary(self) -> None:
         """Scroll to 'Outcome summary' by highlighting it briefly, then remove the highlight."""
