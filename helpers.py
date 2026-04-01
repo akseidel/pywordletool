@@ -1,6 +1,7 @@
 # ----------------------------------------------------------------
 # helpers akseidel 5/2022
 # ----------------------------------------------------------------
+from __future__ import annotations
 import math
 import os
 import random
@@ -14,15 +15,20 @@ from itertools import groupby
 # from string import ascii_lowercase
 from subprocess import Popen, PIPE
 from tkinter import messagebox
+from typing import Any
+from collections import Counter
 
 import customtkinter as ctk
 
 import outcomedrilling
+
+
 # from fmwm import debug_mode
 
 
+# todo: remove this eventually
+# gc_z = [0] * 28
 
-gc_z = [0] * 28
 
 def get_word_list_path_name(local_path_file_name: str, critical: bool = True) -> str:
     """Return the full path to a Wordle word-list file.
@@ -50,10 +56,10 @@ def get_word_list_path_name(local_path_file_name: str, critical: bool = True) ->
     messagebox.showwarning(title='Will Continue', message=msg)
     return ''
 
+
 """
 Letter ranking functions for rank that includes by letter position method
 """
-
 
 _CLASSIC_LTR_RANK: dict = {
     'e': [44.9, 2.30, 8.12, 5.27, 16.59, 12.57],
@@ -74,14 +80,14 @@ _CLASSIC_LTR_RANK: dict = {
     'm': [13.8, 4.69, 1.58, 2.90, 2.99, 1.61],
     'g': [11.4, 4.23, 0.46, 2.65, 2.65, 1.45],
     'b': [10.9, 6.53, 0.56, 2.34, 0.91, 0.54],
-    'k': [8.7,  1.08, 0.39, 1.28, 2.39, 3.52],
-    'f': [7.8,  4.56, 0.26, 0.98, 1.18, 0.85],
-    'w': [7.4,  3.06, 1.59, 1.30, 0.85, 0.57],
-    'v': [5.6,  1.56, 0.56, 2.01, 1.50, 0.00],
-    'z': [1.9,  0.15, 0.05, 0.64, 0.81, 0.24],
-    'x': [1.9,  0.03, 0.54, 0.80, 0.09, 0.40],
-    'j': [1.3,  0.97, 0.06, 0.14, 0.11, 0.00],
-    'q': [1.0,  0.77, 0.20, 0.03, 0.00, 0.00],
+    'k': [8.7, 1.08, 0.39, 1.28, 2.39, 3.52],
+    'f': [7.8, 4.56, 0.26, 0.98, 1.18, 0.85],
+    'w': [7.4, 3.06, 1.59, 1.30, 0.85, 0.57],
+    'v': [5.6, 1.56, 0.56, 2.01, 1.50, 0.00],
+    'z': [1.9, 0.15, 0.05, 0.64, 0.81, 0.24],
+    'x': [1.9, 0.03, 0.54, 0.80, 0.09, 0.40],
+    'j': [1.3, 0.97, 0.06, 0.14, 0.11, 0.00],
+    'q': [1.0, 0.77, 0.20, 0.03, 0.00, 0.00],
 }
 
 
@@ -118,6 +124,7 @@ def make_ltr_rank_dictionary(local_path_rank_file: str) -> dict:
     messagebox.showwarning('Warning', message=msg)
     return _CLASSIC_LTR_RANK
 
+
 def wrd_rank(wrd: str, ltr_rank_dict: dict, method: int) -> float:
     """Return a word's letter-frequency ranking.
 
@@ -148,7 +155,6 @@ def wrd_rank(wrd: str, ltr_rank_dict: dict, method: int) -> float:
     return 0
 
 
-
 def word_has_duplicates(word: str) -> bool:
     """
     Checks if a word has duplicate letters.
@@ -161,6 +167,7 @@ def word_has_duplicates(word: str) -> bool:
     """
     filtered = word.replace('.', '').replace(' ', '')
     return len(set(filtered)) < len(filtered)
+
 
 def print_word_list_col_format(word_list: dict, n_col: int) -> None:
     """
@@ -181,12 +188,12 @@ def print_word_list_col_format(word_list: dict, n_col: int) -> None:
 
 
 def make_ranked_filtered_result_dictionary(
-    words: list,
-    ltr_rank_dict: dict,
-    allow_dups: bool,
-    rank_mode: int,
-    no_ordr: bool,
-    no_rank: bool = False,
+        words: list,
+        ltr_rank_dict: dict,
+        allow_dups: bool,
+        rank_mode: int,
+        no_ordr: bool,
+        no_rank: bool = False,
 ) -> dict:
     """
     Build a ranked and filtered word dictionary.
@@ -215,7 +222,6 @@ def make_ranked_filtered_result_dictionary(
     return dict(sorted(words_dict.items(), key=sort_key))
 
 
-
 def get_results_word_list(shell_cmd) -> list:
     """
     Run the grep command pipeline and return the matched words.
@@ -225,7 +231,6 @@ def get_results_word_list(shell_cmd) -> list:
     """
     with Popen(shell_cmd.full_cmd(), shell=True, stdout=PIPE, text=True) as proc:
         return [line.rstrip('\n') for line in proc.stdout]
-
 
 
 def get_wordlist(full_path_name: str) -> list:
@@ -257,11 +262,13 @@ def cull_sol_list(s_wrds: list, p_wrds: list) -> None:
     exclude = set(p_wrds)
     s_wrds[:] = [w for w in s_wrds if w not in exclude]
 
+
 def clear_scrn() -> None:
     """
     Clears the console window
     """
     os.system("cls" if os.name == "nt" else "clear")
+
 
 def get_gencode(word: str) -> list:
     """Return a word's genetic code.
@@ -286,7 +293,6 @@ def get_gencode(word: str) -> list:
     return gencode
 
 
-
 def get_gendict_tally(gendict: dict[str, list]) -> list:
     """
     Return the letter presence tally across all words in a gen-dictionary.
@@ -302,6 +308,7 @@ def get_gendict_tally(gendict: dict[str, list]) -> list:
         for idx in range(26):
             gen_tally[idx] += gencode[idx]
     return gen_tally
+
 
 def dict_gen_tally(gt: list, cnt: int) -> dict[str, float]:
     """
@@ -337,6 +344,7 @@ def assign_genrank(gendict: dict[str, list], gen_tally: list) -> int:
         maxrank = max(maxrank, g[27])
     return maxrank
 
+
 def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list[str]:
     """
     Return all words in gendict whose genetic rank equals maxrank.
@@ -346,6 +354,7 @@ def get_maxgenrankers(gendict: dict[str, list], maxrank: int) -> list[str]:
     :return: List of words whose gencode rank (index 27) equals maxrank.
     """
     return [w for w, g in gendict.items() if g[27] == maxrank]
+
 
 def regex_maxgenrankers(max_rankers: list[str], wordsdict: dict) -> str:
     """
@@ -359,78 +368,43 @@ def regex_maxgenrankers(max_rankers: list[str], wordsdict: dict) -> str:
     """
     return '|'.join(f"{w} : {wordsdict[w]}" for w in max_rankers)
 
+
 def analyze_pick_to_solution(sol_wrd: str, pick: str, excl_lst: list, x_pos_dict: dict,
-                             r_pos_dict: dict):
+                             r_pos_dict: dict) -> list:
     """
-    This function is used by fmwm.py only. This function determines what and how a guess
-    matches against a target solution. The parameters returned are used to grep filter the
-    current remaining word list to be the next remaining word list according to how the guess
-    compares to the solution.
-    
-    Updates the exclude, exclude position, include position and multi filtering according to
-    what a pick looks like against the solution word.
-    @param sol_wrd: The target solution
-    @param pick: The guess word.
-    @param excl_lst: The letters to be excluded. (ie gray clues)
-    @param x_pos_dict: The letters excluded from a position (ie yellow clues)
-    @param r_pos_dict: The letters required at a position (ie green clues)
-    multi_code:str The multiple same letters and how many code (like 2A,3E)
-    @return: [excl_lst: list, x_pos_dict: dict, r_pos_dict:dict, multi_code:str]
+    Used by fmwm.py only. Determines how a guess matches a target solution,
+    updating the excluded letters, excluded positions, and required positions
+    dictionaries accordingly.
+
+    :param sol_wrd: The target solution word.
+    :param pick: The guess word.
+    :param excl_lst: Letters to exclude (gray clues); modified in place.
+    :param x_pos_dict: Letters excluded from a position (yellow clues); modified in place.
+    :param r_pos_dict: Letters required at a position (green clues); modified in place.
+    :return: [excl_lst, x_pos_dict, r_pos_dict, mult_dict] where mult_dict encodes
+             multiple same-letter requirements (e.g. '2A', '3E').
     """
-    p_ltr_pos: int = 0  # Current letter position in the pick
-    # Multiple same letter accounting is required to filter for multiple same letter
-    # instances when they are called for. The user is expected to make that determination
-    # in the GUI pywt.py. That determination needs to be coded for fmwm.py.
-    for p_ltr in pick:
-        # First check for a p_ltr instance.
-        if sol_wrd.find(p_ltr) < 0:
-            # p_ltr has no matches
-            # This must be a GRAY letter.
-            if not excl_lst.__contains__(p_ltr):
+    for p_ltr_pos, p_ltr in enumerate(pick):
+        if p_ltr not in sol_wrd:
+            # GRAY: letter not in solution
+            if p_ltr not in excl_lst:
                 excl_lst.append(p_ltr)
-            # done with this letter
-            # keep track of the index position
-            p_ltr_pos += 1
             continue
-        # If here, then p_ltr has at least one instance.
-        # value = key in the position dictionaries, so just make the key.
-        key = p_ltr + ',' + str(p_ltr_pos + 1)
-        # Decide into which dictionary: x-clude or r-equire to place this key/value pair,
-        # also make the multiple same letter accounting
+
+        key = f'{p_ltr},{p_ltr_pos + 1}'
         if p_ltr_pos == sol_wrd.find(p_ltr, p_ltr_pos):
-            # This must be a GREEN clue
-            # Add p_ltr and p_ltr's position to the required position dictionary.
+            # GREEN: correct letter at correct position
             r_pos_dict[key] = key
         else:
-            # This must be a YELLOW clue
-            # Add p_ltr and p_ltr's position to the exclude position dictionary.
+            # YELLOW: letter present but wrong position
             x_pos_dict[key] = key
-        # keep track of index position
-        p_ltr_pos += 1
-    # end for
-    # Handling multiple same letter will be done as this afterward process that returns a dictionary of letter count
-    # and include/exclude mode.
 
     mult_dict = mult_ltr_dict(pick, sol_wrd, r_pos_dict)
-
     return [excl_lst, x_pos_dict, r_pos_dict, mult_dict]
 
 
-def letter_counts(word: str) -> dict:
-    """
-    Used by only fmwm.py
-    Returns a dictionary holding the instance counts for the letters
-    withing the word argument.
-    :param word: str
-    :return:
-    """
-    lc_dict: dict[str, int] = {}
-    for w_ltr in word:
-        if w_ltr in lc_dict:
-            lc_dict[w_ltr] = lc_dict[w_ltr] + 1
-        else:
-            lc_dict[w_ltr] = 1
-    return lc_dict
+def letter_counts(word: str) -> dict[str, int]:
+    return dict(Counter(word))
 
 
 def is_include_necessary(r_pos_dict: dict, gl: str, tc: int) -> bool:
@@ -443,12 +417,14 @@ def is_include_necessary(r_pos_dict: dict, gl: str, tc: int) -> bool:
     :type r_pos_dict: dict Required letter at position dictionary
     :rtype: bool
     """
-    gl_cnt = 0
-    for key in r_pos_dict:
-        if key[0] == gl:
-            gl_cnt = gl_cnt + 1
-    r = not (gl_cnt == tc)
-    return r
+    # original
+    # gl_cnt = 0
+    # for key in r_pos_dict:
+    #     if key[0] == gl:
+    #         gl_cnt = gl_cnt + 1
+    # r = not (gl_cnt == tc)
+    # return r
+    return sum(1 for key in r_pos_dict if key[0] == gl) != tc
 
 
 def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
@@ -460,80 +436,71 @@ def mult_ltr_dict(guess: str, target: str, r_pos_dict: dict) -> dict:
     :param r_pos_dict: required letter at position dictionary
     :return: dict; multiple letter with count needing exclusion or inclusion
     key is the letter and its count, value is the mode 1=include, 2=exclude
+
+    Dict mapping letter-count codes to filter mode (1=include, 2=exclude),
+             e.g. {'2a': 1, '3s': 2}.
     """
+
     lc_guess = letter_counts(guess)
     lc_target = letter_counts(target)
     mult_dict: dict[str, int] = {}
+
     for gl, gc in lc_guess.items():
         if gc == 1:
-            # Multiple exclude or include cannot be determined
-            continue
-        if gc > 1:
-            # Quess has multiple same letter. This letter would be excluded or required by earlier code
-            # but if required then an xgL require or exclude might be necessary.
-            tc = None
-            if gl in lc_target:
-                tc = lc_target[gl]
-            match tc:
-                case None:
-                    # gl would have been excluded by prior code
-                    continue
-                case 1:
-                    # target has 1
-                    if gc == 2:
-                        # target has 1, guess has 2
-                        # Exclude 2gl
-                        key = f"{str(gc)}{gl}"
-                        mode_value = 2  # exclude
-                        mult_dict[key] = mode_value
-                case 2:
-                    # target has 2, guess has 2 or 3
-                    if gc == 2:
-                        # target has 2, guess has 2
-                        # Include 2gl, but only if both guess gl are NOT green since
-                        # the prior require dict would cover the grep requirement.
-                        if is_include_necessary(r_pos_dict, gl, tc):
-                            key = f"2{gl}"
-                            mode_value = 1  # include
-                            mult_dict[key] = mode_value
-                    if gc == 3:
-                        # target has 2, guess has 3
-                        # Exclude 3gl
-                        key = f"3{gl}"
-                        mode_value = 2  # exclude
-                        mult_dict[key] = mode_value
-                        # Include 2gl, but only if both guess gl are NOT green since
-                        # the prior require dict would cover the grep requirement.
-                        if is_include_necessary(r_pos_dict, gl, tc):
-                            key = f"2{gl}"
-                            mode_value = 1  # include
-                            mult_dict[key] = mode_value
-                case 3:
-                    # target has 3, guess has 2 or 3
-                    if gc == 2:
-                        # target has 3, guess has 2
-                        # Include 2gl, but only if both guess gl are NOT green since
-                        # the prior require dict would cover the grep requirement.
-                        if is_include_necessary(r_pos_dict, gl, tc):
-                            key = f"2{gl}"
-                            mode_value = 1  # include
-                            mult_dict[key] = mode_value
-                    if gc == 3:
-                        # target has 3, guess has 3
-                        # Include 3gl, but only if all 3 guess gl are NOT green since
-                        # the prior require dict would cover the grep requirement.
-                        if is_include_necessary(r_pos_dict, gl, gc):
-                            key = f"3{gl}"
-                            mode_value = 1  # include
-                            mult_dict[key] = mode_value
+            continue  # single occurrences need no multiple-letter handling
+
+        # Guess has multiple same letter. This letter would be excluded or required by earlier code
+        # but if required then an xgL require or exclude might be necessary.
+        tc = lc_target.get(gl)  # None if letter absent from target
+
+        match tc:
+            case None:
+                # gl would have been excluded by prior code
+                continue  # letter absent from target; already excluded by prior code
+            case 1:
+                # target has 1
+                if gc == 2:
+                    # target has 1, guess has 2
+                    # Exclude 2gl
+                    mult_dict[f"2{gl}"] = 2  # exclude 2gl
+            case 2:
+                # target has 2, guess has 2 or 3
+                if gc == 2:
+                    # target has 2, guess has 2
+                    # Include 2gl, but only if both guess gl are NOT green since
+                    # the prior require dict would cover the grep requirement.
+                    if is_include_necessary(r_pos_dict, gl, tc):
+                        mult_dict[f"2{gl}"] = 1  # include 2gl
+                elif gc == 3:
+                    # target has 2, guess has 3
+                    # Exclude 3gl
+                    mult_dict[f"3{gl}"] = 2  # exclude 3gl
+                    if is_include_necessary(r_pos_dict, gl, tc):
+                        mult_dict[f"2{gl}"] = 1  # include 2gl
+            case 3:
+                # target has 3, guess has 2 or 3
+                if gc == 2:
+                    # target has 3, guess has 2
+                    # Include 2gl, but only if both guess gl are NOT green since
+                    # the prior require dict would cover the grep requirement.
+                    if is_include_necessary(r_pos_dict, gl, tc):
+                        mult_dict[f"2{gl}"] = 1  # include 2gl
+                elif gc == 3:
+                    # target has 3, guess has 3
+                    # Include 3gl, but only if all 3 guess gl are NOT green since
+                    # the prior require dict would cover the grep requirement.
+                    if is_include_necessary(r_pos_dict, gl, gc):
+                        mult_dict[f"3{gl}"] = 1  # include 3gl
     return mult_dict
 
-def build_x_pos_grep(self, this_pos_dict: dict, rq_lts: str) -> None:
+
+def build_x_pos_grep(wordle_tool, this_pos_dict: dict, rq_lts: str) -> None:
     """
     Build grep exclusion commands for each letter-position pair in this_pos_dict.
 
     Example: entry "b,3" produces grep -vE '..b..'
 
+    :param wordle_tool: current wordletool
     :param this_pos_dict: Dict of exclusion entries; each value is "letter,position" (e.g. "b,3").
     :param rq_lts: String of letters already marked as required.
     """
@@ -541,16 +508,18 @@ def build_x_pos_grep(self, this_pos_dict: dict, rq_lts: str) -> None:
         ltr, pos = entry.split(',')
         ltr = ltr.lower()
         already_required = ltr in rq_lts
-        self.tool_command_list.add_excl_pos_cmd(ltr, int(pos), not already_required)
+        wordle_tool.tool_command_list.add_excl_pos_cmd(ltr, int(pos), not already_required)
         if not already_required:
             rq_lts += ltr
 
-def build_r_pos_grep(self, this_pos_dict: dict) -> str:
+
+def build_r_pos_grep(wordle_tool, this_pos_dict: dict) -> str:
     """
     Build a grep inclusion pattern for required letter positions.
 
     Example: entries (b, 3) and (a, 5) produce pattern '..b.a'.
 
+    :param wordle_tool: current wordletool
     :param this_pos_dict: Dict of inclusion entries; each value is "letter,position" (e.g. "b,3").
     :return: The grep pattern string, or '' if this_pos_dict is empty.
     """
@@ -563,18 +532,19 @@ def build_r_pos_grep(self, this_pos_dict: dict) -> str:
         pat[int(p_str) - 1] = ltr.lower()
 
     result = ''.join(pat)
-    self.tool_command_list.add_type_cmd(result, True)
+    wordle_tool.tool_command_list.add_type_cmd(result, True)
     return result
 
-def build_multi_code_grep(lself, multi_code: dict) -> None:
+
+def build_multi_code_grep(wordle_tool, multi_code: dict) -> None:
     """
     used only by fmwm.py
     It is here that add_type_mult_ltr_cmd must be sent for each
-    multi_code entry with the correct require/excluse argument. Otherwise, Only a letter require
+    multi_code entry with the correct require/exclude argument. Otherwise, Only a letter require
     is sent regardless of what it should be.
     """
     for mltr, mode in multi_code.items():
-        lself.tool_command_list.add_type_mult_ltr_cmd(mltr.lower(), mode)
+        wordle_tool.tool_command_list.add_type_mult_ltr_cmd(mltr.lower(), mode)
 
 
 def load_grep_arguments(wordle_tool_cmd_lst, excl_l: list, requ_l: list, x_pos_dict: dict,
@@ -651,7 +621,7 @@ def get_genpattern(subject_word: str, target_word: str) -> str:
     return ''.join(pattern)
 
 
-def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict[str, list]:
+def outcomes_for_this_guess(guess_word: str, word_list_dict: dict) -> dict[str, list]:
     """
     Group words from word_list by the genpattern they produce against guess_word.
 
@@ -661,20 +631,20 @@ def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict[str, list]
     but at wrong position and 2 means letter is present and in correct position.
 
     :param guess_word: The guess word to evaluate against.
-    :param word_list: List of subject words to categorise.
+    :param word_list_dict: List of subject words to categorise.
     :return: Dict mapping 5-digit pattern strings to lists of matching words.
              Pattern digits: '0' = absent, '1' = present but wrong position,
              '2' = present at correct position.
     """
     outcomes: dict[str, list] = {}
-    for subject_word in word_list:
+    for subject_word in word_list_dict:
         genpat = get_genpattern(guess_word, subject_word)
         outcomes.setdefault(genpat, []).append(subject_word)
     return outcomes
 
 
 def get_outcomes_stats(the_outcomes_dict: dict, meta_l: bool = False) -> tuple[
-        int, int, int, float, float, float, float, int, int, int]:
+    int, int, int, float, float, float, float, int, int, int]:
     """
     Compute statistics for a single guess's outcome dictionary.
     Given a single guess's outcome dictionary, returns stats:
@@ -748,908 +718,23 @@ def outcomes_stat_summary(best_rank_dict: dict) -> tuple[int, int, int, float, f
     # to be from the list showing. These selections would be harder to spot when the summary reports the max outcome
     # size instead of the min_max outcome size.
     first = next(iter(best_rank_dict.values()))
-    grps_qty     = first[0]
-    mean         = first[3] # formerly was optimal rank
-    min_grp_size = first[1] # Seed with a member's largest
-    max_grp_size = first[2] # The min_max is desired. Seed with a member's largest
-    min_grp_p2   = first[4] # Seed with member's variance
-    max_grp_ent  = first[5]
-    min_grp_xa   = first[6] # Seed with member's expected average
+    grps_qty = first[0]
+    mean = first[3]  # formerly was optimal rank
+    min_grp_size = first[1]  # Seed with a member's largest
+    max_grp_size = first[2]  # The min_max is desired. Seed with a member's largest
+    min_grp_p2 = first[4]  # Seed with member's variance
+    max_grp_ent = first[5]
+    min_grp_xa = first[6]  # Seed with member's expected average
 
     for g_stats in best_rank_dict.values():
         _, min_stat, max_stat, _, p2_stat, e_stat, xa_stat, *_ = g_stats
         min_grp_size = min(min_grp_size, min_stat)
         max_grp_size = min(max_grp_size, max_stat)  # min_max: prefer smaller largest group
-        min_grp_p2   = min(min_grp_p2, p2_stat)
-        max_grp_ent  = max(max_grp_ent, e_stat)
-        min_grp_xa   = min(min_grp_xa, xa_stat)
+        min_grp_p2 = min(min_grp_p2, p2_stat)
+        max_grp_ent = max(max_grp_ent, e_stat)
+        min_grp_xa = min(min_grp_xa, xa_stat)
 
     return grps_qty, min_grp_size, max_grp_size, mean, min_grp_p2, max_grp_ent, min_grp_xa
-
-
-
-def extended_best_outcomes_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
-                                      cond_rpt: bool, keyed_rpt: bool,
-                                      guess_targets: dict,
-                                      report_header_msg1: str, title_context: str,
-                                      meta_l: bool = False) -> dict:
-    """
-    Find and return the best outcome-ranked guess words from guess_targets.
-
-    Guesses producing more outcomes (and therefore smaller outcomes) rank higher.
-    Within equal outcome counts, guesses with higher entropy — more evenly distributed
-    outcome sizes — are preferred. The returned dict is sorted by entropy descending,
-    putting the best candidate at the top.
-
-    :param remaining_word_lst: The remaining solutions word list.
-    :param reporting: If True, print verbose output to rptwnd.
-    :param byentonly: If True, return only the highest-entropy guesses.
-    :param cond_rpt: If True, use condensed verbose output format.
-    :param keyed_rpt: If True, use keyed-by-word verbose output format.
-    :param guess_targets: Guess vocabulary dictionary.
-    :param report_header_msg1: Message string placed in the verbose report header.
-    :param title_context: String used in the window title to indicate owner.
-    :param meta_l: If True, include clue-digit tallies in outcome stats.
-    :return: Dictionary of best outcome-ranked guesses, sorted by entropy descending.
-    """
-    guess_rank_dict = {}
-    best_rank_dict = {}
-    cond_dict = {}
-    min_score = len(remaining_word_lst)
-    max_ent = 0.0
-
-    rptwnd = RptWnd(title_context)
-    rptwnd.withdraw()
-    if reporting:
-        rptwnd.deiconify()
-        reporting_header_to_window(report_header_msg1, guess_targets, rptwnd)
-
-    for guess in guess_targets:
-        # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest,
-        # [3]:average , [4]:population variance , [5]:entropy as a tuple
-        guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_lst)
-        outcome_stats = get_outcomes_stats(guess_outcomes_dict, meta_l)
-
-        if reporting:
-            clue_pattern_outcomes_to_window(guess, outcome_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
-            # saving the condensed stats for later sorting
-            if cond_rpt:
-                cond_dict[guess] = outcome_stats
-                rptwnd.search_text.set('')
-
-        # This function has changed over time. Its purpose is to return a best_stat_dict of guess
-        # words and their stats sorted by the best rank. Guesses having the most outcomes tend to
-        # result in smaller outcomes. However, within guesses having the same number of outcomes,
-        # the guesses with smaller maximum outcomes or guesses with more evenly distributed
-        # outcomes tend to be better than their brethren. Outcome entropy measures that quality.
-        #
-        # Here the guesses' average outcome size (essentially outcome qty) is used as the rank
-        # criteria while also keeping track of the guess having the maximum entropy. Then the
-        # ranked guess dictionary is sorted by entropy. This pulls the best equal outcome qty
-        # words to the top and, if there are actually lesser outcome qty guesses with the higher
-        # entropy, puts the single best word at the dictionary top.
-        #
-        # It is understood this function does not list all the best guesses in order, but does
-        # but the best at the top. It is also understood entropy only approximates the
-        # expected number of steps to solve.
-        #
-
-        guess_rank_dict[guess] = outcome_stats
-        # Record the smallest outcome pattern average size. (essentially max outcome qty)
-        min_score = min(outcome_stats[3], min_score)
-        # Record the maximum entropy seen
-        max_ent = max(outcome_stats[5], max_ent)
-
-    # Populate the best_rank_dict with the best guesses.
-    # This dictionary's values are outcome_stats tuples.
-    for g, s in guess_rank_dict.items():
-        qualifies = (not byentonly and math.isclose(s[3], min_score)) or math.isclose(s[5], max_ent)
-        if qualifies:
-            best_rank_dict.setdefault(g, s)
-
-    # make a new dict that is best_rank_dict sorted by ent size
-    inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
-
-    # Reporting only the best ranking guesses.
-    if reporting:
-        report_footer_wrapper(report_header_msg1, remaining_word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
-        if cond_rpt:
-            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
-
-    return inorder_best_rank_dict
-
-def best_outcomes_from_showing_as_guess_dict(remaining_word_lst: list, reporting: bool, byentonly: bool,
-                                             cond_rpt: bool, keyed_rpt: bool,
-                                             title_context: str, meta_l=False) -> dict:
-    """
-    Wraps guess word outcomes ranking to return the best
-    outcomes rank guesses. Guesses resulting in more outcomes
-    and smaller outcomes are better guesses.
-    @param remaining_word_lst: the remaining solutions word list
-    @param reporting: flag for verbose printing to rptwnd
-    @param byentonly: flag to return only the highest entropy guesses
-    @param cond_rpt: flag for condensed verbose printing to rptwnd
-    @param keyed_rpt: flag for keyed by word verbose printing to rptwnd
-    @param title_context: String used in title to indicate owner
-    @return: dictionary of the best outcomes ranked guesses where
-    guess words are the keys, outcome_stats tuples are the values
-    outcome_stats tuples are:
-    [0]:qty,[1]:smallest,[2]:largest,[3]:average,[4]:population variance,[5]:entropy
-    """
-    guess_stat_dict = {}
-    best_stat_dict = {}
-    cond_dict = {}
-    min_outcome_ave = len(remaining_word_lst)
-    max_ent = 0.0
-    rptwnd = RptWnd(title_context)
-    rptwnd.withdraw()
-    if reporting:
-        rptwnd.deiconify()
-        reporting_header_to_window("Words Showing", remaining_word_lst, rptwnd)
-
-    for guess in remaining_word_lst:
-        guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_lst)
-        # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
-        # [4]:population variance, [5]:entropy, [6] expected outcome size all as a tuple
-        outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
-
-        if reporting:
-            clue_pattern_outcomes_to_window(guess, outcomes_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
-            # saving the stats for later sorting
-            if cond_rpt:
-                cond_dict[guess] = outcomes_stats
-                # omit the 'For:' in the search control
-                rptwnd.search_text.set('')
-
-        # This function has changed over time. Its purpose is to return a best_stat_dict of guess
-        # words and their stats sorted by the best rank. Guesses having the most outcomes tend to
-        # result in smaller outcomes. However, within guesses having the same number of outcomes,
-        # the guesses with smaller maximum outcomes or guesses with more evenly distributed
-        # outcomes tend to be better than their brethren. Outcome entropy measures that quality.
-        #
-        # Here the guesses' average outcome size (essentially outcome qty) is used as the rank
-        # criteria while also keeping track of the guess having the maximum entropy. Then the
-        # ranked guess dictionary is sorted by entropy. This pulls the best equal outcome qty
-        # words to the top and, if there are actually lesser outcome qty guesses with the higher
-        # entropy, puts the single best word at the dictionary top.
-        #
-        # It is understood this function does not list all the best guesses in order, but does
-        # but the best at the top. It is also understood entropy only approximates the
-        # expected number of steps to solve.
-        #
-        guess_stat_dict[guess] = outcomes_stats
-        # Record the smallest outcome pattern average size. (essentially max outcome qty)
-        min_outcome_ave = min(outcomes_stats[3], min_outcome_ave)
-        # Record the maximum entropy seen
-        max_ent = max(outcomes_stats[5], max_ent)
-
-    # Populate the best_stat_dict with the best guesses.
-    # This dictionary's values are outcome_stats tuples.
-    for g, s in guess_stat_dict.items():
-        # if not only by entropy, then include all with
-        # minimum average outcome size (max outcome size)
-        if not byentonly:
-            if math.isclose(s[3], min_outcome_ave):
-                if g not in best_stat_dict:
-                    best_stat_dict[g] = s
-        # Also collect the max_ent instances, these are not
-        # always with max outcome size.
-        if math.isclose(s[5], max_ent):
-            if g not in best_stat_dict:
-                best_stat_dict[g] = s
-
-    # make a new dict that is best_stat_dict sorted by ent size
-    inorder_best_rank_dict = dict(sorted(best_stat_dict.items(), key=lambda item: item[1][5], reverse=True))
-    # Reporting only the best ranking guesses.
-    if reporting:
-        report_footer_wrapper("Words Showing", remaining_word_lst, inorder_best_rank_dict, rptwnd, cond_rpt)
-        if cond_rpt:
-            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
-
-    return inorder_best_rank_dict
-
-
-def best_entropy_outcomes_guess_dict(targets_word_lst: list, guess_word_lst: list, debug_mode: bool) -> dict:
-    """
-    Intended for finite moinkey use. Not used by pywt.
-    Wraps guess word outcomes ranking to return the best
-    outcomes entropy ranked guesses.
-    @param byentonly: flag to return only the highest entropy guesses
-    @param targets_word_lst: possible solution words
-    @param guess_word_lst: guess words to pull guesses from
-    @return: dictionary of the best outcomes ranked guesses where
-    guess words are the keys, outcome_stats tuples are the values
-    outcome_stats tuples are:
-    [0]:qty,[1]:smallest,[2]:largest,[3]:average,[4]:population variance,[5]:entropy
-    """
-    guess_stat_dict = {}
-    best_stats_found_dict = {}
-    best_desired_dict = {}
-    max_ent = 0.0
-    gl_len = len(guess_word_lst)
-    g_n = 0
-
-    if debug_mode:
-        print(f'Working with {len(targets_word_lst)} remaining possibles. '
-              f'Pulling guesses from a {gl_len} guess list.')
-
-    for guess in guess_word_lst:
-        guess_outcomes_dict = outcomes_for_this_guess(guess, targets_word_lst)
-        outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
-        # outcome_stats tuple is: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
-        # [4]:population variance, [5]:entropy, [6] expected outcome size
-        # [7] cnt_0, [8] cnt_1, [9] cnt_2
-        guess_stat_dict[guess] = outcomes_stats
-        # animated in progress showing
-        msg = '\033[K' + '> ' + guess + ' : ' + str(g_n) + ' of ' + str(gl_len) + '\r'
-        sys.stdout.write(msg)
-        g_n = g_n + 1
-
-        # Record the maximum entropy seen
-        max_ent = max(outcomes_stats[5], max_ent)
-
-    # At this point, all guesses were examined and the maximum entropy
-    # value recorded.
-
-    # Populate the best_stats_found_dict with the best guesses.
-    # Initially, only those guesses with the same max_ent go into
-    # the dictionary.
-    # This dictionary's values are outcome_stats tuples.
-    # Iterate back through the guess_stat_dict to find the guesses
-    # with the max_ent. There could be more than 1.
-    for g, s in guess_stat_dict.items():
-        if math.isclose(s[5], max_ent):
-            if g not in best_stats_found_dict:
-                best_stats_found_dict[g] = s
-                if debug_mode:
-                    print(f'Added {g} having {s} to best_stats_found_dict')
-
-    for w in targets_word_lst:
-        for g, s in best_stats_found_dict.items():
-            if w == g:
-                best_desired_dict[g] = s
-                if debug_mode:
-                    print(f'Added {g} having {s} to best_desired_dict')
-
-    if len(best_desired_dict) > 0:
-        del best_stats_found_dict
-        best_stats_found_dict = best_desired_dict
-        if debug_mode:
-            print(f'Using only target best entropy words')
-
-    return best_stats_found_dict
-
-
-def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: ctk, cond_rpt: bool):
-    """
-    Write the full report footer sequence to rptwnd.
-
-    :param msg1: Header message string.
-    :param word_lst: Remaining solutions word list.
-    :param best_rank_dict: Dictionary of best outcome-ranked guesses.
-    :param rptwnd: The report window instance.
-    :param cond_rpt: If True, use condensed format (skips per-word stats footer).
-    """
-    report_footer_summary_header_to_window(msg1, word_lst, rptwnd)
-    report_footer_stats_summary_to_window(best_rank_dict, rptwnd)
-    report_footer_opt_wrds_to_window(best_rank_dict, rptwnd, cond_rpt)
-    if not cond_rpt:
-        report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
-    rptwnd.back_to_summary()
-
-def report_footer_summary_header_to_window(msg: str, source_list: list, rptwnd: ctk) -> None:
-    """
-    Append the outcome summary header line to the report window.
-
-    :param msg: Label identifying the guess word source.
-    :param source_list: The word list being summarised.
-    :param rptwnd: The report window instance.
-    """
-    rptl = f"\n\n> >  Outcome summary using the {msg} words for guesses on the {len(source_list)} words.  < <"
-    rptwnd.verbose_data.insert(tk.END, rptl)
-
-def prnt_guesses_header(rptwnd: ctk, keyed: bool = False, meta_l: bool = False) -> None:
-    """
-    Append the guess stats column header line to the report window.
-
-    :param rptwnd: The report window instance.
-    :param keyed: If True, prepend a 'slot' column for keyed-by-word format.
-    :param meta_l: If True, append clue-digit count columns (#0, #1, #2).
-    """
-    cols = ['slot', 'guess'] if keyed else ['guess']
-    cols += ['qty', 'ent', 'min', 'max', 'ave', 'exp', 'p2']
-    if meta_l:
-        cols += ['#0', '#1', '#2']
-    rptwnd.verbose_data.insert(tk.END, '\n\n' + '\t'.join(cols))
-
-def reporting_header_to_window(msg: str, source_list: list, rptwnd: ctk) -> None:
-    """
-    Set the report window title and append the decorated header line.
-
-    :param msg: Label identifying the guess word source.
-    :param source_list: The guess target word list.
-    :param rptwnd: The report window instance.
-    """
-    title = f"{rptwnd.context} - Outcome Patterns For Guesses From The {msg} Words List ({len(source_list)})"
-    rptwnd.title(title)
-    rptwnd.verbose_data.insert(tk.END, f"> >  {title}  < <")
-
-def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: ctk, keyed: bool, meta_l: bool = False) -> None:
-    """
-    Append condensed line-by-line guess outcome stats to the report window.
-
-    :param l_cond_dict: Dictionary of guesses and their outcome stats.
-    :param rptwnd: The report window instance.
-    :param keyed: If True, group guesses into entropy slots with a slot index prefix.
-    :param meta_l: If True, append clue-digit count columns to each line.
-    """
-    inorder_cond_dict = dict(sorted(l_cond_dict.items(), key=lambda item: item[1][5], reverse=True))
-    prnt_guesses_header(rptwnd, keyed, meta_l)
-
-    indx = 1
-    c_indx_ent = None
-    for g, s in inorder_cond_dict.items():
-        qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2 = s
-
-        if keyed:
-            if c_indx_ent is None:
-                c_indx_ent = ent
-            elif not math.isclose(ent, c_indx_ent):
-                indx += 1
-                c_indx_ent = ent
-            prefix = f"\n{indx}\t{g}\t"
-        else:
-            prefix = f"\n{g}\t"
-
-        rptl = (f"{prefix}{qty}"
-                f"\t{ent:.3f}"
-                f"\t{smallest}"
-                f"\t{largest}"
-                f"\t{average:.3f}"
-                f"\t{g_xa:.2f}"
-                f"\t{p2:.1f}")
-        if meta_l:
-            rptl += f"\t{cnt_0}\t{cnt_1}\t{cnt_2}"
-
-        rptwnd.verbose_data.insert(tk.END, rptl)
-
-def clue_pattern_outcomes_to_window(guess: any, outcome_stats: tuple, guess_outcomes_dict: dict,
-                                    rptwnd: ctk, cond_rpt: bool, keyed_rpt: bool) -> None:
-    (qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2) = outcome_stats
-    # report in full or condensed format according to cond_prt flag
-    keyed_if = ''
-    if keyed_rpt:
-        keyed_if = guess + '  '
-    if not cond_rpt:
-        rptl = '\n\n' + keyed_if + '> > > > Clue pattern outcomes for: ' + guess + ' < < < < '
-        rptwnd.verbose_data.insert(tk.END, rptl)
-        rptl = '\n' + keyed_if + '> qty ' + str(qty) + \
-               ', ent ' + '{0:.3f}'.format(ent) + \
-               ", sizes: min " + str(smallest) + \
-               ", max " + str(largest) + \
-               ', ave ' + '{0:.2f}'.format(average) + \
-               ', exp ' + '{0:.2f}'.format(g_xa) + \
-               ', p2 ' + '{0:.1f}'.format(p2)
-
-        rptwnd.verbose_data.insert(tk.END, rptl)
-        rptwnd.verbose_data.insert(tk.END, '\n')
-        for key in sorted(guess_outcomes_dict):
-            g = guess_outcomes_dict[key]
-            rptl = '\n' + keyed_if + key + ' ' + '{:3d}'.format(len(g)) + ': ' + ', '.join(sorted(g))
-            rptwnd.verbose_data.insert(tk.END, rptl)
-
-
-
-def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: ctk):
-    rptwnd.verbose_data.insert(tk.END, outcomes_stats_summary_line(best_rank_dict))
-    rptwnd.verbose_data.see('end')
-
-def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
-    """
-    Return a formatted summary line of outcome stats across all best-ranked guesses.
-    stats_summary [0]:qty,[1]:smallest,[2]:largest, [3]:average,
-    [4]:population variance, [5]:entropy bits as a tuple
-    :param best_rank_dict: Dictionary of best outcome-ranked guesses and their stat tuples.
-    :return: Formatted summary string for insertion into the report window.
-    """
-    g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa = outcomes_stat_summary(best_rank_dict)
-    return (f"\n> >  Max ent {g_ent:.3f}"
-            f", grp qty {g_qty:.0f}"
-            f", sizes: min {g_min:.0f}"
-            f", min-max {g_max:.0f}"
-            f", ave {g_ave:.3f}"
-            f", exp {g_xa:.2f}"
-            f", p2 {g_p2:.1f}")
-
-def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: ctk, cond_mode=False):
-    rptwnd.verbose_data.insert(tk.END, opt_wrds_for_reporting(best_rank_dict, cond_mode))
-
-def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode: bool = False) -> str:
-    """
-    Build a formatted string listing the optimal words for report output.
-
-    The dictionary is already sorted by entropy; the first word has the highest
-    entropy, and any subsequent words have the highest outcome quantity.
-
-    :param best_rank_dict: Dictionary of optimal words, sorted by entropy descending.
-    :param cond_mode: If True, append a condensed-mode sort header.
-    :return: Formatted string listing the optimal words.
-    """
-    words = list(best_rank_dict)
-    rptl = (f"\n> >  {len(words)} optimal. "
-            f"1st word is highest ent. Any next have the highest outcome qty:\n"
-            f"{', '.join(words)}")
-    if cond_mode:
-        rptl += '\n\nSorted by highest ent:'
-    return rptl
-
-def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: ctk) -> None:
-    """
-    Append per-word outcome stats for each optimal guess to the report window.
-
-    stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
-    [4]:population variance,[5]:entropy bits as a tuple
-
-    :param best_rank_dict: Dictionary of best outcome-ranked guesses and their stat tuples.
-    :param rptwnd: The report window instance.
-    """
-    stats_summary = outcomes_stat_summary(best_rank_dict)
-    rptwnd.verbose_data.insert(tk.END,
-        f"\n> >  Optimal guess stats, each has outcome qty {stats_summary[0]:.0f} or is max entropy:")
-
-    for w, s in best_rank_dict.items():
-        g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa, *_ = s
-        rptwnd.verbose_data.insert(tk.END,
-            f"\n{w} - "
-            f"qty {g_qty:.0f}, "
-            f"ent {g_ent:.3f}, "
-            f"min {g_min:.0f}, "
-            f"max {g_max:.0f}, "
-            f"ave {g_ave:.3f}, "
-            f"exp {g_xa:.2f}, "
-            f"p2 {g_p2:.1f}")
-        rptwnd.verbose_data.see('end')
-
-    rptwnd.verbose_data.configure(state='disabled')
-
-
-def valid_mult_ltr(s: str) -> bool:
-    """
-    Return True if s is exactly 2 characters and the second is an uppercase letter.
-    The format requires the letter placed after the number. The mltr_entry_str
-    argument will have already been converted to uppercase.
-    :param s: The string to check (expected to already be uppercase).
-    :return: True if len(s) == 2 and s[1] is A–Z, False otherwise.
-    """
-    return len(s) == 2 and s[1] in string.ascii_uppercase
-
-def valid_first_mult_number(s: str) -> bool:
-    """
-    Return True if the first character of s is a valid multiplicity number (2 or 3).
-    The multiple letter requirement would apply to only
-    2 or 3 multiple instances for that letter. The format
-    requires the number placed before the letter.
-    :param s: The string to check.
-    :return: True if s starts with '2' or '3', False otherwise.
-    """
-    return bool(s) and s[0] in ('2', '3')
-
-def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
-    """
-    Validate and clean a multiple-letter specification string.
-
-    Conforms user input to the format <number><letter>,<number><letter> (e.g. "2e,3a").
-    Intentionally lenient — designed as a live entry conformer, not strict validation.
-
-    :param mltr_entry_str: The multiple-letter specification entry.
-    :return: Cleaned, comma-separated string of valid entries.
-    """
-    if not mltr_entry_str:
-        return mltr_entry_str
-    if mltr_entry_str[-1] == ',':
-        return mltr_entry_str
-    if mltr_entry_str[-1] == ' ':
-        return mltr_entry_str.rstrip() + ','
-
-    valid = []
-    for s in mltr_entry_str.upper().split(','):
-        if not s:
-            continue
-        if valid_first_mult_number(s):
-            valid.append(s[:2] if valid_mult_ltr(s) else s[0])
-
-    return ','.join(valid)
-
-def size_and_position_this_window(self, this_wnd_width: int, this_wnd_height: int,
-                                  offset_h: int, offset_w: int) -> None:
-    """
-    Centre the window on screen at the desired size, with optional offsets.
-
-    :param this_wnd_width: Desired window width in pixels.
-    :param this_wnd_height: Desired window height in pixels.
-    :param offset_h: Vertical offset from centre (positive moves down).
-    :param offset_w: Horizontal offset from centre (positive moves right).
-    """
-    pos_x = (self.winfo_screenwidth()  - this_wnd_width)  // 2 + offset_w
-    pos_y = (self.winfo_screenheight() - this_wnd_height) // 2 + offset_h
-    self.geometry(f"{this_wnd_width}x{this_wnd_height}+{pos_x}+{pos_y}")
-
-def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> dict:
-    """
-    Filter guess words to those complying with hard mode green and yellow clue constraints.
-    Returns hard mode guess words from a dictionary of guess words that comply with
-    hard mode for green clues as a regex string and yellow clue letters in a list.
-    :param default_guesses: Dictionary of candidate guess words.
-    :param req_pat: Green clues as a regex pattern string.
-    :param req_ltrs: Yellow clue letters that must be present.
-    :return: Filtered dictionary of hard mode compliant guess words.
-    """
-    return {w: v for w, v in default_guesses.items()
-            if hard_mode_func_grn((w, v), req_pat) and hard_mode_func_yel((w, v), req_ltrs)}
-
-def hard_mode_func_grn(pair: tuple, req_pat: str) -> bool:
-    """
-    Return True if the word (key) in pair matches the required green letter pattern.
-
-    :param pair: A (word, value) dictionary item tuple.
-    :param req_pat: Regex green clue pattern to match against.
-    :return: True if the word matches, False otherwise.
-    """
-    key, _ = pair
-    return bool(re.match(req_pat, key))
-
-def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
-    """
-    Return True if the word (key) in pair contains all required yellow letters.
-
-    :param pair: A (word, value) dictionary item tuple.
-    :param req_ltrs: Yellow letters that must all be present in the word.
-    :return: True if the word contains every required letter, False otherwise.
-    """
-    key, _ = pair
-    return all(ltr in key for ltr in req_ltrs)
-
-def make_lpc_list_dict(wrds: list) -> dict[str, list]:
-    """
-    Build a letter position count dictionary from a word list.
-
-    Each key is a letter; its value is a 5-element list where each element
-    counts how many times that letter appears at that position across all words.
-
-    :param wrds: List of 5-letter words.
-    :return: Dictionary mapping each letter to its per-position occurrence counts.
-    """
-    lpc_dict: dict[str, list] = {}
-    for wrd in wrds:
-        for i, lt in enumerate(wrd):
-            lpc_dict.setdefault(lt, [0, 0, 0, 0, 0])
-            lpc_dict[lt][i] += 1
-    return lpc_dict
-
-def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
-    """
-    Build a letter frequency data dictionary for a word list.
-
-    Each entry maps a letter to its 5-element position count list, extended with
-    a position hierarchy — groups of 1-based positions ordered from most to least
-    frequent. Positions with equal counts are placed in the same group.
-
-    Example: counts [3, 1, 5, 2, 0] → hierarchy [[3], [1], [4], [2]]
-
-    :param wrds: List of 5-letter words.
-    :return: Dictionary mapping each letter to its extended position count list.
-    """
-    lpc_list_dict = make_lpc_list_dict(wrds)
-
-    for ltr, lpc_list in lpc_list_dict.items():
-        if not sum(lpc_list):
-            continue
-
-        # Pair each non-zero count with its position, sorted highest count first
-        pos_counts = sorted(
-            [(count, pos) for pos, count in enumerate(lpc_list) if count],
-            key=lambda x: -x[0]
-        )
-
-        # Group positions sharing the same count into one hierarchy level
-        hierarchy = [
-            [pos + 1 for _, pos in group]
-            for _, group in groupby(pos_counts, key=lambda x: x[0])
-        ]
-
-        lpc_list.append(hierarchy)
-
-    return lpc_list_dict
-
-
-def rpt_ltr_use(gen_tally: list, the_word_list: list) -> None:
-    """
-    Open a data window and report letter usage details for the word list.
-
-    :param gen_tally: 26-element letter tally list.
-    :param the_word_list: The word list to analyse.
-    """
-    datawnd = RptWnd("Data")
-    datawnd.title("Wordle Helper - Letter Use Details")
-
-    gen_tally_dict = dict_gen_tally(gen_tally, len(the_word_list))
-    use_details_dict = dict_ltr_frq_data_for_words_list(the_word_list)
-
-    datawnd.verbose_data.insert(tk.END,
-        f"----- Letter use details for the {len(the_word_list)} words -----\n"
-        f"- Letter, % having, position counts, [position hierarchy] -\n")
-
-    for ltr, lper in gen_tally_dict.items():
-        entry = use_details_dict[ltr]
-        counts    = ', '.join(str(c) for c in entry[:5])
-        hierarchy = ', '.join(str(group) for group in entry[5])
-        datawnd.verbose_data.insert(tk.END,
-            f"{ltr.upper()}, {lper:.2f}, {counts}, {hierarchy}\n")
-
-
-
-class ShellCmdList:
-    """
-    The class is a list holding the shell commands that operate a series of grep regex
-    functions on the word list text targeted as the solutions list file.
-    It has functions that build the grep regex arguments related to filtering wordle
-    letter conditions.
-    Some functions are not used in the gui pywordletool.
-    The command list is by instance.
-    @param list_file_name: The word list filename.
-    """
-
-    def __init__(self, list_file_name: str) -> None:
-        """
-        The shCMDList is the list of ready to pipe together grep arguments, including the
-        base cat filename wordlist command.
-        @param list_file_name:
-        """
-        self.shCMDlist = list()
-        self.shCMDlist.append("cat " + list_file_name)
-
-    def add_cmd(self, s: str) -> None:
-        """
-        Adds string s to the command stack.
-        @param s: the string to add to the command stack
-        """
-        if len(s) > 0:
-            self.shCMDlist.append(s)
-
-    def add_rand_incl_frm_cmd(self, lst: str) -> str:
-        """
-        Given a string of letters lst, adds to the command
-        stack a grep filter requiring a letter picked at random
-        from string lst.
-        @param lst: string of letters to randomly pick one.
-        @return: Returns that randomly picked letter for
-        feedback purposes.
-        """
-        rand_frm_l = random.choice(lst)
-        self.shCMDlist.append("grep -E '" + rand_frm_l + "'")
-        return rand_frm_l
-
-    def add_type_cmd(self, ltr: str, require: bool) -> None:
-        """
-        Adds command to command stack to require or exclude letter ltr.
-        Appends mltr_entry_str to CMDList as either:
-        required (true) or
-        excluded (false)
-        @param ltr: the grep string
-        @param require: true=required, false=exclude
-        """
-        if len(ltr) > 0:
-            if require:  # require
-                self.shCMDlist.append("grep -E '" + ltr + "'")
-            else:
-                self.shCMDlist.append("grep -vE '" + ltr + "'")
-
-    def add_excl_pos_cmd(self, ltr: str, p: int, add_e: bool) -> None:
-        """
-        Adds command to the command stack that excludes letters from a position number.
-        Context is that letter is known, therefore is required but not at the designated position.
-        These are the Wordle Yellow clues.
-        @param ltr: The letter.
-        @param p:  The letter's position, indexed 1 = first.
-        @param add_e: Add as requirement.
-        """
-        if len(ltr) > 0:
-            # add_E a requirement argument, being managed
-            # outside the shCMDList so that the shCMDList
-            # does not duplicate the grep -E for any one letter.
-            if add_e:  # Require the letter if not already done
-                self.shCMDlist.append("grep -E '" + ltr + "'")
-            # Build the dots around the letter to specify the excluded letter position.
-            c = 5
-            dp = ''.rjust(p - 1, '.')
-            dpn = ''.rjust(c - p, '.')
-            self.shCMDlist.append("grep -vE '" + dp + ltr + dpn + "'")
-
-    def add_incl_pos_cmd(self, ltr: str, p: int) -> None:
-        """
-        Adds command to command stack to require the letter at a position number.
-        @param ltr: The letter.
-        @param p: The letter's position, indexed 1 = first.
-        """
-        if len(ltr) > 0:
-            # Build the dots around the letter to specify the required letter position.
-            c = 5
-            dp = ''.rjust(p - 1, '.')
-            dpn = ''.rjust(c - p, '.')
-            self.shCMDlist.append("grep -E '" + dp + ltr + dpn + "'")
-
-    def add_type_mult_ltr_cmd(self, mult_ltr_definition: str, typ: int) -> None:
-        """
-        Converts the multiple letter code, like 2a,3a, to the required grep regex
-        to affect that multiple letter requirement. The appends the command line to the
-        self.shCMDlist
-        @param mult_ltr_definition: something like 2a,3s
-        @param typ: 1=require, 2=exclude
-        """
-        codes = mult_ltr_definition.split(',')
-        g_code = ''
-        for code in codes:
-            if len(code) == 2:
-                c = code[0]
-                x = code[1]
-                if c == '2':
-                    g_c = f"{x}{x}|{x}.{x}|{x}..{x}|{x}...{x}"
-                    if len(g_code) < 1:
-                        g_code = g_c
-                    else:
-                        g_code = g_code + '|' + g_c
-                if c == '3':
-                    g_c = f"{x}{x}{x}|{x}.{x}{x}|.{x}{x}.{x}|{x}.{x}{x}.|{x}..{x}{x}|{x}{x}..{x}|{x}.{x}.{x}"
-                    if len(g_code) < 1:
-                        g_code = g_c
-                    else:
-                        g_code = g_code + '|' + g_c
-        if typ == 1:
-            self.shCMDlist.append("grep -E '" + g_code + "'")
-        if typ == 2:
-            self.shCMDlist.append("grep -vE '" + g_code + "'")
-
-    def full_cmd(self) -> str:
-        """
-        Returns the command stack assembled into one single shell command line to
-        list only those words that satisfy the grep regex filters.
-        @return: string being the single shell command line.
-        """
-        pipe = " | "
-        this_cmd = ""
-        for w in self.shCMDlist[:-1]:
-            this_cmd = this_cmd + w + pipe
-        this_cmd = this_cmd + self.shCMDlist[-1]
-        return this_cmd
-
-
-class ToolResults:
-    """
-    ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
-    The wordle tool all wrapped up into one being, including the grep command list.
-    """
-
-    def __init__(self,
-                 data_path: str,
-                 vocabulary: str,
-                 letter_ranks: str,
-                 allow_dups: bool,
-                 rank_mode: int,
-                 ordr_by_rank: bool,
-                 cull_pu=False,
-                 pu_vocab='') -> None:
-        """
-        @param data_path: words list folder name
-        @param vocabulary: words list file name less path
-        @param letter_ranks: letter ranking textfile name
-        @param allow_dups: allow multiple same letters bool flag
-        @param rank_mode: letter ranking mode integer
-        @param ordr_by_rank: order results by rank bool flag
-        """
-        self.data_path = data_path
-        self.vocab = vocabulary  # vocabulary is the words list textfile
-        self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
-        self.allow_dups = allow_dups  # loc_allow_dups is the-allow-duplicate-letters flag
-        self.cull_pu = cull_pu
-        self.pu_vocab = pu_vocab
-        self.rank_mode = rank_mode
-        self.no_ordr = not ordr_by_rank
-        wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
-        rank_file = self.data_path + self.ltr_ranks
-
-        self.ltr_rank_dict = make_ltr_rank_dictionary(rank_file)  # ltr_rank_dict is the rank dictionary
-
-        # Initialize and set up the ShellCmdList class instance that holds the
-        # grep filtering command stack. Guessing because it is a class instance is why it
-        # can be passed around as a global variable where it gets modified along the way.
-        self.tool_command_list = ShellCmdList(wrd_list_file_name)  # init with cat wordlistfile
-        # At this point the grep stack is ready for executing in as a class function.
-        self.ranked_wrds_dict = {}  # dictionary of ranked words resulting from grep filtering
-        self.raw_cnt = 0
-        self.ranked_cnt = 0
-
-    def get_result_of_grep_wrd_lst(self) -> list:
-        """
-        @return: Return the results words list without any ranking or sorting.
-        """
-        with Popen(self.tool_command_list.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
-            return list(map(lambda i: i[: -1], proc.stdout.readlines()))
-        # return os.popen(self.tool_command_list.full_cmd()).read().split("\n")
-
-    def get_ranked_grep_result_wrd_lst(self, no_rank=False) -> dict:
-        """
-        Ranking and filtering the words into a dictionary
-        Set loc_allow_dups to prevent letters from occurring more than once
-        First pick should not use duplicates, later picks should consider them.
-        Exclude all empty string. This can happen at the file end.
-        @param no_rank:
-        @return: Returns ranked results words list as sorted dictionary.
-        """
-        wrds = self.get_result_of_grep_wrd_lst()
-        if self.cull_pu:
-            pu_wrds = get_wordlist(get_word_list_path_name(self.data_path + self.pu_vocab, False))
-            cull_sol_list(wrds, pu_wrds)
-        self.raw_cnt = len(wrds)
-        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds,
-                                                                       self.ltr_rank_dict,
-                                                                       self.allow_dups,
-                                                                       self.rank_mode,
-                                                                       self.no_ordr,
-                                                                       no_rank)
-        self.ranked_cnt = len(self.ranked_wrds_dict)
-        return self.ranked_wrds_dict
-
-    def get_status(self) -> str:
-        """
-        @return: Returns the status text line.
-        """
-        status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.raw_cnt)
-        return status
-
-    def get_grep_cmd_str(self) -> str:
-        """
-        Returns the entire fully assembled grep command line.
-        This line includes the full path names.
-        @return: fully assembled grep command line
-        """
-        return self.tool_command_list.full_cmd()
-
-    def get_grep_cmd_less_filepath(self) -> str:
-        """
-        Returns the entire fully assembled grep command line. This line excluded
-        the full path names and so is used in the GUI display.
-        @return: Returns the entire fully assembled grep command line,less pathname
-        """
-        full_cmd = self.tool_command_list.full_cmd()
-        full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)
-        part_cmd = full_cmd.replace(full_path_name, '', 1)
-        return part_cmd
-
-    def get_word_list(self, guess_no: int, guess_wrd='', verbose=False, no_rank=False) -> dict:
-        """
-        Used when a guess word has been recently used to be the filter basis
-        for a ranked word list.
-        Combines returning the ranked word list dictionary with
-        printing out information if needed.
-        @param guess_no: The current guess number
-        @param guess_wrd: The guess word basis is the was one
-        @param verbose: Flag to indicate display
-        @param no_rank: Flag to indicate no ranking or sorting, used for speed
-        @return: The ranked word list corresponding to the filtering
-        arguments already passed to the wordletool device.
-        """
-        the_word_list = self.get_ranked_grep_result_wrd_lst(no_rank)
-        if verbose:
-            print()
-            if guess_no > 1:
-                print('Selection pool for guess {} based on guess {} => {}'
-                      .format(guess_no, (guess_no - 1), guess_wrd))
-            else:
-                print('Selection pool for guess {}'.format(guess_no))
-            print(self.get_status())
-            print(self.get_grep_cmd_less_filepath())
-            print_word_list_col_format(the_word_list, 6)
-        return the_word_list
 
 
 class CustomText(tk.Text):
@@ -1659,26 +744,25 @@ class CustomText(tk.Text):
     text.tag_configure("red", foreground="#ff0000")
     text.highlight_pattern("this should be red", "red")
     The highlight_pattern method is a simplified python
-    version of the tcl code at http://wiki.tcl.tk/3246
+    version of the tcl code at https://wiki.tcl.tk/3246
     """
 
     def __init__(self, *args, **kwargs):
-        tk.Text.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def remove_tag(self, tag):
         self.tag_remove(tag, "1.0", "end")
-
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
                           regexp=True, remove_priors=True, do_scroll=True, mode=0) -> int:
         """Apply the given tag to all text that matches the given pattern.
         If 'regexp' is True, pattern is treated as a Tcl regular expression.
 
-        :param pattern:       Text or regex to find.
+        :param pattern:       Text or regexp to find.
         :param tag:           Highlight colour tag to apply.
         :param start:         Search start position (default "1.0").
         :param end:           Search end position (default "end").
-        :param regexp:        Use regex matching.
+        :param regexp:        Use regexp matching.
         :param remove_priors: Remove all prior highlighting for this tag first.
         :param do_scroll:     Scroll to each found occurrence during search;
                               always scrolls to first match when done.
@@ -1692,7 +776,7 @@ class CustomText(tk.Text):
             return 0
 
         self.mark_set("matchStart", self.index(start))
-        self.mark_set("matchEnd",   self.index(start))
+        self.mark_set("matchEnd", self.index(start))
         self.mark_set("searchLimit", self.index(end))
 
         count = tk.IntVar()
@@ -1846,7 +930,7 @@ class RptWnd(ctk.CTkToplevel):
 
         is_data = (context == 'Data')
         size_and_position_this_window(self, 600 if is_data else 790,
-                                           440 if is_data else 600, 0, 0)
+                                      440 if is_data else 600, 0, 0)
 
         self.option_add('*Font', ('Helvetica', 14, 'normal'))
         self.search_text = tk.StringVar(value=self._DEFAULT_SEARCH)
@@ -1900,6 +984,878 @@ class RptWnd(ctk.CTkToplevel):
 
             ctk.CTkButton(self, text='Outcome Driller', text_color='black',
                           command=self.rpt_show_grps_driller).pack(side=tk.LEFT, padx=4, pady=10)
+
+
+# RptWnd and Custom classes should be defined before this function that uses them.
+def extended_best_outcomes_guess_dict(remaining_word_lst_dict: dict, reporting: bool, byentonly: bool,
+                                      cond_rpt: bool, keyed_rpt: bool,
+                                      guess_targets: dict,
+                                      report_header_msg1: str, title_context: str,
+                                      meta_l: bool = False) -> dict:
+    """
+    Find and return the best outcome-ranked guess words from guess_targets.
+
+    Guesses producing more outcomes (and therefore smaller outcomes) rank higher.
+    Within equal outcome counts, guesses with higher entropy — more evenly distributed
+    outcome sizes — are preferred. The returned dict is sorted by entropy descending,
+    putting the best candidate at the top.
+
+    :param remaining_word_lst_dict: The remaining solutions word list.
+    :param reporting: If True, print verbose output to rptwnd.
+    :param byentonly: If True, return only the highest-entropy guesses.
+    :param cond_rpt: If True, use condensed verbose output format.
+    :param keyed_rpt: If True, use keyed-by-word verbose output format.
+    :param guess_targets: Guess vocabulary dictionary.
+    :param report_header_msg1: Message string placed in the verbose report header.
+    :param title_context: String used in the window title to indicate owner.
+    :param meta_l: If True, include clue-digit tallies in outcome stats.
+    :return: Dictionary of best outcome-ranked guesses, sorted by entropy descending.
+    """
+    guess_rank_dict = {}
+    best_rank_dict = {}
+    cond_dict = {}
+    min_score = len(remaining_word_lst_dict)
+    max_ent = 0.0
+
+    rptwnd = RptWnd(title_context)
+    rptwnd.withdraw()
+    if reporting:
+        rptwnd.deiconify()
+        reporting_header_to_window(report_header_msg1, guess_targets, rptwnd)
+
+    for guess in guess_targets:
+        # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest,
+        # [3]:average , [4]:population variance , [5]:entropy as a tuple
+        guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_lst_dict)
+        outcome_stats = get_outcomes_stats(guess_outcomes_dict, meta_l)
+
+        if reporting:
+            clue_pattern_outcomes_to_window(guess, outcome_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
+            # saving the condensed stats for later sorting
+            if cond_rpt:
+                cond_dict[guess] = outcome_stats
+                rptwnd.search_text.set('')
+
+        # This function has changed over time. Its purpose is to return a best_stat_dict of guess
+        # words and their stats sorted by the best rank. Guesses having the most outcomes tend to
+        # result in smaller outcomes. However, within guesses having the same number of outcomes,
+        # the guesses with smaller maximum outcomes or guesses with more evenly distributed
+        # outcomes tend to be better than their brethren. Outcome entropy measures that quality.
+        #
+        # Here the guesses' average outcome size (essentially outcome qty) is used as the rank
+        # criteria while also keeping track of the guess having the maximum entropy. Then the
+        # ranked guess dictionary is sorted by entropy. This pulls the best equal outcome qty
+        # words to the top and, if there are actually lesser outcome qty guesses with the higher
+        # entropy, puts the single best word at the dictionary top.
+        #
+        # It is understood this function does not list all the best guesses in order, but does
+        # but the best at the top. It is also understood entropy only approximates the
+        # expected number of steps to solve.
+        #
+
+        guess_rank_dict[guess] = outcome_stats
+        # Record the smallest outcome pattern average size. (essentially max outcome qty)
+        min_score = min(outcome_stats[3], min_score)
+        # Record the maximum entropy seen
+        max_ent = max(outcome_stats[5], max_ent)
+
+    # Populate the best_rank_dict with the best guesses.
+    # This dictionary's values are outcome_stats tuples.
+    for g, s in guess_rank_dict.items():
+        qualifies = (not byentonly and math.isclose(s[3], min_score)) or math.isclose(s[5], max_ent)
+        if qualifies:
+            best_rank_dict.setdefault(g, s)
+
+    # make a new dict that is best_rank_dict sorted by ent size
+    inorder_best_rank_dict = dict(sorted(best_rank_dict.items(), key=lambda item: item[1][5], reverse=True))
+
+    # Reporting only the best ranking guesses.
+    if reporting:
+        report_footer_wrapper(report_header_msg1, remaining_word_lst_dict, inorder_best_rank_dict, rptwnd, cond_rpt)
+        if cond_rpt:
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
+
+    return inorder_best_rank_dict
+
+
+# RptWnd and Custom classes should be defined before this function that uses them.
+def best_outcomes_from_showing_as_guess_dict(remaining_word_lst_dict: dict, reporting: bool, byentonly: bool,
+                                             cond_rpt: bool, keyed_rpt: bool,
+                                             title_context: str, meta_l: bool = False) -> dict:
+    """
+    Wraps guess word outcomes ranking to return the best
+    outcomes rank guesses. Guesses resulting in more outcomes
+    and smaller outcomes are better guesses.
+    :param meta_l: meta keypress flag
+    :param remaining_word_lst_dict: the remaining solutions word list
+    :param reporting: flag for verbose printing to rptwnd
+    :param byentonly: flag to return only the highest entropy guesses
+    :param cond_rpt: flag for condensed verbose printing to rptwnd
+    :param keyed_rpt: flag for keyed by word verbose printing to rptwnd
+    :param title_context: String used in title to indicate owner
+    :return: dictionary of the best outcomes ranked guesses where
+    guess words are the keys, outcome_stats tuples are the values
+    outcome_stats tuples are:
+    [0]:qty,[1]:smallest,[2]:largest,[3]:average,[4]:population variance,[5]:entropy
+    """
+    guess_stat_dict = {}
+    best_stat_dict = {}
+    cond_dict = {}
+    min_outcome_ave = len(remaining_word_lst_dict)
+    max_ent = 0.0
+    rptwnd = RptWnd(title_context)
+    rptwnd.withdraw()
+    if reporting:
+        rptwnd.deiconify()
+        reporting_header_to_window("Words Showing", remaining_word_lst_dict, rptwnd)
+
+    for guess in remaining_word_lst_dict:
+        guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_lst_dict)
+        # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
+        # [4]:population variance, [5]:entropy, [6] expected outcome size all as a tuple
+        outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
+
+        if reporting:
+            clue_pattern_outcomes_to_window(guess, outcomes_stats, guess_outcomes_dict, rptwnd, cond_rpt, keyed_rpt)
+            # saving the stats for later sorting
+            if cond_rpt:
+                cond_dict[guess] = outcomes_stats
+                # omit the 'For:' in the search control
+                rptwnd.search_text.set('')
+
+        # This function has changed over time. Its purpose is to return a best_stat_dict of guess
+        # words and their stats sorted by the best rank. Guesses having the most outcomes tend to
+        # result in smaller outcomes. However, within guesses having the same number of outcomes,
+        # the guesses with smaller maximum outcomes or guesses with more evenly distributed
+        # outcomes tend to be better than their brethren. Outcome entropy measures that quality.
+        #
+        # Here the guesses' average outcome size (essentially outcome qty) is used as the rank
+        # criteria while also keeping track of the guess having the maximum entropy. Then the
+        # ranked guess dictionary is sorted by entropy. This pulls the best equal outcome qty
+        # words to the top and, if there are actually lesser outcome qty guesses with the higher
+        # entropy, puts the single best word at the dictionary top.
+        #
+        # It is understood this function does not list all the best guesses in order, but does
+        # but the best at the top. It is also understood entropy only approximates the
+        # expected number of steps to solve.
+        #
+        guess_stat_dict[guess] = outcomes_stats
+        # Record the smallest outcome pattern average size. (essentially max outcome qty)
+        min_outcome_ave = min(outcomes_stats[3], min_outcome_ave)
+        # Record the maximum entropy seen
+        max_ent = max(outcomes_stats[5], max_ent)
+
+    # Populate the best_stat_dict with the best guesses.
+    # This dictionary's values are outcome_stats tuples.
+    for g, s in guess_stat_dict.items():
+        # if not only by entropy, then include all with
+        # minimum average outcome size (max outcome size)
+        if not byentonly:
+            if math.isclose(s[3], min_outcome_ave):
+                if g not in best_stat_dict:
+                    best_stat_dict[g] = s
+        # Also collect the max_ent instances, these are not
+        # always with max outcome size.
+        if math.isclose(s[5], max_ent):
+            if g not in best_stat_dict:
+                best_stat_dict[g] = s
+
+    # make a new dict that is best_stat_dict sorted by ent size
+    inorder_best_rank_dict = dict(sorted(best_stat_dict.items(), key=lambda item: item[1][5], reverse=True))
+    # Reporting only the best ranking guesses.
+    if reporting:
+        report_footer_wrapper("Words Showing", remaining_word_lst_dict, inorder_best_rank_dict, rptwnd, cond_rpt)
+        if cond_rpt:
+            report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
+
+    return inorder_best_rank_dict
+
+
+def best_entropy_outcomes_guess_dict(targets_word_lst_dict: dict, guess_word_lst: list, debug_mode: bool) -> dict:
+    """
+    Intended for finite monkey use. Not used by pywt.
+    Returns the best entropy-ranked guesses from guess_word_lst evaluated against
+    targets_word_lst_dict. Prefers guesses that are also valid target words when available.
+
+    :param targets_word_lst_dict: Possible solution words.
+    :param guess_word_lst: Guess words to evaluate.
+    :param debug_mode: If True, print progress and debug output.
+    :return: Dictionary of best entropy-ranked guesses; keys are words,
+             values are outcome_stats tuples:
+             [0]:qty, [1]:smallest, [2]:largest, [3]:average,
+             [4]:population variance, [5]:entropy, [6]:expected size,
+             [7]:cnt_0, [8]:cnt_1, [9]:cnt_2.
+    """
+    gl_len = len(guess_word_lst)
+    guess_stat_dict = {}
+    max_ent = 0.0
+
+    if debug_mode:
+        print(f'Working with {len(targets_word_lst_dict)} remaining possibles. '
+              f'Pulling guesses from a {gl_len} guess list.')
+
+    for g_n, guess in enumerate(guess_word_lst):
+        guess_outcomes_dict = outcomes_for_this_guess(guess, targets_word_lst_dict)
+        outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
+        guess_stat_dict[guess] = outcomes_stats
+        sys.stdout.write(f'\033[K> {guess} : {g_n} of {gl_len}\r')
+        max_ent = max(outcomes_stats[5], max_ent)
+
+    # Collect all guesses sharing the maximum entropy.
+    best_stats_found_dict = {
+        g: s for g, s in guess_stat_dict.items()
+        if math.isclose(s[5], max_ent)
+    }
+    if debug_mode:
+        for g, s in best_stats_found_dict.items():
+            print(f'Added {g} having {s} to best_stats_found_dict')
+
+    # Prefer guesses that are also valid target words.
+    best_desired_dict = {
+        g: s for g, s in best_stats_found_dict.items()
+        if g in targets_word_lst_dict
+    }
+    if best_desired_dict:
+        if debug_mode:
+            for g, s in best_desired_dict.items():
+                print(f'Added {g} having {s} to best_desired_dict')
+            print('Using only target best entropy words')
+        return best_desired_dict
+
+    return best_stats_found_dict
+
+
+def report_footer_wrapper(msg1: str, word_lst_dict: dict, best_rank_dict: dict, rptwnd: RptWnd, cond_rpt: bool):
+    """
+    Write the full report footer sequence to rptwnd.
+
+    :param msg1: Header message string.
+    :param word_lst_dict: Remaining solutions word list dict.
+    :param best_rank_dict: Dictionary of best outcome-ranked guesses.
+    :param rptwnd: The report window instance.
+    :param cond_rpt: If True, use condensed format (skips per-word stats footer).
+    """
+    report_footer_summary_header_to_window(msg1, word_lst_dict, rptwnd)
+    report_footer_stats_summary_to_window(best_rank_dict, rptwnd)
+    report_footer_opt_wrds_to_window(best_rank_dict, rptwnd, cond_rpt)
+    if not cond_rpt:
+        report_footer_optimal_wrds_stats_to_window(best_rank_dict, rptwnd)
+    rptwnd.back_to_summary()
+
+
+def report_footer_summary_header_to_window(msg: str, source_list_dict: dict, rptwnd: RptWnd) -> None:
+    """
+    Append the outcome summary header line to the report window.
+
+    :param msg: Label identifying the guess word source.
+    :param source_list_dict: The word list being summarised.
+    :param rptwnd: The report window instance.
+    """
+    rptl = f"\n\n> >  Outcome summary using the {msg} words for guesses on the {len(source_list_dict)} words.  < <"
+    rptwnd.verbose_data.insert(tk.END, rptl)
+
+
+def prnt_guesses_header(rptwnd: RptWnd, keyed: bool = False, meta_l: bool = False) -> None:
+    """
+    Append the guess stats column header line to the report window.
+
+    :param rptwnd: The report window instance.
+    :param keyed: If True, prepend a 'slot' column for keyed-by-word format.
+    :param meta_l: If True, append clue-digit count columns (#0, #1, #2).
+    """
+    cols = ['slot', 'guess'] if keyed else ['guess']
+    cols += ['qty', 'ent', 'min', 'max', 'ave', 'exp', 'p2']
+    if meta_l:
+        cols += ['#0', '#1', '#2']
+    rptwnd.verbose_data.insert(tk.END, '\n\n' + '\t'.join(cols))
+
+
+def reporting_header_to_window(msg: str, source_list_dict: dict, rptwnd: RptWnd) -> None:
+    """
+    Set the report window title and append the decorated header line.
+
+    :param msg: Label identifying the guess word source.
+    :param source_list_dict: The guess target word list.
+    :param rptwnd: The report window instance.
+    """
+    title = f"{rptwnd.context} - Outcome Patterns For Guesses From The {msg} Words List ({len(source_list_dict)})"
+    rptwnd.title(title)
+    rptwnd.verbose_data.insert(tk.END, f"> >  {title}  < <")
+
+
+def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: RptWnd, keyed: bool,
+                                             meta_l: bool = False) -> None:
+    """
+    Append condensed line-by-line guess outcome stats to the report window.
+
+    :param l_cond_dict: Dictionary of guesses and their outcome stats.
+    :param rptwnd: The report window instance.
+    :param keyed: If True, group guesses into entropy slots with a slot index prefix.
+    :param meta_l: If True, append clue-digit count columns to each line.
+    """
+    inorder_cond_dict = dict(sorted(l_cond_dict.items(), key=lambda item: item[1][5], reverse=True))
+    prnt_guesses_header(rptwnd, keyed, meta_l)
+
+    indx = 1
+    c_indx_ent = None
+    for g, s in inorder_cond_dict.items():
+        qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2 = s
+
+        if keyed:
+            if c_indx_ent is None:
+                c_indx_ent = ent
+            elif not math.isclose(ent, c_indx_ent):
+                indx += 1
+                c_indx_ent = ent
+            prefix = f"\n{indx}\t{g}\t"
+        else:
+            prefix = f"\n{g}\t"
+
+        rptl = (f"{prefix}{qty}"
+                f"\t{ent:.3f}"
+                f"\t{smallest}"
+                f"\t{largest}"
+                f"\t{average:.3f}"
+                f"\t{g_xa:.2f}"
+                f"\t{p2:.1f}")
+        if meta_l:
+            rptl += f"\t{cnt_0}\t{cnt_1}\t{cnt_2}"
+
+        rptwnd.verbose_data.insert(tk.END, rptl)
+
+
+def clue_pattern_outcomes_to_window(guess: Any, outcome_stats: tuple, guess_outcomes_dict: dict,
+                                    rptwnd: RptWnd, cond_rpt: bool, keyed_rpt: bool) -> None:
+    """
+    Append clue pattern outcome details for a single guess to the report window.
+
+    :param guess: The guess word being reported.
+    :param outcome_stats: Tuple of outcome statistics for this guess.
+    :param guess_outcomes_dict: Dict mapping clue patterns to lists of matching words.
+    :param rptwnd: The report window instance.
+    :param cond_rpt: If True, use condensed format (suppresses per-guess detail).
+    :param keyed_rpt: If True, prefix each line with the guess word.
+    """
+    qty, smallest, largest, average, p2, ent, g_xa, cnt_0, cnt_1, cnt_2 = outcome_stats
+    prefix = f'{guess}  ' if keyed_rpt else ''
+
+    if not cond_rpt:
+        rptwnd.verbose_data.insert(tk.END,
+                                   f'\n\n{prefix}> > > > Clue pattern outcomes for: {guess} < < < < ')
+        rptwnd.verbose_data.insert(tk.END,
+                                   f'\n{prefix}> qty {qty}'
+                                   f', ent {ent:.3f}'
+                                   f', sizes: min {smallest}'
+                                   f', max {largest}'
+                                   f', ave {average:.2f}'
+                                   f', exp {g_xa:.2f}'
+                                   f', p2 {p2:.1f}')
+        rptwnd.verbose_data.insert(tk.END, '\n')
+        for key in sorted(guess_outcomes_dict):
+            g = guess_outcomes_dict[key]
+            rptwnd.verbose_data.insert(tk.END,
+                                       f'\n{prefix}{key} {len(g):3d}: {", ".join(sorted(g))}')
+
+
+def report_footer_stats_summary_to_window(best_rank_dict: dict, rptwnd: RptWnd):
+    rptwnd.verbose_data.insert(tk.END, outcomes_stats_summary_line(best_rank_dict))
+    rptwnd.verbose_data.see('end')
+
+
+def outcomes_stats_summary_line(best_rank_dict: dict) -> str:
+    """
+    Return a formatted summary line of outcome stats across all best-ranked guesses.
+    stats_summary [0]:qty,[1]:smallest,[2]:largest, [3]:average,
+    [4]:population variance, [5]:entropy bits as a tuple
+    :param best_rank_dict: Dictionary of best outcome-ranked guesses and their stat tuples.
+    :return: Formatted summary string for insertion into the report window.
+    """
+    g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa = outcomes_stat_summary(best_rank_dict)
+    return (f"\n> >  Max ent {g_ent:.3f}"
+            f", grp qty {g_qty:.0f}"
+            f", sizes: min {g_min:.0f}"
+            f", min-max {g_max:.0f}"
+            f", ave {g_ave:.3f}"
+            f", exp {g_xa:.2f}"
+            f", p2 {g_p2:.1f}")
+
+
+def report_footer_opt_wrds_to_window(best_rank_dict: dict, rptwnd: RptWnd, cond_mode: bool = False) -> None:
+    rptwnd.verbose_data.insert(tk.END, opt_wrds_for_reporting(best_rank_dict, cond_mode))
+
+
+def opt_wrds_for_reporting(best_rank_dict: dict, cond_mode: bool = False) -> str:
+    """
+    Build a formatted string listing the optimal words for report output.
+
+    The dictionary is already sorted by entropy; the first word has the highest
+    entropy, and any subsequent words have the highest outcome quantity.
+
+    :param best_rank_dict: Dictionary of optimal words, sorted by entropy descending.
+    :param cond_mode: If True, append a condensed-mode sort header.
+    :return: Formatted string listing the optimal words.
+    """
+    words = list(best_rank_dict)
+    rptl = (f"\n> >  {len(words)} optimal. "
+            f"1st word is highest ent. Any next have the highest outcome qty:\n"
+            f"{', '.join(words)}")
+    if cond_mode:
+        rptl += '\n\nSorted by highest ent:'
+    return rptl
+
+
+def report_footer_optimal_wrds_stats_to_window(best_rank_dict: dict, rptwnd: RptWnd) -> None:
+    """
+    Append per-word outcome stats for each optimal guess to the report window.
+
+    stats_summary [0]:qty,[1]:smallest,[2]:largest,[3]:average,
+    [4]:population variance,[5]:entropy bits as a tuple
+
+    :param best_rank_dict: Dictionary of best outcome-ranked guesses and their stat tuples.
+    :param rptwnd: The report window instance.
+    """
+    stats_summary = outcomes_stat_summary(best_rank_dict)
+    rptwnd.verbose_data.insert(tk.END,
+                               f"\n> >  Optimal guess stats, each has outcome qty {stats_summary[0]:.0f} or is max entropy:")
+
+    for w, s in best_rank_dict.items():
+        g_qty, g_min, g_max, g_ave, g_p2, g_ent, g_xa, *_ = s
+        rptwnd.verbose_data.insert(tk.END,
+                                   f"\n{w} - "
+                                   f"qty {g_qty:.0f}, "
+                                   f"ent {g_ent:.3f}, "
+                                   f"min {g_min:.0f}, "
+                                   f"max {g_max:.0f}, "
+                                   f"ave {g_ave:.3f}, "
+                                   f"exp {g_xa:.2f}, "
+                                   f"p2 {g_p2:.1f}")
+        rptwnd.verbose_data.see('end')
+
+    rptwnd.verbose_data.configure(state='disabled')
+
+
+def valid_mult_ltr(s: str) -> bool:
+    """
+    Return True if s is exactly 2 characters and the second is an uppercase letter.
+    The format requires the letter placed after the number. The mltr_entry_str
+    argument will have already been converted to uppercase.
+    :param s: The string to check (expected to already be uppercase).
+    :return: True if len(s) == 2 and s[1] is A–Z, False otherwise.
+    """
+    return len(s) == 2 and s[1] in string.ascii_uppercase
+
+
+def valid_first_mult_number(s: str) -> bool:
+    """
+    Return True if the first character of s is a valid multiplicity number (2 or 3).
+    The multiple letter requirement would apply to only
+    2 or 3 multiple instances for that letter. The format
+    requires the number placed before the letter.
+    :param s: The string to check.
+    :return: True if s starts with '2' or '3', False otherwise.
+    """
+    return bool(s) and s[0] in ('2', '3')
+
+
+def validate_mult_ltr_sets(mltr_entry_str: str) -> str:
+    """
+    Validate and clean a multiple-letter specification string.
+
+    Conforms user input to the format <number><letter>,<number><letter> (e.g. "2e,3a").
+    Intentionally lenient — designed as a live entry conformer, not strict validation.
+
+    :param mltr_entry_str: The multiple-letter specification entry.
+    :return: Cleaned, comma-separated string of valid entries.
+    """
+    if not mltr_entry_str:
+        return mltr_entry_str
+    if mltr_entry_str[-1] == ',':
+        return mltr_entry_str
+    if mltr_entry_str[-1] == ' ':
+        return mltr_entry_str.rstrip() + ','
+
+    valid = []
+    for s in mltr_entry_str.upper().split(','):
+        if not s:
+            continue
+        if valid_first_mult_number(s):
+            valid.append(s[:2] if valid_mult_ltr(s) else s[0])
+
+    return ','.join(valid)
+
+
+def size_and_position_this_window(this_wnd, this_wnd_width: int, this_wnd_height: int,
+                                  offset_h: int, offset_w: int) -> None:
+    """
+    Centre the window on screen at the desired size, with optional offsets.
+
+    :param this_wnd: this window
+    :param this_wnd_width: Desired window width in pixels.
+    :param this_wnd_height: Desired window height in pixels.
+    :param offset_h: Vertical offset from centre (positive moves down).
+    :param offset_w: Horizontal offset from centre (positive moves right).
+    """
+    pos_x = (this_wnd.winfo_screenwidth() - this_wnd_width) // 2 + offset_w
+    pos_y = (this_wnd.winfo_screenheight() - this_wnd_height) // 2 + offset_h
+    this_wnd.geometry(f"{this_wnd_width}x{this_wnd_height}+{pos_x}+{pos_y}")
+
+
+def hard_mode_guesses(default_guesses: dict, req_pat: str, req_ltrs: list) -> dict:
+    """
+    Filter guess words to those complying with hard mode green and yellow clue constraints.
+    Returns hard mode guess words from a dictionary of guess words that comply with
+    hard mode for green clues as a regex string and yellow clue letters in a list.
+    :param default_guesses: Dictionary of candidate guess words.
+    :param req_pat: Green clues as a regex pattern string.
+    :param req_ltrs: Yellow clue letters that must be present.
+    :return: Filtered dictionary of hard mode compliant guess words.
+    """
+    return {w: v for w, v in default_guesses.items()
+            if hard_mode_func_grn((w, v), req_pat) and hard_mode_func_yel((w, v), req_ltrs)}
+
+
+def hard_mode_func_grn(pair: tuple, req_pat: str) -> bool:
+    """
+    Return True if the word (key) in pair matches the required green letter pattern.
+
+    :param pair: A (word, value) dictionary item tuple.
+    :param req_pat: Regex green clue pattern to match against.
+    :return: True if the word matches, False otherwise.
+    """
+    key, _ = pair
+    return bool(re.match(req_pat, key))
+
+
+def hard_mode_func_yel(pair: tuple, req_ltrs: list) -> bool:
+    """
+    Return True if the word (key) in pair contains all required yellow letters.
+
+    :param pair: A (word, value) dictionary item tuple.
+    :param req_ltrs: Yellow letters that must all be present in the word.
+    :return: True if the word contains every required letter, False otherwise.
+    """
+    key, _ = pair
+    return all(ltr in key for ltr in req_ltrs)
+
+
+def make_lpc_list_dict(wrds: list) -> dict[str, list]:
+    """
+    Build a letter position count dictionary from a word list.
+
+    Each key is a letter; its value is a 5-element list where each element
+    counts how many times that letter appears at that position across all words.
+
+    :param wrds: List of 5-letter words.
+    :return: Dictionary mapping each letter to its per-position occurrence counts.
+    """
+    lpc_dict: dict[str, list] = {}
+    for wrd in wrds:
+        for i, lt in enumerate(wrd):
+            lpc_dict.setdefault(lt, [0, 0, 0, 0, 0])
+            lpc_dict[lt][i] += 1
+    return lpc_dict
+
+
+def dict_ltr_frq_data_for_words_list(wrds: list) -> dict[str, list]:
+    """
+    Build a letter frequency data dictionary for a word list.
+
+    Each entry maps a letter to its 5-element position count list, extended with
+    a position hierarchy — groups of 1-based positions ordered from most to least
+    frequent. Positions with equal counts are placed in the same group.
+
+    Example: counts [3, 1, 5, 2, 0] → hierarchy [[3], [1], [4], [2]]
+
+    :param wrds: List of 5-letter words.
+    :return: Dictionary mapping each letter to its extended position count list.
+    """
+    lpc_list_dict = make_lpc_list_dict(wrds)
+
+    for ltr, lpc_list in lpc_list_dict.items():
+        if not sum(lpc_list):
+            continue
+
+        # Pair each non-zero count with its position, sorted highest count first
+        pos_counts = sorted(
+            [(count, pos) for pos, count in enumerate(lpc_list) if count],
+            key=lambda x: -x[0]
+        )
+
+        # Group positions sharing the same count into one hierarchy level
+        hierarchy = [
+            [pos + 1 for _, pos in group]
+            for _, group in groupby(pos_counts, key=lambda x: x[0])
+        ]
+
+        lpc_list.append(hierarchy)
+
+    return lpc_list_dict
+
+
+def rpt_ltr_use(gen_tally: list, the_word_list: list) -> None:
+    """
+    Open a data window and report letter usage details for the word list.
+
+    :param gen_tally: 26-element letter tally list.
+    :param the_word_list: The word list to analyse.
+    """
+    datawnd = RptWnd("Data")
+    datawnd.title("Wordle Helper - Letter Use Details")
+
+    gen_tally_dict = dict_gen_tally(gen_tally, len(the_word_list))
+    use_details_dict = dict_ltr_frq_data_for_words_list(the_word_list)
+
+    datawnd.verbose_data.insert(tk.END,
+                                f"----- Letter use details for the {len(the_word_list)} words -----\n"
+                                f"- Letter, % having, position counts, [position hierarchy] -\n")
+
+    for ltr, lper in gen_tally_dict.items():
+        entry = use_details_dict[ltr]
+        counts = ', '.join(str(c) for c in entry[:5])
+        hierarchy = ', '.join(str(group) for group in entry[5])
+        datawnd.verbose_data.insert(tk.END,
+                                    f"{ltr.upper()}, {lper:.2f}, {counts}, {hierarchy}\n")
+
+
+class ShellCmdList:
+    """
+    Holds the shell command pipeline that applies a series of grep filters
+    to the word list file to produce the remaining candidate words.
+
+    The class is a list holding the shell commands that operate a series of grep regex
+    functions on the word list text targeted as the solutions list file.
+    It has functions that build the grep regex arguments related to filtering wordle
+    letter conditions.
+    Some functions are not used in the gui pywordletool.
+
+    :param list_file_name: The word list filename.
+    """
+
+    _WORD_LEN = 5  # expected word length for position pattern building
+
+    def __init__(self, list_file_name: str) -> None:
+        """
+        Initialise the command stack with the base cat command.
+
+        :param list_file_name: The word list file to read from.
+        """
+        self.shCMDlist = [f"cat {list_file_name}"]
+
+    def add_cmd(self, s: str) -> None:
+        """
+        Append a raw command string to the stack.
+
+        :param s: The command string to add.
+        """
+        if s:
+            self.shCMDlist.append(s)
+
+    def add_rand_incl_frm_cmd(self, lst: str) -> str:
+        """
+        Append a grep filter requiring a randomly chosen letter from lst.
+
+        :param lst: String of letters to pick from at random.
+        :return: The randomly chosen letter.
+        """
+        rand_frm_l = random.choice(lst)
+        self.shCMDlist.append(f"grep -E '{rand_frm_l}'")
+        return rand_frm_l
+
+    def add_type_cmd(self, ltr: str, require: bool) -> None:
+        """
+        Append a grep command to require or exclude a letter.
+
+        :param ltr: The letter or pattern string.
+        :param require: If True, require the letter; if False, exclude it.
+        """
+        if ltr:
+            flag = '-E' if require else '-vE'
+            self.shCMDlist.append(f"grep {flag} '{ltr}'")
+
+    def add_excl_pos_cmd(self, ltr: str, p: int, add_e: bool) -> None:
+        """
+        Append a grep command excluding a letter from a specific position (yellow clue).
+
+        :param ltr: The letter.
+        :param p: The letter's position, indexed 1 = first.
+        :param add_e: If True, also add a grep requiring the letter (if not already required).
+        """
+        if ltr:
+            if add_e:
+                self.shCMDlist.append(f"grep -E '{ltr}'")
+            dp = '.' * (p - 1)
+            dpn = '.' * (self._WORD_LEN - p)
+            self.shCMDlist.append(f"grep -vE '{dp}{ltr}{dpn}'")
+
+    def add_incl_pos_cmd(self, ltr: str, p: int) -> None:
+        """
+        Append a grep command requiring a letter at a specific position (green clue).
+
+        :param ltr: The letter.
+        :param p: The letter's position, indexed 1 = first.
+        """
+        if ltr:
+            dp = '.' * (p - 1)
+            dpn = '.' * (self._WORD_LEN - p)
+            self.shCMDlist.append(f"grep -E '{dp}{ltr}{dpn}'")
+
+    def add_type_mult_ltr_cmd(self, mult_ltr_definition: str, typ: int) -> None:
+        """
+        Append a grep command for a multiple same-letter requirement or exclusion.
+
+        :param mult_ltr_definition: Encoded multiple-letter spec, e.g. '2a,3s'.
+        :param typ: 1 = require, 2 = exclude.
+        """
+        parts = []
+        for code in mult_ltr_definition.split(','):
+            if len(code) == 2:
+                c, x = code[0], code[1]
+                if c == '2':
+                    parts.append(f"{x}{x}|{x}.{x}|{x}..{x}|{x}...{x}")
+                elif c == '3':
+                    parts.append(f"{x}{x}{x}|{x}.{x}{x}|.{x}{x}.{x}|{x}.{x}{x}.|{x}..{x}{x}|{x}{x}..{x}|{x}.{x}.{x}")
+
+        g_code = '|'.join(parts)
+        if g_code:
+            flag = '-E' if typ == 1 else '-vE'
+            self.shCMDlist.append(f"grep {flag} '{g_code}'")
+
+    def full_cmd(self) -> str:
+        """
+        Assemble the command stack into a single piped shell command.
+
+        :return: The complete shell command string.
+        """
+        return ' | '.join(self.shCMDlist)
+
+
+class ToolResults:
+    """
+    ToolResults(data path, vocabulary file name, letter_ranks file, loc_allow_dups)
+    The wordle tool all wrapped up into one being, including the grep command list.
+    """
+
+    def __init__(self,
+                 data_path: str,
+                 vocabulary: str,
+                 letter_ranks: str,
+                 allow_dups: bool,
+                 rank_mode: int,
+                 ordr_by_rank: bool,
+                 cull_pu: bool = False,
+                 pu_vocab: str = '') -> None:
+        """
+        :param data_path: words list folder name
+        :param vocabulary: words list file name less path
+        :param letter_ranks: letter ranking textfile name
+        :param allow_dups: allow multiple same letters bool flag
+        :param rank_mode: letter ranking mode integer
+        :param ordr_by_rank: order results by rank bool flag
+        """
+        self.data_path = data_path
+        self.vocab = vocabulary  # vocabulary is the words list textfile
+        self.ltr_ranks = letter_ranks  # ltr_ranks is the letter ranking textfile
+        self.allow_dups = allow_dups  # loc_allow_dups is the-allow-duplicate-letters flag
+        self.cull_pu = cull_pu
+        self.pu_vocab = pu_vocab
+        self.rank_mode = rank_mode
+        self.no_ordr = not ordr_by_rank
+        wrd_list_file_name = get_word_list_path_name(self.data_path + self.vocab)
+        rank_file = self.data_path + self.ltr_ranks
+
+        self.ltr_rank_dict = make_ltr_rank_dictionary(rank_file)  # ltr_rank_dict is the rank dictionary
+
+        # Initialize and set up the ShellCmdList class instance that holds the
+        # grep filtering command stack. Guessing because it is a class instance is why it
+        # can be passed around as a global variable where it gets modified along the way.
+        self.tool_command_list = ShellCmdList(wrd_list_file_name)  # init with cat wordlistfile
+        # At this point the grep stack is ready for executing in as a class function.
+        self.ranked_wrds_dict = {}  # dictionary of ranked words resulting from grep filtering
+        self.raw_cnt = 0
+        self.ranked_cnt = 0
+
+    def get_result_of_grep_wrd_lst(self) -> list:
+        """
+        :return: Return the results words list without any ranking or sorting.
+        """
+        with Popen(self.tool_command_list.full_cmd(), shell=True, stdout=PIPE, text=True, close_fds=True) as proc:
+            return list(map(lambda i: i[: -1], proc.stdout.readlines()))
+        # return os.popen(wordle_tool.tool_command_list.full_cmd()).read().split("\n")
+
+    def get_ranked_grep_result_wrd_lst(self, no_rank: bool = False) -> dict:
+        """
+        Ranking and filtering the words into a dictionary
+        Set loc_allow_dups to prevent letters from occurring more than once
+        First pick should not use duplicates, later picks should consider them.
+        Exclude all empty string. This can happen at the file end.
+        :param no_rank:
+        :return: Returns ranked results words list as sorted dictionary.
+        """
+        wrds = self.get_result_of_grep_wrd_lst()
+        if self.cull_pu:
+            pu_wrds = get_wordlist(get_word_list_path_name(self.data_path + self.pu_vocab, False))
+            cull_sol_list(wrds, pu_wrds)
+        self.raw_cnt = len(wrds)
+        self.ranked_wrds_dict = make_ranked_filtered_result_dictionary(wrds,
+                                                                       self.ltr_rank_dict,
+                                                                       self.allow_dups,
+                                                                       self.rank_mode,
+                                                                       self.no_ordr,
+                                                                       no_rank)
+        self.ranked_cnt = len(self.ranked_wrds_dict)
+        return self.ranked_wrds_dict
+
+    def get_status(self) -> str:
+        """
+        :return: Returns the status text line.
+        """
+        status = '{} words shown from the {} full word list.'.format(self.ranked_cnt, self.raw_cnt)
+        return status
+
+    def get_grep_cmd_str(self) -> str:
+        """
+        Returns the entire fully assembled grep command line.
+        This line includes the full path names.
+        :return: fully assembled grep command line
+        """
+        return self.tool_command_list.full_cmd()
+
+    def get_grep_cmd_less_filepath(self) -> str:
+        """
+        Returns the entire fully assembled grep command line. This line excluded
+        the full path names and so is used in the GUI display.
+        :return: Returns the entire fully assembled grep command line,less pathname
+        """
+        full_cmd = self.tool_command_list.full_cmd()
+        full_path_name = os.path.join(os.path.dirname(__file__), self.data_path)
+        part_cmd = full_cmd.replace(full_path_name, '', 1)
+        return part_cmd
+
+    def get_word_list(self, guess_no: int, guess_wrd: str = '', verbose: bool = False, no_rank=False) -> dict:
+        """
+        Used when a guess word has been recently used to be the filter basis
+        for a ranked word list.
+        Combines returning the ranked word list dictionary with
+        printing out information if needed.
+        :param guess_no: The current guess number
+        :param guess_wrd: The guess word basis is the was one
+        :param verbose: Flag to indicate display
+        :param no_rank: Flag to indicate no ranking or sorting, used for speed
+        :return: The ranked word list corresponding to the filtering
+        arguments already passed to the wordletool device.
+        """
+        the_word_list = self.get_ranked_grep_result_wrd_lst(no_rank)
+        if verbose:
+            print()
+            if guess_no > 1:
+                print('Selection pool for guess {} based on guess {} => {}'
+                      .format(guess_no, (guess_no - 1), guess_wrd))
+            else:
+                print('Selection pool for guess {}'.format(guess_no))
+            print(self.get_status())
+            print(self.get_grep_cmd_less_filepath())
+            print_word_list_col_format(the_word_list, 6)
+        return the_word_list
 
 
 class HelpWindow(ctk.CTkToplevel):
@@ -1956,7 +1912,7 @@ class HelpWindow(ctk.CTkToplevel):
     def close_help(self) -> None:
         self.destroy()
 
-    def __init__(self, data_path, letter_rank_file):
+    def __init__(self, data_path: str, letter_rank_file: str):
         super().__init__()
         self.data_path = data_path
         self.letter_rank_file = letter_rank_file

@@ -32,7 +32,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
             3: ('nyt_wordlist.txt', 'Large Vocabulary'),
         }
 
-        verbose_args = (
+        verbose_args: tuple[bool, bool, bool, bool] = (
             self.d_verbose_outcms.get(),
             self.d_ent_outcms.get(),
             self.d_verbose_outcms_cond.get(),
@@ -40,7 +40,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         )
 
         if source == 0:
-            return hlp.best_outcomes_from_showing_as_guess_dict(o_word_lst, *verbose_args, 'Outcome Drilling')
+            return hlp.best_outcomes_from_showing_as_guess_dict(o_word_lst, *verbose_args, title_context='Outcome Drilling')
 
         filename, msg = vocab_map.get(source, (None, None))
         if filename is None:
@@ -51,7 +51,11 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         ).get_ranked_grep_result_wrd_lst(True)
 
         return hlp.extended_best_outcomes_guess_dict(
-            o_word_lst, *verbose_args, all_targets, msg, 'Outcome Drilling', d_meta_l
+            o_word_lst, *verbose_args,
+            guess_targets=all_targets,
+            report_header_msg1=msg,
+            title_context='Outcome Drilling',
+            meta_l=d_meta_l
         )
 
     def clean_the_outcm_list(self) -> tuple[bool, list[str], list[str]]:

@@ -50,6 +50,7 @@ MID_DIV = ' : '
 MID_PAD = '  '
 LEFT_PAD = ""
 
+
 # Remove certain characters from loc_str string argument.
 def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) -> str:
     """Remove specified characters from loc_str.
@@ -136,8 +137,8 @@ class Pywordlemainwindow(ctk.CTk):
         """Return the string of required letters, excluding the '-' placeholder."""
         return ''.join(ltr for b in self.re_btn_vars if (ltr := b.get()) != '-')
 
-
-    def build_exclude_grep(self, ex_btn_var_list: list) -> str:
+    @staticmethod
+    def build_exclude_grep(ex_btn_var_list: list) -> str:
         """Build the grep exclusion command for the selected letters.
 
         Example output: "grep -vE 'b|f|k|w'"
@@ -151,8 +152,8 @@ class Pywordlemainwindow(ctk.CTk):
         args = '|'.join(lts)
         return f"grep -vE '{args}'"
 
-
-    def build_require_these_grep(self, rq_lts: str) -> str:
+    @staticmethod
+    def build_require_these_grep(rq_lts: str) -> str:
         """Build the piped grep command to require all specified letters.
 
         Example output: "grep -E 'b'| grep -E 'f'| grep -E 'k'"
@@ -161,7 +162,6 @@ class Pywordlemainwindow(ctk.CTk):
         :return:       Piped grep command string, or '' if rq_lts is empty.
         """
         return '| '.join(f"grep -E '{ltr}'" for ltr in rq_lts)
-
 
     def coordinate_special_pattern_dups(self) -> None:
         # Coordinate duplicates in special pattern with no dup setting
@@ -181,7 +181,7 @@ class Pywordlemainwindow(ctk.CTk):
         for i in range(0, len(entries), n_col):
             self.tx_result.insert(tk.END, MID_PAD.join(entries[i:i + n_col]) + '\n')
 
-    def str_wrd_list_hrd(self,event=None) -> None:
+    def str_wrd_list_hrd(self, _event=None) -> None:
         """Creates the word list header line.
         """
         ln_col = self.set_n_col()
@@ -192,13 +192,13 @@ class Pywordlemainwindow(ctk.CTk):
             h_line = h_line + MID_PAD + h_txt
         self.lb_result_hd.configure(text=h_line)
 
-    def sanity_question(self, entry: ttk.Entry) -> None:
+    def sanity_question(self, _entry: ttk.Entry) -> None:
         res = tk.messagebox.askyesno(title='Sanity Check',
                                      message='Duplicate letters are being required but that option is not set. Do '
                                              'you want duplicate letters allowed? Otherwise no words will show.')
         if res:
             self.allow_dup_state.set(True)
-        self.after(200, lambda: self.focus_set) # type: ignore[arg-type]
+        self.after(200, lambda: self.focus_set)  # type: ignore[arg-type]
 
     def do_grep(self) -> None:
         """Run a wordletool helper grep instance."""
@@ -400,7 +400,6 @@ class Pywordlemainwindow(ctk.CTk):
         ['X', 'Z', 'Q', 'J']
     ]
 
-
     def __init__(self):
         super().__init__()
         self.wnd_help = None
@@ -449,12 +448,11 @@ class Pywordlemainwindow(ctk.CTk):
 
         # Set meta left pressed flag used for clue type tally count
         # in condensed output.
-        def key_handler_meta_lr(e):
+        def key_handler_meta_lr(_e):
             self.meta_lr = True
 
         self.bind('<Meta_L>', key_handler_meta_lr)
         self.bind('<Meta_R>', key_handler_meta_lr)
-
 
         def show_outcome_driller() -> None:
             if self.outcms_driller_window is None or not self.outcms_driller_window.winfo_exists():
@@ -481,13 +479,10 @@ class Pywordlemainwindow(ctk.CTk):
         def do_list_by() -> None:
             self.do_grep()
 
-        def update_help_wind(letter_rank_file) -> None:
-            self.wnd_help.letter_rank_file = letter_rank_file
+        def update_help_wind(loc_letter_rank_file) -> None:
+            self.wnd_help.letter_rank_file = loc_letter_rank_file
             self.wnd_help.show_rank_info()
             self.wnd_help.deiconify()
-
-
-
 
         def add_x_pos() -> None:
             x_ltr = self.pos_px_l.get().upper()
@@ -506,8 +501,6 @@ class Pywordlemainwindow(ctk.CTk):
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
             remove_already_from_cbox_px(self.pos_px_l.get())
             reset_cbox_focus(self.cbox_px_l)
-
-
 
         def add_r_pos() -> None:
             x_ltr = self.pos_pr_l.get().upper()
@@ -536,8 +529,6 @@ class Pywordlemainwindow(ctk.CTk):
             # and make the letter state_appearance selected even though it makes no difference
             entrywidget.selection_range(0, 1)
 
-
-
         def remove_x_pos() -> None:
             x_ltr = self.pos_px_l.get().upper()
             x_pos = self.pos_px_p.get()
@@ -558,7 +549,6 @@ class Pywordlemainwindow(ctk.CTk):
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
             self.cbox_px_l.current(0)
             self.cbox_px_p.current(0)
-
 
         def remove_r_pos() -> None:
             # Note - This differs from remove_x_pos because in the
@@ -636,8 +626,6 @@ class Pywordlemainwindow(ctk.CTk):
             if not self.verbose_outcms.get():
                 self.verbose_outcms.set(self.cond_outcms.get())
 
-
-
         def fill_treeview_per_dictionary(this_treeview, this_pos_dict: dict, by_what: int) -> None:
             """Clear and refill a treeview from a dictionary.
             Clears and fills a treeview with dictionary contents
@@ -662,20 +650,14 @@ class Pywordlemainwindow(ctk.CTk):
 
             self.do_grep()
 
-
-
-
-
         def on_window_resize(event):
             width = event.width
             height = event.height
             print(f"Window resized to {width}x{height}")
             sw = self.result_frame.winfo_width()
             print(f"result_frame.winfo_width {sw}")
-            # sw = self.winfo_screenwidth()
+            # sw = wordle_tool.winfo_screenwidth()
             # print(f"winfo_screenwidth {sw}")
-
-
 
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
@@ -687,26 +669,25 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame.grid_rowconfigure(2, weight=1)
         self.result_frame.grid_rowconfigure(3, weight=1)
 
-
         # the header line above the word list
         self.lb_result_hd = tk.Label(self.result_frame,
-                                font=('Courier', 12, 'bold'),
-                                relief='sunken',
-                                background='#dedede',
-                                anchor='w',
-                                borderwidth=0,
-                                highlightthickness=0)
+                                     font=('Courier', 12, 'bold'),
+                                     relief='sunken',
+                                     background='#dedede',
+                                     anchor='w',
+                                     borderwidth=0,
+                                     highlightthickness=0)
         self.lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='enw', padx=6, pady=2)
         self.lb_result_hd.bind("<Configure>", self.str_wrd_list_hrd)
 
         # The word list resulting from grep on the main wordlist
         # The CustomText class is a tk.Text extended to support a color for matched text.
         self.tx_result = hlp.CustomText(self.result_frame,
-                                   font=('Courier', 12, 'normal'),
-                                   wrap='word',
-                                    background='#dedede',
-                                   borderwidth=0,
-                                   highlightthickness=0)
+                                        font=('Courier', 12, 'normal'),
+                                        wrap='word',
+                                        background='#dedede',
+                                        borderwidth=0,
+                                        highlightthickness=0)
         self.tx_result.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=6, pady=2)
         # tx_result.bind("<Configure>", on_window_resize)
         # The CustomText class is a tk.Text extended to support a color for matched text.
@@ -719,7 +700,7 @@ class Pywordlemainwindow(ctk.CTk):
         self.tx_result.tag_configure('gen', background='#ffb8f2')
         # tag 'ent' is used to highlight entropy pick
         self.tx_result.tag_configure('ent', background='#ffd700')
-        # tag 'add' is used to highlight non classic words
+        # tag 'add' is used to highlight non-classic words
         self.tx_result.tag_configure('add', background='#b6df00')
 
         # scrollbar for wordlist
@@ -739,12 +720,12 @@ class Pywordlemainwindow(ctk.CTk):
 
         # grep line being used
         self.tx_gr = tk.Text(self.result_frame,
-                        wrap='word',
-                        font=('Courier', 12, 'normal'),
-                        height=2,
-                        background='#dedede',
-                        borderwidth=0,
-                        highlightthickness=0)
+                             wrap='word',
+                             font=('Courier', 12, 'normal'),
+                             height=2,
+                             background='#dedede',
+                             borderwidth=0,
+                             highlightthickness=0)
         self.tx_gr.grid(row=4, column=0, columnspan=4, sticky='nsew', padx=6, pady=4)
         self.tx_gr.delete(1.0, tk.END)
         # scrollbar for grep line
@@ -761,7 +742,7 @@ class Pywordlemainwindow(ctk.CTk):
                                              corner_radius=10
                                              )
         self.bottomhalf_frame.pack(anchor="s", padx=10, pady=2, fill="x", expand=0)
-        # self.pw.add(self.bottomhalf_frame)
+        # wordle_tool.pw.add(wordle_tool.bottomhalf_frame)
 
         # grep criteria outer frame holding:
         # letter require frame
@@ -806,7 +787,7 @@ class Pywordlemainwindow(ctk.CTk):
                                                 )
         self.criteria_frame_px.pack(side="left", fill="y", padx=0, pady=0, expand=1)
 
-        # letter position frame require- uses pack
+        # letter position frame for require, uses pack
         self.criteria_frame_pr = ttk.LabelFrame(self.criteria_frame_p,
                                                 text='Require At Position',
                                                 labelanchor='n',
@@ -845,14 +826,12 @@ class Pywordlemainwindow(ctk.CTk):
         self.mult_ltr_definition = tk.StringVar()
         self.mult_ltr_mode_var = tk.IntVar(value=2)
 
-
-
-        def do_spec_pat(*args) -> None:
+        def do_spec_pat(*_args) -> None:
             # In this ui all text is shown in uppercase and there can be only five letters
             self.spec_pattern.set('%.5s' % scrub_text(self.spec_pattern.get(), '', True, False).upper())
             self.do_grep()
 
-        def do_mult_ltr_def(*args) -> None:
+        def do_mult_ltr_def(*_args) -> None:
             # In this ui all text is shown in uppercase and the format must conform to:
             # <number><letter>,<number><letter>
             self.mult_ltr_definition.set(hlp.validate_mult_ltr_sets(self.mult_ltr_definition.get()))
@@ -867,7 +846,6 @@ class Pywordlemainwindow(ctk.CTk):
         # special pattern entry clear
         def clear_specials():
             self.spec_pattern.set('')
-            self.mult_ltr_definition.set('')
 
         # The special pattern controls are in a sub frame and all but the text label are RIGHT positioned.
         # Therefore, they are defined from last to first.
@@ -960,7 +938,7 @@ class Pywordlemainwindow(ctk.CTk):
         # =======  START OF ============ exclude from position controls
         # === position exclude letter
         # conform the position exclude letter
-        def pos_px_ltr_conform(*args) -> None:
+        def pos_px_ltr_conform(*_args) -> None:
             cbox_entry_conform(self.pos_px_l, True, False)
             # Once the letter is set, it would be nice to have the position
             # cbox reset to have only the positions not already assigned to
@@ -999,7 +977,7 @@ class Pywordlemainwindow(ctk.CTk):
 
         # === position exclude letter's position
         # conform the position exclude position
-        def pos_px_p_conform(*args) -> None:
+        def pos_px_p_conform(*_args) -> None:
             cbox_entry_conform(self.pos_px_p, False, True)
 
         self.pos_px_p = tk.StringVar(name='pos_px_p')
@@ -1074,7 +1052,7 @@ class Pywordlemainwindow(ctk.CTk):
                 string_var.set(string_var.get()[-1])
 
         # =======  START OF ============ require from position controls
-        def pr_to_uppercase(*args) -> None:
+        def pr_to_uppercase(*_args) -> None:
             cbox_entry_conform(self.pos_pr_l, True, False)
 
         self.pos_pr_l = tk.StringVar()
@@ -1096,7 +1074,7 @@ class Pywordlemainwindow(ctk.CTk):
             # python < 3.6
             self.pos_pr_l.trace('w', pr_to_uppercase)
 
-        def cbox_pos_conform(*args) -> None:
+        def cbox_pos_conform(*_args) -> None:
             cbox_entry_conform(self.pos_pr_p, False, True)
 
         self.pos_pr_p = tk.StringVar()
@@ -1177,7 +1155,6 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_x_clr.pack(side="top", padx=2, pady=2, fill="x", expand=True)
         # ======= End OF Exclude Letters =============
 
-
         # ======= Require Letters =============
         self.re_btn_vars = self._build_letter_checkbuttons(self.criteria_frame_r, self.do_grep)
 
@@ -1192,7 +1169,6 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_r_clr.pack(side="top", padx=2, pady=2, fill="x", expand=True)
 
         # ======= End Of Require Letters =============
-
 
         # === START OF ====== General Controls ==========
         # the_top_frame
@@ -1260,8 +1236,8 @@ class Pywordlemainwindow(ctk.CTk):
         # Vocabulary radio buttons
         rbv1 = ttk.Radiobutton(vocab_frame, text="Classic", variable=self.vocab_var, value=0, command=self.do_grep)
         rbv1.pack(side="left", fill="x", padx=0, pady=6, expand=True)
-        rbv1B = ttk.Radiobutton(vocab_frame, text="Classic+", variable=self.vocab_var, value=1, command=self.do_grep)
-        rbv1B.pack(side="left", fill="x", padx=0, pady=6, expand=True)
+        rbv1_b = ttk.Radiobutton(vocab_frame, text="Classic+", variable=self.vocab_var, value=1, command=self.do_grep)
+        rbv1_b.pack(side="left", fill="x", padx=0, pady=6, expand=True)
         rbv2 = ttk.Radiobutton(vocab_frame, text="Large", variable=self.vocab_var, value=2, command=self.do_grep)
         rbv2.pack(side="left", fill="x", padx=0, pady=6, expand=True)
         chk_cull_the_pu = ttk.Checkbutton(vocab_frame,
@@ -1316,11 +1292,11 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_zap.pack(side="right", padx=4, pady=1, fill="x", expand=True)
 
         self.bt_genetic = ctk.CTkButton(self.bt_grpA_frame, text="Genetic", width=40, text_color="black",
-                                      command=pick_genetic)
+                                        command=pick_genetic)
         self.bt_genetic.pack(side="left", padx=4, pady=1, fill="x", expand=True)
 
         self.bt_not_classic = ctk.CTkButton(self.bt_grpA_frame, text="! Classic", width=40, text_color="black",
-                                      command=not_classic)
+                                            command=not_classic)
         self.bt_not_classic.pack(side="left", padx=4, pady=1, fill="x", expand=True)
 
         self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Random", width=40, text_color="black",
@@ -1399,7 +1375,7 @@ class Pywordlemainwindow(ctk.CTk):
 # def key_handler(event):
 #     print(event.char, event.keysym, event.keycode)
 
-def main(args=None):
+def main(_args=None):
     this_app = Pywordlemainwindow()
     # this_app.bind("<Key>", key_handler)
     this_app.mainloop()
