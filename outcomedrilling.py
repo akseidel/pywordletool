@@ -153,8 +153,7 @@ class OutcmsDrillingMain(ctk.CTkToplevel):
         self.tx_status.insert('end', hlp.outcomes_stats_summary_line(optimal_outcome_guesses))
         self.tx_status.insert('end', wrds)
         self.tx_status.see('1.0')
-        if self.d_ent_outcms.get():
-            tag = 'ent' if self.d_ent_outcms.get() else 'out'
+        tag = 'ent' if self.d_ent_outcms.get() else 'out'
         self.tx_status.highlight_pattern(regex, tag, remove_priors=False, do_scroll=False)
         self.tx_status.configure(state='disabled')
 
