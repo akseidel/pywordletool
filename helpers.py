@@ -26,8 +26,6 @@ import outcomedrilling
 # from fmwm import debug_mode
 
 
-# todo: remove this eventually
-# gc_z = [0] * 28
 
 
 def get_word_list_path_name(local_path_file_name: str, critical: bool = True) -> str:
@@ -828,7 +826,7 @@ class CustomText(tk.Text):
                     f'\n\n"Find" operates a regex search on the entire text.'
                     f' Putting "^", which means "starting with", works in the unkeyed condensed report '
                     f"because each line starts with the guess word and it is the guess word that is usually "
-                    f"what one searches for."
+                    f"for which one searches."
                 )
             messagebox.showinfo(title=None, message=msg)
         elif first_index:
@@ -852,8 +850,18 @@ class RptWnd(ctk.CTkToplevel):
     def close_rpt(self) -> None:
         self.destroy()
 
+    @staticmethod
+    def fix_missing_space(text, search_term):
+        # Escape the term in case it contains regex special chars
+        escaped = re.escape(search_term.strip())
+        # Replace term only when NOT immediately followed by a space
+        return re.sub(rf'{escaped}(?! )', f'{search_term.strip()} ', text)
+
     def find_the_text(self, _event=None) -> None:
-        regex = self.search_text.get().strip()
+        regex = self.fix_missing_space(self.search_text.get(), self._DEFAULT_SEARCH)
+        self.search_text.set(regex)
+        if e := self._entry_widget():
+            e.icursor(tk.END)
         org_title = self.title()
         self.title(f'> > Busy on "{regex}", Please Wait < <')
         self.update()
@@ -910,12 +918,20 @@ class RptWnd(ctk.CTkToplevel):
         if hasattr(self, '_button_next'):
             self._button_next.configure(state='disabled', text='Next')
 
+    def _entry_widget(self) -> tk.Entry | None:
+        """Return the underlying tk.Entry inside the CTkEntry, regardless of ctk version."""
+        return next((w for w in self.entry_find.winfo_children() if isinstance(w, tk.Entry)), None)
+
+
     def back_to_summary(self) -> None:
         """Scroll to 'Outcome summary' by highlighting it briefly, then remove the highlight."""
         self.verbose_data.highlight_pattern(
             'Outcome summary', self._TAG, remove_priors=True, mode=1)
         self.verbose_data.remove_tag(self._TAG)
         self._reset_next_button()
+        self.search_text.set(self._DEFAULT_SEARCH)
+        if e := self._entry_widget():
+            e.icursor(tk.END)
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
@@ -966,9 +982,9 @@ class RptWnd(ctk.CTkToplevel):
         self.protocol('WM_DELETE_WINDOW', self.close_rpt)
 
         if not is_data:
-            entry_find = ctk.CTkEntry(self, textvariable=self.search_text)
-            entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=True, fill=tk.X)
-            entry_find.bind('<KeyRelease-Return>', self.find_the_text)
+            self.entry_find = ctk.CTkEntry(self, textvariable=self.search_text)
+            self.entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=True, fill=tk.X)
+            self.entry_find.bind('<KeyRelease-Return>', self.find_the_text)
 
             ctk.CTkButton(self, text='Find', text_color='black', width=110,
                           command=self.find_the_text).pack(side=tk.LEFT, padx=4, pady=10)
