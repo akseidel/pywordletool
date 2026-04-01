@@ -133,6 +133,41 @@ class Pywordlemainwindow(ctk.CTk):
             if isinstance(sub, tk.Toplevel):
                 sub.destroy()
 
+    def _build_letter_checkbuttons(self, frame, command) -> list:
+        """Build a row of letter checkbuttons with separators between groups.
+
+        :param frame:   Parent frame to pack checkbuttons into.
+        :param command: Callback bound to each checkbutton.
+        :return:        List of StringVars in A-Z alphabetical order.
+        """
+        vars_by_letter = {}
+        for i, group in enumerate(self.LETTER_GROUPS):
+            for letter in group:
+                var = tk.StringVar(value='-')
+                vars_by_letter[letter] = var
+                ttk.Checkbutton(
+                    frame,
+                    text=letter,
+                    variable=var,
+                    onvalue=letter.lower(),
+                    offvalue='-',
+                    command=command
+                ).pack(side="left", padx=2, pady=2, fill="x", expand=True)
+            if i < len(self.LETTER_GROUPS) - 1:
+                ttk.Separator(frame, orient='vertical').pack(
+                    side="left", padx=8, fill="y", expand=True)
+
+        return [vars_by_letter[letter] for letter in sorted(vars_by_letter)]
+
+    LETTER_GROUPS = [
+        ['E', 'A'],
+        ['R', 'O', 'T', 'I', 'L', 'S', 'N'],
+        ['U', 'C', 'Y', 'H', 'D', 'P', 'G', 'M'],
+        ['B', 'F', 'K', 'W', 'V'],
+        ['X', 'Z', 'Q', 'J']
+    ]
+
+
     def __init__(self):
         super().__init__()
         self.wnd_help = None
@@ -1128,151 +1163,8 @@ class Pywordlemainwindow(ctk.CTk):
             for chk_var in var_list:
                 chk_var.set('-')
 
-        # ======= START OF ======== Exclude Letters =============
-        self.v_xE = tk.StringVar()
-        self.v_xE.set('-')
-        bt_x_e = ttk.Checkbutton(self.criteria_frame_x, text="E", variable=self.v_xE, onvalue='e', offvalue='-',
-                                 command=do_grep)
-        bt_x_e.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xA = tk.StringVar()
-        self.v_xA.set('-')
-        bt_x_a = ttk.Checkbutton(self.criteria_frame_x, text="A", variable=self.v_xA, onvalue='a', offvalue='-',
-                                 command=do_grep)
-        bt_x_a.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        sep_1 = ttk.Separator(self.criteria_frame_x, orient='vertical')
-        sep_1.pack(side="left", padx=8, fill="y", expand=True)
-        self.v_xR = tk.StringVar()
-        self.v_xR.set('-')
-        bt_xR = ttk.Checkbutton(self.criteria_frame_x, text="R", variable=self.v_xR, onvalue='r', offvalue='-',
-                                command=do_grep)
-        bt_xR.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xO = tk.StringVar()
-        self.v_xO.set('-')
-        bt_xO = ttk.Checkbutton(self.criteria_frame_x, text="O", variable=self.v_xO, onvalue='o', offvalue='-',
-                                command=do_grep)
-        bt_xO.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xT = tk.StringVar()
-        self.v_xT.set('-')
-        bt_xT = ttk.Checkbutton(self.criteria_frame_x, text="T", variable=self.v_xT, onvalue='t', offvalue='-',
-                                command=do_grep)
-        bt_xT.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xI = tk.StringVar()
-        self.v_xI.set('-')
-        bt_xI = ttk.Checkbutton(self.criteria_frame_x, text="I", variable=self.v_xI, onvalue='i', offvalue='-',
-                                command=do_grep)
-        bt_xI.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xL = tk.StringVar()
-        self.v_xL.set('-')
-        bt_xL = ttk.Checkbutton(self.criteria_frame_x, text="L", variable=self.v_xL, onvalue='l', offvalue='-',
-                                command=do_grep)
-        bt_xL.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xS = tk.StringVar()
-        self.v_xS.set('-')
-        bt_xS = ttk.Checkbutton(self.criteria_frame_x, text="S", variable=self.v_xS, onvalue='s', offvalue='-',
-                                command=do_grep)
-        bt_xS.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xN = tk.StringVar()
-        self.v_xN.set('-')
-        bt_xN = ttk.Checkbutton(self.criteria_frame_x, text="N", variable=self.v_xN, onvalue='n', offvalue='-',
-                                command=do_grep)
-        bt_xN.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        sep_2 = ttk.Separator(self.criteria_frame_x, orient='vertical')
-        sep_2.pack(side="left", padx=8, fill="y", expand=True)
-        self.v_xU = tk.StringVar()
-        self.v_xU.set('-')
-        bt_xU = ttk.Checkbutton(self.criteria_frame_x, text="U", variable=self.v_xU, onvalue='u', offvalue='-',
-                                command=do_grep)
-        bt_xU.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xC = tk.StringVar()
-        self.v_xC.set('-')
-        bt_xC = ttk.Checkbutton(self.criteria_frame_x, text="C", variable=self.v_xC, onvalue='c', offvalue='-',
-                                command=do_grep)
-        bt_xC.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xY = tk.StringVar()
-        self.v_xY.set('-')
-        bt_xY = ttk.Checkbutton(self.criteria_frame_x, text="Y", variable=self.v_xY, onvalue='y', offvalue='-',
-                                command=do_grep)
-        bt_xY.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xH = tk.StringVar()
-        self.v_xH.set('-')
-        bt_xH = ttk.Checkbutton(self.criteria_frame_x, text="H", variable=self.v_xH, onvalue='h', offvalue='-',
-                                command=do_grep)
-        bt_xH.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xD = tk.StringVar()
-        self.v_xD.set('-')
-        bt_xD = ttk.Checkbutton(self.criteria_frame_x, text="D", variable=self.v_xD, onvalue='d', offvalue='-',
-                                command=do_grep)
-        bt_xD.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xP = tk.StringVar()
-        self.v_xP.set('-')
-        bt_xP = ttk.Checkbutton(self.criteria_frame_x, text="P", variable=self.v_xP, onvalue='p', offvalue='-',
-                                command=do_grep)
-        bt_xP.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xG = tk.StringVar()
-        self.v_xG.set('-')
-        bt_xG = ttk.Checkbutton(self.criteria_frame_x, text="G", variable=self.v_xG, onvalue='g', offvalue='-',
-                                command=do_grep)
-        bt_xG.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xM = tk.StringVar()
-        self.v_xM.set('-')
-        bt_xM = ttk.Checkbutton(self.criteria_frame_x, text="M", variable=self.v_xM, onvalue='m', offvalue='-',
-                                command=do_grep)
-        bt_xM.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        sep_3 = ttk.Separator(self.criteria_frame_x, orient='vertical')
-        sep_3.pack(side="left", padx=8, fill="y", expand=True)
-        self.v_xB = tk.StringVar()
-        self.v_xB.set('-')
-        bt_xB = ttk.Checkbutton(self.criteria_frame_x, text="B", variable=self.v_xB, onvalue='b', offvalue='-',
-                                command=do_grep)
-        bt_xB.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xF = tk.StringVar()
-        self.v_xF.set('-')
-        bt_xF = ttk.Checkbutton(self.criteria_frame_x, text="F", variable=self.v_xF, onvalue='f', offvalue='-',
-                                command=do_grep)
-        bt_xF.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xK = tk.StringVar()
-        self.v_xK.set('-')
-        bt_xK = ttk.Checkbutton(self.criteria_frame_x, text="K", variable=self.v_xK, onvalue='k', offvalue='-',
-                                command=do_grep)
-        bt_xK.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xW = tk.StringVar()
-        self.v_xW.set('-')
-        bt_xW = ttk.Checkbutton(self.criteria_frame_x, text="W", variable=self.v_xW, onvalue='w', offvalue='-',
-                                command=do_grep)
-        bt_xW.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xV = tk.StringVar()
-        self.v_xV.set('-')
-        bt_xV = ttk.Checkbutton(self.criteria_frame_x, text="V", variable=self.v_xV, onvalue='v', offvalue='-',
-                                command=do_grep)
-        bt_xV.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        sep_4 = ttk.Separator(self.criteria_frame_x, orient='vertical')
-        sep_4.pack(side="left", padx=8, fill="y", expand=True)
-        self.v_xX = tk.StringVar()
-        self.v_xX.set('-')
-        bt_xX = ttk.Checkbutton(self.criteria_frame_x, text="X", variable=self.v_xX, onvalue='x', offvalue='-',
-                                command=do_grep)
-        bt_xX.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xZ = tk.StringVar()
-        self.v_xZ.set('-')
-        bt_xZ = ttk.Checkbutton(self.criteria_frame_x, text="Z", variable=self.v_xZ, onvalue='z', offvalue='-',
-                                command=do_grep)
-        bt_xZ.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xQ = tk.StringVar()
-        self.v_xQ.set('-')
-        bt_xQ = ttk.Checkbutton(self.criteria_frame_x, text="Q", variable=self.v_xQ, onvalue='q', offvalue='-',
-                                command=do_grep)
-        bt_xQ.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_xJ = tk.StringVar()
-        self.v_xJ.set('-')
-        bt_xJ = ttk.Checkbutton(self.criteria_frame_x, text="J", variable=self.v_xJ, onvalue='j', offvalue='-',
-                                command=do_grep)
-        bt_xJ.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-
-        self.ex_btn_vars = [self.v_xA, self.v_xB, self.v_xC, self.v_xD, self.v_xE, self.v_xF,
-                            self.v_xG, self.v_xH, self.v_xI, self.v_xJ, self.v_xK, self.v_xL,
-                            self.v_xM, self.v_xN, self.v_xO, self.v_xP, self.v_xQ, self.v_xR,
-                            self.v_xS, self.v_xT, self.v_xU, self.v_xV, self.v_xW, self.v_xX,
-                            self.v_xY, self.v_xZ]
+        # ======= Exclude Letters =============
+        self.ex_btn_vars = self._build_letter_checkbuttons(self.criteria_frame_x, do_grep)
 
         def clear_excl_chkbs() -> None:
             clear_these_chk_vars(self.ex_btn_vars)
@@ -1281,156 +1173,13 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_x_clr = ctk.CTkButton(self.criteria_frame_x,
                                       text='Clear All', width=100,
                                       text_color="black",
-                                      command=clear_excl_chkbs
-                                      )
+                                      command=clear_excl_chkbs)
         self.bt_x_clr.pack(side="top", padx=2, pady=2, fill="x", expand=True)
-        # == END OF ========== Exclude Letters =============
+        # ======= End OF Exclude Letters =============
 
-        # ==== START OF =========== Require Letters =============
-        self.v_rE = tk.StringVar()
-        self.v_rE.set('-')
-        bt_r_E = ttk.Checkbutton(self.criteria_frame_r, text="E", variable=self.v_rE, onvalue='e', offvalue='-',
-                                 command=do_grep)
-        bt_r_E.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rA = tk.StringVar()
-        self.v_rA.set('-')
-        bt_r_A = ttk.Checkbutton(self.criteria_frame_r, text="A", variable=self.v_rA, onvalue='a', offvalue='-',
-                                 command=do_grep)
-        bt_r_A.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        sep_1 = ttk.Separator(self.criteria_frame_r, orient='vertical')
-        sep_1.pack(side="left", padx=8, fill="y", expand=True)
-        self.v_rR = tk.StringVar()
-        self.v_rR.set('-')
-        bt_r_R = ttk.Checkbutton(self.criteria_frame_r, text="R", variable=self.v_rR, onvalue='r', offvalue='-',
-                                 command=do_grep)
-        bt_r_R.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rO = tk.StringVar()
-        self.v_rO.set('-')
-        bt_r_O = ttk.Checkbutton(self.criteria_frame_r, text="O", variable=self.v_rO, onvalue='o', offvalue='-',
-                                 command=do_grep)
-        bt_r_O.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rT = tk.StringVar()
-        self.v_rT.set('-')
-        bt_r_T = ttk.Checkbutton(self.criteria_frame_r, text="T", variable=self.v_rT, onvalue='t', offvalue='-',
-                                 command=do_grep)
-        bt_r_T.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rI = tk.StringVar()
-        self.v_rI.set('-')
-        bt_r_I = ttk.Checkbutton(self.criteria_frame_r, text="I", variable=self.v_rI, onvalue='i', offvalue='-',
-                                 command=do_grep)
-        bt_r_I.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rL = tk.StringVar()
-        self.v_rL.set('-')
-        bt_r_L = ttk.Checkbutton(self.criteria_frame_r, text="L", variable=self.v_rL, onvalue='l', offvalue='-',
-                                 command=do_grep)
-        bt_r_L.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rS = tk.StringVar()
-        self.v_rS.set('-')
-        bt_r_S = ttk.Checkbutton(self.criteria_frame_r, text="S", variable=self.v_rS, onvalue='s', offvalue='-',
-                                 command=do_grep)
-        bt_r_S.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rN = tk.StringVar()
-        self.v_rN.set('-')
-        bt_r_N = ttk.Checkbutton(self.criteria_frame_r, text="N", variable=self.v_rN, onvalue='n', offvalue='-',
-                                 command=do_grep)
-        bt_r_N.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        sep_2 = ttk.Separator(self.criteria_frame_r, orient='vertical')
-        sep_2.pack(side="left", padx=8, fill="y", expand=True)
-        self.v_rU = tk.StringVar()
-        self.v_rU.set('-')
-        bt_r_U = ttk.Checkbutton(self.criteria_frame_r, text="U", variable=self.v_rU, onvalue='u', offvalue='-',
-                                 command=do_grep)
-        bt_r_U.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rC = tk.StringVar()
-        self.v_rC.set('-')
-        bt_r_C = ttk.Checkbutton(self.criteria_frame_r, text="C", variable=self.v_rC, onvalue='c', offvalue='-',
-                                 command=do_grep)
-        bt_r_C.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rY = tk.StringVar()
-        self.v_rY.set('-')
-        bt_r_Y = ttk.Checkbutton(self.criteria_frame_r, text="Y", variable=self.v_rY, onvalue='y', offvalue='-',
-                                 command=do_grep)
-        bt_r_Y.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rH = tk.StringVar()
-        self.v_rH.set('-')
-        bt_r_H = ttk.Checkbutton(self.criteria_frame_r, text="H", variable=self.v_rH, onvalue='h', offvalue='-',
-                                 command=do_grep)
-        bt_r_H.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rD = tk.StringVar()
-        self.v_rD.set('-')
-        bt_r_D = ttk.Checkbutton(self.criteria_frame_r, text="D", variable=self.v_rD, onvalue='d', offvalue='-',
-                                 command=do_grep)
-        bt_r_D.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rP = tk.StringVar()
-        self.v_rP.set('-')
-        bt_r_P = ttk.Checkbutton(self.criteria_frame_r, text="P", variable=self.v_rP, onvalue='p', offvalue='-',
-                                 command=do_grep)
-        bt_r_P.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rG = tk.StringVar()
-        self.v_rG.set('-')
-        bt_r_G = ttk.Checkbutton(self.criteria_frame_r, text="G", variable=self.v_rG, onvalue='g', offvalue='-',
-                                 command=do_grep)
-        bt_r_G.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rM = tk.StringVar()
-        self.v_rM.set('-')
-        bt_r_M = ttk.Checkbutton(self.criteria_frame_r, text="M", variable=self.v_rM, onvalue='m', offvalue='-',
-                                 command=do_grep)
-        bt_r_M.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        sep_3 = ttk.Separator(self.criteria_frame_r, orient='vertical')
-        sep_3.pack(side="left", padx=8, fill="y", expand=True)
-        self.v_rB = tk.StringVar()
-        self.v_rB.set('-')
-        bt_r_B = ttk.Checkbutton(self.criteria_frame_r, text="B", variable=self.v_rB, onvalue='b', offvalue='-',
-                                 command=do_grep)
-        bt_r_B.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rF = tk.StringVar()
-        self.v_rF.set('-')
-        bt_r_F = ttk.Checkbutton(self.criteria_frame_r, text="F", variable=self.v_rF, onvalue='f', offvalue='-',
-                                 command=do_grep)
-        bt_r_F.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rK = tk.StringVar()
-        self.v_rK.set('-')
-        bt_r_K = ttk.Checkbutton(self.criteria_frame_r, text="K", variable=self.v_rK, onvalue='k', offvalue='-',
-                                 command=do_grep)
-        bt_r_K.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rW = tk.StringVar()
-        self.v_rW.set('-')
-        bt_r_W = ttk.Checkbutton(self.criteria_frame_r, text="W", variable=self.v_rW, onvalue='w', offvalue='-',
-                                 command=do_grep)
-        bt_r_W.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rV = tk.StringVar()
-        self.v_rV.set('-')
-        bt_r_V = ttk.Checkbutton(self.criteria_frame_r, text="V", variable=self.v_rV, onvalue='v', offvalue='-',
-                                 command=do_grep)
-        bt_r_V.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rX = tk.StringVar()
-        self.v_rX.set('-')
-        sep_4 = ttk.Separator(self.criteria_frame_r, orient='vertical')
-        sep_4.pack(side="left", padx=8, fill="y", expand=True)
-        bt_r_X = ttk.Checkbutton(self.criteria_frame_r, text="X", variable=self.v_rX, onvalue='x', offvalue='-',
-                                 command=do_grep)
-        bt_r_X.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rZ = tk.StringVar()
-        self.v_rZ.set('-')
-        bt_r_Z = ttk.Checkbutton(self.criteria_frame_r, text="Z", variable=self.v_rZ, onvalue='z', offvalue='-',
-                                 command=do_grep)
-        bt_r_Z.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rQ = tk.StringVar()
-        self.v_rQ.set('-')
-        bt_r_Q = ttk.Checkbutton(self.criteria_frame_r, text="Q", variable=self.v_rQ, onvalue='q', offvalue='-',
-                                 command=do_grep)
-        bt_r_Q.pack(side="left", padx=2, pady=2, fill="x", expand=True)
-        self.v_rJ = tk.StringVar()
-        self.v_rJ.set('-')
-        bt_r_J = ttk.Checkbutton(self.criteria_frame_r, text="J", variable=self.v_rJ, onvalue='j', offvalue='-',
-                                 command=do_grep)
-        bt_r_J.pack(side="left", padx=2, pady=2, fill="x", expand=True)
 
-        self.re_btn_vars = [self.v_rA, self.v_rB, self.v_rC, self.v_rD, self.v_rE, self.v_rF,
-                            self.v_rG, self.v_rH, self.v_rI, self.v_rJ, self.v_rK, self.v_rL,
-                            self.v_rM, self.v_rN, self.v_rO, self.v_rP, self.v_rQ, self.v_rR,
-                            self.v_rS, self.v_rT, self.v_rU, self.v_rV, self.v_rW, self.v_rX,
-                            self.v_rY, self.v_rZ]
+        # ======= Require Letters =============
+        self.re_btn_vars = self._build_letter_checkbuttons(self.criteria_frame_r, do_grep)
 
         def clear_reqr_ckbs() -> None:
             clear_these_chk_vars(self.re_btn_vars)
@@ -1439,10 +1188,11 @@ class Pywordlemainwindow(ctk.CTk):
         self.bt_r_clr = ctk.CTkButton(self.criteria_frame_r,
                                       text='Clear All', width=100,
                                       text_color="black",
-                                      command=clear_reqr_ckbs
-                                      )
+                                      command=clear_reqr_ckbs)
         self.bt_r_clr.pack(side="top", padx=2, pady=2, fill="x", expand=True)
-        # === END OF ========= Require Letters =============
+
+        # ======= End Of Require Letters =============
+
 
         # === START OF ====== General Controls ==========
         # the_top_frame
