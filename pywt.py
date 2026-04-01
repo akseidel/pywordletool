@@ -40,14 +40,16 @@ pu_sol_wrd_list = 'pu_wordlist.txt'
 help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
-exclude = []  # exclude list used by monkey sampler
+# exclude = []  # exclude list used by monkey sampler
 # font_tuple_n = ("Courier", 12, "normal")
 font_tuple_n = ("Helvetica", 10, "normal")
 
 ctk.set_appearance_mode("system")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
-
+MID_DIV = ' : '
+MID_PAD = '  '
+LEFT_PAD = ""
 
 # Remove certain characters from loc_str string argument.
 def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) -> str:
@@ -72,8 +74,6 @@ def scrub_text(loc_str: str, l_add: str, no_numbers: bool, no_letters5: bool) ->
 class Pywordlemainwindow(ctk.CTk):
     """The pywordletool application GUI window
     """
-    global x_pos_dict
-    global r_pos_dict
 
     def set_n_col(self):
         sw = self.result_frame.winfo_width()
@@ -172,6 +172,8 @@ class Pywordlemainwindow(ctk.CTk):
         self.sel_genetic = False
         self.outcms_driller_window = None
         self.meta_lr = False
+        self.x_pos_dict: dict[str, str] = {}
+        self.r_pos_dict: dict[str, str] = {}
 
         # configure style
         style = ttk.Style()
@@ -187,18 +189,17 @@ class Pywordlemainwindow(ctk.CTk):
         self.bind('<Meta_L>', key_handler_meta_lr)
         self.bind('<Meta_R>', key_handler_meta_lr)
 
-        def str_wrd_list_hrd() -> None:
+        def str_wrd_list_hrd(event=None) -> None:
             """Creates the word list header line.
             @param ln_col: number of columns in header
             @return: column header string
             """
             ln_col = self.set_n_col()
             h_txt = " Word : Rank "
-            left_pad = ""
-            mid_pad = "  "
-            h_line = left_pad + h_txt
+
+            h_line = LEFT_PAD + h_txt
             for i in range(1, ln_col):
-                h_line = h_line + mid_pad + h_txt
+                h_line = h_line + MID_PAD + h_txt
             lb_result_hd.configure(text=h_line)
 
         def show_outcome_driller() -> None:
@@ -231,6 +232,17 @@ class Pywordlemainwindow(ctk.CTk):
             self.wnd_help.show_rank_info()
             self.wnd_help.deiconify()
 
+        def update_results(the_word_list)-> None:
+            tx_result.configure(state='normal')
+            tx_result.delete(1.0, tk.END)
+
+            n_col = self.set_n_col()
+            # results header
+            str_wrd_list_hrd()
+            # results words
+            entries = [f"{key}{MID_DIV}{value}" for key, value in the_word_list.items()]
+            for i in range(0, len(entries), n_col):
+                tx_result.insert(tk.END, MID_PAD.join(entries[i:i + n_col]) + '\n')
 
         def do_grep() -> None:
             """Run a wordletool helper grep instance."""
@@ -281,25 +293,16 @@ class Pywordlemainwindow(ctk.CTk):
             coordinate_special_pattern_dups()
             wordletool.allow_dups = self.allow_dup_state.get()
 
-            tx_result.configure(state='normal')
-            tx_result.delete(1.0, tk.END)
-
             the_word_list = wordletool.get_ranked_grep_result_wrd_lst()
             n_items = len(the_word_list)
-            mid_div = ' : '
-            mid_pad = '  '
-            n_col = self.set_n_col()
 
-            entries = [f"{key}{mid_div}{value}" for key, value in the_word_list.items()]
-            for i in range(0, len(entries), n_col):
-                tx_result.insert(tk.END, mid_pad.join(entries[i:i + n_col]) + '\n')
+            # update the results
+            update_results(the_word_list)
 
-            str_wrd_list_hrd()
             comment = ''
-
             if self.sel_rando and n_items > 0:
                 word, rank = random.choice(list(the_word_list.items()))
-                tx_result.highlight_pattern(f"{word}{mid_div}{rank}", 'ran', remove_priors=False)
+                tx_result.highlight_pattern(f"{word}{MID_DIV}{rank}", 'ran', remove_priors=False)
                 comment = ' (1 random pick selected)'
 
             if self.sel_not_classic and n_items > 0:
@@ -482,8 +485,6 @@ class Pywordlemainwindow(ctk.CTk):
             fill_treeview_per_dictionary(self.treeview_px, x_pos_dict, 0)
             self.cbox_px_l.current(0)
             self.cbox_px_p.current(0)
-            exclude.clear()
-
 
 
         def remove_r_pos() -> None:
@@ -619,14 +620,16 @@ class Pywordlemainwindow(ctk.CTk):
 
 
 
-        # def on_window_resize(event):
-        #     width = event.width
-        #     height = event.height
-        #     print(f"Window resized to {width}x{height}")
-        #     sw = self.result_frame.winfo_width()
-        #     print(f"result_frame.winfo_width {sw}")
-        #     sw = self.winfo_screenwidth()
-        #     print(f"winfo_screenwidth {sw}")
+        def on_window_resize(event):
+            width = event.width
+            height = event.height
+            print(f"Window resized to {width}x{height}")
+            sw = self.result_frame.winfo_width()
+            print(f"result_frame.winfo_width {sw}")
+            # sw = self.winfo_screenwidth()
+            # print(f"winfo_screenwidth {sw}")
+
+
 
         # upper frame showing the words
         self.result_frame = ctk.CTkFrame(self,
@@ -638,7 +641,6 @@ class Pywordlemainwindow(ctk.CTk):
         self.result_frame.grid_rowconfigure(2, weight=1)
         self.result_frame.grid_rowconfigure(3, weight=1)
 
-        # self.pw.add(self.result_frame)
 
         # the header line above the word list
         lb_result_hd = tk.Label(self.result_frame,
@@ -649,7 +651,7 @@ class Pywordlemainwindow(ctk.CTk):
                                 borderwidth=0,
                                 highlightthickness=0)
         lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='enw', padx=6, pady=2)
-        lb_result_hd.bind("<Configure>", str_wrd_list_hrd())
+        lb_result_hd.bind("<Configure>", str_wrd_list_hrd)
         # The word list resulting from grep on the main wordlist
         # The CustomText class is a tk.Text extended to support a color for matched text.
         tx_result = hlp.CustomText(self.result_frame,
@@ -1106,7 +1108,6 @@ class Pywordlemainwindow(ctk.CTk):
                                    height=7
                                    )
         self.treeview_pr.grid(row=1, column=0, columnspan=5, padx=4, pady=2, sticky='ew')
-        ttk.Style().configure('Treeview', relief='raised')
         self.treeview_pr.heading(1, text='Letter')
         self.treeview_pr.heading(2, text='Position')
         for column in self.treeview_pr["columns"]:
@@ -1564,13 +1565,13 @@ class Pywordlemainwindow(ctk.CTk):
                                     command=clear_all)
         self.bt_zap.pack(side="right", padx=4, pady=1, fill="x", expand=True)
 
-        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Genetic", width=40, text_color="black",
+        self.bt_genetic = ctk.CTkButton(self.bt_grpA_frame, text="Genetic", width=40, text_color="black",
                                       command=pick_genetic)
-        self.bt_rando.pack(side="left", padx=4, pady=1, fill="x", expand=True)
+        self.bt_genetic.pack(side="left", padx=4, pady=1, fill="x", expand=True)
 
-        self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="! Classic", width=40, text_color="black",
+        self.bt_not_classic = ctk.CTkButton(self.bt_grpA_frame, text="! Classic", width=40, text_color="black",
                                       command=not_classic)
-        self.bt_rando.pack(side="left", padx=4, pady=1, fill="x", expand=True)
+        self.bt_not_classic.pack(side="left", padx=4, pady=1, fill="x", expand=True)
 
         self.bt_rando = ctk.CTkButton(self.bt_grpA_frame, text="Random", width=40, text_color="black",
                                       command=pick_rando)
