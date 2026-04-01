@@ -37,7 +37,6 @@ full_wordle_wrd_list = 'nyt_wordlist.txt'
 bot_pos_sol_wrd_list = 'botadd_nyt_wordlist.txt'
 classic_pos_sol_wrd_list = 'wo_nyt_wordlist.txt'
 pu_sol_wrd_list = 'pu_wordlist.txt'
-help_showing = False  # flag indicating help window is open
 x_pos_dict = {}  # exclude position dictionary
 r_pos_dict = {}  # require position dictionary
 # exclude = []  # exclude list used by monkey sampler
@@ -133,6 +132,240 @@ class Pywordlemainwindow(ctk.CTk):
             if isinstance(sub, tk.Toplevel):
                 sub.destroy()
 
+    def get_rq_ltrs(self) -> str:
+        """Return the string of required letters, excluding the '-' placeholder."""
+        return ''.join(ltr for b in self.re_btn_vars if (ltr := b.get()) != '-')
+
+
+    def build_exclude_grep(self, ex_btn_var_list: list) -> str:
+        """Build the grep exclusion command for the selected letters.
+
+        Example output: "grep -vE 'b|f|k|w'"
+
+        :param ex_btn_var_list: List of button variables holding letter values.
+        :return:                grep command string, or '' if no letters are selected.
+        """
+        lts = [ltr for b in ex_btn_var_list if (ltr := b.get()) != '-']
+        if not lts:
+            return ''
+        args = '|'.join(lts)
+        return f"grep -vE '{args}'"
+
+
+    def build_require_these_grep(self, rq_lts: str) -> str:
+        """Build the piped grep command to require all specified letters.
+
+        Example output: "grep -E 'b'| grep -E 'f'| grep -E 'k'"
+
+        :param rq_lts: String of required letters.
+        :return:       Piped grep command string, or '' if rq_lts is empty.
+        """
+        return '| '.join(f"grep -E '{ltr}'" for ltr in rq_lts)
+
+
+    def coordinate_special_pattern_dups(self) -> None:
+        # Coordinate duplicates in special pattern with no dup setting
+        self.update()
+        if hlp.word_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
+            self.sanity_question(self.entry_spec_pattern)
+
+    def update_results(self, the_word_list) -> None:
+        self.tx_result.configure(state='normal')
+        self.tx_result.delete(1.0, tk.END)
+
+        n_col = self.set_n_col()
+        # results header
+        self.str_wrd_list_hrd()
+        # results words
+        entries = [f"{key}{MID_DIV}{value}" for key, value in the_word_list.items()]
+        for i in range(0, len(entries), n_col):
+            self.tx_result.insert(tk.END, MID_PAD.join(entries[i:i + n_col]) + '\n')
+
+    def str_wrd_list_hrd(self,event=None) -> None:
+        """Creates the word list header line.
+        """
+        ln_col = self.set_n_col()
+        h_txt = " Word : Rank "
+
+        h_line = LEFT_PAD + h_txt
+        for i in range(1, ln_col):
+            h_line = h_line + MID_PAD + h_txt
+        self.lb_result_hd.configure(text=h_line)
+
+    def sanity_question(self, entry: ttk.Entry) -> None:
+        res = tk.messagebox.askyesno(title='Sanity Check',
+                                     message='Duplicate letters are being required but that option is not set. Do '
+                                             'you want duplicate letters allowed? Otherwise no words will show.')
+        if res:
+            self.allow_dup_state.set(True)
+        self.after(200, lambda: self.focus_set) # type: ignore[arg-type]
+
+    def do_grep(self) -> None:
+        """Run a wordletool helper grep instance."""
+        if self.suppress_grep:
+            return
+
+        rq_ltrs = self.get_rq_ltrs()
+        allow_dups = self.allow_dup_state.get()
+
+        vocab_filename = {
+            0: classic_pos_sol_wrd_list,
+            1: bot_pos_sol_wrd_list,
+        }.get(self.vocab_var.get(), full_wordle_wrd_list)
+
+        wordletool = hlp.ToolResults(data_path,
+                                     vocab_filename,
+                                     letter_rank_file,
+                                     allow_dups,
+                                     self.rank_mode.get(),
+                                     self.ordr_by_rank.get(),
+                                     self.cull_the_pu.get(),
+                                     pu_sol_wrd_list)
+
+        wordletool.tool_command_list.add_cmd(self.build_exclude_grep(self.ex_btn_vars))
+        wordletool.tool_command_list.add_cmd(self.build_require_these_grep(rq_ltrs))
+        hlp.build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
+        req_pat = hlp.build_r_pos_grep(wordletool, r_pos_dict)
+
+        self.update()
+        if hlp.word_has_duplicates(req_pat) and not self.allow_dup_state.get():
+            self.sanity_question(self.entry_spec_pattern)
+
+        wordletool.tool_command_list.add_type_cmd(
+            self.spec_pattern.get().lower(),
+            self.sp_pat_mode_var.get() == 1
+        )
+
+        if len(self.mult_ltr_definition.get()) > 1 and not self.allow_dup_state.get():
+            self.sanity_question(self.entry_mult_ltr_def)
+
+        if len(self.mult_ltr_definition.get()) > 1:
+            wordletool.tool_command_list.add_type_mult_ltr_cmd(
+                self.mult_ltr_definition.get().lower(),
+                self.mult_ltr_mode_var.get()
+            )
+
+        self.coordinate_special_pattern_dups()
+        wordletool.allow_dups = self.allow_dup_state.get()
+
+        the_word_list = wordletool.get_ranked_grep_result_wrd_lst()
+        n_items = len(the_word_list)
+
+        # update the results
+        self.update_results(the_word_list)
+
+        comment = ''
+        if self.sel_rando and n_items > 0:
+            word, rank = random.choice(list(the_word_list.items()))
+            self.tx_result.highlight_pattern(f"{word}{MID_DIV}{rank}", 'ran', remove_priors=False)
+            comment = ' (1 random pick selected)'
+
+        if self.sel_not_classic and n_items > 0:
+            classic_wrds = hlp.get_wordlist(
+                hlp.get_word_list_path_name(data_path + classic_pos_sol_wrd_list, False))
+            bot_added_wrds = list(set(the_word_list) - set(classic_wrds))
+            regex = hlp.regex_maxgenrankers(bot_added_wrds, the_word_list)
+            self.tx_result.highlight_pattern(regex, 'add', remove_priors=False)
+            comment = f' ({len(bot_added_wrds)} non originals selected)'
+
+        if self.sel_genetic and n_items > 0:
+            gendict = {w: hlp.get_gencode(w) for w in the_word_list}
+            gen_tally = hlp.get_gendict_tally(gendict)
+            maxrank = hlp.assign_genrank(gendict, gen_tally)
+            max_rankers = hlp.get_maxgenrankers(gendict, maxrank)
+            regex = hlp.regex_maxgenrankers(max_rankers, the_word_list)
+            self.tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
+            comment = f' ({len(max_rankers)} highest genetic rank selected)'
+            if self.meta_lr:
+                hlp.rpt_ltr_use(gen_tally, list(the_word_list.keys()))
+                self.meta_lr = False
+
+        if self.sel_outcm_optimal and n_items > 0:
+            self.enable_optimal_controls('disabled')
+            self.tx_result.remove_tag('opt')
+            self.update()
+
+            remaining_word_list = list(the_word_list.keys())
+            grps_guess_source = self.outcms_guess_source.get()
+            optimal_group_guesses = {}
+            context = 'Wordle Helper'
+
+            hm_grn_pat = ''
+            hm_yel_ltrs = []
+            if self.use_hard_mode.get():
+                hm_grn_pat = f'^{req_pat}'
+                hm_yel_ltrs = [key[0].lower() for key in x_pos_dict]
+
+            _vocab_sources = {
+                1: (classic_pos_sol_wrd_list, 'Classic Vocabulary'),
+                2: (bot_pos_sol_wrd_list, 'Classic+ Vocabulary'),
+                3: (full_wordle_wrd_list, 'Large Vocabulary'),
+            }
+
+            match grps_guess_source:
+                case 0:
+                    optimal_group_guesses = hlp.best_outcomes_from_showing_as_guess_dict(
+                        remaining_word_list,
+                        self.verbose_outcms.get(),
+                        self.ent_outcms.get(),
+                        self.cond_outcms.get(),
+                        self.keyed_verbose_outcms.get(),
+                        context)
+                case 1 | 2 | 3:
+                    vocab_file, vocab_label = _vocab_sources[grps_guess_source]
+                    guess_targets = hlp.ToolResults(
+                        data_path, vocab_file, letter_rank_file,
+                        True, 0, True).get_ranked_grep_result_wrd_lst(True)
+                    use_hm = self.use_hard_mode.get()
+                    if use_hm:
+                        guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
+                    report_msg1 = f"{vocab_label}-{'HM' if use_hm else 'DF'}"
+                    optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(
+                        remaining_word_list,
+                        self.verbose_outcms.get(),
+                        self.ent_outcms.get(),
+                        self.cond_outcms.get(),
+                        self.keyed_verbose_outcms.get(),
+                        guess_targets,
+                        report_msg1,
+                        context,
+                        self.meta_lr)
+
+            self.meta_lr = False
+            opt_group_guesses_as_list = list(optimal_group_guesses.keys())
+            (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = hlp.outcomes_stat_summary(optimal_group_guesses)
+
+            match grps_guess_source:
+                case 0:
+                    regex = hlp.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
+                case _:
+                    # When the guess source is broader than the displayed list, highlight
+                    # only words that appear in both.
+                    words_in_common = list(set(the_word_list) & set(opt_group_guesses_as_list))
+                    regex = hlp.regex_maxgenrankers(words_in_common, the_word_list)
+
+            tag = 'ent' if self.ent_outcms.get() else 'opt'
+            self.tx_result.highlight_pattern(regex, tag, remove_priors=False)
+
+            comment = (f" ({len(opt_group_guesses_as_list)} optimal"
+                       f", grp qty {g_qty:.0f}"
+                       f", ent {g_e:.2f}"
+                       f", sizes: min {g_min:.0f}"
+                       f", min-max {g_max:.0f}"
+                       f", ave {g_ave:.2f}"
+                       f", exp {g_xa:.2f}"
+                       f", p2 {g_p2:.2f})")
+            self.enable_optimal_controls('active')
+
+        self.tx_result.configure(state='disabled')
+        if not self.sel_rando and not self.sel_outcm_optimal and not self.sel_genetic:
+            self.tx_result.see('end')
+        self.status.set(wordletool.get_status() + comment)
+        self.tx_gr.configure(state='normal')
+        self.tx_gr.delete(1.0, tk.END)
+        self.tx_gr.insert(tk.END, wordletool.get_grep_cmd_less_filepath())
+        self.tx_gr.configure(state='disabled')
+
     def _build_letter_checkbuttons(self, frame, command) -> list:
         """Build a row of letter checkbuttons with separators between groups.
 
@@ -207,8 +440,6 @@ class Pywordlemainwindow(ctk.CTk):
         self.sel_genetic = False
         self.outcms_driller_window = None
         self.meta_lr = False
-        self.x_pos_dict: dict[str, str] = {}
-        self.r_pos_dict: dict[str, str] = {}
 
         # configure style
         style = ttk.Style()
@@ -224,18 +455,6 @@ class Pywordlemainwindow(ctk.CTk):
         self.bind('<Meta_L>', key_handler_meta_lr)
         self.bind('<Meta_R>', key_handler_meta_lr)
 
-        def str_wrd_list_hrd(event=None) -> None:
-            """Creates the word list header line.
-            @param ln_col: number of columns in header
-            @return: column header string
-            """
-            ln_col = self.set_n_col()
-            h_txt = " Word : Rank "
-
-            h_line = LEFT_PAD + h_txt
-            for i in range(1, ln_col):
-                h_line = h_line + MID_PAD + h_txt
-            lb_result_hd.configure(text=h_line)
 
         def show_outcome_driller() -> None:
             if self.outcms_driller_window is None or not self.outcms_driller_window.winfo_exists():
@@ -249,7 +468,7 @@ class Pywordlemainwindow(ctk.CTk):
                 letter_rank_file = 'letter_ranks.txt'
             else:
                 letter_rank_file = 'letter_ranks_bot.txt'
-            do_grep()
+            self.do_grep()
             if self.wnd_help is not None:
                 # This seems to be the only way to avoid an exception if the
                 # wnd_help had already been visible but also destroyed. It remains
@@ -260,195 +479,14 @@ class Pywordlemainwindow(ctk.CTk):
                     update_help_wind(letter_rank_file)
 
         def do_list_by() -> None:
-            do_grep()
+            self.do_grep()
 
         def update_help_wind(letter_rank_file) -> None:
             self.wnd_help.letter_rank_file = letter_rank_file
             self.wnd_help.show_rank_info()
             self.wnd_help.deiconify()
 
-        def update_results(the_word_list)-> None:
-            tx_result.configure(state='normal')
-            tx_result.delete(1.0, tk.END)
 
-            n_col = self.set_n_col()
-            # results header
-            str_wrd_list_hrd()
-            # results words
-            entries = [f"{key}{MID_DIV}{value}" for key, value in the_word_list.items()]
-            for i in range(0, len(entries), n_col):
-                tx_result.insert(tk.END, MID_PAD.join(entries[i:i + n_col]) + '\n')
-
-        def do_grep() -> None:
-            """Run a wordletool helper grep instance."""
-            if self.suppress_grep:
-                return
-
-            global data_path
-            rq_ltrs = get_rq_ltrs(self)
-            allow_dups = self.allow_dup_state.get()
-
-            vocab_filename = {
-                0: classic_pos_sol_wrd_list,
-                1: bot_pos_sol_wrd_list,
-            }.get(self.vocab_var.get(), full_wordle_wrd_list)
-
-            wordletool = hlp.ToolResults(data_path,
-                                         vocab_filename,
-                                         letter_rank_file,
-                                         allow_dups,
-                                         self.rank_mode.get(),
-                                         self.ordr_by_rank.get(),
-                                         self.cull_the_pu.get(),
-                                         pu_sol_wrd_list)
-
-            wordletool.tool_command_list.add_cmd(build_exclude_grep(self.ex_btn_vars))
-            wordletool.tool_command_list.add_cmd(build_require_these_grep(rq_ltrs))
-            hlp.build_x_pos_grep(wordletool, x_pos_dict, rq_ltrs)
-            req_pat = hlp.build_r_pos_grep(wordletool, r_pos_dict)
-
-            self.update()
-            if hlp.word_has_duplicates(req_pat) and not self.allow_dup_state.get():
-                sanity_question(self.entry_spec_pattern)
-
-            wordletool.tool_command_list.add_type_cmd(
-                self.spec_pattern.get().lower(),
-                self.sp_pat_mode_var.get() == 1
-            )
-
-            if len(self.mult_ltr_definition.get()) > 1 and not self.allow_dup_state.get():
-                sanity_question(self.entry_mult_ltr_def)
-
-            if len(self.mult_ltr_definition.get()) > 1:
-                wordletool.tool_command_list.add_type_mult_ltr_cmd(
-                    self.mult_ltr_definition.get().lower(),
-                    self.mult_ltr_mode_var.get()
-                )
-
-            coordinate_special_pattern_dups()
-            wordletool.allow_dups = self.allow_dup_state.get()
-
-            the_word_list = wordletool.get_ranked_grep_result_wrd_lst()
-            n_items = len(the_word_list)
-
-            # update the results
-            update_results(the_word_list)
-
-            comment = ''
-            if self.sel_rando and n_items > 0:
-                word, rank = random.choice(list(the_word_list.items()))
-                tx_result.highlight_pattern(f"{word}{MID_DIV}{rank}", 'ran', remove_priors=False)
-                comment = ' (1 random pick selected)'
-
-            if self.sel_not_classic and n_items > 0:
-                classic_wrds = hlp.get_wordlist(
-                    hlp.get_word_list_path_name(data_path + classic_pos_sol_wrd_list, False))
-                bot_added_wrds = list(set(the_word_list) - set(classic_wrds))
-                regex = hlp.regex_maxgenrankers(bot_added_wrds, the_word_list)
-                tx_result.highlight_pattern(regex, 'add', remove_priors=False)
-                comment = f' ({len(bot_added_wrds)} non originals selected)'
-
-            if self.sel_genetic and n_items > 0:
-                gendict = {w: hlp.get_gencode(w) for w in the_word_list}
-                gen_tally = hlp.get_gendict_tally(gendict)
-                maxrank = hlp.assign_genrank(gendict, gen_tally)
-                max_rankers = hlp.get_maxgenrankers(gendict, maxrank)
-                regex = hlp.regex_maxgenrankers(max_rankers, the_word_list)
-                tx_result.highlight_pattern(regex, 'gen', remove_priors=False)
-                comment = f' ({len(max_rankers)} highest genetic rank selected)'
-                if self.meta_lr:
-                    hlp.rpt_ltr_use(gen_tally, list(the_word_list.keys()))
-                    self.meta_lr = False
-
-            if self.sel_outcm_optimal and n_items > 0:
-                self.enable_optimal_controls('disabled')
-                tx_result.remove_tag('opt')
-                self.update()
-
-                remaining_word_list = list(the_word_list.keys())
-                grps_guess_source = self.outcms_guess_source.get()
-                optimal_group_guesses = {}
-                context = 'Wordle Helper'
-
-                hm_grn_pat = ''
-                hm_yel_ltrs = []
-                if self.use_hard_mode.get():
-                    hm_grn_pat = f'^{req_pat}'
-                    hm_yel_ltrs = [key[0].lower() for key in x_pos_dict]
-
-                _vocab_sources = {
-                    1: (classic_pos_sol_wrd_list, 'Classic Vocabulary'),
-                    2: (bot_pos_sol_wrd_list, 'Classic+ Vocabulary'),
-                    3: (full_wordle_wrd_list, 'Large Vocabulary'),
-                }
-
-                match grps_guess_source:
-                    case 0:
-                        optimal_group_guesses = hlp.best_outcomes_from_showing_as_guess_dict(
-                            remaining_word_list,
-                            self.verbose_outcms.get(),
-                            self.ent_outcms.get(),
-                            self.cond_outcms.get(),
-                            self.keyed_verbose_outcms.get(),
-                            context)
-                    case 1 | 2 | 3:
-                        vocab_file, vocab_label = _vocab_sources[grps_guess_source]
-                        guess_targets = hlp.ToolResults(
-                            data_path, vocab_file, letter_rank_file,
-                            True, 0, True).get_ranked_grep_result_wrd_lst(True)
-                        use_hm = self.use_hard_mode.get()
-                        if use_hm:
-                            guess_targets = hlp.hard_mode_guesses(guess_targets, hm_grn_pat, hm_yel_ltrs)
-                        report_msg1 = f"{vocab_label}-{'HM' if use_hm else 'DF'}"
-                        optimal_group_guesses = hlp.extended_best_outcomes_guess_dict(
-                            remaining_word_list,
-                            self.verbose_outcms.get(),
-                            self.ent_outcms.get(),
-                            self.cond_outcms.get(),
-                            self.keyed_verbose_outcms.get(),
-                            guess_targets,
-                            report_msg1,
-                            context,
-                            self.meta_lr)
-
-                self.meta_lr = False
-                opt_group_guesses_as_list = list(optimal_group_guesses.keys())
-                (g_qty, g_min, g_max, g_ave, g_p2, g_e, g_xa) = hlp.outcomes_stat_summary(optimal_group_guesses)
-
-                match grps_guess_source:
-                    case 0:
-                        regex = hlp.regex_maxgenrankers(opt_group_guesses_as_list, the_word_list)
-                    case _:
-                        # When the guess source is broader than the displayed list, highlight
-                        # only words that appear in both.
-                        words_in_common = list(set(the_word_list) & set(opt_group_guesses_as_list))
-                        regex = hlp.regex_maxgenrankers(words_in_common, the_word_list)
-
-                tag = 'ent' if self.ent_outcms.get() else 'opt'
-                tx_result.highlight_pattern(regex, tag, remove_priors=False)
-
-                comment = (f" ({len(opt_group_guesses_as_list)} optimal"
-                           f", grp qty {g_qty:.0f}"
-                           f", ent {g_e:.2f}"
-                           f", sizes: min {g_min:.0f}"
-                           f", min-max {g_max:.0f}"
-                           f", ave {g_ave:.2f}"
-                           f", exp {g_xa:.2f}"
-                           f", p2 {g_p2:.2f})")
-                self.enable_optimal_controls('active')
-
-            tx_result.configure(state='disabled')
-            if not self.sel_rando and not self.sel_outcm_optimal and not self.sel_genetic:
-                tx_result.see('end')
-            self.status.set(wordletool.get_status() + comment)
-            tx_gr.configure(state='normal')
-            tx_gr.delete(1.0, tk.END)
-            tx_gr.insert(tk.END, wordletool.get_grep_cmd_less_filepath())
-            tx_gr.configure(state='disabled')
-
-        def get_rq_ltrs(self) -> str:
-            """Return the string of required letters, excluding the '-' placeholder."""
-            return ''.join(ltr for b in self.re_btn_vars if (ltr := b.get()) != '-')
 
 
         def add_x_pos() -> None:
@@ -570,27 +608,27 @@ class Pywordlemainwindow(ctk.CTk):
         def not_classic() -> None:
             self.sel_not_classic = True
             self.title("> > > ... Busy Finding Not Classics ... < < <")
-            do_grep()
+            self.do_grep()
             self.title("This Wordle Helper")
             self.sel_not_classic = False
 
         # selected a random word in the result
         def pick_rando() -> None:
             self.sel_rando = True
-            do_grep()
+            self.do_grep()
             self.sel_rando = False
 
         # selected genetic ranking in the result
         def pick_genetic() -> None:
             self.sel_genetic = True
-            do_grep()
+            self.do_grep()
             self.sel_genetic = False
 
         # selected optimal group ranking in the result
         def pick_optimals() -> None:
             self.sel_outcm_optimal = True
             self.title("> > > ... Busy Finding Optimals ... < < <")
-            do_grep()
+            self.do_grep()
             self.title("This Wordle Helper")
             self.sel_outcm_optimal = False
 
@@ -622,36 +660,9 @@ class Pywordlemainwindow(ctk.CTk):
             for i, (_, value) in enumerate(items):
                 this_treeview.insert(parent='', index=i, id=i, values=value.split(','))
 
-            do_grep()
+            self.do_grep()
 
 
-
-
-        def build_exclude_grep(ex_btn_var_list: list) -> str:
-            """Build the grep exclusion command for the selected letters.
-
-            Example output: "grep -vE 'b|f|k|w'"
-
-            :param ex_btn_var_list: List of button variables holding letter values.
-            :return:                grep command string, or '' if no letters are selected.
-            """
-            lts = [ltr for b in ex_btn_var_list if (ltr := b.get()) != '-']
-            if not lts:
-                return ''
-            args = '|'.join(lts)
-            return f"grep -vE '{args}'"
-
-
-
-        def build_require_these_grep(rq_lts: str) -> str:
-            """Build the piped grep command to require all specified letters.
-
-            Example output: "grep -E 'b'| grep -E 'f'| grep -E 'k'"
-
-            :param rq_lts: String of required letters.
-            :return:       Piped grep command string, or '' if rq_lts is empty.
-            """
-            return '| '.join(f"grep -E '{ltr}'" for ltr in rq_lts)
 
 
 
@@ -678,43 +689,44 @@ class Pywordlemainwindow(ctk.CTk):
 
 
         # the header line above the word list
-        lb_result_hd = tk.Label(self.result_frame,
+        self.lb_result_hd = tk.Label(self.result_frame,
                                 font=('Courier', 12, 'bold'),
                                 relief='sunken',
                                 background='#dedede',
                                 anchor='w',
                                 borderwidth=0,
                                 highlightthickness=0)
-        lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='enw', padx=6, pady=2)
-        lb_result_hd.bind("<Configure>", str_wrd_list_hrd)
+        self.lb_result_hd.grid(row=0, column=0, columnspan=4, sticky='enw', padx=6, pady=2)
+        self.lb_result_hd.bind("<Configure>", self.str_wrd_list_hrd)
+
         # The word list resulting from grep on the main wordlist
         # The CustomText class is a tk.Text extended to support a color for matched text.
-        tx_result = hlp.CustomText(self.result_frame,
+        self.tx_result = hlp.CustomText(self.result_frame,
                                    font=('Courier', 12, 'normal'),
                                    wrap='word',
-                                   background='#dedede',
+                                    background='#dedede',
                                    borderwidth=0,
                                    highlightthickness=0)
-        tx_result.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=6, pady=2)
+        self.tx_result.grid(row=1, column=0, columnspan=4, sticky="nsew", padx=6, pady=2)
         # tx_result.bind("<Configure>", on_window_resize)
         # The CustomText class is a tk.Text extended to support a color for matched text.
         # #c6e2ff = red 198, green 226, blue 255 => a light blue, www.color-hex.com
         # tag 'opt' is used to highlight group ranker
-        tx_result.tag_configure('opt', background='#fff69a')
+        self.tx_result.tag_configure('opt', background='#fff69a')
         # tag 'ran' is used to highlight random pick
-        tx_result.tag_configure('ran', background='#7cfc00')
+        self.tx_result.tag_configure('ran', background='#7cfc00')
         # tag 'gen' is used to highlight genetic pick
-        tx_result.tag_configure('gen', background='#ffb8f2')
+        self.tx_result.tag_configure('gen', background='#ffb8f2')
         # tag 'ent' is used to highlight entropy pick
-        tx_result.tag_configure('ent', background='#ffd700')
+        self.tx_result.tag_configure('ent', background='#ffd700')
         # tag 'add' is used to highlight non classic words
-        tx_result.tag_configure('add', background='#b6df00')
+        self.tx_result.tag_configure('add', background='#b6df00')
 
         # scrollbar for wordlist
         tx_results_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
         tx_results_sb.grid(row=1, column=5, sticky='ens')
-        tx_result.config(yscrollcommand=tx_results_sb.set)
-        tx_results_sb.config(command=tx_result.yview)
+        self.tx_result.config(yscrollcommand=tx_results_sb.set)
+        tx_results_sb.config(command=self.tx_result.yview)
         # status line
         lb_status = tk.Label(self.result_frame,
                              textvariable=self.status,
@@ -726,20 +738,20 @@ class Pywordlemainwindow(ctk.CTk):
         self.status.set('No status yet.')
 
         # grep line being used
-        tx_gr = tk.Text(self.result_frame,
+        self.tx_gr = tk.Text(self.result_frame,
                         wrap='word',
                         font=('Courier', 12, 'normal'),
                         height=2,
                         background='#dedede',
                         borderwidth=0,
                         highlightthickness=0)
-        tx_gr.grid(row=4, column=0, columnspan=4, sticky='nsew', padx=6, pady=4)
-        tx_gr.delete(1.0, tk.END)
+        self.tx_gr.grid(row=4, column=0, columnspan=4, sticky='nsew', padx=6, pady=4)
+        self.tx_gr.delete(1.0, tk.END)
         # scrollbar for grep line
         tx_gr_sb = ttk.Scrollbar(self.result_frame, orient='vertical')
         tx_gr_sb.grid(row=4, column=5, sticky='ens', pady=4)
-        tx_gr.config(yscrollcommand=tx_gr_sb.set)
-        tx_gr_sb.config(command=tx_gr.yview)
+        self.tx_gr.config(yscrollcommand=tx_gr_sb.set)
+        tx_gr_sb.config(command=self.tx_gr.yview)
 
         # Divide results from controls
         self.separator = ttk.Separator(self, orient="horizontal")
@@ -833,30 +845,18 @@ class Pywordlemainwindow(ctk.CTk):
         self.mult_ltr_definition = tk.StringVar()
         self.mult_ltr_mode_var = tk.IntVar(value=2)
 
-        # Coordinate duplicates in special pattern with no dup setting
-        def coordinate_special_pattern_dups() -> None:
-            self.update()
-            if hlp.word_has_duplicates(self.spec_pattern.get()) and (not self.allow_dup_state.get()):
-                sanity_question(self.entry_spec_pattern)
 
-        def sanity_question(entry: ttk.Entry) -> None:
-            res = tk.messagebox.askyesno(title='Sanity Check',
-                                         message='Duplicate letters are being required but that option is not set. Do '
-                                                 'you want duplicate letters allowed? Otherwise no words will show.')
-            if res:
-                self.allow_dup_state.set(True)
-            self.after(200, lambda: self.focus_set())
 
         def do_spec_pat(*args) -> None:
             # In this ui all text is shown in uppercase and there can be only five letters
             self.spec_pattern.set('%.5s' % scrub_text(self.spec_pattern.get(), '', True, False).upper())
-            do_grep()
+            self.do_grep()
 
         def do_mult_ltr_def(*args) -> None:
             # In this ui all text is shown in uppercase and the format must conform to:
             # <number><letter>,<number><letter>
             self.mult_ltr_definition.set(hlp.validate_mult_ltr_sets(self.mult_ltr_definition.get()))
-            do_grep()
+            self.do_grep()
 
         # label for Pattern Special
         self.lb_sp_pat = ctk.CTkLabel(self.specialpatt_subframeA,
@@ -1164,11 +1164,11 @@ class Pywordlemainwindow(ctk.CTk):
                 chk_var.set('-')
 
         # ======= Exclude Letters =============
-        self.ex_btn_vars = self._build_letter_checkbuttons(self.criteria_frame_x, do_grep)
+        self.ex_btn_vars = self._build_letter_checkbuttons(self.criteria_frame_x, self.do_grep)
 
         def clear_excl_chkbs() -> None:
             clear_these_chk_vars(self.ex_btn_vars)
-            do_grep()
+            self.do_grep()
 
         self.bt_x_clr = ctk.CTkButton(self.criteria_frame_x,
                                       text='Clear All', width=100,
@@ -1179,11 +1179,11 @@ class Pywordlemainwindow(ctk.CTk):
 
 
         # ======= Require Letters =============
-        self.re_btn_vars = self._build_letter_checkbuttons(self.criteria_frame_r, do_grep)
+        self.re_btn_vars = self._build_letter_checkbuttons(self.criteria_frame_r, self.do_grep)
 
         def clear_reqr_ckbs() -> None:
             clear_these_chk_vars(self.re_btn_vars)
-            do_grep()
+            self.do_grep()
 
         self.bt_r_clr = ctk.CTkButton(self.criteria_frame_r,
                                       text='Clear All', width=100,
@@ -1207,7 +1207,7 @@ class Pywordlemainwindow(ctk.CTk):
                                          onvalue=True,
                                          offvalue=False,
                                          padding=0,
-                                         command=do_grep)
+                                         command=self.do_grep)
         chk_allow_dups.pack(side="left", fill="x", padx=0, pady=2, expand=True)
 
         chk_hard_mode = ttk.Checkbutton(the_top_frame,
@@ -1235,11 +1235,11 @@ class Pywordlemainwindow(ctk.CTk):
                                     )
         rank_frame.pack(padx=6, fill="x", expand=True)
         # Vocabulary radio buttons
-        rbr1 = ttk.Radiobutton(rank_frame, text="Occurrence", variable=self.rank_mode, value=0, command=do_grep)
+        rbr1 = ttk.Radiobutton(rank_frame, text="Occurrence", variable=self.rank_mode, value=0, command=self.do_grep)
         rbr1.pack(side="left", fill="x", padx=0, pady=2, expand=True)
-        rbr2 = ttk.Radiobutton(rank_frame, text="Position", variable=self.rank_mode, value=1, command=do_grep)
+        rbr2 = ttk.Radiobutton(rank_frame, text="Position", variable=self.rank_mode, value=1, command=self.do_grep)
         rbr2.pack(side="left", fill="x", padx=0, pady=2, expand=True)
-        rbr3 = ttk.Radiobutton(rank_frame, text="Both", variable=self.rank_mode, value=2, command=do_grep)
+        rbr3 = ttk.Radiobutton(rank_frame, text="Both", variable=self.rank_mode, value=2, command=self.do_grep)
         rbr3.pack(side="left", fill="x", padx=0, pady=2, expand=True)
         chk_ltr_freq_typ = ttk.Checkbutton(rank_frame,
                                            text="Classic Ranking",
@@ -1258,18 +1258,18 @@ class Pywordlemainwindow(ctk.CTk):
                                      )
         vocab_frame.pack(padx=6, fill="x", expand=True)
         # Vocabulary radio buttons
-        rbv1 = ttk.Radiobutton(vocab_frame, text="Classic", variable=self.vocab_var, value=0, command=do_grep)
+        rbv1 = ttk.Radiobutton(vocab_frame, text="Classic", variable=self.vocab_var, value=0, command=self.do_grep)
         rbv1.pack(side="left", fill="x", padx=0, pady=6, expand=True)
-        rbv1B = ttk.Radiobutton(vocab_frame, text="Classic+", variable=self.vocab_var, value=1, command=do_grep)
+        rbv1B = ttk.Radiobutton(vocab_frame, text="Classic+", variable=self.vocab_var, value=1, command=self.do_grep)
         rbv1B.pack(side="left", fill="x", padx=0, pady=6, expand=True)
-        rbv2 = ttk.Radiobutton(vocab_frame, text="Large", variable=self.vocab_var, value=2, command=do_grep)
+        rbv2 = ttk.Radiobutton(vocab_frame, text="Large", variable=self.vocab_var, value=2, command=self.do_grep)
         rbv2.pack(side="left", fill="x", padx=0, pady=6, expand=True)
         chk_cull_the_pu = ttk.Checkbutton(vocab_frame,
                                           text="Remove PU Wrds",
                                           variable=self.cull_the_pu,
                                           onvalue=True,
                                           offvalue=False,
-                                          command=do_grep)
+                                          command=self.do_grep)
         chk_cull_the_pu.pack(side="left", fill="x", padx=0, pady=6, expand=True)
         # === END OF ====== General Controls ==========
 
@@ -1391,7 +1391,7 @@ class Pywordlemainwindow(ctk.CTk):
         # === END OF ====== Application Controls ==========
 
         # run the initial grep
-        do_grep()
+        self.do_grep()
 
 
 # end Pywordlemainwindow class
