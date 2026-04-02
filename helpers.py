@@ -885,6 +885,7 @@ class RptWnd(ctk.CTkToplevel):
 
         self.title(org_title)
         self.update()
+        self.back_to_entry()
 
     def _run_search(self, regex: str) -> None:
         fnd_cnt = self.verbose_data.highlight_pattern(
@@ -924,8 +925,16 @@ class RptWnd(ctk.CTkToplevel):
             'Outcome summary', self._TAG, remove_priors=True, mode=1)
         self.verbose_data.remove_tag(self._TAG)
         self._reset_next_button()
-        self.search_text.set(self._DEFAULT_SEARCH)
+
+        if self.be_cond_rpt:
+            self.search_text.set("")
+        else:
+            self.search_text.set(self._DEFAULT_SEARCH)
+        self.back_to_entry()
+
+    def back_to_entry(self) -> None:
         if e := self._entry_widget():
+            e.focus_set()
             e.icursor(tk.END)
 
     def rpt_show_grps_driller(self) -> None:
@@ -934,9 +943,10 @@ class RptWnd(ctk.CTkToplevel):
         else:
             self.rpt_grpsdriller_window.focus()
 
-    def __init__(self, context: str = '') -> None:
+    def __init__(self, context: str = '', be_cond_rpt: bool = False) -> None:
         super().__init__()
         self.context = context
+        self.be_cond_rpt = be_cond_rpt
         self.resizable(width=True, height=True)
 
         is_data = (context == 'Data')
@@ -944,7 +954,7 @@ class RptWnd(ctk.CTkToplevel):
                                       440 if is_data else 600, 0, 0)
 
         self.option_add('*Font', ('Helvetica', 14, 'normal'))
-        self.search_text = tk.StringVar(value=self._DEFAULT_SEARCH)
+
         self.rpt_grpsdriller_window = None
         self._match_positions: list = []
         self._match_index: int = 0
@@ -975,7 +985,8 @@ class RptWnd(ctk.CTkToplevel):
                                  width=100, command=self.close_rpt)
         button_q.pack(side='right', padx=10, pady=10)
         self.protocol('WM_DELETE_WINDOW', self.close_rpt)
-
+        # note: search text will be later reset according to be_cond_rpt
+        self.search_text = tk.StringVar(value=self._DEFAULT_SEARCH)
         if not is_data:
             self.entry_find = ctk.CTkEntry(self, textvariable=self.search_text)
             self.entry_find.pack(side=tk.LEFT, padx=10, pady=10, expand=True, fill=tk.X)
@@ -1028,7 +1039,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst_dict: dict, reporting: 
     min_score = len(remaining_word_lst_dict)
     max_ent = 0.0
 
-    rptwnd = RptWnd(title_context)
+    rptwnd = RptWnd(title_context, cond_rpt)
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
@@ -1114,7 +1125,7 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst_dict: dict, repo
     cond_dict = {}
     min_outcome_ave = len(remaining_word_lst_dict)
     max_ent = 0.0
-    rptwnd = RptWnd(title_context)
+    rptwnd = RptWnd(title_context, cond_rpt)
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
