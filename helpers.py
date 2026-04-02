@@ -934,8 +934,12 @@ class RptWnd(ctk.CTkToplevel):
 
     def back_to_entry(self) -> None:
         self.lift()
-        self.focus_force()
-        self.after(50, lambda: (e := self._entry_widget()) and (e.focus_set() or e.icursor(tk.END)))
+        # The issue is that lift() alone doesn't grab window manager focus
+        # it just raises the window in the stacking order. focus_force() is needed
+        # first to actually claim focus at the OS/window manager level.
+
+        self.after(200, lambda: (self.focus_force(),
+                                 (e := self._entry_widget()) and (e.focus_set() or e.icursor(tk.END))))
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
@@ -1343,7 +1347,9 @@ def report_sorted_cond_guess_stats_to_window(l_cond_dict: dict, rptwnd: RptWnd, 
         if meta_l:
             rptl += f"\t{cnt_0}\t{cnt_1}\t{cnt_2}"
 
+        rptwnd.verbose_data.configure(state='normal')
         rptwnd.verbose_data.insert(tk.END, rptl)
+        rptwnd.verbose_data.configure(state='disabled')
 
 
 def clue_pattern_outcomes_to_window(guess: Any, outcome_stats: tuple, guess_outcomes_dict: dict,
