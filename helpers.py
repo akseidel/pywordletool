@@ -933,9 +933,9 @@ class RptWnd(ctk.CTkToplevel):
         self.back_to_entry()
 
     def back_to_entry(self) -> None:
-        if e := self._entry_widget():
-            e.focus_set()
-            e.icursor(tk.END)
+        self.lift()
+        self.focus_force()
+        self.after(50, lambda: (e := self._entry_widget()) and (e.focus_set() or e.icursor(tk.END)))
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
