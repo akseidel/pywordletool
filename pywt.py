@@ -593,6 +593,7 @@ class Pywordlemainwindow(ctk.CTk):
             clear_reqr_ckbs()
             self.suppress_grep = False
             clear_specials()
+            clear_mult_ltr_def()
 
         # select all not classic words
         def not_classic() -> None:
