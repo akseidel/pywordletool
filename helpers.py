@@ -614,7 +614,7 @@ def get_genpattern(subject_word: str, target_word: str) -> str:
     return ''.join(pattern)
 
 
-def outcomes_for_this_guess(guess_word: str, word_list_dict: dict) -> dict[str, list]:
+def outcomes_for_this_guess(guess_word: str, word_list: list) -> dict[str, list]:
     """
     Group words from word_list by the genpattern they produce against guess_word.
 
@@ -624,13 +624,13 @@ def outcomes_for_this_guess(guess_word: str, word_list_dict: dict) -> dict[str, 
     but at wrong position and 2 means letter is present and in correct position.
 
     :param guess_word: The guess word to evaluate against.
-    :param word_list_dict: List of subject words to categorise.
+    :param word_list: List of subject words to categorise.
     :return: Dict mapping 5-digit pattern strings to lists of matching words.
              Pattern digits: '0' = absent, '1' = present but wrong position,
              '2' = present at correct position.
     """
     outcomes: dict[str, list] = {}
-    for subject_word in word_list_dict:
+    for subject_word in word_list:
         genpat = get_genpattern(guess_word, subject_word)
         outcomes.setdefault(genpat, []).append(subject_word)
     return outcomes
@@ -934,12 +934,15 @@ class RptWnd(ctk.CTkToplevel):
 
     def back_to_entry(self) -> None:
         self.lift()
-        # The issue is that lift() alone doesn't grab window manager focus
-        # it just raises the window in the stacking order. focus_force() is needed
-        # first to actually claim focus at the OS/window manager level.
+        # lift() raises the window in stacking order but doesn't claim OS/WM focus.
+        # focus_force() is needed first, then we restore focus to the entry widget.
+        self.after(200, self._restore_entry_focus) # type: ignore
 
-        self.after(200, lambda: (self.focus_force(),
-                                 (e := self._entry_widget()) and (e.focus_set() or e.icursor(tk.END))))
+    def _restore_entry_focus(self) -> None:
+        self.focus_force()
+        if e := self._entry_widget():
+            e.focus_set()
+            e.icursor(tk.END)
 
     def rpt_show_grps_driller(self) -> None:
         if self.rpt_grpsdriller_window is None or not self.rpt_grpsdriller_window.winfo_exists():
@@ -1013,7 +1016,7 @@ class RptWnd(ctk.CTkToplevel):
 
 
 # RptWnd and Custom classes should be defined before this function that uses them.
-def extended_best_outcomes_guess_dict(remaining_word_lst_dict: dict, reporting: bool, byentonly: bool,
+def extended_best_outcomes_guess_dict(remaining_word_lst_dict: list, reporting: bool, byentonly: bool,
                                       cond_rpt: bool, keyed_rpt: bool,
                                       guess_targets: dict,
                                       report_header_msg1: str, title_context: str,
@@ -1047,7 +1050,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst_dict: dict, reporting: 
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window(report_header_msg1, guess_targets, rptwnd)
+        reporting_header_to_window(report_header_msg1, len(guess_targets), rptwnd)
 
     for guess in guess_targets:
         # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest,
@@ -1105,7 +1108,7 @@ def extended_best_outcomes_guess_dict(remaining_word_lst_dict: dict, reporting: 
 
 
 # RptWnd and Custom classes should be defined before this function that uses them.
-def best_outcomes_from_showing_as_guess_dict(remaining_word_lst_dict: dict, reporting: bool, byentonly: bool,
+def best_outcomes_from_showing_as_guess_dict(remaining_word_list: list, reporting: bool, byentonly: bool,
                                              cond_rpt: bool, keyed_rpt: bool,
                                              title_context: str, meta_l: bool = False) -> dict:
     """
@@ -1113,7 +1116,7 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst_dict: dict, repo
     outcomes rank guesses. Guesses resulting in more outcomes
     and smaller outcomes are better guesses.
     :param meta_l: meta keypress flag
-    :param remaining_word_lst_dict: the remaining solutions word list
+    :param remaining_word_list: the remaining solutions word list
     :param reporting: flag for verbose printing to rptwnd
     :param byentonly: flag to return only the highest entropy guesses
     :param cond_rpt: flag for condensed verbose printing to rptwnd
@@ -1127,16 +1130,16 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst_dict: dict, repo
     guess_stat_dict = {}
     best_stat_dict = {}
     cond_dict = {}
-    min_outcome_ave = len(remaining_word_lst_dict)
+    min_outcome_ave = len(remaining_word_list)
     max_ent = 0.0
     rptwnd = RptWnd(title_context, cond_rpt)
     rptwnd.withdraw()
     if reporting:
         rptwnd.deiconify()
-        reporting_header_to_window("Words Showing", remaining_word_lst_dict, rptwnd)
+        reporting_header_to_window("Words Showing", len(remaining_word_list), rptwnd)
 
-    for guess in remaining_word_lst_dict:
-        guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_lst_dict)
+    for guess in remaining_word_list:
+        guess_outcomes_dict = outcomes_for_this_guess(guess, remaining_word_list)
         # outcome_stats are: [0]:qty, [1]:smallest, [2]:largest, [3]:average,
         # [4]:population variance, [5]:entropy, [6] expected outcome size all as a tuple
         outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
@@ -1190,7 +1193,7 @@ def best_outcomes_from_showing_as_guess_dict(remaining_word_lst_dict: dict, repo
     inorder_best_rank_dict = dict(sorted(best_stat_dict.items(), key=lambda item: item[1][5], reverse=True))
     # Reporting only the best ranking guesses.
     if reporting:
-        report_footer_wrapper("Words Showing", remaining_word_lst_dict, inorder_best_rank_dict, rptwnd, cond_rpt)
+        report_footer_wrapper("Words Showing", remaining_word_list, inorder_best_rank_dict, rptwnd, cond_rpt)
         if cond_rpt:
             report_sorted_cond_guess_stats_to_window(cond_dict, rptwnd, keyed_rpt, meta_l)
 
@@ -1221,7 +1224,7 @@ def best_entropy_outcomes_guess_dict(targets_word_lst_dict: dict, guess_word_lst
               f'Pulling guesses from a {gl_len} guess list.')
 
     for g_n, guess in enumerate(guess_word_lst):
-        guess_outcomes_dict = outcomes_for_this_guess(guess, targets_word_lst_dict)
+        guess_outcomes_dict = outcomes_for_this_guess(guess, list(targets_word_lst_dict))
         outcomes_stats = get_outcomes_stats(guess_outcomes_dict)
         guess_stat_dict[guess] = outcomes_stats
         sys.stdout.write(f'\033[K> {guess} : {g_n} of {gl_len}\r')
@@ -1251,17 +1254,17 @@ def best_entropy_outcomes_guess_dict(targets_word_lst_dict: dict, guess_word_lst
     return best_stats_found_dict
 
 
-def report_footer_wrapper(msg1: str, word_lst_dict: dict, best_rank_dict: dict, rptwnd: RptWnd, cond_rpt: bool):
+def report_footer_wrapper(msg1: str, word_lst: list, best_rank_dict: dict, rptwnd: RptWnd, cond_rpt: bool):
     """
     Write the full report footer sequence to rptwnd.
 
     :param msg1: Header message string.
-    :param word_lst_dict: Remaining solutions word list dict.
+    :param word_lst: Remaining solutions word list dict.
     :param best_rank_dict: Dictionary of best outcome-ranked guesses.
     :param rptwnd: The report window instance.
     :param cond_rpt: If True, use condensed format (skips per-word stats footer).
     """
-    report_footer_summary_header_to_window(msg1, word_lst_dict, rptwnd)
+    report_footer_summary_header_to_window(msg1, word_lst, rptwnd)
     report_footer_stats_summary_to_window(best_rank_dict, rptwnd)
     report_footer_opt_wrds_to_window(best_rank_dict, rptwnd, cond_rpt)
     if not cond_rpt:
@@ -1269,15 +1272,15 @@ def report_footer_wrapper(msg1: str, word_lst_dict: dict, best_rank_dict: dict, 
     rptwnd.back_to_summary()
 
 
-def report_footer_summary_header_to_window(msg: str, source_list_dict: dict, rptwnd: RptWnd) -> None:
+def report_footer_summary_header_to_window(msg: str, source_list: list, rptwnd: RptWnd) -> None:
     """
     Append the outcome summary header line to the report window.
 
     :param msg: Label identifying the guess word source.
-    :param source_list_dict: The word list being summarised.
+    :param source_list: The word list being summarised.
     :param rptwnd: The report window instance.
     """
-    rptl = f"\n\n> >  Outcome summary using the {msg} words for guesses on the {len(source_list_dict)} words.  < <"
+    rptl = f"\n\n> >  Outcome summary using the {msg} words for guesses on the {len(source_list)} words.  < <"
     rptwnd.verbose_data.insert(tk.END, rptl)
 
 
@@ -1296,15 +1299,15 @@ def prnt_guesses_header(rptwnd: RptWnd, keyed: bool = False, meta_l: bool = Fals
     rptwnd.verbose_data.insert(tk.END, '\n\n' + '\t'.join(cols))
 
 
-def reporting_header_to_window(msg: str, source_list_dict: dict, rptwnd: RptWnd) -> None:
+def reporting_header_to_window(msg: str, source_count: int, rptwnd: RptWnd) -> None:
     """
     Set the report window title and append the decorated header line.
 
     :param msg: Label identifying the guess word source.
-    :param source_list_dict: The guess target word list.
+    :param source_count: The guess target word list.
     :param rptwnd: The report window instance.
     """
-    title = f"{rptwnd.context} - Outcome Patterns For Guesses From The {msg} Words List ({len(source_list_dict)})"
+    title = f"{rptwnd.context} - Outcome Patterns For Guesses From The {msg} Words List ({source_count})"
     rptwnd.title(title)
     rptwnd.verbose_data.insert(tk.END, f"> >  {title}  < <")
 
