@@ -54,6 +54,7 @@ astir
 atlas
 atria
 auger
+aught
 aural
 avast
 axing
@@ -319,6 +320,7 @@ gated
 gator
 gauzy
 gazed
+genus
 geode
 germy
 getup
@@ -435,6 +437,7 @@ knell
 knish
 kooky
 koran
+krone
 kudos
 kudzu
 kugel
@@ -629,6 +632,7 @@ porgy
 porky
 posed
 potty
+prate
 pricy
 prima
 primp
@@ -656,6 +660,7 @@ rangy
 rated
 rater
 raved
+ravel
 raver
 razed
 rebid
@@ -755,6 +760,7 @@ spork
 spume
 squab
 squid
+stagy
 staph
 stele
 steno
@@ -784,6 +790,7 @@ taser
 tater
 taupe
 taxed
+techy
 teeny
 telos
 tempt
