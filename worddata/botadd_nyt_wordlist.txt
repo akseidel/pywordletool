@@ -2120,6 +2120,7 @@ proxy
 prude
 prune
 psalm
+pshaw
 psych
 pubic
 pudge
@@ -2447,6 +2448,7 @@ shire
 shirk
 shirt
 shiva
+shlep
 shoal
 shock
 shoed
