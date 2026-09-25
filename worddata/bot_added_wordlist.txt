@@ -640,6 +640,7 @@ prion
 prise
 prole
 promo
+pshaw
 psych
 pudge
 puked
@@ -726,6 +727,7 @@ sewed
 sheaf
 shill
 shiva
+shlep
 shoed
 shred
 shyer
